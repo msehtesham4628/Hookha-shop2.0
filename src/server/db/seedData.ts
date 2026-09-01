@@ -512,11 +512,424 @@ export const INITIAL_BRANDS: Brand[] = [
     logoUrl: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=300&auto=format&fit=crop',
     productCount: 4,
     isActive: true
+  },
+  {
+    id: 'brand-rht',
+    name: 'Russian Hookah Tobacco',
+    slug: 'russian-hookah-tobacco',
+    origin: 'Russia',
+    description: 'Premier Russian dark and blonde leaf tobacco blends curated by leading master mixologists.',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+    productCount: 10,
+    isActive: true
+  },
+  {
+    id: 'brand-adalya',
+    name: 'Adalya Tobacco',
+    slug: 'adalya-tobacco',
+    origin: 'Turkey / Germany',
+    description: 'World-renowned blonde leaf tobacco famous for Love 66, Lady Killer, and Havana.',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+    productCount: 8,
+    isActive: true
+  },
+  {
+    id: 'brand-serbetli',
+    name: 'Serbetli tobacco',
+    slug: 'serbetli-tobacco',
+    origin: 'Turkey',
+    description: 'Smooth honey-infused light Virginia shisha tobacco packed with juicy flavor nuances.',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+    productCount: 6,
+    isActive: true
+  },
+  {
+    id: 'brand-banger',
+    name: 'Banger Hookah Tobacco',
+    slug: 'banger-tobacco',
+    origin: 'Russia',
+    description: 'High-octane collaboration between Timati and Burn Tobacco featuring bright, candy-sweet dessert and berry notes.',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+    productCount: 7,
+    isActive: true
+  },
+  {
+    id: 'brand-element',
+    name: 'Element Tobacco',
+    slug: 'element-tobacco',
+    origin: 'Russia',
+    description: 'Concept shisha tobacco based on the 4 elements: Air, Water, Earth, and Fire with rich natural aromas.',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+    productCount: 6,
+    isActive: true
+  },
+  {
+    id: 'brand-japona',
+    name: 'Japona Hookah',
+    slug: 'japona-hookah',
+    origin: 'Saint Petersburg, Russia',
+    description: 'Exquisite Japanese-inspired wooden and ceramic hookahs and hand-corded bowls.',
+    logoUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+    productCount: 5,
+    isActive: true
+  },
+  {
+    id: 'brand-steamulation',
+    name: 'Steamulation Hookah',
+    slug: 'steamulation-hookah',
+    origin: 'Germany / Switzerland',
+    description: 'Swiss precision engineering featuring patented SteamClick 360 rotation and Air-Flow Control systems.',
+    logoUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
+  },
+  {
+    id: 'brand-solaris',
+    name: 'Solaris Bowls',
+    slug: 'solaris-bowls',
+    origin: 'Ukraine',
+    description: 'Planetary themed thick-walled clay pots offering ultra-stable heat retention and classic draw.',
+    logoUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
+  },
+  {
+    id: 'brand-target',
+    name: 'Target Bowls',
+    slug: 'target-bowls',
+    origin: 'Russia',
+    description: 'Precision grooved clay and semi-porcelain phunnel bowls with heat lock ribs.',
+    logoUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
   }
 ];
 
 export const INITIAL_PRODUCTS: Product[] = [
-  // 1. Alpha Hookah Model X
+  // 0.1 Black Burn Ananas Shock 200gr
+  {
+    id: 'prod-blackburn-ananas-shock',
+    name: 'Black Burn Ananas Shock – 200gr',
+    slug: 'black-burn-ananas-shock-200gr',
+    sku: 'BKB-ANA-200',
+    description: 'Extremely intense sour fresh pineapple shisha tobacco made on high-strength Burley leaf.',
+    shortDescription: 'Sour tangy pineapple dark leaf tobacco blend with explosive citrus aroma.',
+    price: 30.00,
+    currency: 'USD',
+    brand: 'BlackBurn Tobacco',
+    brandSlug: 'blackburn-tobacco',
+    category: 'Shisha Tobacco',
+    categorySlug: 'tobacco',
+    subcategory: 'Dark Leaf Tobacco',
+    images: [
+      {
+        id: 'img-bkb-ana-1',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+        alt: 'Black Burn Ananas Shock 200gr',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 120,
+    lowStockThreshold: 15,
+    weight: 200,
+    flavor: 'Sour Pineapple Shock',
+    tags: ['bulk-discount', 'blackburn', 'ananas-shock', 'sour', 'dark-leaf', 'bestseller'],
+    specifications: [
+      { label: 'Weight', value: '200 grams' },
+      { label: 'Leaf Type', value: 'Toasted Burley' },
+      { label: 'Strength', value: 'Strong (7/10)' }
+    ],
+    rating: 4.97,
+    reviewCount: 68,
+    isFeatured: true,
+    isNewArrival: false,
+    isBestSeller: true,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-01-01T00:00:00Z'
+  },
+
+  // 0.2 Black Burn Sundaysun 200gr
+  {
+    id: 'prod-blackburn-sundaysun',
+    name: 'Black Burn Sundaysun – 200gr',
+    slug: 'black-burn-sundaysun-200gr',
+    sku: 'BKB-SUN-200',
+    description: 'A radiant tropical citrus explosion with juicy orange, ripe sweet grapefruit, and yellow passion fruit notes.',
+    shortDescription: 'Sweet and tangy sunny citrus tropical fusion on Burley dark tobacco.',
+    price: 30.00,
+    currency: 'USD',
+    brand: 'BlackBurn Tobacco',
+    brandSlug: 'blackburn-tobacco',
+    category: 'Shisha Tobacco',
+    categorySlug: 'tobacco',
+    subcategory: 'Fruity & Sweet',
+    images: [
+      {
+        id: 'img-bkb-sun-1',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+        alt: 'Black Burn Sundaysun 200gr',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 95,
+    lowStockThreshold: 12,
+    weight: 200,
+    flavor: 'Sunny Tropical Citrus Cocktail',
+    tags: ['bulk-discount', 'blackburn', 'sundaysun', 'citrus'],
+    specifications: [
+      { label: 'Weight', value: '200 grams' },
+      { label: 'Strength', value: 'Strong (7/10)' }
+    ],
+    rating: 4.92,
+    reviewCount: 52,
+    isFeatured: true,
+    isNewArrival: false,
+    isBestSeller: true,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-02T00:00:00Z',
+    updatedAt: '2026-01-02T00:00:00Z'
+  },
+
+  // 0.3 Element Tobacco Moroz 200gr
+  {
+    id: 'prod-element-moroz',
+    name: 'Element Tobacco Moroz (Water Line) – 200gr',
+    slug: 'element-tobacco-moroz-water-line-200gr',
+    sku: 'ELM-MRZ-200',
+    description: 'Pure Russian Siberian Frost without extraneous sweetness or menthol aftertaste. Designed to cool down any mix.',
+    shortDescription: 'Pure frosty Siberian frost cooling additive on Water Line Burley.',
+    price: 23.00,
+    currency: 'USD',
+    brand: 'Element Tobacco',
+    brandSlug: 'element-tobacco',
+    category: 'Shisha Tobacco',
+    categorySlug: 'tobacco',
+    subcategory: 'Mint & Cooling',
+    images: [
+      {
+        id: 'img-elm-mrz-1',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+        alt: 'Element Tobacco Moroz Water Line 200gr',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 140,
+    lowStockThreshold: 20,
+    weight: 200,
+    flavor: 'Pure Siberian Frost',
+    tags: ['bulk-discount', 'element', 'moroz', 'cooling', 'water-line'],
+    specifications: [
+      { label: 'Weight', value: '200 grams' },
+      { label: 'Line', value: 'Water Line (Medium Strength)' }
+    ],
+    rating: 4.95,
+    reviewCount: 77,
+    isFeatured: true,
+    isNewArrival: false,
+    isBestSeller: true,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-03T00:00:00Z',
+    updatedAt: '2026-01-03T00:00:00Z'
+  },
+
+  // 0.4 Maklaud Dart 23 Project Hookah
+  {
+    id: 'prod-maklaud-dart-23',
+    name: 'Maklaud Dart 23 Project Hookah',
+    slug: 'maklaud-dart-23-project-hookah',
+    sku: 'MKL-DRT-23',
+    description: 'Limited edition project artwork hookah featuring solid aircraft titanium and hand-sculpted bronze centerpiece with custom collector case.',
+    shortDescription: 'Project 23 Collector Edition with hand-cast bronze and precision aerospace titanium.',
+    price: 3700.00,
+    currency: 'USD',
+    brand: 'Maklaud Hookah',
+    brandSlug: 'maklaud-hookah',
+    category: 'Hookahs',
+    categorySlug: 'hookahs',
+    subcategory: 'Modern Hookahs',
+    images: [
+      {
+        id: 'img-mkl-drt-1',
+        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        alt: 'Maklaud Dart 23 Project Hookah',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 2,
+    lowStockThreshold: 1,
+    weight: 5200,
+    material: 'Aircraft Titanium, Bronze & Bohemian Crystal',
+    tags: ['maklaud', 'dart-23', 'project-hookah', 'ultra-luxury', 'museum-grade'],
+    specifications: [
+      { label: 'Edition', value: 'Limited Worldwide Run of 50' },
+      { label: 'Stem', value: 'Hand-Cast Solid Patinated Bronze' },
+      { label: 'Packaging', value: 'Custom Hard Flight Case' }
+    ],
+    rating: 5.0,
+    reviewCount: 14,
+    isFeatured: true,
+    isNewArrival: true,
+    isBestSeller: false,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-04T00:00:00Z',
+    updatedAt: '2026-01-04T00:00:00Z'
+  },
+
+  // 0.5 Maklaud The Shine of Moon by Di-lun Hookah
+  {
+    id: 'prod-maklaud-shine-moon',
+    name: 'Maklaud The Shine of Moon by Di-lun Hookah',
+    slug: 'maklaud-the-shine-of-moon-by-di-lun-hookah',
+    sku: 'MKL-MOON-DL',
+    description: 'The pinnacle of artisan hookah jewelry. Collaboration with master jeweler Di-lun featuring silver and gold leaf accents and iridescent moon sphere purge.',
+    shortDescription: 'Jewelry-grade collaboration with Di-lun featuring silver plating and glowing lunar purge.',
+    price: 4300.00,
+    currency: 'USD',
+    brand: 'Maklaud Hookah',
+    brandSlug: 'maklaud-hookah',
+    category: 'Hookahs',
+    categorySlug: 'hookahs',
+    subcategory: 'Modern Hookahs',
+    images: [
+      {
+        id: 'img-mkl-moon-1',
+        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        alt: 'Maklaud The Shine of Moon by Di-lun Hookah',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 2,
+    lowStockThreshold: 1,
+    weight: 5600,
+    material: 'Silver-Plated Brass, Surgical Inox & Black Crystal',
+    tags: ['maklaud', 'shine-of-moon', 'di-lun', 'jeweler-edition'],
+    specifications: [
+      { label: 'Crafting', value: 'Jewelry Master Silver Inlay' },
+      { label: 'Vase', value: 'Heavy Obsidian Bohemian Crystal' }
+    ],
+    rating: 5.0,
+    reviewCount: 9,
+    isFeatured: true,
+    isNewArrival: true,
+    isBestSeller: false,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-05T00:00:00Z',
+    updatedAt: '2026-01-05T00:00:00Z'
+  },
+
+  // 0.6 Alpha Hookah Smart Exzo Tribal Black
+  {
+    id: 'prod-alpha-smart-exzo',
+    name: 'Alpha Hookah – Smart (Exzo Tribal) Black',
+    slug: 'alpha-hookah-smart-exzo-tribal-black',
+    sku: 'ALP-SMR-EXZ',
+    description: 'Compact travel powerhouse with laser engraved tribal ethnic sleeve, magnetic port, and quick purge.',
+    shortDescription: 'Tribal engraved compact Russian hookah with magnetic hose connection.',
+    price: 340.00,
+    currency: 'USD',
+    brand: 'Alpha Hookah',
+    brandSlug: 'alpha-hookah',
+    category: 'Hookahs',
+    categorySlug: 'hookahs',
+    subcategory: 'Russian Hookahs',
+    images: [
+      {
+        id: 'img-alp-smr-1',
+        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        alt: 'Alpha Hookah Smart Exzo Tribal Black',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 16,
+    lowStockThreshold: 3,
+    weight: 2100,
+    material: 'Anodized Aircraft Aluminum & Inox AISI 304',
+    tags: ['alpha-hookah', 'smart', 'exzo-tribal', 'black-edition'],
+    specifications: [
+      { label: 'Height', value: '38 cm' },
+      { label: 'Purge', value: 'Vertical Smart Blow-Off' }
+    ],
+    rating: 4.96,
+    reviewCount: 39,
+    isFeatured: true,
+    isNewArrival: true,
+    isBestSeller: true,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-06T00:00:00Z',
+    updatedAt: '2026-01-06T00:00:00Z'
+  },
+
+  // 0.7 Alpha Hookah Model X Cyber Sunset
+  {
+    id: 'prod-alpha-model-x-cyber',
+    name: 'Alpha Hookah Model X (Cyber Sunset)',
+    slug: 'alpha-hookah-model-x-cyber-sunset',
+    sku: 'ALP-MODX-CYB',
+    description: 'Special gradient anodized Cyber Sunset edition with vertical multi-port purge.',
+    shortDescription: 'Cyber Sunset multi-port purge edition with magnetic hose adapter.',
+    price: 260.00,
+    currency: 'USD',
+    brand: 'Alpha Hookah',
+    brandSlug: 'alpha-hookah',
+    category: 'Hookahs',
+    categorySlug: 'hookahs',
+    subcategory: 'Russian Hookahs',
+    images: [
+      {
+        id: 'img-alp-cyb-1',
+        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        alt: 'Alpha Hookah Model X Cyber Sunset',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 22,
+    lowStockThreshold: 4,
+    weight: 2200,
+    tags: ['alpha-hookah', 'model-x', 'cyber-sunset', 'bestseller'],
+    specifications: [
+      { label: 'Height', value: '42 cm' },
+      { label: 'Purge', value: 'Multi-jet Upward Tray Purge' }
+    ],
+    rating: 4.97,
+    reviewCount: 71,
+    isFeatured: true,
+    isNewArrival: false,
+    isBestSeller: true,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-07T00:00:00Z',
+    updatedAt: '2026-01-07T00:00:00Z'
+  },
+
+  // 1. Alpha Hookah Model X Black Matte
   {
     id: 'prod-alpha-model-x-black',
     name: 'Alpha Hookah Model X (Black Matte)',

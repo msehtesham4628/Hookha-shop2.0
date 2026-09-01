@@ -1,17 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../services/api.js';
 import { ProductCard } from '../components/ProductCard.js';
-import { Product, Category, Brand } from '../../types/index.js';
+import { HeroCarousel } from '../components/HeroCarousel.js';
+import { Product } from '../../types/index.js';
+import { useStore } from '../store/useStore.js';
 import {
-  ArrowRight,
-  Shield,
-  Truck,
-  Sparkles,
-  Flame,
-  Award,
+  ChevronLeft,
   ChevronRight,
-  Star,
+  Gift,
+  X,
+  ShoppingBag,
+  MessageSquare,
+  Clock,
   Package,
+  Sparkles,
+  Tag,
+  Mail,
+  ArrowRight,
   CheckCircle2
 } from 'lucide-react';
 
@@ -19,37 +24,110 @@ interface HomePageProps {
   onNavigate: (path: string) => void;
 }
 
+interface BrandAvatar {
+  name: string;
+  slug: string;
+  bgClass: string;
+  textColor: string;
+  borderClass?: string;
+  badgeText?: string;
+}
+
+interface BlogPostCard {
+  id: string;
+  title: string;
+  ghostBg: string;
+  ghostEmoji: string;
+  tag: string;
+  readTime: string;
+}
+
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const { cart, setCartOpen, showToast } = useStore();
   const [tobaccoProducts, setTobaccoProducts] = useState<Product[]>([]);
-  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
+  const [hookahProducts, setHookahProducts] = useState<Product[]>([]);
+  const [bowlProducts, setBowlProducts] = useState<Product[]>([]);
+  const [newInProducts, setNewInProducts] = useState<Product[]>([]);
+  const [bestSellers, setBestSellers] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Floating widgets state
+  const [showPointsBanner, setShowPointsBanner] = useState(true);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackSent, setFeedbackSent] = useState(false);
+
+  // Newsletter state
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterSuccess, setNewsletterSuccess] = useState(false);
+
+  // Carousel Refs for horizontal scrolling
+  const tobaccoScrollRef = useRef<HTMLDivElement>(null);
+  const hookahScrollRef = useRef<HTMLDivElement>(null);
+  const bowlScrollRef = useRef<HTMLDivElement>(null);
+  const postsScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollContainer = (ref: React.RefObject<HTMLDivElement | null>, direction: 'left' | 'right') => {
+    if (ref.current) {
+      const scrollAmount = direction === 'left' ? -340 : 340;
+      ref.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     const loadHomeData = async () => {
       try {
         setLoading(true);
-        const [prodRes, catRes, brandRes] = await Promise.all([
-          api.getProducts({ limit: 20 }),
-          api.getCategories(),
-          api.getBrands()
-        ]);
+        const prodRes = await api.getProducts({ limit: 60 });
 
         if (prodRes.success && prodRes.data) {
           const prods = prodRes.data.products;
-          setFeaturedProducts(prods.filter(p => p.categorySlug === 'hookahs' || p.isFeatured).slice(0, 4));
-          setTobaccoProducts(prods.filter(p => p.categorySlug === 'tobacco' || p.categorySlug === 'tobacco-flavor').slice(0, 4));
-          setNewArrivals(prods.filter(p => p.isNewArrival).slice(0, 4));
-        }
 
-        if (catRes.success && catRes.data) {
-          setCategories(catRes.data.slice(0, 6));
-        }
+          // 1. Shisha Tobacco
+          const tobacco = prods.filter(p => 
+            p.categorySlug === 'tobacco' || 
+            p.categorySlug === 'shisha-tobacco' || 
+            p.subcategory?.includes('Tobacco') ||
+            p.tags?.includes('musthave') ||
+            p.tags?.includes('darkside') ||
+            p.tags?.includes('blackburn')
+          );
+          setTobaccoProducts(tobacco);
 
-        if (brandRes.success && brandRes.data) {
-          setBrands(brandRes.data);
+          // 2. Hookahs
+          const hookahs = prods.filter(p => 
+            p.categorySlug === 'hookahs' || 
+            p.subcategory?.includes('Hookahs') ||
+            p.tags?.includes('maklaud') ||
+            p.tags?.includes('alpha-hookah') ||
+            p.tags?.includes('el-bomber')
+          );
+          setHookahProducts(hookahs);
+
+          // 3. Bowls
+          const bowls = prods.filter(p => 
+            p.categorySlug === 'bowls' || 
+            p.categorySlug === 'hookahs-bowls' || 
+            p.name.toLowerCase().includes('bowl')
+          );
+          setBowlProducts(bowls);
+
+          // 4. New In (DarkSide Xperience and fresh drops)
+          const newIn = prods.filter(p =>
+            p.tags?.includes('new-arrival') ||
+            p.tags?.includes('darkside') ||
+            p.isFeatured
+          ).slice(0, 9);
+          setNewInProducts(newIn.length > 0 ? newIn : prods.slice(0, 9));
+
+          // 5. Best Sellers (MustHave, Coco Loco, BlackCoco, Adalya)
+          const best = prods.filter(p =>
+            p.isBestSeller ||
+            p.tags?.includes('musthave') ||
+            p.tags?.includes('charcoal') ||
+            p.tags?.includes('adalya')
+          ).slice(0, 9);
+          setBestSellers(best.length > 0 ? best : prods.slice(0, 9));
         }
       } catch (err) {
         console.error('Failed to load homepage data:', err);
@@ -61,271 +139,660 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     loadHomeData();
   }, []);
 
+  // Top Brands matching screenshots
+  const tobaccoBrands: BrandAvatar[] = [
+    { name: 'Russian Hookah Tobacco', slug: 'russian-hookah-tobacco', bgClass: 'bg-red-600', textColor: 'text-white', badgeText: 'RHT' },
+    { name: 'MustHave Tobacco', slug: 'musthave-tobacco', bgClass: 'bg-white', textColor: 'text-stone-900', borderClass: 'border border-stone-300 shadow-xs', badgeText: 'MUSTHAVE' },
+    { name: 'Adalya Tobacco', slug: 'adalya-tobacco', bgClass: 'bg-stone-900', textColor: 'text-amber-400', badgeText: 'ADALYA' },
+    { name: 'Serbetli tobacco', slug: 'serbetli-tobacco', bgClass: 'bg-rose-100', textColor: 'text-rose-700', borderClass: 'border border-rose-200', badgeText: 'Serbetli' },
+    { name: 'Banger Hookah Tobacco', slug: 'banger-tobacco', bgClass: 'bg-amber-400', textColor: 'text-stone-900', badgeText: 'BANGER' },
+    { name: 'DarkSide Tobacco', slug: 'darkside-tobacco', bgClass: 'bg-stone-950', textColor: 'text-white', badgeText: 'DARKSIDE' },
+    { name: 'BlackBurn Tobacco', slug: 'blackburn-tobacco', bgClass: 'bg-black', textColor: 'text-yellow-400', badgeText: 'BLACKBURN' },
+    { name: 'Tangiers', slug: 'tangiers', bgClass: 'bg-emerald-950', textColor: 'text-emerald-300', badgeText: 'TANGIERS' }
+  ];
+
+  const hookahBrands: BrandAvatar[] = [
+    { name: 'Alpha Hookah', slug: 'alpha-hookah', bgClass: 'bg-white', textColor: 'text-stone-900', borderClass: 'border border-stone-300 shadow-xs', badgeText: 'ALPHA' },
+    { name: 'El Bomber Hookah', slug: 'el-bomber', bgClass: 'bg-stone-900', textColor: 'text-red-500', badgeText: 'EL BOMBER' },
+    { name: 'WOOKAH Hookah', slug: 'wookah', bgClass: 'bg-amber-900', textColor: 'text-amber-100', badgeText: 'WOOKAH' },
+    { name: 'Japona Hookah', slug: 'japona-hookah', bgClass: 'bg-stone-800', textColor: 'text-stone-100', badgeText: 'JAPONA' },
+    { name: 'Steamulation Hookah', slug: 'steamulation-hookah', bgClass: 'bg-slate-100', textColor: 'text-slate-900', borderClass: 'border border-slate-300', badgeText: 'STEAM' }
+  ];
+
+  const bowlBrands: BrandAvatar[] = [
+    { name: 'Alpha Bowls', slug: 'alpha-hookah', bgClass: 'bg-stone-900', textColor: 'text-white', badgeText: 'ALPHA' },
+    { name: 'Oblako bowls', slug: 'oblako-bowls', bgClass: 'bg-sky-50', textColor: 'text-sky-800', borderClass: 'border border-sky-300', badgeText: 'OBLAKO' },
+    { name: 'Japona Bowls', slug: 'japona-hookah', bgClass: 'bg-amber-900', textColor: 'text-amber-200', badgeText: 'JAPONA' },
+    { name: 'Kong Bowls', slug: 'kong-bowls', bgClass: 'bg-orange-950', textColor: 'text-orange-400', badgeText: 'KONG' },
+    { name: 'Don', slug: 'don-bowls', bgClass: 'bg-stone-800', textColor: 'text-stone-200', badgeText: 'DON' }
+  ];
+
+  // Blog posts matching Screenshot 6
+  const blogPosts: BlogPostCard[] = [
+    {
+      id: 'post-1',
+      title: 'Top 10 flavors of Sapphire Crown shisha tobacco',
+      ghostBg: 'bg-cyan-50 border-cyan-200',
+      ghostEmoji: '👻',
+      tag: 'Flavor Guide',
+      readTime: '4 min read'
+    },
+    {
+      id: 'post-2',
+      title: 'Best Dark Leaf Hookah Flavors: MustHave vs DarkSide',
+      ghostBg: 'bg-rose-50 border-rose-200',
+      ghostEmoji: '💖',
+      tag: 'Review',
+      readTime: '6 min read'
+    },
+    {
+      id: 'post-3',
+      title: 'Sizes of hookah stems: Mini, Medium, or Standard?',
+      ghostBg: 'bg-amber-50 border-amber-200',
+      ghostEmoji: '🌟',
+      tag: 'Hardware',
+      readTime: '5 min read'
+    },
+    {
+      id: 'post-4',
+      title: 'What do people typically smoke in modern hookah lounges?',
+      ghostBg: 'bg-emerald-50 border-emerald-200',
+      ghostEmoji: '😮',
+      tag: 'Lounge Trends',
+      readTime: '3 min read'
+    },
+    {
+      id: 'post-5',
+      title: 'The Ultimate Guide to Phunnel vs Killer Bowls',
+      ghostBg: 'bg-purple-50 border-purple-200',
+      ghostEmoji: '😜',
+      tag: 'Masterclass',
+      readTime: '7 min read'
+    }
+  ];
+
+  const totalCartCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+
+  const handleSendFeedback = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!feedbackText.trim()) return;
+    setFeedbackSent(true);
+    setTimeout(() => {
+      setShowFeedbackModal(false);
+      setFeedbackSent(false);
+      setFeedbackText('');
+    }, 1500);
+  };
+
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail || !newsletterEmail.includes('@')) return;
+    setNewsletterSuccess(true);
+    showToast('Subscribed to World Hookah Market newsletter!', 'success');
+    setNewsletterEmail('');
+    setTimeout(() => setNewsletterSuccess(false), 3000);
+  };
+
   return (
-    <div className="w-full bg-stone-50/50">
-      {/* 1. HERO BANNER */}
-      <section className="relative bg-white border-b border-stone-200 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          <div className="lg:col-span-7 space-y-6 text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200/80 rounded-xs text-amber-900 text-xs font-semibold uppercase tracking-widest">
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              <span>Haute Shisha & Architectural Hookahs</span>
-            </div>
+    <div className="w-full bg-[#f8f9fa] pb-20 text-stone-900 font-sans">
+      
+      {/* 1. HERO IMAGE CAROUSEL (3 Scrolling Visual Slides matching Screenshot 1) */}
+      <HeroCarousel onNavigate={onNavigate} />
 
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-stone-900 leading-[1.1] tracking-tight">
-              The Sovereign Standard of Luxury Smoking.
-            </h1>
-
-            <p className="text-stone-600 text-sm sm:text-base leading-relaxed max-w-xl">
-              Engineered from V2A surgical stainless steel, Bohemian hand-cut crystal, and aged European hardwoods. Curated for distinguished lounges and discerning connoisseurs.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <button
-                id="hero-shop-hookahs-btn"
-                onClick={() => onNavigate('/shop?category=hookahs')}
-                className="bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold uppercase tracking-widest px-8 py-4 rounded-xs transition-all duration-200 flex items-center justify-center gap-2 shadow-xs group"
-              >
-                <span>Explore Masterpieces</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-
-              <button
-                id="hero-shop-tobacco-btn"
-                onClick={() => onNavigate('/shop?category=tobacco')}
-                className="bg-stone-100 hover:bg-stone-200 text-stone-900 text-xs font-semibold uppercase tracking-widest px-8 py-4 rounded-xs border border-stone-300 transition-colors text-center"
-              >
-                Dark Leaf Reserve
-              </button>
-            </div>
-
-            <div className="pt-6 border-t border-stone-100 flex items-center gap-8 text-xs text-stone-500">
-              <div>
-                <strong className="text-stone-900 font-bold block text-sm">100% Authentic</strong>
-                <span>Verified Direct Sourcing</span>
-              </div>
-              <div className="w-px h-8 bg-stone-200" />
-              <div>
-                <strong className="text-stone-900 font-bold block text-sm">Break-Free</strong>
-                <span>Custom Foam Double-Boxing</span>
-              </div>
-              <div className="w-px h-8 bg-stone-200" />
-              <div>
-                <strong className="text-stone-900 font-bold block text-sm">Age 21+</strong>
-                <span>Certified ID Compliance</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="lg:col-span-5 relative">
-            <div className="relative aspect-4/5 w-full bg-stone-100 rounded-sm border border-stone-200 overflow-hidden shadow-xl p-4 flex items-center justify-center">
-              <img
-                src="https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1000&auto=format&fit=crop"
-                alt="Wookah Luxury Stainless Steel Shisha"
-                className="w-full h-full object-cover object-center rounded-xs"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md p-4 rounded-xs border border-stone-200 shadow-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-amber-900">Featured Artifact</span>
-                    <h4 className="font-serif text-sm font-bold text-stone-900">Wookah Masterpiece Oak Crystal</h4>
-                  </div>
-                  <span className="text-sm font-bold text-stone-900 font-sans">$449.00</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* 2. BRAND LOGO TICKER */}
-      <section className="bg-white py-6 border-b border-stone-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-[10px] uppercase font-bold tracking-[0.25em] text-stone-400 mb-4">
-            Official Authorized Purveyor of World-Renowned Hookah Houses
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 text-xs font-serif font-semibold tracking-wider text-stone-700">
-            {brands.map((b) => (
-              <button
-                key={b.id}
-                onClick={() => onNavigate(`/shop?brand=${b.slug}`)}
-                className="hover:text-amber-900 transition-colors uppercase"
-              >
-                {b.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 3. CATEGORY SHOWCASE */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <span className="text-[11px] uppercase font-bold tracking-widest text-amber-800">Curated Catalog</span>
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900 mt-1">
-              Explore by Discipline
+      {/* 2. SECTION: BUY HOOKAH TOBACCO AND SHISHA (Screenshot 1 & 2) */}
+      <section id="section-tobacco" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8">
+        
+        {/* Section Header with Blue Accent Bar */}
+        <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
+          <div className="relative">
+            <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
+              BUY HOOKAH TOBACCO AND SHISHA
             </h2>
+            {/* Solid Royal Blue Underline Bar */}
+            <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#0088cc] z-10"></div>
           </div>
-          <button
-            onClick={() => onNavigate('/shop')}
-            className="text-xs font-semibold text-amber-900 hover:underline flex items-center gap-1"
-          >
-            <span>View All Categories</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                onClick={() => scrollContainer(tobaccoScrollRef, 'left')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Previous"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => scrollContainer(tobaccoScrollRef, 'right')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Next"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <button
+              onClick={() => onNavigate('/shop?category=tobacco')}
+              className="text-xs font-bold text-stone-600 hover:text-[#0088cc] transition-colors uppercase tracking-wider"
+            >
+              ― View All
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map((cat) => (
-            <div
-              key={cat.id}
-              onClick={() => onNavigate(`/shop?category=${cat.slug}`)}
-              className="group relative bg-white border border-stone-200 rounded-xs p-4 text-center cursor-pointer hover:border-amber-800 hover:shadow-md transition-all flex flex-col items-center justify-between"
-            >
-              <div className="w-16 h-16 rounded-full bg-stone-50 border border-stone-200 overflow-hidden flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-                <img
-                  src={cat.imageUrl || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=200'}
-                  alt={cat.name}
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <h3 className="font-serif text-xs font-bold text-stone-900 group-hover:text-amber-900 transition-colors">
-                {cat.name}
-              </h3>
-              <span className="text-[10px] text-stone-400 mt-1">
-                {cat.productCount || 'Explore'} items
-              </span>
+        {/* Tobacco Products Horizontal Slider Track */}
+        <div
+          ref={tobaccoScrollRef}
+          className="flex gap-4 overflow-x-auto pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory"
+        >
+          {tobaccoProducts.map((product) => (
+            <div key={product.id} className="w-[230px] sm:w-[250px] md:w-[270px] shrink-0 snap-start">
+              <ProductCard
+                product={product}
+                showBulkDiscount={true}
+                onNavigate={(slug) => onNavigate(`/product/${slug}`)}
+              />
             </div>
           ))}
         </div>
+
+        {/* Top Tobacco Brands Badges */}
+        <div className="mt-8 pt-6 border-t border-stone-200">
+          <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
+            Top Tobacco Brands
+          </h3>
+
+          <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
+            {tobaccoBrands.map((brand) => (
+              <div
+                key={brand.slug}
+                onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
+                className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
+              >
+                <div
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor} ${brand.borderClass || ''}`}
+                >
+                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
+                    {brand.badgeText}
+                  </span>
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#0088cc] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
+                  {brand.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </section>
 
-      {/* 4. FEATURED HOOKAH MASTERPIECES */}
-      <section className="bg-white border-y border-stone-200 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <span className="text-[11px] uppercase font-bold tracking-widest text-amber-800">Precision Metallurgy</span>
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900 mt-1">
-                Architectural Hookah Stems
-              </h2>
-            </div>
-            <button
-              onClick={() => onNavigate('/shop?category=hookahs')}
-              className="text-xs font-semibold text-amber-900 hover:underline flex items-center gap-1"
-            >
-              <span>Explore All Hookahs</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
+      {/* 4. SECTION: BUY HOOKAHS (Screenshot 2 & 3) */}
+      <section id="section-hookahs" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
+        
+        {/* Section Header with Teal Accent Bar */}
+        <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
+          <div className="relative">
+            <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
+              BUY HOOKAHS
+            </h2>
+            {/* Solid Cyan/Teal Underline Bar */}
+            <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#00b5ad] z-10"></div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                onClick={() => scrollContainer(hookahScrollRef, 'left')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Previous"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => scrollContainer(hookahScrollRef, 'right')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Next"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <button
+              onClick={() => onNavigate('/shop?category=hookahs')}
+              className="text-xs font-bold text-stone-600 hover:text-[#00b5ad] transition-colors uppercase tracking-wider"
+            >
+              ― View All
+            </button>
+          </div>
+        </div>
+
+        {/* Hookahs Horizontal Slider Track */}
+        <div
+          ref={hookahScrollRef}
+          className="flex gap-4 overflow-x-auto pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory"
+        >
+          {hookahProducts.map((product) => (
+            <div key={product.id} className="w-[230px] sm:w-[250px] md:w-[270px] shrink-0 snap-start">
               <ProductCard
-                key={product.id}
                 product={product}
                 onNavigate={(slug) => onNavigate(`/product/${slug}`)}
               />
+            </div>
+          ))}
+        </div>
+
+        {/* Top Hookah Brands Badges */}
+        <div className="mt-8 pt-6 border-t border-stone-200">
+          <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
+            Top Hookah Brands
+          </h3>
+
+          <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
+            {hookahBrands.map((brand) => (
+              <div
+                key={brand.slug}
+                onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
+                className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
+              >
+                <div
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor} ${brand.borderClass || ''}`}
+                >
+                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
+                    {brand.badgeText}
+                  </span>
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#00b5ad] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
+                  {brand.name}
+                </span>
+              </div>
             ))}
           </div>
         </div>
+
       </section>
 
-      {/* 5. DARK LEAF SOMMELIER & SHISHA FLAVORS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <span className="text-[11px] uppercase font-bold tracking-widest text-amber-800">Sommelier Selection</span>
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900 mt-1">
-              Dark Leaf Shisha Reserve
+      {/* 5. SECTION: BUY HOOKAH BOWLS (Screenshot 3) */}
+      <section id="section-bowls" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
+        
+        {/* Section Header with Coral Accent Bar */}
+        <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
+          <div className="relative">
+            <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
+              BUY HOOKAH BOWLS
             </h2>
+            {/* Solid Coral Underline Bar */}
+            <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#f26c60] z-10"></div>
           </div>
-          <button
-            onClick={() => onNavigate('/shop?category=tobacco')}
-            className="text-xs font-semibold text-amber-900 hover:underline flex items-center gap-1"
-          >
-            <span>Explore All Flavors</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                onClick={() => scrollContainer(bowlScrollRef, 'left')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Previous"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => scrollContainer(bowlScrollRef, 'right')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Next"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <button
+              onClick={() => onNavigate('/shop?category=bowls')}
+              className="text-xs font-bold text-stone-600 hover:text-[#f26c60] transition-colors uppercase tracking-wider"
+            >
+              ― View All
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {tobaccoProducts.map((product) => (
+        {/* Bowls Horizontal Slider Track */}
+        <div
+          ref={bowlScrollRef}
+          className="flex gap-4 overflow-x-auto pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory"
+        >
+          {bowlProducts.map((product) => (
+            <div key={product.id} className="w-[230px] sm:w-[250px] md:w-[270px] shrink-0 snap-start">
+              <ProductCard
+                product={product}
+                onNavigate={(slug) => onNavigate(`/product/${slug}`)}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Top Bowls Brands Badges */}
+        <div className="mt-8 pt-6 border-t border-stone-200">
+          <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
+            Top Bowl Brands
+          </h3>
+
+          <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
+            {bowlBrands.map((brand) => (
+              <div
+                key={brand.slug}
+                onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
+                className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
+              >
+                <div
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor} ${brand.borderClass || ''}`}
+                >
+                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
+                    {brand.badgeText}
+                  </span>
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#f26c60] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
+                  {brand.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </section>
+
+      {/* 6. THREE SERVICE VALUE GUARANTEE BOXES (Screenshots 3 & 4) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          {/* Box 1: Same Day Shipping */}
+          <div className="bg-white border border-stone-200/90 rounded-sm p-5 flex items-center gap-4 shadow-2xs">
+            <div className="w-12 h-12 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+              <Clock className="w-6 h-6 text-[#0088cc]" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-stone-900 leading-tight">
+                Shiping on the same day
+              </h4>
+              <p className="text-xs text-stone-500 mt-0.5">
+                USA(1-4 days) Internationl(3-30 days)
+              </p>
+            </div>
+          </div>
+
+          {/* Box 2: Free Shipping over $89 */}
+          <div className="bg-white border border-stone-200/90 rounded-sm p-5 flex items-center gap-4 shadow-2xs">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+              <Package className="w-6 h-6 text-emerald-600" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-stone-900 leading-tight">
+                Free shipping
+              </h4>
+              <p className="text-xs text-stone-500 mt-0.5">
+                for orders over $89
+              </p>
+            </div>
+          </div>
+
+          {/* Box 3: Save up to 50% */}
+          <div className="bg-white border border-stone-200/90 rounded-sm p-5 flex items-center gap-4 shadow-2xs">
+            <div className="w-12 h-12 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center shrink-0">
+              <Tag className="w-6 h-6 text-rose-600" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-stone-900 leading-tight">
+                Save up to 50% with
+              </h4>
+              <p className="text-xs text-stone-500 mt-0.5">
+                World Hookah Market
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 7. SECTION: NEW IN (Screenshots 4 & 5) */}
+      <section id="section-new-in" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
+        <div className="text-center mb-8">
+          <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wider text-stone-900">
+            NEW IN
+          </h2>
+          <div className="w-12 h-[3px] bg-[#0088cc] mx-auto mt-2"></div>
+        </div>
+
+        {/* 3-Column Product Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          {newInProducts.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
+              showBulkDiscount={true}
               onNavigate={(slug) => onNavigate(`/product/${slug}`)}
             />
           ))}
         </div>
       </section>
 
-      {/* 6. WHOLESALE & LOUNGE PARTNERSHIP PROMO */}
-      <section className="bg-stone-900 text-white border-y border-stone-800 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-8 space-y-4">
-            <span className="inline-block bg-amber-500/20 text-amber-400 text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-xs border border-amber-500/30">
-              B2B Commercial Accounts
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-stone-100">
-              Supply Your Hookah Lounge or Retail Store
-            </h2>
-            <p className="text-stone-400 text-xs sm:text-sm max-w-2xl leading-relaxed">
-              Gain direct access to master wholesale pricing (35% - 50% margins), bulk 1kg dark leaf allotments, priority pallet freight, and dedicated account management.
+      {/* 8. SECTION: OUR BEST SELLERS (Screenshots 5 & 6) */}
+      <section id="section-best-sellers" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
+        <div className="text-center mb-8">
+          <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wider text-stone-900">
+            OUR BEST SELLERS
+          </h2>
+          <div className="w-12 h-[3px] bg-[#0088cc] mx-auto mt-2"></div>
+        </div>
+
+        {/* 3-Column Product Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          {bestSellers.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              showBulkDiscount={true}
+              onNavigate={(slug) => onNavigate(`/product/${slug}`)}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* 9. SECTION: POSTS (Screenshot 6) */}
+      <section id="section-posts" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
+        <div className="text-center mb-8">
+          <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wider text-stone-900">
+            POSTS
+          </h2>
+          <div className="w-12 h-[3px] bg-[#0088cc] mx-auto mt-2"></div>
+        </div>
+
+        {/* Posts Horizontal Slider Track */}
+        <div
+          ref={postsScrollRef}
+          className="flex gap-4 overflow-x-auto pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory"
+        >
+          {blogPosts.map((post) => (
+            <div
+              key={post.id}
+              onClick={() => onNavigate('/blog')}
+              className={`w-[260px] sm:w-[280px] p-5 rounded-sm border cursor-pointer transition-all duration-300 hover:shadow-md hover:-translate-y-1 flex flex-col justify-between shrink-0 snap-start bg-white ${post.ghostBg}`}
+            >
+              <div>
+                {/* Ghost Emoji Header */}
+                <div className="text-3xl mb-3">{post.ghostEmoji}</div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-[#0088cc]">
+                  {post.tag}
+                </span>
+                <h3 className="text-sm font-bold text-stone-900 mt-1 leading-snug line-clamp-3">
+                  {post.title}
+                </h3>
+              </div>
+              <div className="mt-4 pt-3 border-t border-stone-200/60 flex items-center justify-between text-xs text-stone-500 font-medium">
+                <span>{post.readTime}</span>
+                <span className="text-[#0088cc] font-bold inline-flex items-center gap-1">
+                  Read ➔
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 10. SECTION: SEO / ABOUT US STORY (Screenshot 6) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-stone-200 text-stone-700">
+        <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-stone-900 mb-3">
+          WORLDHOOKAHMARKET IS ONLINE HOOKAH AND SHISHA STORE WITH WORLDWIDE SHIPPING.
+        </h2>
+        <div className="space-y-3 text-xs sm:text-sm text-stone-600 leading-relaxed max-w-5xl">
+          <p>
+            World Hookah Market offers an extensive selection of premium hookah products, including stems, bowls, flasks, accessories, charcoal, and world-renowned shisha tobacco brands such as MustHave, DarkSide, BlackBurn, Tangiers, and Adalya. We work directly with master manufacturers across Russia, Germany, Poland, and the USA to guarantee 100% authenticity and fresh factory packaging.
+          </p>
+          <p>
+            Whether you are a seasoned connoisseur seeking heavy dark leaf blends, artisan Bohemian crystal vases, or commercial hookah lounges requiring reliable bulk wholesale distribution, our dedicated fulfillment center provides same-day dispatch, secure break-free packaging, and insured global delivery.
+          </p>
+        </div>
+      </section>
+
+      {/* 11. SECTION: NEWSLETTER SUBSCRIBE BAR (Screenshot 6) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="bg-white border border-stone-200 rounded-sm p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xs">
+          <div className="flex items-center gap-4 text-left">
+            <div className="w-12 h-12 rounded-full bg-cyan-50 border border-cyan-200 flex items-center justify-center shrink-0">
+              <Mail className="w-6 h-6 text-[#00b5ad]" />
+            </div>
+            <div>
+              <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-stone-900">
+                SUBSCRIBE TO OUR NEWSLETTER TO RECEIVE BEST NEW DEALS!
+              </h3>
+              <p className="text-xs text-stone-500 mt-0.5">
+                Get first notice on exclusive flavor restocks and special discounts.
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleNewsletterSubmit} className="w-full md:w-auto flex items-center gap-2 max-w-md">
+            <input
+              type="email"
+              required
+              placeholder="Your email address"
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
+              className="flex-1 min-w-[200px] sm:min-w-[260px] bg-stone-50 border border-stone-300 text-xs px-3.5 py-2.5 rounded-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-[#00b5ad]"
+            />
+            <button
+              type="submit"
+              className="bg-[#00c5b2] hover:bg-[#00b5ad] text-white p-2.5 rounded-xs transition-colors shrink-0 shadow-xs flex items-center justify-center"
+              title="Subscribe"
+            >
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* 12. FLOATING REGISTRATION & POINTS NOTIFICATION BANNER (STICKY BOTTOM) */}
+      {showPointsBanner && (
+        <div
+          id="sticky-points-banner"
+          className="fixed bottom-3 left-3 right-3 sm:left-auto sm:right-6 sm:bottom-6 z-40 bg-stone-950/95 backdrop-blur-md text-white border border-stone-800 rounded-full py-2.5 px-4 sm:px-5 flex items-center justify-between gap-3 shadow-2xl animate-fade-in max-w-md"
+        >
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-medium">
+            <Gift className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span className="line-clamp-1">Register and get 1000 points ($10)</span>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              id="points-get-btn"
+              onClick={() => onNavigate('/auth/register')}
+              className="bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-xs font-bold px-3 py-1 rounded-full transition-colors shadow-xs"
+            >
+              Get $10
+            </button>
+            <button
+              id="points-close-btn"
+              onClick={() => setShowPointsBanner(false)}
+              className="text-stone-400 hover:text-white p-1 transition-colors"
+              title="Dismiss"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 13. FLOATING CART ACTION BUTTON (BOTTOM RIGHT) */}
+      <button
+        id="floating-cart-btn"
+        onClick={() => setCartOpen(true)}
+        className="fixed bottom-20 right-4 sm:right-6 z-40 w-13 h-13 rounded-full bg-black text-white flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-transform border border-stone-800 group"
+        title="View Cart"
+      >
+        <ShoppingBag className="w-5 h-5 text-white" />
+        <span className="absolute -top-1 -right-1 bg-[#00c5b2] text-stone-950 text-[11px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-xs">
+          {totalCartCount}
+        </span>
+      </button>
+
+      {/* 14. FLOATING FEEDBACK SIDE TAB (RIGHT EDGE) */}
+      <button
+        id="floating-feedback-tab"
+        onClick={() => setShowFeedbackModal(true)}
+        className="fixed top-1/2 right-0 -translate-y-1/2 z-40 bg-stone-900 hover:bg-[#0088cc] text-white text-[11px] font-bold uppercase tracking-widest py-2 px-1.5 rounded-l-md shadow-lg transition-colors writing-vertical select-none"
+        style={{ writingMode: 'vertical-rl' }}
+      >
+        FEEDBACK
+      </button>
+
+      {/* 15. FEEDBACK MODAL OVERLAY */}
+      {showFeedbackModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-md max-w-md w-full p-6 shadow-2xl relative animate-fade-in text-left">
+            <button
+              onClick={() => setShowFeedbackModal(false)}
+              className="absolute top-4 right-4 text-stone-400 hover:text-stone-700"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-2 mb-3 text-[#0088cc]">
+              <MessageSquare className="w-5 h-5" />
+              <h3 className="font-bold text-lg text-stone-900">Your Feedback Matters</h3>
+            </div>
+            <p className="text-xs text-stone-500 mb-4">
+              Help us improve World Hookah Market. Let us know if you are looking for specific tobacco flavors, hookah models, or wholesale options.
             </p>
-          </div>
 
-          <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-end">
-            <button
-              id="home-wholesale-apply-btn"
-              onClick={() => onNavigate('/wholesale')}
-              className="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold uppercase tracking-wider px-6 py-3.5 rounded-xs transition-colors text-center shadow-xs"
-            >
-              Apply for Wholesale Tier
-            </button>
-            <button
-              onClick={() => onNavigate('/contact')}
-              className="bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold uppercase tracking-wider px-6 py-3.5 rounded-xs transition-colors text-center"
-            >
-              Contact B2B Concierge
-            </button>
+            {feedbackSent ? (
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xs p-4 text-center space-y-1">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600 mx-auto" />
+                <h4 className="font-bold text-sm">Thank You!</h4>
+                <p className="text-xs">Your feedback has been received by our store team.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSendFeedback} className="space-y-4">
+                <textarea
+                  rows={4}
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                  placeholder="Type your message, requested brands, or experience..."
+                  required
+                  className="w-full text-xs p-3 border border-stone-300 rounded-xs focus:ring-1 focus:ring-[#0088cc] focus:border-[#0088cc] outline-none resize-none"
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowFeedbackModal(false)}
+                    className="px-4 py-2 text-xs font-semibold text-stone-600 hover:text-stone-900"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 text-xs font-bold uppercase tracking-wider bg-[#0088cc] hover:bg-[#0077b3] text-white rounded-xs transition-colors shadow-2xs"
+                  >
+                    Send Feedback
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
-      </section>
-
-      {/* 7. NEW ARRIVALS & ACCESSORIES */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <span className="text-[11px] uppercase font-bold tracking-widest text-amber-800">Fresh Vault Releases</span>
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900 mt-1">
-              New Arrivals & Essentials
-            </h2>
-          </div>
-          <button
-            onClick={() => onNavigate('/shop?newArrival=true')}
-            className="text-xs font-semibold text-amber-900 hover:underline flex items-center gap-1"
-          >
-            <span>View All New Arrivals</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {newArrivals.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onNavigate={(slug) => onNavigate(`/product/${slug}`)}
-            />
-          ))}
-        </div>
-      </section>
+      )}
 
     </div>
   );

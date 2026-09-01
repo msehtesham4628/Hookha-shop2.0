@@ -1,206 +1,165 @@
-import React, { useState } from 'react';
-import { api } from '../services/api.js';
-import { useStore } from '../store/useStore.js';
-import { Shield, Sparkles, Truck, CheckCircle2, ArrowRight, Lock, AlertTriangle } from 'lucide-react';
+import React from 'react';
+import { AlertTriangle, Instagram, Phone, Mail, MapPin } from 'lucide-react';
 
 interface FooterProps {
   onNavigate: (path: string) => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
-  const { showToast } = useStore();
-  const [email, setEmail] = useState('');
-  const [isSubscribing, setIsSubscribing] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !email.includes('@')) return;
-
-    try {
-      setIsSubscribing(true);
-      const res = await api.subscribeNewsletter(email);
-      if (res.success) {
-        setIsSuccess(true);
-        setEmail('');
-        showToast(res.message || 'Subscribed to Private Reserve', 'success');
-      }
-    } catch (err: any) {
-      showToast(err.message || 'Subscription failed', 'error');
-    } finally {
-      setIsSubscribing(false);
-    }
-  };
-
   return (
-    <footer className="bg-stone-950 text-stone-300 pt-16 pb-12 border-t border-stone-800">
-      {/* 4 Trust & Excellence Pillars */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 border-b border-stone-800/80">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="flex items-start gap-4">
-            <div className="p-2.5 bg-stone-900 border border-stone-800 rounded-xs text-amber-500 shrink-0">
-              <Shield className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="text-stone-100 font-semibold text-sm tracking-wide">Authenticity Guaranteed</h4>
-              <p className="text-stone-400 text-xs mt-1 leading-relaxed">Direct manufacturer import with holographic serial verification.</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4">
-            <div className="p-2.5 bg-stone-900 border border-stone-800 rounded-xs text-amber-500 shrink-0">
-              <Truck className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="text-stone-100 font-semibold text-sm tracking-wide">Break-Free Packing</h4>
-              <p className="text-stone-400 text-xs mt-1 leading-relaxed">Custom double-boxed high-density foam for all crystal glass bases.</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4">
-            <div className="p-2.5 bg-stone-900 border border-stone-800 rounded-xs text-amber-500 shrink-0">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="text-stone-100 font-semibold text-sm tracking-wide">Sommelier Selection</h4>
-              <p className="text-stone-400 text-xs mt-1 leading-relaxed">Hand-curated dark leaf reserves and artisan stoneware bowls.</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4">
-            <div className="p-2.5 bg-stone-900 border border-stone-800 rounded-xs text-amber-500 shrink-0">
-              <Lock className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="text-stone-100 font-semibold text-sm tracking-wide">Age 21+ Compliant</h4>
-              <p className="text-stone-400 text-xs mt-1 leading-relaxed">Certified ID verification and strict federal tobacco compliance.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
+    <footer className="bg-[#1f2329] text-stone-300 pt-10 pb-8 border-t border-stone-800 text-xs">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Main Footer Contact & Links */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pb-8 border-b border-stone-800">
           
-          {/* Brand Info & Newsletter */}
-          <div className="lg:col-span-2 space-y-6">
-            <div>
-              <span className="font-serif text-2xl font-bold tracking-[0.15em] text-stone-100 uppercase">
-                WORLD HOOKAH
-              </span>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-amber-500 font-bold mt-0.5">
-                MARKET • AUTHORIZED DISTRIBUTOR
-              </p>
-            </div>
+          {/* Column 1: Contact Info matching Screenshot 6 */}
+          <div className="space-y-3">
+            <h5 className="text-white font-bold uppercase tracking-wider text-xs">
+              World Hookah Market
+            </h5>
+            <div className="space-y-2 text-stone-400">
+              <a
+                href="https://instagram.com/worldhookahmarket"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 text-stone-300 hover:text-cyan-400 transition-colors"
+              >
+                <Instagram className="w-4 h-4 text-rose-400" />
+                <span>@worldhookahmarket</span>
+              </a>
 
-            <p className="text-stone-400 text-xs leading-relaxed max-w-md">
-              The premier marketplace and authorized master distributor for Alpha Hookah, MustHave, DarkSide, BlackBurn, Bonche, Oblako, Kong, MattPear, Wookah, and Kaloud in the United States and worldwide.
+              <a
+                href="tel:+16309736648"
+                className="flex items-center gap-2 text-stone-300 hover:text-cyan-400 transition-colors"
+              >
+                <Phone className="w-4 h-4 text-emerald-400" />
+                <span>+1 (630) 973-6648</span>
+              </a>
+
+              <a
+                href="mailto:cs@worldhookahmarket.com"
+                className="flex items-center gap-2 text-stone-300 hover:text-cyan-400 transition-colors"
+              >
+                <Mail className="w-4 h-4 text-cyan-400" />
+                <span>cs@worldhookahmarket.com</span>
+              </a>
+
+              <div className="flex items-start gap-2 text-stone-400 pt-1">
+                <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <span>346 Anthony trl, Northbrook, IL 60062, USA</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Column 2: Products Catalog */}
+          <div>
+            <h5 className="text-white font-bold uppercase tracking-wider text-xs mb-3">
+              Shop Categories
+            </h5>
+            <ul className="space-y-2 text-stone-400">
+              <li>
+                <button onClick={() => onNavigate('/shop?category=tobacco')} className="hover:text-cyan-400 transition-colors">
+                  Shisha Tobacco
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('/shop?category=hookahs')} className="hover:text-cyan-400 transition-colors">
+                  Hookahs & Stems
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('/shop?category=bowls')} className="hover:text-cyan-400 transition-colors">
+                  Hookah Bowls
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('/shop?category=bases')} className="hover:text-cyan-400 transition-colors">
+                  Bases & Flasks
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('/shop?category=coal')} className="hover:text-cyan-400 transition-colors">
+                  Coconut Charcoal
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('/shop?category=accessories')} className="hover:text-cyan-400 transition-colors">
+                  Accessories & HMD
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Customer Care */}
+          <div>
+            <h5 className="text-white font-bold uppercase tracking-wider text-xs mb-3">
+              Customer Support
+            </h5>
+            <ul className="space-y-2 text-stone-400">
+              <li>
+                <button onClick={() => onNavigate('/wholesale')} className="hover:text-cyan-400 transition-colors">
+                  Wholesale & Lounge B2B
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('/account')} className="hover:text-cyan-400 transition-colors">
+                  My Account & Orders
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('/contact')} className="hover:text-cyan-400 transition-colors">
+                  Contact Us
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('/blog')} className="hover:text-cyan-400 transition-colors">
+                  Hookah Blog & Guides
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('/admin')} className="text-stone-500 hover:text-cyan-400 transition-colors">
+                  Staff Admin Login
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Compliance & Statement */}
+          <div>
+            <h5 className="text-white font-bold uppercase tracking-wider text-xs mb-3">
+              Legal & Verification
+            </h5>
+            <p className="text-stone-400 leading-relaxed text-[11px] mb-3">
+              All buyers must be 21+ years of age. Adult signature and identity verification required upon delivery.
             </p>
-
-            {/* Newsletter Subscription */}
-            <div className="pt-2">
-              <p className="text-xs uppercase font-bold tracking-widest text-stone-200 mb-2">
-                Join World Hookah Insider Club
-              </p>
-              <p className="text-stone-400 text-xs mb-3">
-                Get first access to exclusive Russian drop releases, rare dark leaf allocations, and VIP distributor discounts.
-              </p>
-
-              {isSuccess ? (
-                <div className="flex items-center gap-2 text-xs text-amber-400 bg-amber-950/40 border border-amber-900/60 p-3 rounded-xs">
-                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Welcome to the World Hookah Market Insider Club.</span>
-                </div>
-              ) : (
-                <form onSubmit={handleSubscribe} className="flex gap-2 max-w-md">
-                  <input
-                    id="newsletter-email-input"
-                    type="email"
-                    required
-                    placeholder="Enter your email address..."
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="flex-1 bg-stone-900 border border-stone-800 text-stone-100 placeholder-stone-500 text-xs px-3.5 py-2.5 rounded-xs focus:outline-none focus:border-amber-600 transition-colors"
-                  />
-                  <button
-                    id="newsletter-submit-btn"
-                    type="submit"
-                    disabled={isSubscribing}
-                    className="bg-amber-700 hover:bg-amber-600 text-white text-xs font-semibold px-4 py-2.5 rounded-xs transition-colors flex items-center gap-1.5 shadow-xs"
-                  >
-                    <span>{isSubscribing ? 'Joining...' : 'Subscribe'}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
-
-          {/* Quick Links Columns */}
-          <div>
-            <h5 className="text-xs font-bold uppercase tracking-widest text-stone-100 mb-4">
-              Catalog
-            </h5>
-            <ul className="space-y-2.5 text-xs text-stone-400">
-              <li><button onClick={() => onNavigate('/shop?category=hookahs')} className="hover:text-amber-400 transition-colors">Russian & Modern Hookahs</button></li>
-              <li><button onClick={() => onNavigate('/shop?category=tobacco')} className="hover:text-amber-400 transition-colors">Shisha Tobacco</button></li>
-              <li><button onClick={() => onNavigate('/shop?category=bowls')} className="hover:text-amber-400 transition-colors">Hookah Bowls</button></li>
-              <li><button onClick={() => onNavigate('/shop?category=bases')} className="hover:text-amber-400 transition-colors">Bases & Vases</button></li>
-              <li><button onClick={() => onNavigate('/shop?category=coal')} className="hover:text-amber-400 transition-colors">Coconut Charcoals</button></li>
-              <li><button onClick={() => onNavigate('/shop?category=accessories')} className="hover:text-amber-400 transition-colors">Heat Management & HMD</button></li>
-              <li><button onClick={() => onNavigate('/shop?onSale=true')} className="hover:text-amber-400 transition-colors">Special Offers</button></li>
-            </ul>
-          </div>
-
-          <div>
-            <h5 className="text-xs font-bold uppercase tracking-widest text-stone-100 mb-4">
-              Customer Care & B2B
-            </h5>
-            <ul className="space-y-2.5 text-xs text-stone-400">
-              <li><button onClick={() => onNavigate('/wholesale')} className="hover:text-amber-400 transition-colors">Lounge & Wholesale Portal</button></li>
-              <li><button onClick={() => onNavigate('/account')} className="hover:text-amber-400 transition-colors">Track Order Delivery</button></li>
-              <li><button onClick={() => onNavigate('/contact')} className="hover:text-amber-400 transition-colors">Customer Support</button></li>
-              <li><button onClick={() => onNavigate('/about')} className="hover:text-amber-400 transition-colors">About World Hookah Market</button></li>
-              <li><button onClick={() => onNavigate('/admin')} className="text-stone-500 hover:text-amber-400 transition-colors">Staff Login</button></li>
-            </ul>
-          </div>
-
-          <div>
-            <h5 className="text-xs font-bold uppercase tracking-widest text-stone-100 mb-4">
-              Headquarters
-            </h5>
-            <div className="space-y-3 text-xs text-stone-400">
-              <p>World Hookah Market HQ<br />Miami / Los Angeles / US Hub</p>
-              <p>Email: <a href="mailto:support@worldhookahmarket.com" className="text-amber-400 hover:underline">support@worldhookahmarket.com</a></p>
-              <p>Phone: +1 (800) 785-8260</p>
-              <p className="text-[11px] text-stone-500">Mon - Sat: 9:00 AM - 8:00 PM EST</p>
-            </div>
+            <button
+              onClick={() => onNavigate('/contact')}
+              className="text-cyan-400 hover:underline text-xs"
+            >
+              Accessibility Statement
+            </button>
           </div>
 
         </div>
-      </div>
 
-      {/* Mandatory Tobacco & Age Warning Statement */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8 border-t border-stone-800/80">
-        <div className="bg-stone-900/90 border border-stone-800 p-4 rounded-xs flex flex-col md:flex-row items-start md:items-center gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5 md:mt-0" />
-          <div className="text-[11px] text-stone-400 leading-relaxed">
-            <strong className="text-stone-200 uppercase font-semibold">SURGEON GENERAL'S WARNING:</strong> Smoking Shisha Tobacco contains nicotine, an addictive chemical. It increases the risk of heart disease, stroke, and emphysema. You must be at least 21 years of age to purchase products on this platform. Age verification is strictly performed during checkout and upon adult signature carrier delivery.
+        {/* Surgeon General Warning Bar */}
+        <div className="py-6 border-b border-stone-800 flex items-center gap-3 text-[11px] text-stone-400 leading-relaxed">
+          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+          <div>
+            <strong className="text-stone-200 uppercase">SURGEON GENERAL'S WARNING:</strong> Smoking Shisha Tobacco contains nicotine. You must be at least 21 years of age to purchase on this platform.
           </div>
         </div>
-      </div>
 
-      {/* Copyright and Bottom Sub-bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-stone-900 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-stone-500">
-        <p>© {new Date().getFullYear()} World Hookah Market. All rights reserved.</p>
-        <div className="flex items-center gap-6">
-          <span>Encrypted 256-Bit SSL</span>
-          <span>•</span>
-          <span>UPS 2-Day Air Express</span>
-          <span>•</span>
-          <span>California Prop 65 Compliant</span>
+        {/* Bottom Sub-bar with Kaani Web Credit matching Screenshot 6 */}
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-400">
+          <p>© {new Date().getFullYear()} World Hookah Market. All rights reserved.</p>
+          <div className="text-stone-400 text-xs">
+            <span>kaan! Site created by </span>
+            <span className="text-cyan-400 font-semibold">kaani web</span>
+          </div>
         </div>
+
       </div>
     </footer>
   );

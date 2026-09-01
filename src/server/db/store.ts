@@ -118,6 +118,22 @@ export class DatabaseStore {
 
     this.users = [
       {
+        id: 'usr-super-admin-0',
+        email: 'admin@worldhookahmarket.com',
+        firstName: 'World Hookah',
+        lastName: 'Administrator',
+        phone: '+1 (800) 785-8260',
+        role: 'SUPER_ADMIN',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: superAdminPasswordHash,
+        createdAt: '2026-01-01T00:00:00Z',
+        updatedAt: '2026-01-01T00:00:00Z'
+      },
+      {
         id: 'usr-super-admin-1',
         email: 'admin@sultan.com',
         firstName: 'Farhan',

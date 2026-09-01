@@ -52,9 +52,29 @@ router.get('/dashboard', requirePermission('dashboard.view'), (req: Authenticate
 
   const recentAuditLogs = [...db.auditLogs].slice(0, 8);
 
+  const topFlavors = [
+    { flavor: 'MustHave Pinkman (Grapefruit Strawberry Raspberry)', units: 142 },
+    { flavor: 'DarkSide Supernova (Sub-Zero Menthol)', units: 118 },
+    { flavor: 'BlackBurn Cane Mint (Bold Peppermint)', units: 96 },
+    { flavor: 'Bonche Dark Chocolate (Single Origin)', units: 74 },
+    { flavor: 'Tangiers Noir Cane Mint', units: 68 }
+  ];
+
+  const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
   return res.json({
     success: true,
     data: {
+      totalRevenue: Math.round(totalRevenue * 100) / 100,
+      totalOrders,
+      pendingOrders,
+      totalCustomers,
+      totalProducts,
+      lowStockCount: lowStockProducts.length,
+      pendingWholesale,
+      refundsCount,
+      averageOrderValue: Math.round(averageOrderValue * 100) / 100,
+      topFlavors,
       stats: {
         totalRevenue: Math.round(totalRevenue * 100) / 100,
         totalOrders,
@@ -63,7 +83,8 @@ router.get('/dashboard', requirePermission('dashboard.view'), (req: Authenticate
         totalProducts,
         lowStockCount: lowStockProducts.length,
         pendingWholesale,
-        refundsCount
+        refundsCount,
+        averageOrderValue: Math.round(averageOrderValue * 100) / 100
       },
       charts: {
         salesByMonth,

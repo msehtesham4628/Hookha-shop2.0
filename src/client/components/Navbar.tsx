@@ -48,33 +48,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white">
-      {/* Top Announcement Bar */}
-      <div className="bg-stone-900 text-stone-300 text-[11px] py-1.5 px-4 border-b border-stone-800">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="hidden sm:flex items-center gap-2">
-            <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
-            <span className="tracking-wide">Age 21+ Verified Master Hookah Distributor</span>
-          </div>
-
-          <div className="flex-1 text-center font-medium text-amber-100/90 tracking-wider">
-            <span>Free Express US Shipping on Orders Over $99 · Official Master Distributor</span>
-          </div>
-
-          <div className="hidden md:flex items-center gap-4 text-[11px]">
-            <button
-              onClick={() => onNavigate('/wholesale')}
-              className="text-stone-300 hover:text-amber-400 transition-colors"
-            >
-              Lounge & B2B Wholesale
-            </button>
-            <span className="text-stone-700">|</span>
-            <button
-              onClick={() => onNavigate('/contact')}
-              className="text-stone-300 hover:text-amber-400 transition-colors"
-            >
-              Support Desk
-            </button>
-          </div>
+      {/* Top Announcement Bar - Exactly matching Screenshot 1 */}
+      <div className="bg-[#15181e] text-stone-200 text-[10px] sm:text-[11px] font-bold py-2 px-4 border-b border-stone-800 text-center tracking-wider uppercase">
+        <div className="max-w-7xl mx-auto">
+          <span>YOU MUST BE AT LEAST 21 YEARS OF AGE TO PURCHASE ON THIS WEBSITE. ALL CUSTOMERS WILL BE AGE VERIFIED.</span>
         </div>
       </div>
 
