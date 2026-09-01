@@ -1,0 +1,465 @@
+import bcrypt from 'bcryptjs';
+import {
+  User,
+  Role,
+  Permission,
+  Product,
+  Category,
+  Brand,
+  Order,
+  Review,
+  Coupon,
+  WholesaleApplication,
+  InventoryTransaction,
+  AuditLog,
+  StoreSettings,
+  AdminNotification,
+  Address
+} from '../../types/index.js';
+import {
+  DEFAULT_PERMISSIONS,
+  DEFAULT_ROLES,
+  DEFAULT_SETTINGS,
+  INITIAL_CATEGORIES,
+  INITIAL_BRANDS,
+  INITIAL_PRODUCTS,
+  INITIAL_COUPONS,
+  INITIAL_REVIEWS
+} from './seedData.js';
+
+interface StoredOTP {
+  identifier: string; // email or phone
+  codeHash: string;
+  type: 'EMAIL' | 'SMS';
+  expiresAt: number;
+  attempts: number;
+}
+
+interface StoredPasswordResetToken {
+  token: string;
+  email: string;
+  expiresAt: number;
+}
+
+interface StoredCartItem {
+  id: string;
+  userId: string;
+  productId: string;
+  quantity: number;
+  selectedFlavor?: string;
+  selectedColor?: string;
+}
+
+interface StoredWishlist {
+  userId: string;
+  productIds: string[];
+}
+
+export class DatabaseStore {
+  public permissions: Permission[] = [];
+  public roles: Role[] = [];
+  public users: (User & { passwordHash?: string })[] = [];
+  public products: Product[] = [];
+  public categories: Category[] = [];
+  public brands: Brand[] = [];
+  public orders: Order[] = [];
+  public reviews: Review[] = [];
+  public coupons: Coupon[] = [];
+  public wholesaleApplications: WholesaleApplication[] = [];
+  public inventoryTransactions: InventoryTransaction[] = [];
+  public auditLogs: AuditLog[] = [];
+  public settings: StoreSettings = { ...DEFAULT_SETTINGS };
+  public notifications: AdminNotification[] = [];
+  public addresses: Address[] = [];
+  
+  public cartItems: StoredCartItem[] = [];
+  public wishlists: StoredWishlist[] = [];
+  public otps: StoredOTP[] = [];
+  public passwordResetTokens: StoredPasswordResetToken[] = [];
+  public newsletterSubscribers: { email: string; createdAt: string }[] = [];
+  public contactMessages: { id: string; name: string; email: string; phone?: string; subject: string; message: string; createdAt: string }[] = [];
+  public mediaLibrary: { id: string; url: string; alt: string; category: string; size: string; createdAt: string }[] = [];
+
+  private isInitialized = false;
+
+  constructor() {
+    this.init();
+  }
+
+  public async init() {
+    if (this.isInitialized) return;
+    
+    this.permissions = [...DEFAULT_PERMISSIONS];
+    this.roles = [...DEFAULT_ROLES];
+    this.categories = [...INITIAL_CATEGORIES];
+    this.brands = [...INITIAL_BRANDS];
+    this.products = [...INITIAL_PRODUCTS];
+    this.coupons = [...INITIAL_COUPONS];
+    this.reviews = [...INITIAL_REVIEWS];
+    this.settings = { ...DEFAULT_SETTINGS };
+
+    // Initialize media library with high res assets
+    this.mediaLibrary = [
+      { id: 'med-1', url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop', alt: 'Luxury Shisha Stainless Steel Studio Photo', category: 'Products', size: '1.4 MB', createdAt: new Date().toISOString() },
+      { id: 'med-2', url: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200&auto=format&fit=crop', alt: 'Bohemian Cut Crystal Shisha Base', category: 'Bases', size: '1.8 MB', createdAt: new Date().toISOString() },
+      { id: 'med-3', url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop', alt: 'Artisan Dark Leaf Shisha Tobacco Leaf', category: 'Tobacco', size: '2.1 MB', createdAt: new Date().toISOString() },
+      { id: 'med-4', url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop', alt: 'Stoneware Handthrown Hookah Bowl Phunnel', category: 'Bowls', size: '1.1 MB', createdAt: new Date().toISOString() },
+      { id: 'med-5', url: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1200&auto=format&fit=crop', alt: 'Organic Coconut Charcoal Coals Glowing', category: 'Charcoal', size: '1.6 MB', createdAt: new Date().toISOString() },
+      { id: 'med-6', url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop', alt: 'Silver Heat Management Device', category: 'Accessories', size: '980 KB', createdAt: new Date().toISOString() }
+    ];
+
+    // Seed default administrative users and demo customer
+    const superAdminPasswordHash = await bcrypt.hash('Admin123!', 10);
+    const sultanAdminHash = await bcrypt.hash('Sultan@Admin2026!', 10);
+    const staffPasswordHash = await bcrypt.hash('Staff123!', 10);
+    const sultanManagerHash = await bcrypt.hash('Sultan@Manager2026!', 10);
+    const customerPasswordHash = await bcrypt.hash('Customer123!', 10);
+    const sultanVipHash = await bcrypt.hash('Sultan@Vip2026!', 10);
+
+    this.users = [
+      {
+        id: 'usr-super-admin-1',
+        email: 'admin@sultan.com',
+        firstName: 'Farhan',
+        lastName: 'Al-Mansoor',
+        phone: '+1 (800) 785-8260',
+        role: 'SUPER_ADMIN',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: superAdminPasswordHash,
+        createdAt: '2026-01-01T00:00:00Z',
+        updatedAt: '2026-01-01T00:00:00Z'
+      },
+      {
+        id: 'usr-super-admin-2',
+        email: 'admin@sultanhookah.com',
+        firstName: 'Farhan',
+        lastName: 'Al-Mansoor',
+        phone: '+1 (800) 785-8260',
+        role: 'SUPER_ADMIN',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: sultanAdminHash,
+        createdAt: '2026-01-01T00:00:00Z',
+        updatedAt: '2026-01-01T00:00:00Z'
+      },
+      {
+        id: 'usr-product-manager-1',
+        email: 'pm@sultan.com',
+        firstName: 'Dmitri',
+        lastName: 'Volkov',
+        phone: '+1 (555) 492-8821',
+        role: 'PRODUCT_MANAGER',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: false,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: staffPasswordHash,
+        createdAt: '2026-01-02T00:00:00Z',
+        updatedAt: '2026-01-02T00:00:00Z'
+      },
+      {
+        id: 'usr-manager-2',
+        email: 'manager@sultanhookah.com',
+        firstName: 'Dmitri',
+        lastName: 'Volkov',
+        phone: '+1 (555) 492-8821',
+        role: 'STORE_MANAGER',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: false,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: sultanManagerHash,
+        createdAt: '2026-01-02T00:00:00Z',
+        updatedAt: '2026-01-02T00:00:00Z'
+      },
+      {
+        id: 'usr-support-1',
+        email: 'support@sultan.com',
+        firstName: 'Sarah',
+        lastName: 'Jenkins',
+        phone: '+1 (555) 381-9922',
+        role: 'CUSTOMER_SUPPORT',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: false,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: staffPasswordHash,
+        createdAt: '2026-01-03T00:00:00Z',
+        updatedAt: '2026-01-03T00:00:00Z'
+      },
+      {
+        id: 'usr-customer-1',
+        email: 'customer@example.com',
+        firstName: 'Julian',
+        lastName: 'Vance',
+        phone: '+1 (555) 219-4402',
+        role: 'CUSTOMER',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 733.95,
+        orderCount: 2,
+        passwordHash: customerPasswordHash,
+        createdAt: '2026-01-10T00:00:00Z',
+        updatedAt: '2026-01-10T00:00:00Z'
+      },
+      {
+        id: 'usr-vip-2',
+        email: 'vip@sultanhookah.com',
+        firstName: 'Julian',
+        lastName: 'Vance',
+        phone: '+1 (555) 219-4402',
+        role: 'CUSTOMER',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 1250.00,
+        orderCount: 4,
+        passwordHash: sultanVipHash,
+        createdAt: '2026-01-10T00:00:00Z',
+        updatedAt: '2026-01-10T00:00:00Z'
+      }
+    ];
+
+    // Seed addresses for demo customer
+    this.addresses = [
+      {
+        id: 'addr-1',
+        userId: 'usr-customer-1',
+        fullName: 'Julian Vance',
+        addressLine1: '742 Evergreen Terrace',
+        addressLine2: 'Apt 4B',
+        city: 'Beverly Hills',
+        state: 'CA',
+        postalCode: '90210',
+        country: 'United States',
+        phone: '+1 (555) 219-4402',
+        isDefault: true
+      }
+    ];
+
+    // Seed initial orders for demonstration
+    this.orders = [
+      {
+        id: 'ord-1001',
+        orderNumber: 'SLT-2026-1001',
+        userId: 'usr-customer-1',
+        customerName: 'Julian Vance',
+        customerEmail: 'customer@example.com',
+        customerPhone: '+1 (555) 219-4402',
+        items: [
+          {
+            productId: 'prod-wookah-oak-crystal',
+            productName: 'Wookah Masterpiece Oak with Olives Crystal Base',
+            productSku: 'WKH-OAK-01',
+            productImage: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=400&auto=format&fit=crop',
+            price: 449.00,
+            quantity: 1,
+            subtotal: 449.00
+          },
+          {
+            productId: 'prod-tangiers-cane-mint',
+            productName: 'Tangiers Noir Cane Mint (250g)',
+            productSku: 'TNG-NOIR-CM250',
+            productImage: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400&auto=format&fit=crop',
+            price: 24.99,
+            quantity: 2,
+            subtotal: 49.98
+          }
+        ],
+        shippingAddress: this.addresses[0],
+        billingAddress: this.addresses[0],
+        subtotal: 498.98,
+        discount: 0,
+        shippingFee: 0,
+        tax: 42.41,
+        total: 541.39,
+        paymentMethod: 'STRIPE',
+        paymentStatus: 'PAID',
+        paymentIntentId: 'pi_test_392817293817',
+        orderStatus: 'DELIVERED',
+        trackingNumber: '1Z9999999999999999',
+        carrier: 'UPS Express 2-Day Air',
+        timeline: [
+          { status: 'PLACED', timestamp: '2026-02-01T14:30:00Z', note: 'Customer placed order online', actor: 'Julian Vance' },
+          { status: 'PAYMENT_CONFIRMED', timestamp: '2026-02-01T14:31:00Z', note: 'Stripe payment intent confirmed', actor: 'System' },
+          { status: 'PROCESSING', timestamp: '2026-02-01T15:00:00Z', note: 'Order sent to luxury fulfillment center', actor: 'Dmitri Volkov' },
+          { status: 'PACKED', timestamp: '2026-02-01T17:30:00Z', note: 'Custom double-boxed with anti-break foam', actor: 'Warehouse Team' },
+          { status: 'SHIPPED', timestamp: '2026-02-02T09:00:00Z', note: 'Dispatched via UPS Express Air', actor: 'UPS Carrier' },
+          { status: 'DELIVERED', timestamp: '2026-02-04T13:45:00Z', note: 'Signed for by resident (Age 21+ Verified ID)', actor: 'UPS Driver' }
+        ],
+        createdAt: '2026-02-01T14:30:00Z',
+        updatedAt: '2026-02-04T13:45:00Z'
+      },
+      {
+        id: 'ord-1002',
+        orderNumber: 'SLT-2026-1002',
+        userId: 'usr-customer-1',
+        customerName: 'Julian Vance',
+        customerEmail: 'customer@example.com',
+        customerPhone: '+1 (555) 219-4402',
+        items: [
+          {
+            productId: 'prod-kaloud-lotus-plus',
+            productName: 'Kaloud Lotus I+ Heat Management Device (Silver Nectar)',
+            productSku: 'KLD-LOT-SLV',
+            productImage: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=400&auto=format&fit=crop',
+            price: 54.95,
+            quantity: 1,
+            subtotal: 54.95
+          },
+          {
+            productId: 'prod-alpaca-symphony',
+            productName: 'Alpaca Symphony Hand-Thrown Clay Phunnel Bowl',
+            productSku: 'ALP-BOWL-SYM',
+            productImage: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=400&auto=format&fit=crop',
+            price: 29.99,
+            quantity: 1,
+            subtotal: 29.99
+          },
+          {
+            productId: 'prod-cocourth-cubes-26mm',
+            productName: 'CocoUrth 100% Organic Coconut Charcoal (26mm Cubes - 1kg)',
+            productSku: 'COCO-26MM-1KG',
+            productImage: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=400&auto=format&fit=crop',
+            price: 14.50,
+            quantity: 2,
+            subtotal: 29.00
+          }
+        ],
+        shippingAddress: this.addresses[0],
+        billingAddress: this.addresses[0],
+        subtotal: 113.94,
+        discount: 17.09,
+        couponCode: 'WELCOME15',
+        shippingFee: 0,
+        tax: 8.23,
+        total: 105.08,
+        paymentMethod: 'STRIPE',
+        paymentStatus: 'PAID',
+        orderStatus: 'PROCESSING',
+        timeline: [
+          { status: 'PLACED', timestamp: '2026-02-26T10:15:00Z', note: 'Customer applied coupon WELCOME15' },
+          { status: 'PAYMENT_CONFIRMED', timestamp: '2026-02-26T10:16:00Z', note: 'Stripe charge verified' },
+          { status: 'PROCESSING', timestamp: '2026-02-26T11:00:00Z', note: 'Fragile packing in progress' }
+        ],
+        createdAt: '2026-02-26T10:15:00Z',
+        updatedAt: '2026-02-26T11:00:00Z'
+      }
+    ];
+
+    // Seed sample wholesale applications
+    this.wholesaleApplications = [
+      {
+        id: 'whs-1',
+        companyName: 'Lounge Mirage Shisha & Cocktails',
+        contactName: 'Karim Al-Hassan',
+        email: 'karim@loungemirage.com',
+        phone: '+1 (310) 882-9900',
+        businessType: 'LOUNGE',
+        taxId: 'US-94829104',
+        website: 'https://loungemirage.com',
+        estimatedMonthlyVolume: '$5,000 - $10,000',
+        notes: 'Premium hookah lounge in West Hollywood seeking monthly 50kg dark leaf supply and 10x custom stainless hookahs.',
+        status: 'PENDING',
+        createdAt: '2026-02-20T16:00:00Z',
+        updatedAt: '2026-02-20T16:00:00Z'
+      }
+    ];
+
+    // Seed system audit log entries
+    this.auditLogs = [
+      {
+        id: 'aud-1',
+        userId: 'usr-super-admin-1',
+        userName: 'Farhan Al-Mansoor',
+        userRole: 'SUPER_ADMIN',
+        action: 'SYSTEM_BOOTSTRAP',
+        resource: 'PLATFORM',
+        ipAddress: '127.0.0.1',
+        details: { message: 'Initialized Sultan Hookah enterprise catalog, RBAC system, and permission matrices.' },
+        createdAt: '2026-01-01T00:00:00Z'
+      },
+      {
+        id: 'aud-2',
+        userId: 'usr-product-manager-1',
+        userName: 'Dmitri Volkov',
+        userRole: 'PRODUCT_MANAGER',
+        action: 'PRODUCT_PUBLISHED',
+        resource: 'PRODUCT',
+        resourceId: 'prod-wookah-oak-crystal',
+        ipAddress: '192.168.1.45',
+        details: { sku: 'WKH-OAK-01', price: 449.00 },
+        createdAt: '2026-01-10T12:00:00Z'
+      }
+    ];
+
+    this.notifications = [
+      {
+        id: 'notif-1',
+        type: 'ORDER',
+        title: 'New High-Value Order',
+        message: 'Order #SLT-2026-1002 received for $105.08',
+        link: '/admin/orders',
+        isRead: false,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'notif-2',
+        type: 'WHOLESALE',
+        title: 'New B2B Lounge Application',
+        message: 'Lounge Mirage Shisha & Cocktails applied for wholesale tier.',
+        link: '/admin/wholesale',
+        isRead: false,
+        createdAt: new Date(Date.now() - 3600000).toISOString()
+      }
+    ];
+
+    this.isInitialized = true;
+  }
+
+  // Audit Logging helper
+  public logAudit(actor: { id: string; name: string; role: string; ip?: string }, action: string, resource: string, resourceId?: string, details?: Record<string, any>) {
+    const entry: AuditLog = {
+      id: `aud-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      userId: actor.id,
+      userName: actor.name,
+      userRole: actor.role,
+      action,
+      resource,
+      resourceId,
+      ipAddress: actor.ip || '127.0.0.1',
+      details,
+      createdAt: new Date().toISOString()
+    };
+    this.auditLogs.unshift(entry);
+    return entry;
+  }
+
+  // Notification helper
+  public createNotification(type: AdminNotification['type'], title: string, message: string, link?: string) {
+    const notif: AdminNotification = {
+      id: `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      type,
+      title,
+      message,
+      link,
+      isRead: false,
+      createdAt: new Date().toISOString()
+    };
+    this.notifications.unshift(notif);
+    return notif;
+  }
+}
+
+export const db = new DatabaseStore();
