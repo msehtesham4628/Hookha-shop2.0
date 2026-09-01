@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore.js';
+import { useTranslation } from '../i18n/LanguageContext.js';
+import { LanguageSelector } from './LanguageSelector.js';
 import {
   Search,
   ShoppingBag,
@@ -12,7 +14,8 @@ import {
   LogOut,
   Package,
   Settings,
-  Sparkles
+  Sparkles,
+  Globe
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -22,10 +25,10 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
   const { user, isAdmin, cart, wishlistIds, setCartOpen, setSearchOpen, logout } = useStore();
+  const { t } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [catalogDropdownOpen, setCatalogDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,22 +39,32 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
   }, []);
 
   const navLinks = [
-    { label: 'All Products', path: '/shop' },
-    { label: 'Hookahs', path: '/shop?category=hookahs' },
-    { label: 'Shisha Tobacco', path: '/shop?category=tobacco' },
-    { label: 'Bowls', path: '/shop?category=bowls' },
-    { label: 'Bases', path: '/shop?category=bases' },
-    { label: 'Charcoal', path: '/shop?category=coal' },
-    { label: 'Accessories', path: '/shop?category=accessories' },
-    { label: 'Wholesale B2B', path: '/wholesale' }
+    { label: t('nav.all_products', 'All Products'), path: '/shop' },
+    { label: t('nav.hookahs', 'Hookahs'), path: '/shop?category=hookahs' },
+    { label: t('nav.tobacco', 'Shisha Tobacco'), path: '/shop?category=tobacco' },
+    { label: t('nav.bowls', 'Hookah Bowls'), path: '/shop?category=bowls' },
+    { label: t('nav.bases', 'Bases & Vases'), path: '/shop?category=bases' },
+    { label: t('nav.charcoal', 'Charcoal & Heat'), path: '/shop?category=coal' },
+    { label: t('nav.accessories', 'Accessories'), path: '/shop?category=accessories' },
+    { label: t('nav.wholesale', 'Wholesale B2B'), path: '/wholesale' }
   ];
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white">
-      {/* Top Announcement Bar - Exactly matching Screenshot 1 */}
-      <div className="bg-[#15181e] text-stone-200 text-[10px] sm:text-[11px] font-bold py-2 px-4 border-b border-stone-800 text-center tracking-wider uppercase">
-        <div className="max-w-7xl mx-auto">
-          <span>YOU MUST BE AT LEAST 21 YEARS OF AGE TO PURCHASE ON THIS WEBSITE. ALL CUSTOMERS WILL BE AGE VERIFIED.</span>
+      {/* Top Announcement & Language Selector Bar */}
+      <div className="bg-[#15181e] text-stone-200 text-[10px] sm:text-[11px] font-bold py-1.5 px-4 border-b border-stone-800 tracking-wider uppercase">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <div className="flex-1 text-center sm:text-left flex items-center gap-2">
+            <ShieldCheck className="w-3.5 h-3.5 text-amber-400 hidden sm:inline" />
+            <span className="line-clamp-1">
+              {t('topbar.age_notice', 'YOU MUST BE AT LEAST 21 YEARS OF AGE TO PURCHASE ON THIS WEBSITE. ALL CUSTOMERS WILL BE AGE VERIFIED.')}
+            </span>
+          </div>
+
+          {/* Topbar Language Selector */}
+          <div className="flex-shrink-0 flex items-center gap-2">
+            <LanguageSelector variant="topbar" />
+          </div>
         </div>
       </div>
 
@@ -63,7 +76,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
           <button
             id="mobile-menu-toggle"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-stone-800 hover:text-amber-900 transition-colors"
+            className="lg:hidden p-2 text-stone-800 hover:text-amber-900 transition-colors cursor-pointer"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -90,11 +103,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
             <button
               id="desktop-search-trigger"
               onClick={() => setSearchOpen(true)}
-              className="w-full flex items-center justify-between bg-stone-100/80 hover:bg-stone-100 border border-stone-200 text-stone-500 text-xs px-4 py-2.5 rounded-xs transition-all shadow-2xs group"
+              className="w-full flex items-center justify-between bg-stone-100/80 hover:bg-stone-100 border border-stone-200 text-stone-500 text-xs px-4 py-2.5 rounded-xs transition-all shadow-2xs group cursor-pointer"
             >
               <div className="flex items-center gap-2.5">
                 <Search className="w-4 h-4 text-stone-400 group-hover:text-amber-800 transition-colors" />
-                <span className="tracking-wide">Search hookahs, dark leaf, bowls, coals...</span>
+                <span className="tracking-wide">
+                  {t('nav.search_placeholder', 'Search hookahs, dark leaf, bowls, coals...')}
+                </span>
               </div>
               <kbd className="hidden lg:inline-block text-[10px] bg-stone-200/80 text-stone-600 px-1.5 py-0.5 rounded-xs border border-stone-300/80 font-mono">
                 ⌘K
@@ -108,7 +123,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
             <button
               id="mobile-search-btn"
               onClick={() => setSearchOpen(true)}
-              className="md:hidden p-2 text-stone-700 hover:text-amber-900 transition-colors"
+              className="md:hidden p-2 text-stone-700 hover:text-amber-900 transition-colors cursor-pointer"
               title="Search Catalog"
             >
               <Search className="w-5 h-5" />
@@ -118,8 +133,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
             <button
               id="navbar-wishlist-btn"
               onClick={() => onNavigate('/account?tab=wishlist')}
-              className="relative p-2 text-stone-700 hover:text-amber-900 transition-colors"
-              title="Luxury Wishlist"
+              className="relative p-2 text-stone-700 hover:text-amber-900 transition-colors cursor-pointer"
+              title="Wishlist"
             >
               <Heart className="w-5 h-5" />
               {wishlistIds.length > 0 && (
@@ -134,11 +149,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
               <button
                 id="navbar-user-btn"
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-1.5 p-2 text-stone-700 hover:text-amber-900 transition-colors rounded-sm"
+                className="flex items-center gap-1.5 p-2 text-stone-700 hover:text-amber-900 transition-colors rounded-sm cursor-pointer"
               >
                 <UserIcon className="w-5 h-5" />
                 <span className="hidden sm:inline text-xs font-semibold text-stone-800">
-                  {user ? user.firstName : 'Sign In'}
+                  {user ? user.firstName : t('nav.sign_in', 'Sign In')}
                 </span>
                 <ChevronDown className="hidden sm:inline w-3 h-3 text-stone-400" />
               </button>
@@ -164,19 +179,19 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
 
                       <button
                         onClick={() => { setUserDropdownOpen(false); onNavigate('/account'); }}
-                        className="w-full text-left px-4 py-2 text-xs text-stone-700 hover:bg-stone-50 hover:text-amber-900 flex items-center gap-2"
+                        className="w-full text-left px-4 py-2 text-xs text-stone-700 hover:bg-stone-50 hover:text-amber-900 flex items-center gap-2 cursor-pointer"
                       >
                         <Package className="w-3.5 h-3.5 text-stone-400" />
-                        <span>My Account & Orders</span>
+                        <span>{t('nav.my_account', 'My Account & Orders')}</span>
                       </button>
 
                       {isAdmin && (
                         <button
                           onClick={() => { setUserDropdownOpen(false); onNavigate('/admin'); }}
-                          className="w-full text-left px-4 py-2 text-xs font-medium text-amber-900 bg-amber-50/60 hover:bg-amber-100 flex items-center gap-2"
+                          className="w-full text-left px-4 py-2 text-xs font-medium text-amber-900 bg-amber-50/60 hover:bg-amber-100 flex items-center gap-2 cursor-pointer"
                         >
                           <Settings className="w-3.5 h-3.5 text-amber-700" />
-                          <span>Admin Control Center</span>
+                          <span>{t('nav.admin_suite', 'Admin Suite')}</span>
                         </button>
                       )}
 
@@ -184,26 +199,28 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
 
                       <button
                         onClick={() => { setUserDropdownOpen(false); logout(); }}
-                        className="w-full text-left px-4 py-2 text-xs text-rose-700 hover:bg-rose-50 flex items-center gap-2"
+                        className="w-full text-left px-4 py-2 text-xs text-rose-700 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
                       >
                         <LogOut className="w-3.5 h-3.5 text-rose-500" />
-                        <span>Sign Out</span>
+                        <span>{t('nav.sign_out', 'Sign Out')}</span>
                       </button>
                     </>
                   ) : (
                     <div className="p-3">
-                      <p className="text-xs text-stone-600 mb-3">Sign in to access orders, private reserve releases, and luxury perks.</p>
+                      <p className="text-xs text-stone-600 mb-3">
+                        Sign in to access orders, private reserve releases, and luxury perks.
+                      </p>
                       <button
                         onClick={() => { setUserDropdownOpen(false); onNavigate('/auth/login'); }}
-                        className="w-full bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold py-2 px-3 rounded-xs mb-2 transition-colors text-center block"
+                        className="w-full bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold py-2 px-3 rounded-xs mb-2 transition-colors text-center block cursor-pointer"
                       >
-                        Sign In
+                        {t('nav.sign_in', 'Sign In')}
                       </button>
                       <button
                         onClick={() => { setUserDropdownOpen(false); onNavigate('/auth/register'); }}
-                        className="w-full bg-white hover:bg-stone-50 text-stone-800 border border-stone-300 text-xs font-semibold py-2 px-3 rounded-xs transition-colors text-center block"
+                        className="w-full bg-white hover:bg-stone-50 text-stone-800 border border-stone-300 text-xs font-semibold py-2 px-3 rounded-xs transition-colors text-center block cursor-pointer"
                       >
-                        Create Account
+                        {t('nav.create_account', 'Create Account')}
                       </button>
                     </div>
                   )}
@@ -215,7 +232,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
             <button
               id="navbar-cart-btn"
               onClick={() => setCartOpen(true)}
-              className="flex items-center gap-2 bg-stone-900 hover:bg-amber-900 text-white px-3.5 py-2 rounded-xs shadow-xs transition-all duration-200 group"
+              className="flex items-center gap-2 bg-stone-900 hover:bg-amber-900 text-white px-3.5 py-2 rounded-xs shadow-xs transition-all duration-200 group cursor-pointer"
             >
               <div className="relative">
                 <ShoppingBag className="w-4 h-4" />
@@ -235,11 +252,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
               <button
                 id="admin-quick-badge"
                 onClick={() => onNavigate('/admin')}
-                className="hidden lg:flex items-center gap-1 bg-amber-700 hover:bg-amber-800 text-white text-[10px] uppercase font-bold tracking-wider px-2.5 py-1.5 rounded-xs shadow-2xs"
+                className="hidden lg:flex items-center gap-1 bg-amber-700 hover:bg-amber-800 text-white text-[10px] uppercase font-bold tracking-wider px-2.5 py-1.5 rounded-xs shadow-2xs cursor-pointer"
                 title="Open Admin Portal"
               >
                 <Sparkles className="w-3 h-3 text-amber-300" />
-                <span>Admin Suite</span>
+                <span>{t('nav.admin_suite', 'Admin Suite')}</span>
               </button>
             )}
           </div>
@@ -256,7 +273,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
                 <li key={link.path}>
                   <button
                     onClick={() => onNavigate(link.path)}
-                    className={`hover:text-amber-900 transition-colors py-1 relative ${
+                    className={`hover:text-amber-900 transition-colors py-1 relative cursor-pointer ${
                       isActive ? 'text-amber-900 font-bold' : ''
                     }`}
                   >
@@ -274,7 +291,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-[104px] z-50 bg-stone-950/40 backdrop-blur-xs flex">
+        <div className="lg:hidden fixed inset-0 top-[90px] z-50 bg-stone-950/40 backdrop-blur-xs flex">
           <div className="w-4/5 max-w-sm bg-white h-full p-6 overflow-y-auto flex flex-col justify-between shadow-xl">
             <div>
               <div className="mb-6">
@@ -283,7 +300,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
                   className="w-full flex items-center gap-3 bg-stone-100 text-stone-600 text-xs p-3 rounded-xs border border-stone-200"
                 >
                   <Search className="w-4 h-4 text-stone-500" />
-                  <span>Search entire collection...</span>
+                  <span>{t('nav.search_placeholder', 'Search entire collection...')}</span>
                 </button>
               </div>
 
@@ -292,13 +309,16 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
                   <li key={link.path} className="border-b border-stone-100 pb-2">
                     <button
                       onClick={() => { onNavigate(link.path); setMobileMenuOpen(false); }}
-                      className="w-full text-left uppercase tracking-wider text-xs font-semibold hover:text-amber-800"
+                      className="w-full text-left uppercase tracking-wider text-xs font-semibold hover:text-amber-800 cursor-pointer"
                     >
                       {link.label}
                     </button>
                   </li>
                 ))}
               </ul>
+
+              {/* Language Selector in Mobile Drawer */}
+              <LanguageSelector variant="drawer" />
             </div>
 
             <div className="pt-6 border-t border-stone-200">
@@ -320,24 +340,24 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
                   </div>
                   <button
                     onClick={() => { logout(); setMobileMenuOpen(false); }}
-                    className="w-full text-xs text-rose-700 border border-rose-200 p-2 rounded-xs hover:bg-rose-50"
+                    className="w-full text-xs text-rose-700 border border-rose-200 p-2 rounded-xs hover:bg-rose-50 cursor-pointer"
                   >
-                    Sign Out
+                    {t('nav.sign_out', 'Sign Out')}
                   </button>
                 </div>
               ) : (
                 <div className="flex gap-2">
                   <button
                     onClick={() => { onNavigate('/auth/login'); setMobileMenuOpen(false); }}
-                    className="flex-1 bg-stone-900 text-white text-xs font-semibold py-2.5 rounded-xs"
+                    className="flex-1 bg-stone-900 text-white text-xs font-semibold py-2.5 rounded-xs cursor-pointer"
                   >
-                    Sign In
+                    {t('nav.sign_in', 'Sign In')}
                   </button>
                   <button
                     onClick={() => { onNavigate('/auth/register'); setMobileMenuOpen(false); }}
-                    className="flex-1 border border-stone-300 text-stone-800 text-xs font-semibold py-2.5 rounded-xs"
+                    className="flex-1 border border-stone-300 text-stone-800 text-xs font-semibold py-2.5 rounded-xs cursor-pointer"
                   >
-                    Register
+                    {t('nav.create_account', 'Register')}
                   </button>
                 </div>
               )}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../i18n/LanguageContext.js';
 import { AlertTriangle, Instagram, Phone, Mail, MapPin } from 'lucide-react';
 
 interface FooterProps {
@@ -6,6 +7,8 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-[#1f2329] text-stone-300 pt-10 pb-8 border-t border-stone-800 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -55,37 +58,37 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           {/* Column 2: Products Catalog */}
           <div>
             <h5 className="text-white font-bold uppercase tracking-wider text-xs mb-3">
-              Shop Categories
+              {t('footer.shop_categories', 'Shop Categories')}
             </h5>
             <ul className="space-y-2 text-stone-400">
               <li>
-                <button onClick={() => onNavigate('/shop?category=tobacco')} className="hover:text-cyan-400 transition-colors">
-                  Shisha Tobacco
+                <button onClick={() => onNavigate('/shop?category=tobacco')} className="hover:text-cyan-400 transition-colors cursor-pointer">
+                  {t('nav.tobacco', 'Shisha Tobacco')}
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/shop?category=hookahs')} className="hover:text-cyan-400 transition-colors">
-                  Hookahs & Stems
+                <button onClick={() => onNavigate('/shop?category=hookahs')} className="hover:text-cyan-400 transition-colors cursor-pointer">
+                  {t('nav.hookahs', 'Hookahs & Stems')}
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/shop?category=bowls')} className="hover:text-cyan-400 transition-colors">
-                  Hookah Bowls
+                <button onClick={() => onNavigate('/shop?category=bowls')} className="hover:text-cyan-400 transition-colors cursor-pointer">
+                  {t('nav.bowls', 'Hookah Bowls')}
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/shop?category=bases')} className="hover:text-cyan-400 transition-colors">
-                  Bases & Flasks
+                <button onClick={() => onNavigate('/shop?category=bases')} className="hover:text-cyan-400 transition-colors cursor-pointer">
+                  {t('nav.bases', 'Bases & Flasks')}
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/shop?category=coal')} className="hover:text-cyan-400 transition-colors">
-                  Coconut Charcoal
+                <button onClick={() => onNavigate('/shop?category=coal')} className="hover:text-cyan-400 transition-colors cursor-pointer">
+                  {t('nav.charcoal', 'Coconut Charcoal')}
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/shop?category=accessories')} className="hover:text-cyan-400 transition-colors">
-                  Accessories & HMD
+                <button onClick={() => onNavigate('/shop?category=accessories')} className="hover:text-cyan-400 transition-colors cursor-pointer">
+                  {t('nav.accessories', 'Accessories & HMD')}
                 </button>
               </li>
             </ul>
@@ -94,32 +97,27 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           {/* Column 3: Customer Care */}
           <div>
             <h5 className="text-white font-bold uppercase tracking-wider text-xs mb-3">
-              Customer Support
+              {t('footer.customer_care', 'Customer Support')}
             </h5>
             <ul className="space-y-2 text-stone-400">
               <li>
-                <button onClick={() => onNavigate('/wholesale')} className="hover:text-cyan-400 transition-colors">
-                  Wholesale & Lounge B2B
+                <button onClick={() => onNavigate('/wholesale')} className="hover:text-cyan-400 transition-colors cursor-pointer">
+                  {t('nav.wholesale', 'Wholesale & Lounge B2B')}
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/account')} className="hover:text-cyan-400 transition-colors">
-                  My Account & Orders
+                <button onClick={() => onNavigate('/account')} className="hover:text-cyan-400 transition-colors cursor-pointer">
+                  {t('nav.my_account', 'My Account & Orders')}
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/contact')} className="hover:text-cyan-400 transition-colors">
-                  Contact Us
+                <button onClick={() => onNavigate('/contact')} className="hover:text-cyan-400 transition-colors cursor-pointer">
+                  {t('footer.contact_us', 'Contact Us')}
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/blog')} className="hover:text-cyan-400 transition-colors">
-                  Hookah Blog & Guides
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('/admin')} className="text-stone-500 hover:text-cyan-400 transition-colors">
-                  Staff Admin Login
+                <button onClick={() => onNavigate('/admin')} className="text-stone-500 hover:text-cyan-400 transition-colors cursor-pointer">
+                  {t('footer.staff_portal', 'Staff Admin Login')}
                 </button>
               </li>
             </ul>
@@ -128,16 +126,16 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           {/* Column 4: Compliance & Statement */}
           <div>
             <h5 className="text-white font-bold uppercase tracking-wider text-xs mb-3">
-              Legal & Verification
+              {t('footer.legal_compliance', 'Legal & Verification')}
             </h5>
             <p className="text-stone-400 leading-relaxed text-[11px] mb-3">
-              All buyers must be 21+ years of age. Adult signature and identity verification required upon delivery.
+              {t('footer.age_disclaimer', 'All buyers must be 21+ years of age. Adult signature and identity verification required upon delivery.')}
             </p>
             <button
               onClick={() => onNavigate('/contact')}
-              className="text-cyan-400 hover:underline text-xs"
+              className="text-cyan-400 hover:underline text-xs cursor-pointer"
             >
-              Accessibility Statement
+              {t('footer.accessibility_statement', 'Accessibility Statement')}
             </button>
           </div>
 
@@ -147,7 +145,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <div className="py-6 border-b border-stone-800 flex items-center gap-3 text-[11px] text-stone-400 leading-relaxed">
           <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
           <div>
-            <strong className="text-stone-200 uppercase">SURGEON GENERAL'S WARNING:</strong> Smoking Shisha Tobacco contains nicotine. You must be at least 21 years of age to purchase on this platform.
+            <strong className="text-stone-200 uppercase">{t('footer.warning_label', "SURGEON GENERAL'S WARNING:")}</strong> {t('footer.warning_text', 'Smoking Shisha Tobacco contains nicotine. You must be at least 21 years of age to purchase on this platform.')}
           </div>
         </div>
 

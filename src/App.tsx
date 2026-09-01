@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from './client/store/useStore.js';
+import { LanguageProvider } from './client/i18n/LanguageContext.js';
 import { Navbar } from './client/components/Navbar.js';
 import { Footer } from './client/components/Footer.js';
 import { AgeGateModal } from './client/components/AgeGateModal.js';
@@ -130,24 +131,26 @@ export default function App() {
   const isAdminRoute = currentPath.startsWith('/admin');
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-stone-900 selection:bg-amber-100 selection:text-amber-900">
-      {/* Global Modals & Overlays */}
-      <AgeGateModal />
-      <SearchModal onNavigate={navigate} />
-      <QuickViewModal onNavigate={navigate} />
-      <CartDrawer onNavigate={navigate} />
-      <ToastContainer />
+    <LanguageProvider>
+      <div className="min-h-screen flex flex-col bg-white text-stone-900 selection:bg-amber-100 selection:text-amber-900">
+        {/* Global Modals & Overlays */}
+        <AgeGateModal />
+        <SearchModal onNavigate={navigate} />
+        <QuickViewModal onNavigate={navigate} />
+        <CartDrawer onNavigate={navigate} />
+        <ToastContainer />
 
-      {/* Main Navbar (Hidden in Admin suite for immersive focus) */}
-      {!isAdminRoute && <Navbar currentPath={currentPath} onNavigate={navigate} />}
+        {/* Main Navbar (Hidden in Admin suite for immersive focus) */}
+        {!isAdminRoute && <Navbar currentPath={currentPath} onNavigate={navigate} />}
 
-      {/* Page View */}
-      <div className="flex-1">
-        {renderRoute()}
+        {/* Page View */}
+        <div className="flex-1">
+          {renderRoute()}
+        </div>
+
+        {/* Footer (Hidden in Admin suite) */}
+        {!isAdminRoute && <Footer onNavigate={navigate} />}
       </div>
-
-      {/* Footer (Hidden in Admin suite) */}
-      {!isAdminRoute && <Footer onNavigate={navigate} />}
-    </div>
+    </LanguageProvider>
   );
 }
