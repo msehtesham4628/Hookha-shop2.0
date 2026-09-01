@@ -245,8 +245,8 @@ export const DEFAULT_ROLES: Role[] = [
 ];
 
 export const DEFAULT_SETTINGS: StoreSettings = {
-  storeName: 'Sultan Hookah Co.',
-  supportEmail: 'concierge@sultanhookah.com',
+  storeName: 'World Hookah Market',
+  supportEmail: 'support@worldhookahmarket.com',
   supportPhone: '+1 (800) 785-8260',
   currency: 'USD',
   currencySymbol: '$',
@@ -258,7 +258,7 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   stripeEnabled: true,
   resendEnabled: true,
   smsProvider: 'twilio',
-  bannerAnnouncement: 'Complimentary Express Shipping on all orders over $99 · Premium Age 21+ Verified Selection',
+  bannerAnnouncement: 'World Hookah Market · Fast Worldwide & US Express Shipping · Official Master Distributor for MustHave, DarkSide, Alpha Hookah, Oblako & Kong',
   maintenanceMode: false
 };
 
@@ -267,52 +267,52 @@ export const INITIAL_CATEGORIES: Category[] = [
     id: 'cat-hookahs',
     name: 'Hookahs',
     slug: 'hookahs',
-    description: 'Precision engineered luxury hookahs crafted from aerospace-grade V2A stainless steel, precious hardwood, and artisanal crystal.',
+    description: 'Precision engineered modern and Russian hookahs crafted from aerospace-grade AISI 304 stainless steel, polyacetal, and artisanal crystal.',
     imageUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800&auto=format&fit=crop',
     bannerUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1600&auto=format&fit=crop',
-    subcategories: ['Modern Hookahs', 'Traditional Hookahs', 'Compact & Travel', 'Luxury Wooden Hookahs', 'Custom Stainless Sets'],
-    productCount: 8,
+    subcategories: ['Modern Hookahs', 'Russian Hookahs', 'Stainless Steel', 'Luxury Wooden Hookahs', 'Compact & Travel Hookahs'],
+    productCount: 14,
     isActive: true,
     sortOrder: 1,
-    seoTitle: 'Luxury Hookahs & Modern Shisha Pipes | Sultan Hookah',
-    seoDescription: 'Discover our handpicked collection of the finest European and Russian premium stainless steel hookahs.'
+    seoTitle: 'Buy Hookahs Online | Alpha Hookah, El Bomber, MattPear, Wookah',
+    seoDescription: 'Shop premier European and Russian hookahs with worldwide shipping and fast USA delivery from World Hookah Market.'
   },
   {
     id: 'cat-tobacco',
-    name: 'Tobacco & Shisha',
+    name: 'Shisha Tobacco',
     slug: 'tobacco',
-    description: 'Dark leaf, blonde leaf, and premium artisanal tobacco blends cured with honey, natural molasses, and authentic flavor extracts.',
+    description: 'Dark leaf, blonde leaf, and whole-leaf cigar shisha tobacco blends featuring world-renowned brands like MustHave, DarkSide, BlackBurn, and Tangiers.',
     imageUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=800&auto=format&fit=crop',
     bannerUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1600&auto=format&fit=crop',
-    subcategories: ['Dark Leaf Tobacco', 'Blonde Leaf Tobacco', 'Fruity & Sweet', 'Mint & Cooling', 'Dessert & Spices', 'Herbal & Non-Tobacco'],
-    productCount: 12,
+    subcategories: ['Dark Leaf Tobacco', 'Blonde Leaf Tobacco', 'Cigar Tobacco', 'Fruity & Sweet', 'Mint & Cooling', 'Dessert & Spices', 'Herbal & Non-Tobacco'],
+    productCount: 22,
     isActive: true,
     sortOrder: 2,
-    seoTitle: 'Premium Shisha Tobacco Flavors | Darkside, Tangiers, MustHave',
-    seoDescription: 'Shop premier shisha tobacco flavors with international shipping and guaranteed freshness.'
+    seoTitle: 'Shisha Tobacco | MustHave, DarkSide, BlackBurn, Bonche, Tangiers',
+    seoDescription: 'Largest online collection of Russian dark leaf and American shisha tobacco flavors with guaranteed freshness.'
   },
   {
     id: 'cat-bowls',
-    name: 'Bowls',
+    name: 'Hookah Bowls',
     slug: 'bowls',
-    description: 'Hand-thrown clay, semi-porcelain, and glaze-resistant phunnel bowls engineered for even heat conduction and rich sessions.',
+    description: 'Handcrafted clay, semi-porcelain, and character art bowls designed for high thermal retention, pure flavor, and dense smoke output.',
     imageUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=800&auto=format&fit=crop',
     bannerUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1600&auto=format&fit=crop',
-    subcategories: ['Phunnel Bowls', 'Turkish / Traditional Clay', 'Killer Bowls', 'Glazed Art Bowls'],
-    productCount: 6,
+    subcategories: ['Phunnel Bowls', 'Turkish / Killer Bowls', 'Art & Character Bowls', 'Glazed Bowls', 'Clay & Semi-Porcelain'],
+    productCount: 12,
     isActive: true,
     sortOrder: 3,
-    seoTitle: 'Handcrafted Shisha Bowls & Phunnels | Alpaca & Werkbund',
-    seoDescription: 'High thermal retention clay bowls ensuring pure flavor and dense smoke output.'
+    seoTitle: 'Hookah Bowls | Oblako, Kong, Alpaca, Cosmo, Big Maks',
+    seoDescription: 'Shop top-rated hookah phunnel and Turkish bowls from Oblako, Kong, Alpaca, and Cosmo Bowl.'
   },
   {
     id: 'cat-bases',
     name: 'Bases & Vases',
     slug: 'bases',
-    description: 'Hand-blown crystal glass and heavy drop vases created by Master Glassmakers with flawless optical clarity.',
+    description: 'Russian drop vases, craft glass, and hand-cut Bohemian crystal bases engineered for maximum stability and visual elegance.',
     imageUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=800&auto=format&fit=crop',
-    subcategories: ['Russian Drop Bases', 'Bohemian Crystal', 'Modern Craft Glass', 'Mini Bases'],
-    productCount: 4,
+    subcategories: ['Russian Drop Bases', 'Bohemian Crystal', 'Craft Glass Vases', 'Mini & Compact Bases'],
+    productCount: 6,
     isActive: true,
     sortOrder: 4
   },
@@ -320,21 +320,21 @@ export const INITIAL_CATEGORIES: Category[] = [
     id: 'cat-coal',
     name: 'Charcoal & Heat',
     slug: 'coal',
-    description: '100% organic coconut shell charcoal cubes, odorless, low-ash, and ultra-long burn duration.',
+    description: '100% natural coconut charcoal cubes, flats, and circle cuts with low ash, zero sulfur chemicals, and up to 90 minutes burn time.',
     imageUrl: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=800&auto=format&fit=crop',
-    subcategories: ['26mm Coconut Cubes', '28mm Jumbo Cubes', 'Quarter Circles for HMD', 'Charcoal Burners'],
-    productCount: 4,
+    subcategories: ['26mm Coconut Cubes', '28mm Jumbo Cubes', 'HMD Quarter Circles', 'Charcoal Burners', 'Master Lounge Cases'],
+    productCount: 6,
     isActive: true,
     sortOrder: 5
   },
   {
     id: 'cat-accessories',
-    name: 'Accessories',
+    name: 'Accessories & HMD',
     slug: 'accessories',
-    description: 'Heat Management Devices (HMD), medical silicone hoses, precision tongs, mouthpieces, and molasses catchers.',
+    description: 'Heat Management Devices (Kaloud, Na Grani), medical-grade silicone hoses, precision tongs, molasses catchers, and cleaning supplies.',
     imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=800&auto=format&fit=crop',
-    subcategories: ['Heat Management Devices', 'Silicone Hoses & Handles', 'Precision Tongs', 'Molasses Catchers', 'Cleaning Supplies'],
-    productCount: 6,
+    subcategories: ['Heat Management Devices (HMD)', 'Silicone Hoses & Handles', 'Precision Tongs', 'Molasses Catchers', 'Forks & Pokers', 'Grommets & Mouthpieces'],
+    productCount: 10,
     isActive: true,
     sortOrder: 6
   },
@@ -342,7 +342,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     id: 'cat-ehookah',
     name: 'E-Hookah & Electronic',
     slug: 'e-hookah',
-    description: 'Electronic hookah heads and portable shisha vapor systems for seamless modern sessions.',
+    description: 'Electronic hookah heads and portable shisha vaporizers for convenient, smoke-free modern sessions.',
     imageUrl: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=800&auto=format&fit=crop',
     subcategories: ['E-Heads', 'Pod Systems', 'Cartridges'],
     productCount: 3,
@@ -350,13 +350,13 @@ export const INITIAL_CATEGORIES: Category[] = [
     sortOrder: 7
   },
   {
-    id: 'cat-vapes',
-    name: 'Vapes & Vaporizers',
-    slug: 'vapes',
-    description: 'Premium curated electronic vapor devices and salt nicotine systems.',
+    id: 'cat-wholesale',
+    name: 'Wholesale Lounge Supplies',
+    slug: 'wholesale-supplies',
+    description: 'Commercial 1kg shisha tins, 20kg master charcoal cartons, and bulk lounge accessory packs at distributor pricing.',
     imageUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=800&auto=format&fit=crop',
-    subcategories: ['Disposables', 'Pod Kits', 'E-Liquids'],
-    productCount: 3,
+    subcategories: ['1kg Shisha Tins', '20kg Master Coal Cases', 'Disposable Lounge Mouthpieces', 'Commercial Starter Sets'],
+    productCount: 4,
     isActive: true,
     sortOrder: 8
   }
@@ -368,29 +368,79 @@ export const INITIAL_BRANDS: Brand[] = [
     name: 'Alpha Hookah',
     slug: 'alpha-hookah',
     origin: 'Saint Petersburg, Russia',
-    description: 'Award-winning manufacturer of the legendary Model X with iconic vertical blow-off purge technology and magnetic hose connectors.',
+    description: 'Award-winning manufacturer of the legendary Model X, Beat, and Artist hookahs featuring vertical blow-off purge technology and magnetic connectors.',
+    logoUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+    productCount: 8,
+    isActive: true
+  },
+  {
+    id: 'brand-el-bomber',
+    name: 'El Bomber',
+    slug: 'el-bomber',
+    origin: 'Russia',
+    description: 'Futuristic and cyberpunk-inspired hookahs featuring Katana samurai blades, motorcycle exhaust manifolds, and precision AISI 304 engineering.',
+    logoUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+    productCount: 5,
+    isActive: true
+  },
+  {
+    id: 'brand-mattpear',
+    name: 'MattPear',
+    slug: 'mattpear',
+    origin: 'Russia',
+    description: 'Pioneers of medical-grade AISI 304 stainless steel hookahs with patented magnetic hose valves and whisper-quiet adjustable diffusers.',
     logoUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
     productCount: 4,
     isActive: true
   },
   {
-    id: 'brand-wookah',
-    name: 'Wookah',
-    slug: 'wookah',
-    origin: 'Poland',
-    description: 'Master craftsmen uniting rare exotic European woods, V2A stainless steel, and hand-cut lead-free Bohemian crystal glass.',
-    logoUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=300&auto=format&fit=crop',
-    productCount: 3,
+    id: 'brand-maklaud',
+    name: 'Maklaud Hookah',
+    slug: 'maklaud-hookah',
+    origin: 'Russia',
+    description: 'Artisan sculptural masterpieces uniting functional high-grade stainless steel with hand-cast bronze and brass dragon sculptures.',
+    logoUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
+  },
+  {
+    id: 'brand-musthave',
+    name: 'MustHave Tobacco',
+    slug: 'musthave-tobacco',
+    origin: 'Russia',
+    description: 'Finely cut toasted Burley blend featuring hyper-realistic fruit, berry, and dessert flavor formulations packed in sealed plastic cans.',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+    productCount: 8,
     isActive: true
   },
   {
     id: 'brand-darkside',
-    name: 'Darkside Tobacco',
+    name: 'DarkSide Tobacco',
     slug: 'darkside-tobacco',
     origin: 'Russia',
     description: 'Pioneers of unwashed boiled Burley tobacco leaf shisha offering potent strength, rich aroma retention, and heat resilience.',
     logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+    productCount: 7,
+    isActive: true
+  },
+  {
+    id: 'brand-blackburn',
+    name: 'BlackBurn Tobacco',
+    slug: 'blackburn-tobacco',
+    origin: 'Russia',
+    description: 'High-intensity dark leaf shisha tobacco known for the Overdose line, maximum flavor brightness, and superior heat resistance.',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
     productCount: 6,
+    isActive: true
+  },
+  {
+    id: 'brand-bonche',
+    name: 'Bonche Tobacco',
+    slug: 'bonche-tobacco',
+    origin: 'Russia',
+    description: '100% whole-leaf Caribbean and Cuban cigar shisha tobacco creating an ultra-refined, woody, and luxurious smoking session.',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
     isActive: true
   },
   {
@@ -400,27 +450,27 @@ export const INITIAL_BRANDS: Brand[] = [
     origin: 'San Diego, USA',
     description: 'The golden standard of dark leaf American shisha tobacco, famous for Cane Mint and distinctive Noir blends.',
     logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
-    productCount: 4,
-    isActive: true
-  },
-  {
-    id: 'brand-musthave',
-    name: 'MustHave Tobacco',
-    slug: 'musthave-tobacco',
-    origin: 'Russia',
-    description: 'Finely cut toasted Burley blend featuring hyper-realistic fruit, berry, and dessert flavor formulations.',
-    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
     productCount: 5,
     isActive: true
   },
   {
-    id: 'brand-kaloud',
-    name: 'Kaloud',
-    slug: 'kaloud',
-    origin: 'Los Angeles, USA',
-    description: 'Inventors of the revolutionary Lotus Heat Management Device and world-renowned Samsaris silicone-ceramic bowls.',
-    logoUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=300&auto=format&fit=crop',
-    productCount: 3,
+    id: 'brand-oblako',
+    name: 'Oblako Bowls',
+    slug: 'oblako-bowls',
+    origin: 'Russia',
+    description: 'World-famous Russian white ceramic and red clay phunnel bowls with high-gloss colorful marble glazes.',
+    logoUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=300&auto=format&fit=crop',
+    productCount: 6,
+    isActive: true
+  },
+  {
+    id: 'brand-kong',
+    name: 'Kong Bowls',
+    slug: 'kong-bowls',
+    origin: 'Russia',
+    description: 'Handmade character and glowing ceramic bowls featuring Sub-Zero, Godzilla Light, King Kong, and textured Lava glazes.',
+    logoUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=300&auto=format&fit=crop',
+    productCount: 5,
     isActive: true
   },
   {
@@ -432,10 +482,294 @@ export const INITIAL_BRANDS: Brand[] = [
     logoUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=300&auto=format&fit=crop',
     productCount: 4,
     isActive: true
+  },
+  {
+    id: 'brand-wookah',
+    name: 'Wookah',
+    slug: 'wookah',
+    origin: 'Poland',
+    description: 'Master craftsmen uniting rare exotic European woods, V2A stainless steel, and hand-cut lead-free Bohemian crystal glass.',
+    logoUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
+  },
+  {
+    id: 'brand-kaloud',
+    name: 'Kaloud',
+    slug: 'kaloud',
+    origin: 'Los Angeles, USA',
+    description: 'Inventors of the revolutionary Lotus Heat Management Device and world-renowned Samsaris silicone-ceramic bowls.',
+    logoUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
+  },
+  {
+    id: 'brand-coco-loco',
+    name: 'Coco Loco',
+    slug: 'coco-loco',
+    origin: 'Indonesia / USA',
+    description: '100% premium natural coconut charcoal cubes with stable high heat, low ash residue, and 0% chemical taste.',
+    logoUrl: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
   }
 ];
 
 export const INITIAL_PRODUCTS: Product[] = [
+  // 1. Alpha Hookah Model X
+  {
+    id: 'prod-alpha-model-x-black',
+    name: 'Alpha Hookah Model X (Black Matte)',
+    slug: 'alpha-hookah-model-x-black-matte',
+    sku: 'ALP-MODX-BLK',
+    description: 'The worldwide award-winning Russian hookah from Alpha Hookah. Features iconic upward vertical blow-off purge technology under the tray, anodized aerospace aluminum stem, and magnetic hose connectors.',
+    shortDescription: 'Iconic vertical purge system, matte black anodized finish, magnetic hose connector, and adjustable diffuser.',
+    price: 244.99,
+    salePrice: 229.00,
+    currency: 'USD',
+    brand: 'Alpha Hookah',
+    brandSlug: 'alpha-hookah',
+    category: 'Hookahs',
+    categorySlug: 'hookahs',
+    subcategory: 'Russian Hookahs',
+    images: [
+      {
+        id: 'img-alp-x-1',
+        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        alt: 'Alpha Hookah Model X Black Matte',
+        isPrimary: true,
+        sortOrder: 1
+      },
+      {
+        id: 'img-alp-x-2',
+        url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=300&auto=format&fit=crop',
+        alt: 'Alpha Hookah Upward Vertical Purge System',
+        isPrimary: false,
+        sortOrder: 2
+      }
+    ],
+    stock: 24,
+    lowStockThreshold: 4,
+    weight: 2200,
+    material: 'Anodized Aluminum & AISI 304 Stainless Steel',
+    color: 'Matte Obsidian Black',
+    tags: ['vertical-purge', 'russian-hookah', 'magnetic-connector', 'bestseller'],
+    specifications: [
+      { label: 'Height', value: '42 cm (16.5 in)' },
+      { label: 'Purge Style', value: 'Multi-jet Upward Tray Purge' },
+      { label: 'Hose Connector', value: 'Neodymium Magnetic Lock' },
+      { label: 'Diffuser', value: 'Removable 2-stage Silencer' },
+      { label: 'Origin', value: 'Saint Petersburg, Russia' }
+    ],
+    rating: 4.96,
+    reviewCount: 88,
+    isFeatured: true,
+    isNewArrival: false,
+    isBestSeller: true,
+    isOnSale: true,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-10T10:00:00Z',
+    updatedAt: '2026-01-10T10:00:00Z'
+  },
+
+  // 2. Alpha Hookah Beat White
+  {
+    id: 'prod-alpha-beat-white',
+    name: 'Alpha Hookah Beat White (Silver & White)',
+    slug: 'alpha-hookah-beat-white-silver',
+    sku: 'ALP-BEAT-WHT',
+    description: 'Compact street-culture inspired portable hookah. The Alpha Beat features an ultra-responsive draw, cylindrical blow-off purge, and compact dimensions making it the ultimate travel and lounge powerhouse.',
+    shortDescription: 'Compact street-style hookah with radial blow-off purge, magnetic hose port, and carrying case.',
+    price: 279.95,
+    currency: 'USD',
+    brand: 'Alpha Hookah',
+    brandSlug: 'alpha-hookah',
+    category: 'Hookahs',
+    categorySlug: 'hookahs',
+    subcategory: 'Compact & Travel Hookahs',
+    images: [
+      {
+        id: 'img-alp-beat-1',
+        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        alt: 'Alpha Hookah Beat White Silver',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 18,
+    lowStockThreshold: 3,
+    weight: 1800,
+    material: 'Polyacetal & AISI 304 Stainless Steel',
+    color: 'Gloss White / Silver',
+    tags: ['compact', 'beat', 'alpha-hookah', 'portable'],
+    specifications: [
+      { label: 'Height', value: '35 cm (13.8 in)' },
+      { label: 'Purge Style', value: 'Center Stem Radial Jet Purge' },
+      { label: 'Connector', value: 'Magnetic Port' }
+    ],
+    rating: 4.88,
+    reviewCount: 34,
+    isFeatured: true,
+    isNewArrival: true,
+    isBestSeller: false,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-15T00:00:00Z',
+    updatedAt: '2026-01-15T00:00:00Z'
+  },
+
+  // 3. El Bomber Katana Hookah
+  {
+    id: 'prod-el-bomber-katana',
+    name: 'El Bomber Katana Hookah (Samurai Edition)',
+    slug: 'el-bomber-katana-samurai-edition',
+    sku: 'ELB-KTN-01',
+    description: 'Inspired by traditional Japanese samurai sword craftsmanship. El Bomber Katana features a laser-engraved steel katana tray, unique downward purge along the stem spine, and precision CNC-machined stainless steel fittings.',
+    shortDescription: 'Japanese Samurai inspired design, engraved katana tray, magnetic hose port, and smooth diffuser.',
+    price: 289.00,
+    salePrice: 269.00,
+    currency: 'USD',
+    brand: 'El Bomber',
+    brandSlug: 'el-bomber',
+    category: 'Hookahs',
+    categorySlug: 'hookahs',
+    subcategory: 'Modern Hookahs',
+    images: [
+      {
+        id: 'img-elb-ktn-1',
+        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        alt: 'El Bomber Katana Hookah Samurai Edition',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 15,
+    lowStockThreshold: 3,
+    weight: 2400,
+    material: 'AISI 304 Stainless Steel & Polyacetal',
+    color: 'Samurai Black / Crimson Red',
+    tags: ['el-bomber', 'katana', 'samurai', 'exclusive'],
+    specifications: [
+      { label: 'Height', value: '47 cm' },
+      { label: 'Tray Style', value: 'Laser Engraved Katana Blade Tray' },
+      { label: 'Purge Style', value: 'Spine-Guided Downward Jet' }
+    ],
+    rating: 4.95,
+    reviewCount: 41,
+    isFeatured: true,
+    isNewArrival: true,
+    isBestSeller: true,
+    isOnSale: true,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-20T00:00:00Z',
+    updatedAt: '2026-01-20T00:00:00Z'
+  },
+
+  // 4. MattPear Simple M Ball White
+  {
+    id: 'prod-mattpear-simple-m',
+    name: 'MattPear Simple M Ball Hookah (White Edition)',
+    slug: 'mattpear-simple-m-ball-white',
+    sku: 'MTP-SMP-WHT',
+    description: 'The pinnacle of Russian reliability. Made entirely of certified AISI 304 medical stainless steel. Features patented MattPear magnetic hose connection, threaded diffuser, and clean minimalist ball accents.',
+    shortDescription: '100% AISI 304 surgical stainless steel, patented magnetic port, and quiet whisper diffuser.',
+    price: 225.00,
+    currency: 'USD',
+    brand: 'MattPear',
+    brandSlug: 'mattpear',
+    category: 'Hookahs',
+    categorySlug: 'hookahs',
+    subcategory: 'Stainless Steel',
+    images: [
+      {
+        id: 'img-mtp-1',
+        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        alt: 'MattPear Simple M Ball Hookah',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 20,
+    lowStockThreshold: 4,
+    weight: 2500,
+    material: 'AISI 304 Medical Stainless Steel',
+    color: 'Surgical Steel / White Ball',
+    tags: ['mattpear', 'stainless-steel', 'indestructible', 'magnetic'],
+    specifications: [
+      { label: 'Height', value: '45 cm' },
+      { label: 'Material', value: '100% AISI 304 Inox' },
+      { label: 'Warranty', value: '5-Year Manufacturer Warranty' }
+    ],
+    rating: 4.93,
+    reviewCount: 52,
+    isFeatured: false,
+    isNewArrival: false,
+    isBestSeller: true,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-05T00:00:00Z',
+    updatedAt: '2026-01-05T00:00:00Z'
+  },
+
+  // 5. Maklaud Warta Heavy Brass Hookah
+  {
+    id: 'prod-maklaud-warta',
+    name: 'Maklaud Warta Sculptural Brass Hookah',
+    slug: 'maklaud-warta-brass-hookah',
+    sku: 'MKL-WRT-01',
+    description: 'An extraordinary union of functional sculpture and Russian engineering. Features an intricately cast brass skull inset in the central stem, surgical stainless steel core, and handcrafted heavy glass drop vase.',
+    shortDescription: 'Handcrafted Russian sculptural brass artwork stem with solid stainless steel air column.',
+    price: 495.00,
+    salePrice: 460.00,
+    currency: 'USD',
+    brand: 'Maklaud Hookah',
+    brandSlug: 'maklaud-hookah',
+    category: 'Hookahs',
+    categorySlug: 'hookahs',
+    subcategory: 'Modern Hookahs',
+    images: [
+      {
+        id: 'img-mkl-1',
+        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        alt: 'Maklaud Warta Sculptural Brass Hookah',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 8,
+    lowStockThreshold: 2,
+    weight: 3400,
+    material: 'Artisanal Brass & AISI 304 Stainless Steel',
+    color: 'Antique Brass / Polished Steel',
+    tags: ['maklaud', 'sculptural', 'luxury', 'brass'],
+    specifications: [
+      { label: 'Height', value: '55 cm' },
+      { label: 'Inset Sculpture', value: 'Hand-Cast Solid Brass' },
+      { label: 'Airflow', value: 'Classic Open Russian Draw' }
+    ],
+    rating: 4.98,
+    reviewCount: 29,
+    isFeatured: true,
+    isNewArrival: false,
+    isBestSeller: false,
+    isOnSale: true,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-08T00:00:00Z',
+    updatedAt: '2026-01-08T00:00:00Z'
+  },
+
+  // 6. Wookah Masterpiece Oak
   {
     id: 'prod-wookah-oak-crystal',
     name: 'Wookah Masterpiece Oak with Olives Crystal Base',
@@ -456,7 +790,7 @@ export const INITIAL_PRODUCTS: Product[] = [
         id: 'img-wkh-1',
         url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
         thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
-        alt: 'Wookah Masterpiece Oak Shisha in Studio Lighting',
+        alt: 'Wookah Masterpiece Oak Shisha',
         isPrimary: true,
         sortOrder: 1
       },
@@ -467,14 +801,6 @@ export const INITIAL_PRODUCTS: Product[] = [
         alt: 'Hand-Cut Bohemian Crystal Base Detail',
         isPrimary: false,
         sortOrder: 2
-      },
-      {
-        id: 'img-wkh-3',
-        url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=300&auto=format&fit=crop',
-        alt: 'Wookah Quick Lock Stainless Steel Stem Connection',
-        isPrimary: false,
-        sortOrder: 3
       }
     ],
     stock: 14,
@@ -487,8 +813,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       { label: 'Height', value: '64 cm (25.2 in)' },
       { label: 'Vase Material', value: 'Hand-cut Heavy Crystal Glass' },
       { label: 'Stem Material', value: 'Solid Oak Wood + V2A Surgical Inox' },
-      { label: 'Connection', value: 'Quick-Lock Click System' },
-      { label: 'Origin', value: 'Manufactured in Poland' }
+      { label: 'Connection', value: 'Quick-Lock Click System' }
     ],
     rating: 4.95,
     reviewCount: 42,
@@ -498,78 +823,353 @@ export const INITIAL_PRODUCTS: Product[] = [
     isOnSale: true,
     isActive: true,
     ageRestricted: true,
-    seoTitle: 'Buy Wookah Oak Olives Crystal Hookah | Sultan Hookah',
-    seoDescription: 'Authentic Wookah European Oak with hand-cut crystal vase. Full warranty with free worldwide insured delivery.',
     createdAt: '2026-01-10T12:00:00Z',
     updatedAt: '2026-01-10T12:00:00Z'
   },
+
+  // 7. MustHave Pinkman 125g
   {
-    id: 'prod-alpha-model-x-cyber',
-    name: 'Alpha Hookah Model X Cyber Gold Edition',
-    slug: 'alpha-hookah-model-x-cyber-gold',
-    sku: 'ALP-MODX-GLD',
-    description: 'Winner of Hookah Club Show Hookah of the Year. The Alpha Model X features the iconic upward purge valve blowing smoke under the charcoal tray, anodized aerospace aluminum exterior, and magnetic hose ports.',
-    shortDescription: 'Iconic vertical purge system, gold titanium PVD finish, magnetic hose connector and adjustable diffuser.',
-    price: 269.00,
-    salePrice: 245.00,
+    id: 'prod-musthave-pinkman',
+    name: 'MustHave Tobacco Pinkman (125g)',
+    slug: 'musthave-tobacco-pinkman-125g',
+    sku: 'MST-PNK-125',
+    description: 'The undisputed #1 top-selling Russian shisha tobacco in the world. MustHave Pinkman delivers an explosive fusion of pink grapefruit, ripe wild raspberries, and sweet garden strawberries with a refreshing citrus finish.',
+    shortDescription: 'World-famous pink grapefruit, forest raspberries, and sweet strawberry jam on toasted Burley leaf.',
+    price: 19.99,
     currency: 'USD',
-    brand: 'Alpha Hookah',
-    brandSlug: 'alpha-hookah',
-    category: 'Hookahs',
-    categorySlug: 'hookahs',
-    subcategory: 'Modern Hookahs',
+    brand: 'MustHave Tobacco',
+    brandSlug: 'musthave-tobacco',
+    category: 'Shisha Tobacco',
+    categorySlug: 'tobacco',
+    subcategory: 'Fruity & Sweet',
     images: [
       {
-        id: 'img-alp-1',
-        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
-        alt: 'Alpha Hookah Model X Cyber Gold Edition',
+        id: 'img-mst-pnk-1',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+        alt: 'MustHave Pinkman 125g Jar',
         isPrimary: true,
         sortOrder: 1
-      },
-      {
-        id: 'img-alp-2',
-        url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop',
-        alt: 'Alpha Hookah Upward Vertical Purge System',
-        isPrimary: false,
-        sortOrder: 2
       }
     ],
-    stock: 28,
-    lowStockThreshold: 5,
-    weight: 2200,
-    material: 'Anodized Aluminum & AISI 304 Steel',
-    color: 'Cyber Gold / Obsidian Black',
-    tags: ['vertical-purge', 'modern', 'magnetic-port', 'top-rated'],
+    stock: 140,
+    lowStockThreshold: 20,
+    weight: 125,
+    flavor: 'Grapefruit, Raspberry & Strawberry',
+    tags: ['musthave', 'pinkman', 'bestseller', 'dark-leaf', 'russian-tobacco'],
     specifications: [
-      { label: 'Height', value: '42 cm (16.5 in)' },
-      { label: 'Purge Style', value: 'Multi-jet Upward Tray Purge' },
-      { label: 'Hose Connector', value: 'Neodymium Magnetic Lock' },
-      { label: 'Diffuser', value: 'Removable 2-stage Silencer' }
+      { label: 'Weight', value: '125 grams' },
+      { label: 'Leaf Grade', value: 'Toasted Burley Medium Cut' },
+      { label: 'Strength', value: 'Medium-Strong (6/10)' },
+      { label: 'Origin', value: 'Moscow, Russia' }
     ],
-    rating: 4.88,
-    reviewCount: 67,
+    rating: 4.97,
+    reviewCount: 164,
+    isFeatured: true,
+    isNewArrival: false,
+    isBestSeller: true,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-12T00:00:00Z',
+    updatedAt: '2026-01-12T00:00:00Z'
+  },
+
+  // 8. MustHave Space Flavour 125g
+  {
+    id: 'prod-musthave-space-flavour',
+    name: 'MustHave Tobacco Space Flavour (125g)',
+    slug: 'musthave-tobacco-space-flavour-125g',
+    sku: 'MST-SPC-125',
+    description: 'An exotic intergalactic cocktail of sweet tropical mango, fragrant passionfruit, and juicy lychee syrup. Perfectly balanced sweetness and tropical aroma.',
+    shortDescription: 'Tropical mango, juicy passion fruit, and aromatic lychee in a sealed 125g jar.',
+    price: 19.99,
+    currency: 'USD',
+    brand: 'MustHave Tobacco',
+    brandSlug: 'musthave-tobacco',
+    category: 'Shisha Tobacco',
+    categorySlug: 'tobacco',
+    subcategory: 'Fruity & Sweet',
+    images: [
+      {
+        id: 'img-mst-spc-1',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+        alt: 'MustHave Space Flavour 125g Jar',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 95,
+    lowStockThreshold: 15,
+    weight: 125,
+    flavor: 'Mango, Passionfruit & Lychee',
+    tags: ['musthave', 'space-flavour', 'tropical', 'dark-leaf'],
+    specifications: [
+      { label: 'Weight', value: '125 grams' },
+      { label: 'Leaf Type', value: 'Toasted Burley' },
+      { label: 'Strength', value: 'Medium-Strong' }
+    ],
+    rating: 4.92,
+    reviewCount: 78,
     isFeatured: true,
     isNewArrival: true,
+    isBestSeller: true,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-14T00:00:00Z',
+    updatedAt: '2026-01-14T00:00:00Z'
+  },
+
+  // 9. MustHave Alova 125g
+  {
+    id: 'prod-musthave-alova',
+    name: 'MustHave Tobacco Alova (125g)',
+    slug: 'musthave-tobacco-alova-125g',
+    sku: 'MST-ALV-125',
+    description: 'Refreshing natural aloe vera juice accented with delicate sweet tropical fruits and a smooth cooling breeze. Exceptional for fruit and citrus mixology.',
+    shortDescription: 'Sweet refreshing aloe vera juice with tropical nectar undertones.',
+    price: 19.99,
+    currency: 'USD',
+    brand: 'MustHave Tobacco',
+    brandSlug: 'musthave-tobacco',
+    category: 'Shisha Tobacco',
+    categorySlug: 'tobacco',
+    subcategory: 'Fruity & Sweet',
+    images: [
+      {
+        id: 'img-mst-alv-1',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+        alt: 'MustHave Alova 125g Jar',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 80,
+    lowStockThreshold: 10,
+    weight: 125,
+    flavor: 'Aloe Vera & Sweet Tropical Ice',
+    tags: ['musthave', 'alova', 'aloe-vera', 'mixer'],
+    specifications: [
+      { label: 'Weight', value: '125 grams' },
+      { label: 'Strength', value: 'Medium-Strong' }
+    ],
+    rating: 4.89,
+    reviewCount: 45,
+    isFeatured: false,
+    isNewArrival: true,
+    isBestSeller: false,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-16T00:00:00Z',
+    updatedAt: '2026-01-16T00:00:00Z'
+  },
+
+  // 10. DarkSide Core Supernova 200g
+  {
+    id: 'prod-darkside-supernova',
+    name: 'DarkSide Core Supernova (200g)',
+    slug: 'darkside-core-supernova-200g',
+    sku: 'DKS-SUP-200',
+    description: 'The legendary sub-zero cooling booster of the shisha industry. Pure zero-flavor polar frost crafted to add an icy bite to any mix without altering the fruit or dessert aroma profile.',
+    shortDescription: 'Zero-flavor pure sub-zero arctic frost booster. The ultimate shisha mixologist tool.',
+    price: 26.99,
+    salePrice: 24.50,
+    currency: 'USD',
+    brand: 'DarkSide Tobacco',
+    brandSlug: 'darkside-tobacco',
+    category: 'Shisha Tobacco',
+    categorySlug: 'tobacco',
+    subcategory: 'Mint & Cooling',
+    images: [
+      {
+        id: 'img-dks-sup-1',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+        alt: 'DarkSide Core Supernova 200g Tub',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 110,
+    lowStockThreshold: 15,
+    weight: 200,
+    flavor: 'Pure Sub-Zero Arctic Ice (No Flavor)',
+    tags: ['darkside', 'supernova', 'ice', 'cooling', 'bestseller'],
+    specifications: [
+      { label: 'Weight', value: '200 grams' },
+      { label: 'Cut', value: 'Fine Boiled Dark Burley Leaf' },
+      { label: 'Heat Resistance', value: 'Extremely High (3-4 Coals)' }
+    ],
+    rating: 4.95,
+    reviewCount: 112,
+    isFeatured: true,
+    isNewArrival: false,
     isBestSeller: true,
     isOnSale: true,
     isActive: true,
     ageRestricted: true,
-    createdAt: '2026-01-15T10:00:00Z',
-    updatedAt: '2026-01-15T10:00:00Z'
+    createdAt: '2026-01-08T00:00:00Z',
+    updatedAt: '2026-01-08T00:00:00Z'
   },
+
+  // 11. DarkSide Core Falling Star 200g
+  {
+    id: 'prod-darkside-falling-star',
+    name: 'DarkSide Core Falling Star (200g)',
+    slug: 'darkside-core-falling-star-200g',
+    sku: 'DKS-FLS-200',
+    description: 'Juicy tropical mango blended harmoniously with tangy passion fruit on DarkSide signature boiled Burley dark leaf tobacco. Rich, long-lasting, and intensely aromatic.',
+    shortDescription: 'Sweet tropical mango and tart passionfruit on robust dark leaf.',
+    price: 26.99,
+    currency: 'USD',
+    brand: 'DarkSide Tobacco',
+    brandSlug: 'darkside-tobacco',
+    category: 'Shisha Tobacco',
+    categorySlug: 'tobacco',
+    subcategory: 'Fruity & Sweet',
+    images: [
+      {
+        id: 'img-dks-fls-1',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+        alt: 'DarkSide Falling Star 200g Tub',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 75,
+    lowStockThreshold: 10,
+    weight: 200,
+    flavor: 'Tropical Mango & Tart Passionfruit',
+    tags: ['darkside', 'falling-star', 'mango', 'dark-leaf'],
+    specifications: [
+      { label: 'Weight', value: '200 grams' },
+      { label: 'Strength', value: 'Core Line (Medium-High)' }
+    ],
+    rating: 4.90,
+    reviewCount: 64,
+    isFeatured: false,
+    isNewArrival: false,
+    isBestSeller: true,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-10T00:00:00Z',
+    updatedAt: '2026-01-10T00:00:00Z'
+  },
+
+  // 12. BlackBurn Overdose (200g)
+  {
+    id: 'prod-blackburn-overdose',
+    name: 'BlackBurn Overdose High-Strength (200g)',
+    slug: 'blackburn-overdose-high-strength-200g',
+    sku: 'BKB-OVD-200',
+    description: 'The heavyweight of Russian dark leaf tobacco. Overdose blends premium unwashed Burley tobacco cured with tart sparkling citrus lemonade. Engineered for veteran shisha connoisseurs seeking maximum strength and smoke density.',
+    shortDescription: 'High-nicotine tart sparkling citrus lemonade on extra-strong Burley tobacco leaf.',
+    price: 27.99,
+    salePrice: 25.50,
+    currency: 'USD',
+    brand: 'BlackBurn Tobacco',
+    brandSlug: 'blackburn-tobacco',
+    category: 'Shisha Tobacco',
+    categorySlug: 'tobacco',
+    subcategory: 'Dark Leaf Tobacco',
+    images: [
+      {
+        id: 'img-bkb-ovd-1',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+        alt: 'BlackBurn Overdose 200g Tub',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 90,
+    lowStockThreshold: 12,
+    weight: 200,
+    flavor: 'Sparkling Citrus Lemonade & Zesty Lime',
+    tags: ['blackburn', 'overdose', 'high-strength', 'dark-leaf', 'russian-tobacco'],
+    specifications: [
+      { label: 'Weight', value: '200 grams' },
+      { label: 'Strength', value: 'High / Extra Strong (8/10)' },
+      { label: 'Heat Tolerance', value: 'Extreme (3-4 Coals in Phunnel)' }
+    ],
+    rating: 4.96,
+    reviewCount: 92,
+    isFeatured: true,
+    isNewArrival: false,
+    isBestSeller: true,
+    isOnSale: true,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-07T00:00:00Z',
+    updatedAt: '2026-01-07T00:00:00Z'
+  },
+
+  // 13. Bonche Cigar Tobacco Whiskey 120g
+  {
+    id: 'prod-bonche-whiskey',
+    name: 'Bonche 100% Cigar Shisha Tobacco Whiskey (120g)',
+    slug: 'bonche-cigar-tobacco-whiskey-120g',
+    sku: 'BNC-WSK-120',
+    description: 'Made exclusively from 100% whole Caribbean and Cuban cigar leaf tobacco. Cured with single malt whiskey and oak barrel notes. Yields an intensely rich, earthy, and sophisticated smoke.',
+    shortDescription: '100% whole Cuban cigar leaf shisha infused with aged oak barrel single malt whiskey.',
+    price: 48.00,
+    currency: 'USD',
+    brand: 'Bonche Tobacco',
+    brandSlug: 'bonche-tobacco',
+    category: 'Shisha Tobacco',
+    categorySlug: 'tobacco',
+    subcategory: 'Cigar Tobacco',
+    images: [
+      {
+        id: 'img-bnc-wsk-1',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
+        alt: 'Bonche Cigar Tobacco Whiskey 120g Jar',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 35,
+    lowStockThreshold: 5,
+    weight: 120,
+    flavor: 'Aged Single Malt Whiskey & Cuban Cigar Leaf',
+    tags: ['bonche', 'cigar-leaf', 'whiskey', 'luxury', 'connoisseur'],
+    specifications: [
+      { label: 'Weight', value: '120 grams' },
+      { label: 'Leaf Origin', value: '100% Whole Caribbean Cigar Leaf' },
+      { label: 'Strength', value: 'Heavy Cigar Strength' }
+    ],
+    rating: 4.97,
+    reviewCount: 38,
+    isFeatured: true,
+    isNewArrival: true,
+    isBestSeller: false,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-22T00:00:00Z',
+    updatedAt: '2026-01-22T00:00:00Z'
+  },
+
+  // 14. Tangiers Noir Cane Mint 250g
   {
     id: 'prod-tangiers-cane-mint',
     name: 'Tangiers Noir Cane Mint (250g)',
     slug: 'tangiers-noir-cane-mint-250g',
     sku: 'TNG-NOIR-CM250',
-    description: 'The undisputed king of peppermint shisha. Tangiers Cane Mint delivers an unmatched frosty sweet peppermint blast built on unwashed robust dark leaf tobacco.',
-    shortDescription: 'Legendary intense peppermint dark leaf tobacco. The gold benchmark of cooling shisha blends.',
-    price: 24.99,
+    description: 'The undisputed benchmark of peppermint dark leaf shisha. Tangiers Cane Mint delivers an unmatched frosty sweet peppermint blast built on unwashed robust dark leaf tobacco.',
+    shortDescription: 'Legendary intense peppermint dark leaf tobacco. The gold standard of cooling blends.',
+    price: 23.99,
     currency: 'USD',
     brand: 'Tangiers',
     brandSlug: 'tangiers',
-    category: 'Tobacco & Shisha',
+    category: 'Shisha Tobacco',
     categorySlug: 'tobacco',
     subcategory: 'Dark Leaf Tobacco',
     images: [
@@ -586,7 +1186,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     lowStockThreshold: 15,
     weight: 250,
     flavor: 'Intense Pure Cane Peppermint',
-    tags: ['dark-leaf', 'cane-mint', 'high-nicotine', 'legendary'],
+    tags: ['dark-leaf', 'cane-mint', 'high-nicotine', 'legendary', 'tangiers'],
     specifications: [
       { label: 'Weight', value: '250 grams' },
       { label: 'Leaf Type', value: 'Unwashed Dark Leaf Burley' },
@@ -604,98 +1204,108 @@ export const INITIAL_PRODUCTS: Product[] = [
     createdAt: '2026-01-05T00:00:00Z',
     updatedAt: '2026-01-05T00:00:00Z'
   },
+
+  // 15. Oblako Phunnel L Glazed Hookah Bowl
   {
-    id: 'prod-darkside-supernova',
-    name: 'Darkside Core Supernova (200g)',
-    slug: 'darkside-core-supernova-200g',
-    sku: 'DKS-SUP-200',
-    description: 'The coldest cooling booster in the shisha industry. Pure zero-flavor polar frost crafted to elevate any fruit or dessert shisha mix.',
-    shortDescription: 'Zero-flavor intense arctic coolant booster for elite shisha mixology.',
-    price: 28.50,
-    salePrice: 25.00,
+    id: 'prod-oblako-phunnel-l',
+    name: 'Oblako Phunnel L Glazed Hookah Bowl (Mono Marble)',
+    slug: 'oblako-phunnel-l-glazed-marble',
+    sku: 'OBK-PHN-L-MRB',
+    description: 'Made in Russia from premium white ceramics and finished with a heat-resistant gloss marble glaze. The Oblako Phunnel L ensures zero molasses leakage, uniform thermal distribution, and maximum flavor retention for dark and blonde shisha.',
+    shortDescription: 'Russian white ceramic phunnel bowl with high-gloss marble glaze. Capacity 20-25g.',
+    price: 24.99,
     currency: 'USD',
-    brand: 'Darkside Tobacco',
-    brandSlug: 'darkside-tobacco',
-    category: 'Tobacco & Shisha',
-    categorySlug: 'tobacco',
-    subcategory: 'Mint & Cooling',
+    brand: 'Oblako Bowls',
+    brandSlug: 'oblako-bowls',
+    category: 'Hookahs Bowls',
+    categorySlug: 'bowls',
+    subcategory: 'Phunnel Bowls',
     images: [
       {
-        id: 'img-dks-1',
-        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
-        alt: 'Darkside Core Supernova 200g Sealed Tub',
+        id: 'img-obk-1',
+        url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=300&auto=format&fit=crop',
+        alt: 'Oblako Phunnel L Glazed Hookah Bowl',
         isPrimary: true,
         sortOrder: 1
       }
     ],
-    stock: 85,
+    stock: 65,
     lowStockThreshold: 10,
-    weight: 200,
-    flavor: 'Pure Sub-Zero Polar Ice',
-    tags: ['booster', 'darkside', 'supernova', 'cooling'],
+    weight: 320,
+    material: 'Russian White Ceramic & Gloss Glaze',
+    color: 'Marble White / Obsidian Swirl',
+    tags: ['oblako', 'phunnel', 'glazed', 'russian-bowl', 'bestseller'],
     specifications: [
-      { label: 'Weight', value: '200 grams' },
-      { label: 'Cut', value: 'Fine Boiled Dark Leaf' },
-      { label: 'Heat Resistance', value: 'Extremely High (3-4 Coals)' }
+      { label: 'Capacity', value: '20 - 25 grams' },
+      { label: 'Spire Height', value: 'Phunnel Central Spire' },
+      { label: 'HMD Compatibility', value: 'Universal (Kaloud, Na Grani, Provost)' }
     ],
-    rating: 4.91,
-    reviewCount: 53,
-    isFeatured: false,
-    isNewArrival: false,
-    isBestSeller: true,
-    isOnSale: true,
-    isActive: true,
-    ageRestricted: true,
-    createdAt: '2026-01-08T00:00:00Z',
-    updatedAt: '2026-01-08T00:00:00Z'
-  },
-  {
-    id: 'prod-musthave-pinkman',
-    name: 'MustHave Pinkman (Grapefruit, Raspberry & Strawberry) 125g',
-    slug: 'musthave-pinkman-125g',
-    sku: 'MST-PNK-125',
-    description: 'A global shisha sensation: bursting pink grapefruit juice blended with wild forest raspberries and ripe garden strawberries with a refreshing citrus finish.',
-    shortDescription: 'Mouthwatering pink grapefruit, wild raspberries and sweet strawberry jam.',
-    price: 21.00,
-    currency: 'USD',
-    brand: 'MustHave Tobacco',
-    brandSlug: 'musthave-tobacco',
-    category: 'Tobacco & Shisha',
-    categorySlug: 'tobacco',
-    subcategory: 'Fruity & Sweet',
-    images: [
-      {
-        id: 'img-mst-1',
-        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
-        alt: 'MustHave Pinkman 125g Jar',
-        isPrimary: true,
-        sortOrder: 1
-      }
-    ],
-    stock: 96,
-    lowStockThreshold: 12,
-    weight: 125,
-    flavor: 'Grapefruit, Raspberry & Strawberry Syrup',
-    tags: ['musthave', 'fruity', 'pinkman', 'all-day-smoke'],
-    specifications: [
-      { label: 'Weight', value: '125 grams' },
-      { label: 'Leaf Grade', value: 'Toasted Burley Medium Cut' },
-      { label: 'Strength', value: 'Medium-Strong' }
-    ],
-    rating: 4.96,
-    reviewCount: 98,
+    rating: 4.94,
+    reviewCount: 86,
     isFeatured: true,
     isNewArrival: false,
     isBestSeller: true,
     isOnSale: false,
     isActive: true,
-    ageRestricted: true,
-    createdAt: '2026-01-12T00:00:00Z',
-    updatedAt: '2026-01-12T00:00:00Z'
+    ageRestricted: false,
+    createdAt: '2026-01-10T00:00:00Z',
+    updatedAt: '2026-01-10T00:00:00Z'
   },
+
+  // 16. Kong Sub-Zero Luminous Hookah Bowl
+  {
+    id: 'prod-kong-subzero',
+    name: 'Kong Sub-Zero Luminous Glow-In-The-Dark Bowl',
+    slug: 'kong-sub-zero-luminous-glow-bowl',
+    sku: 'KNG-SBZ-GLW',
+    description: 'A masterpiece from Russian artisans Kong. Features a hand-sculpted Mortal Kombat Sub-Zero ice mask design crafted from high-temperature red clay and coated with luminous glow-in-the-dark eyes and ice crystals.',
+    shortDescription: 'Handcrafted Russian character bowl with glow-in-the-dark luminous crystals and high heat retention.',
+    price: 38.00,
+    salePrice: 34.99,
+    currency: 'USD',
+    brand: 'Kong Bowls',
+    brandSlug: 'kong-bowls',
+    category: 'Hookahs Bowls',
+    categorySlug: 'bowls',
+    subcategory: 'Art & Character Bowls',
+    images: [
+      {
+        id: 'img-kng-sbz-1',
+        url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=300&auto=format&fit=crop',
+        alt: 'Kong Sub-Zero Luminous Hookah Bowl',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 32,
+    lowStockThreshold: 5,
+    weight: 380,
+    material: 'High-Temperature Red Clay & Glow Glaze',
+    color: 'Ice Blue / Frost White',
+    tags: ['kong', 'sub-zero', 'glow-in-the-dark', 'character-bowl', 'handmade'],
+    specifications: [
+      { label: 'Capacity', value: '16 - 20 grams' },
+      { label: 'Feature', value: 'Luminous Phosphorescent Elements' },
+      { label: 'Style', value: 'Traditional 5-Hole Killer Style' }
+    ],
+    rating: 4.97,
+    reviewCount: 54,
+    isFeatured: true,
+    isNewArrival: true,
+    isBestSeller: true,
+    isOnSale: true,
+    isActive: true,
+    ageRestricted: false,
+    createdAt: '2026-01-18T00:00:00Z',
+    updatedAt: '2026-01-18T00:00:00Z'
+  },
+
+  // 17. Alpaca Symphony Hand-Thrown Phunnel Bowl
   {
     id: 'prod-alpaca-symphony',
-    name: 'Alpaca Symphony Hand-Thrown Clay Phunnel Bowl',
+    name: 'Alpaca Symphony Hand-Thrown Stoneware Phunnel Bowl',
     slug: 'alpaca-symphony-phunnel-bowl',
     sku: 'ALP-BOWL-SYM',
     description: 'Handmade in California from proprietary American stoneware clay. The Alpaca Symphony features a central spire bridge that prevents foil drag and secures HMD devices with supreme heat management.',
@@ -705,13 +1315,14 @@ export const INITIAL_PRODUCTS: Product[] = [
     currency: 'USD',
     brand: 'Alpaca Bowls',
     brandSlug: 'alpaca-bowls',
-    category: 'Bowls',
+    category: 'Hookahs Bowls',
     categorySlug: 'bowls',
     subcategory: 'Phunnel Bowls',
     images: [
       {
         id: 'img-bwl-1',
         url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=300&auto=format&fit=crop',
         alt: 'Alpaca Symphony Clay Phunnel Bowl',
         isPrimary: true,
         sortOrder: 1
@@ -722,7 +1333,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     weight: 280,
     material: 'American White Stoneware Clay',
     color: 'Ivory Marble Glaze',
-    tags: ['handmade', 'stoneware', 'phunnel', 'hmd-compatible'],
+    tags: ['handmade', 'stoneware', 'phunnel', 'hmd-compatible', 'alpaca'],
     specifications: [
       { label: 'Capacity', value: '18 - 22 grams' },
       { label: 'Spire Type', value: 'Cross-Bridge Spire' },
@@ -739,6 +1350,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     createdAt: '2026-01-18T00:00:00Z',
     updatedAt: '2026-01-18T00:00:00Z'
   },
+
+  // 18. Kaloud Lotus I+ HMD
   {
     id: 'prod-kaloud-lotus-plus',
     name: 'Kaloud Lotus I+ Heat Management Device (Silver Nectar)',
@@ -750,13 +1363,14 @@ export const INITIAL_PRODUCTS: Product[] = [
     currency: 'USD',
     brand: 'Kaloud',
     brandSlug: 'kaloud',
-    category: 'Accessories',
+    category: 'Accessories & HMD',
     categorySlug: 'accessories',
-    subcategory: 'Heat Management Devices',
+    subcategory: 'Heat Management Devices (HMD)',
     images: [
       {
         id: 'img-kld-1',
         url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=300&auto=format&fit=crop',
         alt: 'Kaloud Lotus I+ HMD in Metallic Silver Finish',
         isPrimary: true,
         sortOrder: 1
@@ -784,44 +1398,47 @@ export const INITIAL_PRODUCTS: Product[] = [
     createdAt: '2026-01-02T00:00:00Z',
     updatedAt: '2026-01-02T00:00:00Z'
   },
+
+  // 19. Coco Loco Organic Coconut Charcoal 26mm (1kg)
   {
-    id: 'prod-cocourth-cubes-26mm',
-    name: 'CocoUrth 100% Organic Coconut Charcoal (26mm Cubes - 1kg)',
-    slug: 'cocourth-coconut-charcoal-26mm-1kg',
-    sku: 'COCO-26MM-1KG',
-    description: 'Manufactured from 100% pure organic coconut husk with zero tree timber, zero sulfur chemicals, and under 2.5% ash residue. Burns odorless and clean for up to 90 minutes.',
-    shortDescription: 'Odorless, zero chemical sulfur, ultra-dense 26mm organic coconut coals (72 pieces/box).',
-    price: 16.99,
-    salePrice: 14.50,
+    id: 'prod-coco-loco-26mm',
+    name: 'Coco Loco 100% Organic Coconut Charcoal (26mm Cubes - 1kg)',
+    slug: 'coco-loco-coconut-charcoal-26mm-1kg',
+    sku: 'CLC-26MM-1KG',
+    description: 'The preferred charcoal of Russian and European shisha master mixologists. 100% pure organic coconut husk with zero timber, zero chemical binders, and under 2.0% ash residue. Burns hot and odorless for up to 90 minutes.',
+    shortDescription: '100% natural organic coconut charcoal cubes (72 pcs). Odorless, ultra-low ash, stable high heat.',
+    price: 15.99,
+    salePrice: 13.99,
     currency: 'USD',
-    brand: 'CocoUrth',
-    brandSlug: 'cocourth',
+    brand: 'Coco Loco',
+    brandSlug: 'coco-loco',
     category: 'Charcoal & Heat',
     categorySlug: 'coal',
     subcategory: '26mm Coconut Cubes',
     images: [
       {
-        id: 'img-coal-1',
+        id: 'img-clc-1',
         url: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1200&auto=format&fit=crop',
-        alt: 'CocoUrth 26mm Coconut Shell Charcoal Box',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=300&auto=format&fit=crop',
+        alt: 'Coco Loco 26mm Coconut Charcoal Box',
         isPrimary: true,
         sortOrder: 1
       }
     ],
-    stock: 240,
-    lowStockThreshold: 30,
+    stock: 280,
+    lowStockThreshold: 40,
     weight: 1000,
     material: '100% Compressed Organic Coconut Shell',
-    tags: ['organic', 'low-ash', 'odorless', 'long-burn'],
+    tags: ['coco-loco', 'charcoal', 'organic', 'low-ash', 'bestseller'],
     specifications: [
       { label: 'Piece Count', value: '72 Cubes per 1 kg Box' },
-      { label: 'Burn Duration', value: '80 - 100 Minutes' },
-      { label: 'Ash Content', value: '< 2.2%' },
-      { label: 'Moisture', value: '< 5%' }
+      { label: 'Cube Dimensions', value: '26 x 26 x 26 mm' },
+      { label: 'Burn Duration', value: '85 - 100 Minutes' },
+      { label: 'Ash Content', value: '< 2.0%' }
     ],
-    rating: 4.89,
-    reviewCount: 76,
-    isFeatured: false,
+    rating: 4.95,
+    reviewCount: 130,
+    isFeatured: true,
     isNewArrival: false,
     isBestSeller: true,
     isOnSale: true,
@@ -830,17 +1447,19 @@ export const INITIAL_PRODUCTS: Product[] = [
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-01-01T00:00:00Z'
   },
+
+  // 20. Russian Craft Cut Crystal Drop Shisha Base
   {
     id: 'prod-craft-crystal-drop-base',
-    name: 'Russian Craft Cut Crystal Drop Shisha Base',
+    name: 'Russian Craft Cut Crystal Drop Shisha Base (Universal 45mm)',
     slug: 'russian-craft-cut-crystal-drop-base',
     sku: 'BASE-CRF-DRP',
-    description: 'Heavy solid hand-cut crystal glass vase with a low center of gravity. Compatible with all Russian and European plug-in grommet stems including Alpha, Hoob, and MattPear.',
+    description: 'Heavy solid hand-cut crystal glass vase with a low center of gravity. Compatible with all Russian and European plug-in grommet stems including Alpha Hookah, Hoob, El Bomber, and MattPear.',
     shortDescription: 'Ultra-heavy lead-free cut crystal vase with universal 45mm neck opening.',
     price: 89.00,
     currency: 'USD',
-    brand: 'Craft Glassworks',
-    brandSlug: 'craft-glass',
+    brand: 'Wookah',
+    brandSlug: 'wookah',
     category: 'Bases & Vases',
     categorySlug: 'bases',
     subcategory: 'Russian Drop Bases',
@@ -848,7 +1467,8 @@ export const INITIAL_PRODUCTS: Product[] = [
       {
         id: 'img-bas-1',
         url: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200&auto=format&fit=crop',
-        alt: 'Russian Craft Cut Crystal Base',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=300&auto=format&fit=crop',
+        alt: 'Russian Craft Cut Crystal Drop Base',
         isPrimary: true,
         sortOrder: 1
       }
@@ -874,6 +1494,101 @@ export const INITIAL_PRODUCTS: Product[] = [
     ageRestricted: false,
     createdAt: '2026-01-20T00:00:00Z',
     updatedAt: '2026-01-20T00:00:00Z'
+  },
+
+  // 21. Alpha Hookah Cyber Precision Tongs
+  {
+    id: 'prod-alpha-cyber-tongs',
+    name: 'Alpha Hookah Cyber Stainless Precision Tongs',
+    slug: 'alpha-hookah-cyber-precision-tongs',
+    sku: 'ALP-TNG-CYB',
+    description: 'Precision laser-cut AISI 304 stainless steel tongs designed by Alpha Hookah with custom ergonomic thumb grips and heavy-duty coal clamping teeth.',
+    shortDescription: 'Laser-cut AISI 304 stainless steel charcoal tongs with ergonomic grip.',
+    price: 28.00,
+    currency: 'USD',
+    brand: 'Alpha Hookah',
+    brandSlug: 'alpha-hookah',
+    category: 'Accessories & HMD',
+    categorySlug: 'accessories',
+    subcategory: 'Precision Tongs',
+    images: [
+      {
+        id: 'img-alp-tng-1',
+        url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=300&auto=format&fit=crop',
+        alt: 'Alpha Hookah Cyber Stainless Tongs',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 50,
+    lowStockThreshold: 10,
+    weight: 180,
+    material: 'AISI 304 Stainless Steel',
+    color: 'Titanium Gunmetal Grey',
+    tags: ['tongs', 'alpha-hookah', 'accessories'],
+    specifications: [
+      { label: 'Length', value: '23 cm (9 in)' },
+      { label: 'Material', value: 'Heavy Gauge Stainless Steel' }
+    ],
+    rating: 4.91,
+    reviewCount: 24,
+    isFeatured: false,
+    isNewArrival: true,
+    isBestSeller: false,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: false,
+    createdAt: '2026-01-22T00:00:00Z',
+    updatedAt: '2026-01-22T00:00:00Z'
+  },
+
+  // 22. Coco Loco 20kg Master Lounge Box
+  {
+    id: 'prod-coco-loco-20kg-lounge',
+    name: 'Coco Loco 20kg Master Lounge Carton (26mm Cubes / 1440 Coals)',
+    slug: 'coco-loco-20kg-master-lounge-box',
+    sku: 'CLC-20KG-LNG',
+    description: 'Bulk master carton for hookah lounges, smoke bars, and connoisseurs. Contains 20x individual 1kg boxes (1440 natural coconut cubes) with zero chemical odor and long burn time.',
+    shortDescription: 'Commercial 20kg lounge master carton containing 1,440 premium coconut charcoal cubes.',
+    price: 189.00,
+    salePrice: 169.00,
+    currency: 'USD',
+    brand: 'Coco Loco',
+    brandSlug: 'coco-loco',
+    category: 'Wholesale Lounge Supplies',
+    categorySlug: 'wholesale-supplies',
+    subcategory: '20kg Master Coal Cases',
+    images: [
+      {
+        id: 'img-clc-20k-1',
+        url: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=300&auto=format&fit=crop',
+        alt: 'Coco Loco 20kg Master Lounge Carton',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 40,
+    lowStockThreshold: 5,
+    weight: 20000,
+    material: '100% Pure Organic Coconut Shell',
+    tags: ['wholesale', 'bulk-coal', 'lounge-supplies', 'coco-loco'],
+    specifications: [
+      { label: 'Total Weight', value: '20 Kilograms (44 lbs)' },
+      { label: 'Piece Count', value: '1,440 Cubes (20 x 1kg Boxes)' },
+      { label: 'Target Audience', value: 'Lounges, Bars & High-Volume Users' }
+    ],
+    rating: 4.99,
+    reviewCount: 47,
+    isFeatured: true,
+    isNewArrival: false,
+    isBestSeller: true,
+    isOnSale: true,
+    isActive: true,
+    ageRestricted: false,
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-01-01T00:00:00Z'
   }
 ];
 
@@ -881,7 +1596,7 @@ export const INITIAL_COUPONS: Coupon[] = [
   {
     id: 'cpn-welcome15',
     code: 'WELCOME15',
-    description: '15% discount for your inaugural luxury order',
+    description: '15% discount on your initial World Hookah Market order',
     discountType: 'PERCENTAGE',
     discountValue: 15,
     minOrderAmount: 50,
@@ -891,9 +1606,9 @@ export const INITIAL_COUPONS: Coupon[] = [
     createdAt: '2026-01-01T00:00:00Z'
   },
   {
-    id: 'cpn-viphookah',
-    code: 'VIPHOOKAH',
-    description: '$30 off luxury hookah pipes over $200',
+    id: 'cpn-hookah30',
+    code: 'HOOKAH30',
+    description: '$30 off Russian and European hookahs over $200',
     discountType: 'FIXED',
     discountValue: 30,
     minOrderAmount: 200,
@@ -908,26 +1623,26 @@ export const INITIAL_COUPONS: Coupon[] = [
 export const INITIAL_REVIEWS: Review[] = [
   {
     id: 'rev-1',
-    productId: 'prod-wookah-oak-crystal',
-    productName: 'Wookah Masterpiece Oak with Olives Crystal Base',
+    productId: 'prod-alpha-model-x-black',
+    productName: 'Alpha Hookah Model X (Black Matte)',
     userId: 'usr-customer-1',
     userName: 'Alexander M.',
     rating: 5,
-    title: 'The pinnacle of hookah craftsmanship',
-    comment: 'The grain of the European oak is flawless, and the crystal vase is so heavy it feels virtually immovable. Purges effortlessly and tastes exceptionally clean.',
+    title: 'The best hookah I have ever smoked',
+    comment: 'The vertical purge is a work of art. Incredibly smooth draw with the adjustable diffuser, and the magnetic hose connector feels rock solid. Shipped quickly from the US warehouse!',
     isVerifiedPurchase: true,
     status: 'APPROVED',
     createdAt: '2026-02-10T15:20:00Z'
   },
   {
     id: 'rev-2',
-    productId: 'prod-tangiers-cane-mint',
-    productName: 'Tangiers Noir Cane Mint (250g)',
+    productId: 'prod-musthave-pinkman',
+    productName: 'MustHave Tobacco Pinkman (125g)',
     userId: 'usr-customer-2',
     userName: 'Elena Rostova',
     rating: 5,
-    title: 'Strongest and most natural peppermint on earth',
-    comment: 'A staple in my shisha lounge. Dense packed in an Alpaca bowl with foil and Provost, this lasts 2+ hours with pure mint flavor throughout.',
+    title: 'Unmatched pink grapefruit and berry flavor',
+    comment: 'MustHave Pinkman is an absolute staple. Dense smoke, heat resistant, and lasts easily 90+ minutes without losing flavor in an Oblako bowl.',
     isVerifiedPurchase: true,
     status: 'APPROVED',
     createdAt: '2026-02-14T11:45:00Z'
@@ -940,9 +1655,10 @@ export const INITIAL_REVIEWS: Review[] = [
     userName: 'Tariq Al-Mansoor',
     rating: 5,
     title: 'No more burnt tobacco!',
-    comment: 'Completely transformed how my shisha sessions run. No ash in the tobacco, zero harsh burnt flavor spikes. Worth every penny.',
+    comment: 'Completely transformed my shisha sessions. No ash in the bowl, zero harsh burnt flavor spikes. Works flawlessly with Coco Loco coals.',
     isVerifiedPurchase: true,
     status: 'APPROVED',
     createdAt: '2026-02-18T09:12:00Z'
   }
 ];
+

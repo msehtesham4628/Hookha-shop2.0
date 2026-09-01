@@ -40,7 +40,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         if (prodRes.success && prodRes.data) {
           const prods = prodRes.data.products;
           setFeaturedProducts(prods.filter(p => p.categorySlug === 'hookahs' || p.isFeatured).slice(0, 4));
-          setTobaccoProducts(prods.filter(p => p.categorySlug === 'tobacco-flavor').slice(0, 4));
+          setTobaccoProducts(prods.filter(p => p.categorySlug === 'tobacco' || p.categorySlug === 'tobacco-flavor').slice(0, 4));
           setNewArrivals(prods.filter(p => p.isNewArrival).slice(0, 4));
         }
 
@@ -93,7 +93,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
               <button
                 id="hero-shop-tobacco-btn"
-                onClick={() => onNavigate('/shop?category=tobacco-flavor')}
+                onClick={() => onNavigate('/shop?category=tobacco')}
                 className="bg-stone-100 hover:bg-stone-200 text-stone-900 text-xs font-semibold uppercase tracking-widest px-8 py-4 rounded-xs border border-stone-300 transition-colors text-center"
               >
                 Dark Leaf Reserve
@@ -246,7 +246,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             </h2>
           </div>
           <button
-            onClick={() => onNavigate('/shop?category=tobacco-flavor')}
+            onClick={() => onNavigate('/shop?category=tobacco')}
             className="text-xs font-semibold text-amber-900 hover:underline flex items-center gap-1"
           >
             <span>Explore All Flavors</span>

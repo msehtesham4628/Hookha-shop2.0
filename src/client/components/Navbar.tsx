@@ -36,29 +36,28 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
   }, []);
 
   const navLinks = [
-    { label: 'Catalog', path: '/shop' },
+    { label: 'All Products', path: '/shop' },
     { label: 'Hookahs', path: '/shop?category=hookahs' },
-    { label: 'Shisha Tobacco', path: '/shop?category=tobacco-flavor' },
-    { label: 'Bowls', path: '/shop?category=bowls-phunnels' },
-    { label: 'Charcoal', path: '/shop?category=charcoal' },
-    { label: 'HMD & Accessories', path: '/shop?category=heat-management' },
-    { label: 'Wholesale B2B', path: '/wholesale' },
-    { label: 'About', path: '/about' },
-    { label: 'Contact', path: '/contact' }
+    { label: 'Shisha Tobacco', path: '/shop?category=tobacco' },
+    { label: 'Bowls', path: '/shop?category=bowls' },
+    { label: 'Bases', path: '/shop?category=bases' },
+    { label: 'Charcoal', path: '/shop?category=coal' },
+    { label: 'Accessories', path: '/shop?category=accessories' },
+    { label: 'Wholesale B2B', path: '/wholesale' }
   ];
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white">
-      {/* Top Luxury Announcement Bar */}
+      {/* Top Announcement Bar */}
       <div className="bg-stone-900 text-stone-300 text-[11px] py-1.5 px-4 border-b border-stone-800">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="hidden sm:flex items-center gap-2">
             <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
-            <span className="tracking-wide">Age 21+ Verified Luxury Shisha Purveyor</span>
+            <span className="tracking-wide">Age 21+ Verified Master Hookah Distributor</span>
           </div>
 
           <div className="flex-1 text-center font-medium text-amber-100/90 tracking-wider">
-            <span>Complimentary Express Air Delivery on All Orders Over $150</span>
+            <span>Free Express US Shipping on Orders Over $99 · Official Master Distributor</span>
           </div>
 
           <div className="hidden md:flex items-center gap-4 text-[11px]">
@@ -73,7 +72,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
               onClick={() => onNavigate('/contact')}
               className="text-stone-300 hover:text-amber-400 transition-colors"
             >
-              Concierge Desk
+              Support Desk
             </button>
           </div>
         </div>
@@ -100,12 +99,12 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
             className="cursor-pointer flex flex-col items-center select-none group"
           >
             <div className="flex items-center gap-1.5">
-              <span className="font-serif text-2xl sm:text-3xl font-bold tracking-[0.2em] text-stone-900 group-hover:text-amber-900 transition-colors">
-                SULTAN
+              <span className="font-serif text-xl sm:text-2xl font-bold tracking-[0.15em] text-stone-900 group-hover:text-amber-900 transition-colors uppercase">
+                WORLD HOOKAH
               </span>
             </div>
-            <span className="text-[9px] uppercase tracking-[0.35em] text-amber-800/90 font-sans font-semibold -mt-1">
-              HOOKAH CO. • EST. 2018
+            <span className="text-[9px] uppercase tracking-[0.35em] text-amber-800/90 font-sans font-bold -mt-1">
+              MARKET • EST. 2018
             </span>
           </div>
 

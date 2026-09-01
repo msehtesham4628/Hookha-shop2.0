@@ -1,6 +1,7 @@
 {
-  "name": "Sultan Hookah Co. - Luxury Shisha & Hookah E-Commerce",
-  "description": "High-end luxury hookah, premium tobacco, handcrafted bowls, artisan bases, accessories, and B2B wholesale platform with comprehensive RBAC administration.",
+  "name": "World Hookah Market - Premier Hookahs, Shisha Tobacco, Bowls & Accessories",
+  "description": "The leading online store and master distributor for Alpha Hookah, MustHave, DarkSide, Oblako, Kong, MattPear, Wookah, Kaloud, and premium shisha tobacco.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
+

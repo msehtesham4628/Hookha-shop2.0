@@ -86,31 +86,31 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           {/* Brand Info & Newsletter */}
           <div className="lg:col-span-2 space-y-6">
             <div>
-              <span className="font-serif text-2xl font-bold tracking-[0.2em] text-stone-100">
-                SULTAN
+              <span className="font-serif text-2xl font-bold tracking-[0.15em] text-stone-100 uppercase">
+                WORLD HOOKAH
               </span>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-amber-500 font-semibold mt-0.5">
-                HOOKAH CO. • LUXURY ARTIFACTS
+              <p className="text-[10px] uppercase tracking-[0.3em] text-amber-500 font-bold mt-0.5">
+                MARKET • AUTHORIZED DISTRIBUTOR
               </p>
             </div>
 
             <p className="text-stone-400 text-xs leading-relaxed max-w-md">
-              Purveyor of the world's most distinguished stainless steel hookahs, Bohemian cut crystal vases, and rare dark leaf tobacco blends. Sourced across Warsaw, Munich, Moscow, and San Diego.
+              The premier marketplace and authorized master distributor for Alpha Hookah, MustHave, DarkSide, BlackBurn, Bonche, Oblako, Kong, MattPear, Wookah, and Kaloud in the United States and worldwide.
             </p>
 
             {/* Newsletter Subscription */}
             <div className="pt-2">
               <p className="text-xs uppercase font-bold tracking-widest text-stone-200 mb-2">
-                Join the Private Reserve Club
+                Join World Hookah Insider Club
               </p>
               <p className="text-stone-400 text-xs mb-3">
-                Receive private access to limited batch drops, rare vintage leaf allocations, and VIP lounge events.
+                Get first access to exclusive Russian drop releases, rare dark leaf allocations, and VIP distributor discounts.
               </p>
 
               {isSuccess ? (
                 <div className="flex items-center gap-2 text-xs text-amber-400 bg-amber-950/40 border border-amber-900/60 p-3 rounded-xs">
                   <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Welcome to the Sultan Reserve. Verification confirmation sent.</span>
+                  <span>Welcome to the World Hookah Market Insider Club.</span>
                 </div>
               ) : (
                 <form onSubmit={handleSubscribe} className="flex gap-2 max-w-md">
@@ -118,7 +118,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                     id="newsletter-email-input"
                     type="email"
                     required
-                    placeholder="Enter your VIP email..."
+                    placeholder="Enter your email address..."
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="flex-1 bg-stone-900 border border-stone-800 text-stone-100 placeholder-stone-500 text-xs px-3.5 py-2.5 rounded-xs focus:outline-none focus:border-amber-600 transition-colors"
@@ -140,40 +140,41 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           {/* Quick Links Columns */}
           <div>
             <h5 className="text-xs font-bold uppercase tracking-widest text-stone-100 mb-4">
-              Masterpieces
+              Catalog
             </h5>
             <ul className="space-y-2.5 text-xs text-stone-400">
-              <li><button onClick={() => onNavigate('/shop?category=hookahs')} className="hover:text-amber-400 transition-colors">Luxury Hookahs</button></li>
-              <li><button onClick={() => onNavigate('/shop?category=tobacco-flavor')} className="hover:text-amber-400 transition-colors">Dark Leaf Shisha</button></li>
-              <li><button onClick={() => onNavigate('/shop?category=bowls-phunnels')} className="hover:text-amber-400 transition-colors">Hand-Thrown Bowls</button></li>
-              <li><button onClick={() => onNavigate('/shop?category=charcoal')} className="hover:text-amber-400 transition-colors">Coconut Charcoals</button></li>
-              <li><button onClick={() => onNavigate('/shop?category=heat-management')} className="hover:text-amber-400 transition-colors">Heat Management (HMD)</button></li>
-              <li><button onClick={() => onNavigate('/shop?onSale=true')} className="hover:text-amber-400 transition-colors">Private Vault Sale</button></li>
+              <li><button onClick={() => onNavigate('/shop?category=hookahs')} className="hover:text-amber-400 transition-colors">Russian & Modern Hookahs</button></li>
+              <li><button onClick={() => onNavigate('/shop?category=tobacco')} className="hover:text-amber-400 transition-colors">Shisha Tobacco</button></li>
+              <li><button onClick={() => onNavigate('/shop?category=bowls')} className="hover:text-amber-400 transition-colors">Hookah Bowls</button></li>
+              <li><button onClick={() => onNavigate('/shop?category=bases')} className="hover:text-amber-400 transition-colors">Bases & Vases</button></li>
+              <li><button onClick={() => onNavigate('/shop?category=coal')} className="hover:text-amber-400 transition-colors">Coconut Charcoals</button></li>
+              <li><button onClick={() => onNavigate('/shop?category=accessories')} className="hover:text-amber-400 transition-colors">Heat Management & HMD</button></li>
+              <li><button onClick={() => onNavigate('/shop?onSale=true')} className="hover:text-amber-400 transition-colors">Special Offers</button></li>
             </ul>
           </div>
 
           <div>
             <h5 className="text-xs font-bold uppercase tracking-widest text-stone-100 mb-4">
-              Concierge & B2B
+              Customer Care & B2B
             </h5>
             <ul className="space-y-2.5 text-xs text-stone-400">
-              <li><button onClick={() => onNavigate('/wholesale')} className="hover:text-amber-400 transition-colors">Lounge Wholesale Portal</button></li>
+              <li><button onClick={() => onNavigate('/wholesale')} className="hover:text-amber-400 transition-colors">Lounge & Wholesale Portal</button></li>
               <li><button onClick={() => onNavigate('/account')} className="hover:text-amber-400 transition-colors">Track Order Delivery</button></li>
-              <li><button onClick={() => onNavigate('/contact')} className="hover:text-amber-400 transition-colors">VIP Concierge Desk</button></li>
-              <li><button onClick={() => onNavigate('/about')} className="hover:text-amber-400 transition-colors">Artisan Heritage</button></li>
+              <li><button onClick={() => onNavigate('/contact')} className="hover:text-amber-400 transition-colors">Customer Support</button></li>
+              <li><button onClick={() => onNavigate('/about')} className="hover:text-amber-400 transition-colors">About World Hookah Market</button></li>
               <li><button onClick={() => onNavigate('/admin')} className="text-stone-500 hover:text-amber-400 transition-colors">Staff Login</button></li>
             </ul>
           </div>
 
           <div>
             <h5 className="text-xs font-bold uppercase tracking-widest text-stone-100 mb-4">
-              Concierge HQ
+              Headquarters
             </h5>
             <div className="space-y-3 text-xs text-stone-400">
-              <p>9465 Wilshire Blvd, Suite 800<br />Beverly Hills, CA 90212</p>
-              <p>Email: <a href="mailto:concierge@sultanhookah.com" className="text-amber-400 hover:underline">concierge@sultanhookah.com</a></p>
+              <p>World Hookah Market HQ<br />Miami / Los Angeles / US Hub</p>
+              <p>Email: <a href="mailto:support@worldhookahmarket.com" className="text-amber-400 hover:underline">support@worldhookahmarket.com</a></p>
               <p>Phone: +1 (800) 785-8260</p>
-              <p className="text-[11px] text-stone-500">Mon - Sat: 9:00 AM - 8:00 PM PST</p>
+              <p className="text-[11px] text-stone-500">Mon - Sat: 9:00 AM - 8:00 PM EST</p>
             </div>
           </div>
 
@@ -192,7 +193,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
       {/* Copyright and Bottom Sub-bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-stone-900 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-stone-500">
-        <p>© {new Date().getFullYear()} Sultan Hookah Co. All rights reserved. Registered trademark.</p>
+        <p>© {new Date().getFullYear()} World Hookah Market. All rights reserved.</p>
         <div className="flex items-center gap-6">
           <span>Encrypted 256-Bit SSL</span>
           <span>•</span>

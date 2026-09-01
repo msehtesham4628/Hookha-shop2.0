@@ -13,13 +13,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         {/* Header Hero */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <span className="text-[11px] uppercase font-bold tracking-[0.3em] text-amber-800">
-            Heritage & Craftsmanship
+            Heritage & Distribution
           </span>
           <h1 className="font-serif text-3xl sm:text-5xl font-bold text-stone-900 leading-tight">
-            The Architectural Renaissance of the Water Pipe
+            The Premier Destination for Russian & World Hookah Culture
           </h1>
           <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-            Founded in 2018, Sultan Hookah Co. was conceived to elevate the centuries-old tradition of shisha into modern architectural art. We unite V2A stainless steel metallurgy, Bohemian hand-cut crystal, and aged European hardwoods.
+            Founded in 2018, World Hookah Market is the leading master distributor and online retailer for authentic Russian hookah brands, premium shisha tobacco, artisan bowls, and heat management systems.
           </p>
         </div>
 
@@ -54,7 +54,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             <Shield className="w-6 h-6 text-amber-800" />
             <h3 className="font-serif text-base font-bold text-stone-900">Direct Sourcing Guarantee</h3>
             <p className="text-xs text-stone-600 leading-relaxed">
-              We hold exclusive authorized distribution rights for Wookah, Steamulation, Hoob, Tangiers, and Alpaca Bowl. Every product ships with verified serial tags.
+              We hold authorized distribution rights for Alpha Hookah, El Bomber, MattPear, Maklaud, MustHave, DarkSide, Bonche, BlackBurn, Oblako, Kong, and Kaloud. Every product ships with verified serial tags.
             </p>
           </div>
 
