@@ -632,6 +632,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           ))}
         </div>
 
+        {/* Top Base Brands Badges */}
         <div className="mt-8 pt-6 border-t border-stone-200">
           <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
             Top Base Brands
@@ -708,6 +709,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           ))}
         </div>
 
+        {/* Top Coal Brands Badges */}
         <div className="mt-8 pt-6 border-t border-stone-200">
           <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
             Top Coal Brands
@@ -784,6 +786,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           ))}
         </div>
 
+        {/* Top Accessory Brands Badges */}
         <div className="mt-8 pt-6 border-t border-stone-200">
           <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
             Top Accessory Brands
@@ -860,6 +863,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           ))}
         </div>
 
+        {/* Top E-Hookah Brands Badges */}
         <div className="mt-8 pt-6 border-t border-stone-200">
           <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
             Top E-Hookah Brands
@@ -936,6 +940,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           ))}
         </div>
 
+        {/* Top Vape Brands Badges */}
         <div className="mt-8 pt-6 border-t border-stone-200">
           <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
             Top Vape Brands

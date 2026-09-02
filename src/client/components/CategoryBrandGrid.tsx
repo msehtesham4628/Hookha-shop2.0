@@ -111,18 +111,18 @@ export const CategoryBrandGrid: React.FC<CategoryBrandGridProps> = ({
   const displayBrands = relevantBrands.length > 0 ? relevantBrands : brands.slice(0, 12);
 
   return (
-    <div className="mb-8 bg-white border border-stone-200/90 rounded-sm p-4 sm:p-5 shadow-2xs">
+    <div className="mb-8 bg-white border border-stone-200/90 rounded-xl p-4 sm:p-5 shadow-xs">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-stone-100">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-amber-800" />
-          <h3 className="font-serif text-sm sm:text-base font-bold text-stone-900 tracking-wide uppercase">
+          <div className="w-2.5 h-2.5 rounded-full bg-cyan-600" />
+          <h3 className="font-sans text-xs sm:text-sm font-bold text-stone-900 tracking-wider uppercase">
             {t('category.explore_brands', `Featured ${categoryName || 'Category'} Brands`)}
           </h3>
         </div>
         {selectedBrand && (
           <button
             onClick={() => onSelectBrand('')}
-            className="text-xs text-amber-900 font-semibold hover:underline flex items-center gap-1 self-start sm:self-auto"
+            className="text-xs text-cyan-600 hover:text-cyan-700 font-bold hover:underline flex items-center gap-1 self-start sm:self-auto"
           >
             <span>Show All {categoryName} Brands</span>
           </button>
@@ -130,7 +130,7 @@ export const CategoryBrandGrid: React.FC<CategoryBrandGridProps> = ({
       </div>
 
       {/* Brand Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-2.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
         {displayBrands.map((brand) => {
           const isSelected = selectedBrand === brand.slug;
           const meta = BRAND_METRICS[brand.slug] || { logoIcon: '🏷️', countryCode: brand.origin?.includes('Russia') ? 'RU' : 'US' };
@@ -139,39 +139,39 @@ export const CategoryBrandGrid: React.FC<CategoryBrandGridProps> = ({
             <button
               key={brand.id}
               onClick={() => onSelectBrand(isSelected ? '' : brand.slug)}
-              className={`group relative flex flex-col items-center text-center p-3 rounded-sm border transition-all duration-200 cursor-pointer ${
+              className={`group relative flex flex-col items-center text-center p-3 sm:p-3.5 rounded-xl border transition-all duration-300 cursor-pointer ${
                 isSelected
-                  ? 'bg-amber-50/90 border-amber-800 ring-1 ring-amber-800 shadow-xs'
-                  : 'bg-stone-50/70 hover:bg-white hover:border-amber-700/60 border-stone-200 shadow-2xs'
+                  ? 'bg-cyan-50/90 border-cyan-600 ring-2 ring-cyan-600/20 shadow-md scale-[1.02]'
+                  : 'bg-stone-50/60 hover:bg-white hover:border-cyan-400/60 border-stone-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md hover:-translate-y-0.5'
               }`}
             >
               {isSelected && (
-                <div className="absolute top-1.5 right-1.5 bg-amber-800 text-white rounded-full p-0.5">
+                <div className="absolute top-2 right-2 bg-cyan-600 text-white rounded-full p-0.5 shadow-xs">
                   <Check className="w-2.5 h-2.5" />
                 </div>
               )}
 
               {/* Brand Avatar/Icon */}
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg mb-2 transition-transform duration-200 group-hover:scale-105 ${
-                isSelected ? 'bg-amber-900 text-white shadow-xs' : 'bg-white border border-stone-200 shadow-2xs'
+              <div className={`w-11 h-11 rounded-full flex items-center justify-center text-xl mb-2 transition-transform duration-300 group-hover:scale-110 ${
+                isSelected ? 'bg-cyan-700 text-white shadow-sm' : 'bg-white border border-stone-200/90 shadow-2xs'
               }`}>
                 {meta.logoIcon}
               </div>
 
               {/* Brand Name */}
-              <span className={`text-xs font-semibold leading-tight line-clamp-1 ${
-                isSelected ? 'text-amber-950 font-bold' : 'text-stone-800 group-hover:text-amber-900'
+              <span className={`text-xs font-bold leading-tight line-clamp-1 ${
+                isSelected ? 'text-cyan-950 font-black' : 'text-stone-800 group-hover:text-cyan-700'
               }`}>
                 {brand.name}
               </span>
 
               {/* Origin & Count */}
-              <div className="flex items-center gap-1.5 mt-1 text-[10px] text-stone-500">
-                <span className="font-mono uppercase font-bold text-stone-400 bg-stone-200/80 px-1 py-0.2 rounded-2xs">
+              <div className="flex items-center gap-1.5 mt-1.5 text-[10px] text-stone-500">
+                <span className="font-mono uppercase font-bold text-stone-600 bg-stone-200/80 px-1.5 py-0.5 rounded">
                   {meta.countryCode}
                 </span>
                 <span>•</span>
-                <span className="font-medium text-stone-600">
+                <span className="font-medium text-stone-500">
                   {brand.productCount || 8} items
                 </span>
               </div>

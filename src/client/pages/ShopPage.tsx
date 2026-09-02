@@ -5,6 +5,7 @@ import { CategoryBrandGrid } from '../components/CategoryBrandGrid.js';
 import { CategoryStories } from '../components/CategoryStories.js';
 import { CategoryMixologyWidget } from '../components/CategoryMixologyWidget.js';
 import { CategoryBuyersGuide } from '../components/CategoryBuyersGuide.js';
+import { CategoryHeroBanner } from '../components/CategoryHeroBanner.js';
 import { Product, Category, Brand } from '../../types/index.js';
 import { useTranslation } from '../i18n/LanguageContext.js';
 import {
@@ -197,101 +198,25 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     <div className="w-full bg-stone-50/50 min-h-screen py-6 sm:py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Breadcrumb Navigation */}
-        <nav className="flex items-center gap-1.5 text-xs text-stone-500 mb-4 overflow-x-auto whitespace-nowrap pb-1">
-          <button onClick={() => onNavigate('/')} className="hover:text-amber-900 transition-colors">
-            Home
-          </button>
-          <ChevronRight className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
-          <button
-            onClick={() => {
-              setSelectedCategory('');
-              setSelectedBrand('');
-              setSelectedSubcategory('');
-              setSearchQuery('');
-              onNavigate('/shop');
-            }}
-            className={`hover:text-amber-900 transition-colors cursor-pointer ${!selectedCategory && !selectedBrand ? 'text-amber-950 font-bold' : ''}`}
-          >
-            {t('nav.all_products', 'All Products')}
-          </button>
-          {currentCategoryObj && (
-            <>
-              <ChevronRight className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
-              <button
-                onClick={() => setSelectedBrand('')}
-                className={`hover:text-amber-900 transition-colors ${!selectedBrand ? 'text-amber-950 font-bold' : ''}`}
-              >
-                {currentCategoryObj.name}
-              </button>
-            </>
-          )}
-          {currentBrandObj && (
-            <>
-              <ChevronRight className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
-              <span className="text-amber-950 font-bold">{currentBrandObj.name}</span>
-            </>
-          )}
-        </nav>
-
-        {/* Category Header Banner */}
-        <div className="mb-6 bg-white border border-stone-200/90 rounded-sm p-5 sm:p-6 shadow-2xs">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="text-[10px] uppercase font-bold tracking-widest text-amber-800 mb-1 flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3" />
-                <span>Haute Shisha Collection • Verified Authentic Master Drops</span>
-              </div>
-              <h1 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">
-                {selectedCategory
-                  ? currentCategoryObj?.name || 'Curated Category Catalog'
-                  : selectedBrand
-                  ? `${currentBrandObj?.name || selectedBrand} Reserve Collection`
-                  : t('nav.all_products', 'All Masterpieces & Shisha Tobacco')}
-              </h1>
-              <p className="text-xs text-stone-600 mt-1 max-w-2xl leading-relaxed">
-                {currentCategoryObj?.description || 'Browse premier Russian and European aerospace-grade hookahs, toasted dark leaf shisha tobacco, artisanal clay bowls, and heat management systems.'}
-              </p>
-            </div>
-
-            <div className="text-right self-start md:self-auto">
-              <span className="text-xs font-semibold text-stone-700 bg-stone-100 px-3 py-1.5 rounded-full border border-stone-200">
-                {t('category.showing_items', `Showing ${products.length} products`, { count: products.length })}
-              </span>
-            </div>
-          </div>
-
-          {/* Subcategory Pills (Inside Category) */}
-          {selectedCategory && subcategoryList.length > 0 && (
-            <div className="mt-5 pt-4 border-t border-stone-100">
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-                <button
-                  onClick={() => setSelectedSubcategory('')}
-                  className={`text-xs px-3.5 py-1.5 rounded-full font-medium transition-colors whitespace-nowrap cursor-pointer ${
-                    selectedSubcategory === ''
-                      ? 'bg-amber-900 text-white font-bold shadow-xs'
-                      : 'bg-stone-100 hover:bg-stone-200/80 text-stone-700'
-                  }`}
-                >
-                  All {currentCategoryObj?.name || 'Items'}
-                </button>
-                {subcategoryList.map((sub) => (
-                  <button
-                    key={sub}
-                    onClick={() => setSelectedSubcategory(selectedSubcategory === sub ? '' : sub)}
-                    className={`text-xs px-3.5 py-1.5 rounded-full font-medium transition-colors whitespace-nowrap cursor-pointer ${
-                      selectedSubcategory === sub
-                        ? 'bg-amber-900 text-white font-bold shadow-xs'
-                        : 'bg-stone-100 hover:bg-stone-200/80 text-stone-700'
-                    }`}
-                  >
-                    {sub}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Category Hero Banner with Rich Photography & Specs */}
+        <CategoryHeroBanner
+          category={currentCategoryObj}
+          categorySlug={selectedCategory}
+          brand={currentBrandObj}
+          brandSlug={selectedBrand}
+          subcategories={selectedCategory ? subcategoryList : []}
+          selectedSubcategory={selectedSubcategory}
+          onSelectSubcategory={(sub) => setSelectedSubcategory(sub)}
+          productCount={products.length}
+          onNavigate={onNavigate}
+          onResetCategory={() => {
+            setSelectedCategory('');
+            setSelectedBrand('');
+            setSelectedSubcategory('');
+            setSearchQuery('');
+            onNavigate('/shop');
+          }}
+        />
 
         {/* 1. Inside Category: Educational Guides & Stories Carousel */}
         <CategoryStories categorySlug={selectedCategory || 'all'} />

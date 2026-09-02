@@ -248,7 +248,7 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ onNavi
                   onClick={() => onNavigate(`/shop?category=${col.categorySlug}`)}
                   onMouseEnter={() => setHoveredCardId(col.id)}
                   onMouseLeave={() => setHoveredCardId(null)}
-                  className={`group relative overflow-hidden rounded-sm cursor-pointer border border-stone-200/90 transition-all duration-500 flex flex-col justify-end min-h-[300px] sm:min-h-[340px] bg-stone-950 ${col.gridSpan || 'md:col-span-6'} ${styles.borderHover} ${styles.glow}`}
+                  className={`group relative overflow-hidden rounded-2xl cursor-pointer border border-stone-200/90 transition-all duration-500 flex flex-col justify-end min-h-[310px] sm:min-h-[350px] bg-stone-950 ${col.gridSpan || 'md:col-span-6'} ${styles.borderHover} ${styles.glow} shadow-sm hover:shadow-xl hover:-translate-y-1`}
                 >
                   {/* Background Image with Hover Zoom */}
                   <div className="absolute inset-0 w-full h-full overflow-hidden">
@@ -267,7 +267,7 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ onNavi
                   {/* Top Badges & Counters */}
                   <div className="absolute top-3.5 left-3.5 right-3.5 z-10 flex items-center justify-between">
                     {col.highlightBadge && (
-                      <span className={`text-[10px] sm:text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-xs shadow-md backdrop-blur-xs flex items-center gap-1 ${styles.badgeBg}`}>
+                      <span className={`text-[10px] sm:text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-lg shadow-md backdrop-blur-xs flex items-center gap-1 ${styles.badgeBg}`}>
                         <Sparkles className="w-3 h-3" />
                         <span>{col.highlightBadge}</span>
                       </span>
@@ -289,7 +289,7 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ onNavi
                     </p>
 
                     {/* Main Title */}
-                    <h3 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight group-hover:text-white transition-colors">
+                    <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight group-hover:text-white transition-colors">
                       {col.title}
                     </h3>
 
@@ -303,7 +303,7 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ onNavi
                       {col.tags.map((tag, idx) => (
                         <span
                           key={idx}
-                          className={`text-[10px] font-medium px-2 py-0.5 rounded-xs border backdrop-blur-md transition-all duration-300 ${styles.pillBg} ${isHovered ? 'scale-102 opacity-100' : 'opacity-85'}`}
+                          className={`text-[10px] font-medium px-2 py-0.5 rounded-md border backdrop-blur-md transition-all duration-300 ${styles.pillBg} ${isHovered ? 'scale-102 opacity-100' : 'opacity-85'}`}
                         >
                           {tag}
                         </span>
