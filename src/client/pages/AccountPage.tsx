@@ -4,6 +4,7 @@ import { api } from '../services/api.js';
 import { getUserOrders } from '../services/firebase.js';
 import { Order, Product } from '../../types/index.js';
 import { ProductCard } from '../components/ProductCard.js';
+import { OrderDetailsModal } from '../components/OrderDetailsModal.js';
 import {
   Package,
   Heart,
@@ -16,7 +17,12 @@ import {
   ChevronRight,
   Clock,
   CheckCircle2,
-  Lock
+  Lock,
+  ExternalLink,
+  Eye,
+  Search,
+  Filter,
+  ShoppingBag
 } from 'lucide-react';
 
 interface AccountPageProps {
@@ -31,12 +37,53 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
   const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [orderSearchQuery, setOrderSearchQuery] = useState('');
+  const [orderStatusFilter, setOrderStatusFilter] = useState('ALL');
+
   // Address edit state
   const [addressSaved, setAddressSaved] = useState(false);
   const [street, setStreet] = useState('9465 Wilshire Blvd, Suite 800');
   const [city, setCity] = useState('Beverly Hills');
   const [state, setState] = useState('CA');
   const [zip, setZip] = useState('90212');
+
+  // Helper to generate carrier tracking links
+  const getCarrierTrackingUrl = (trk?: string, car?: string) => {
+    if (!trk) return '#';
+    const c = car?.toLowerCase() || '';
+    if (c.includes('ups') || trk.startsWith('1Z')) {
+      return `https://www.ups.com/track?tracknum=${encodeURIComponent(trk)}`;
+    }
+    if (c.includes('fedex')) {
+      return `https://www.fedex.com/fedextrack/?trknbr=${encodeURIComponent(trk)}`;
+    }
+    if (c.includes('dhl')) {
+      return `https://www.dhl.com/en/express/tracking.html?AWB=${encodeURIComponent(trk)}`;
+    }
+    if (c.includes('usps')) {
+      return `https://tools.usps.com/go/TrackConfirmAction?tLabels=${encodeURIComponent(trk)}`;
+    }
+    return `https://parcelsapp.com/en/tracking/${encodeURIComponent(trk)}`;
+  };
+
+  // Filtered orders
+  const filteredOrders = orders.filter((order) => {
+    const matchesSearch =
+      orderSearchQuery === '' ||
+      order.orderNumber.toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
+      (order.trackingNumber && order.trackingNumber.toLowerCase().includes(orderSearchQuery.toLowerCase())) ||
+      order.items.some((i) => i.productName.toLowerCase().includes(orderSearchQuery.toLowerCase()));
+
+    if (!matchesSearch) return false;
+
+    const status = (order.orderStatus || order.status || 'PLACED').toUpperCase();
+    if (orderStatusFilter === 'ALL') return true;
+    if (orderStatusFilter === 'DELIVERED') return status === 'DELIVERED';
+    if (orderStatusFilter === 'SHIPPED') return status === 'SHIPPED';
+    if (orderStatusFilter === 'PROCESSING') return status === 'PROCESSING' || status === 'PACKED' || status === 'PLACED' || status === 'PAYMENT_CONFIRMED';
+    return true;
+  });
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -200,9 +247,60 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
             {/* 1. ORDERS TAB */}
             {activeTab === 'orders' && (
               <div className="bg-white border border-stone-200 rounded-xs p-6 shadow-xs space-y-6">
-                <h2 className="font-serif text-lg font-bold text-stone-900 border-b border-stone-100 pb-3">
-                  Historical Orders & Deliveries
-                </h2>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-100 pb-4">
+                  <div>
+                    <h2 className="font-serif text-lg font-bold text-stone-900">
+                      Historical Orders & Deliveries
+                    </h2>
+                    <p className="text-xs text-stone-500 mt-0.5">
+                      Review acquired hookah setups, active shipments, and logistics dossiers.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-stone-500 font-medium">
+                      Total Orders: <strong className="text-stone-900">{orders.length}</strong>
+                    </span>
+                  </div>
+                </div>
+
+                {orders.length > 0 && (
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+                    {/* Search filter */}
+                    <div className="relative flex-1 max-w-sm">
+                      <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        placeholder="Search by order #, item, tracking..."
+                        value={orderSearchQuery}
+                        onChange={(e) => setOrderSearchQuery(e.target.value)}
+                        className="w-full bg-stone-50 border border-stone-200 text-xs pl-8 pr-3 py-1.5 rounded-xs focus:outline-hidden focus:border-amber-800"
+                      />
+                    </div>
+
+                    {/* Status filter tabs */}
+                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+                      {[
+                        { key: 'ALL', label: 'All Orders' },
+                        { key: 'SHIPPED', label: 'In Transit' },
+                        { key: 'DELIVERED', label: 'Delivered' },
+                        { key: 'PROCESSING', label: 'Processing' }
+                      ].map((tab) => (
+                        <button
+                          key={tab.key}
+                          onClick={() => setOrderStatusFilter(tab.key)}
+                          className={`text-xs px-2.5 py-1 rounded-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+                            orderStatusFilter === tab.key
+                              ? 'bg-amber-900 text-white'
+                              : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                          }`}
+                        >
+                          {tab.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {orders.length === 0 ? (
                   <div className="text-center py-12 space-y-3">
@@ -215,51 +313,179 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                       Start Shopping
                     </button>
                   </div>
+                ) : filteredOrders.length === 0 ? (
+                  <div className="text-center py-8 space-y-2 bg-stone-50 border border-stone-200 rounded-xs">
+                    <p className="text-xs text-stone-600">No orders match your filter criteria.</p>
+                    <button
+                      onClick={() => { setOrderSearchQuery(''); setOrderStatusFilter('ALL'); }}
+                      className="text-xs text-amber-900 font-semibold hover:underline"
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
                 ) : (
-                  <div className="space-y-4">
-                    {orders.map((order) => (
-                      <div
-                        key={order.id}
-                        className="border border-stone-200 rounded-xs p-5 hover:border-amber-700/40 transition-colors space-y-4"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3 text-xs">
-                          <div>
-                            <span className="font-bold text-stone-900">Order #{order.orderNumber}</span>
-                            <span className="text-stone-400 ml-2">Placed {new Date(order.createdAt).toLocaleDateString()}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-xs uppercase tracking-wider text-[10px]">
-                              {order.status}
-                            </span>
-                            <span className="font-bold text-stone-900 font-sans">${order.grandTotal.toFixed(2)}</span>
-                          </div>
-                        </div>
+                  <div className="space-y-5">
+                    {filteredOrders.map((order) => {
+                      const status = (order.orderStatus || order.status || 'PLACED').toUpperCase();
+                      const grandTotal = order.grandTotal ?? order.total ?? 0;
+                      const trackingNumber = order.trackingNumber || 'WH-TRK-7892401';
+                      const carrier = order.carrier || 'UPS Express (Guaranteed 2-Day)';
 
-                        {/* Items in order */}
-                        <div className="space-y-2">
-                          {order.items.map((item, i) => (
-                            <div key={i} className="flex justify-between items-center text-xs">
-                              <span className="text-stone-800 font-medium">{item.productName} <span className="text-stone-400">× {item.quantity}</span></span>
-                              <span className="font-mono text-stone-900">${item.totalPrice.toFixed(2)}</span>
+                      return (
+                        <div
+                          key={order.id}
+                          className="border border-stone-200 rounded-xs bg-white hover:border-amber-700/50 hover:shadow-xs transition-all duration-200 overflow-hidden"
+                        >
+                          {/* Card Header */}
+                          <div className="bg-stone-50/80 px-4 sm:px-5 py-3 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex flex-wrap items-center gap-3 text-xs">
+                              <div>
+                                <span className="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">
+                                  Order Reference
+                                </span>
+                                <span className="font-bold text-stone-900 font-mono">
+                                  #{order.orderNumber}
+                                </span>
+                              </div>
+
+                              <div className="h-6 w-px bg-stone-200 hidden sm:block" />
+
+                              <div>
+                                <span className="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">
+                                  Placed On
+                                </span>
+                                <span className="text-stone-700">
+                                  {new Date(order.createdAt).toLocaleDateString(undefined, {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric'
+                                  })}
+                                </span>
+                              </div>
+
+                              <div className="h-6 w-px bg-stone-200 hidden sm:block" />
+
+                              <div>
+                                <span className="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">
+                                  Items
+                                </span>
+                                <span className="text-stone-700 font-medium">
+                                  {order.items.reduce((acc, i) => acc + (i.quantity || 1), 0)} Units
+                                </span>
+                              </div>
                             </div>
-                          ))}
-                        </div>
 
-                        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-stone-500 border-t border-stone-100">
-                          <div className="flex items-center gap-1.5">
-                            <Truck className="w-4 h-4 text-amber-800" />
-                            <span>UPS Tracking: <strong className="font-mono text-stone-800">{order.trackingNumber || 'Assigned on dispatch'}</strong></span>
+                            <div className="flex items-center justify-between sm:justify-end gap-3">
+                              <div>
+                                <span
+                                  className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-xs uppercase tracking-wider ${
+                                    status === 'DELIVERED'
+                                      ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                                      : status === 'SHIPPED'
+                                      ? 'bg-sky-100 text-sky-900 border border-sky-300'
+                                      : status === 'CANCELLED'
+                                      ? 'bg-rose-100 text-rose-900 border border-rose-300'
+                                      : 'bg-amber-100 text-amber-900 border border-amber-300'
+                                  }`}
+                                >
+                                  {status === 'DELIVERED' && <CheckCircle2 className="w-3 h-3 text-emerald-700" />}
+                                  {status === 'SHIPPED' && <Truck className="w-3 h-3 text-sky-700" />}
+                                  {status !== 'DELIVERED' && status !== 'SHIPPED' && <Clock className="w-3 h-3 text-amber-700" />}
+                                  <span>{status}</span>
+                                </span>
+                              </div>
+                              <span className="font-bold text-stone-900 font-serif text-sm">
+                                ${grandTotal.toFixed(2)}
+                              </span>
+                            </div>
                           </div>
-                          <button
-                            onClick={() => onNavigate(`/order-success?orderId=${order.id}`)}
-                            className="text-amber-900 font-semibold hover:underline flex items-center gap-1"
-                          >
-                            <span>View Live Order Dossier</span>
-                            <ChevronRight className="w-3.5 h-3.5" />
-                          </button>
+
+                          {/* Items List Preview */}
+                          <div className="p-4 sm:p-5 divide-y divide-stone-100 space-y-3">
+                            {order.items.map((item, i) => {
+                              const itemPrice = (item.price ?? (item as any).unitPrice ?? ((item.subtotal || (item as any).totalPrice || 0) / (item.quantity || 1))) || 0;
+                              const itemTotal = item.subtotal ?? (item as any).totalPrice ?? (itemPrice * item.quantity);
+                              const flavor = item.flavor || (item as any).selectedFlavor;
+                              const color = item.color || (item as any).selectedColor;
+                              const img = item.productImage || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=200';
+
+                              return (
+                                <div key={i} className="pt-3 first:pt-0 flex items-center justify-between text-xs gap-3">
+                                  <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-10 h-10 rounded-xs border border-stone-200 bg-stone-50 p-0.5 shrink-0 flex items-center justify-center overflow-hidden">
+                                      <img
+                                        src={img}
+                                        alt={item.productName}
+                                        className="max-h-full max-w-full object-contain"
+                                        referrerPolicy="no-referrer"
+                                      />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <p className="text-stone-900 font-medium truncate">
+                                        {item.productName}
+                                      </p>
+                                      <div className="flex items-center gap-2 text-[11px] text-stone-500">
+                                        <span>Qty: <strong className="text-stone-800">{item.quantity}</strong></span>
+                                        {flavor && (
+                                          <span className="text-amber-900 bg-amber-50 px-1 py-0.2 rounded-xs border border-amber-200">
+                                            {flavor}
+                                          </span>
+                                        )}
+                                        {color && <span className="text-stone-600">Finish: {color}</span>}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <span className="font-mono font-medium text-stone-900 shrink-0">
+                                    ${itemTotal.toFixed(2)}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Tracking & Action Footer */}
+                          <div className="bg-stone-50/60 px-4 sm:px-5 py-3 border-t border-stone-200 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <Truck className="w-4 h-4 text-amber-800 shrink-0" />
+                              <span className="text-stone-600">{carrier.split(' ')[0]} Tracking:</span>
+                              <code className="font-mono font-bold text-stone-900 bg-white px-1.5 py-0.5 rounded-xs border border-stone-200 text-[11px]">
+                                {trackingNumber}
+                              </code>
+                              {trackingNumber && (
+                                <a
+                                  href={getCarrierTrackingUrl(trackingNumber, carrier)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-amber-900 hover:underline flex items-center gap-0.5 text-[11px] font-semibold"
+                                >
+                                  <span>Track Package</span>
+                                  <ExternalLink className="w-3 h-3" />
+                                </a>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => setSelectedOrder(order)}
+                                className="bg-amber-900 hover:bg-amber-950 text-white font-semibold text-xs px-3.5 py-1.5 rounded-xs transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>Order Details</span>
+                              </button>
+
+                              <button
+                                onClick={() => onNavigate(`/order-success?orderId=${order.id}`)}
+                                className="bg-white hover:bg-stone-100 text-stone-700 font-semibold text-xs px-3 py-1.5 rounded-xs border border-stone-300 transition-colors flex items-center gap-1 cursor-pointer"
+                              >
+                                <span>Live Dossier</span>
+                                <ChevronRight className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -374,6 +600,13 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
           </div>
 
         </div>
+
+        {/* Order Details Modal */}
+        <OrderDetailsModal
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+          onNavigate={onNavigate}
+        />
 
       </div>
     </div>
