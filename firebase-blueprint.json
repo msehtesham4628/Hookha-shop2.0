@@ -1,0 +1,267 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role, contact info, and customer status",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique user ID matching Auth UID" },
+        "email": { "type": "string", "format": "email", "description": "User email address" },
+        "firstName": { "type": "string", "description": "Given name" },
+        "lastName": { "type": "string", "description": "Family name" },
+        "phone": { "type": "string", "description": "Contact phone number" },
+        "role": { "type": "string", "enum": ["SUPER_ADMIN", "ADMIN", "MANAGER", "PRODUCT_MANAGER", "ORDER_MANAGER", "CUSTOMER_SUPPORT", "MARKETING", "INVENTORY_MANAGER", "CONTENT_MANAGER", "STAFF", "CUSTOMER"], "description": "Assigned access role" },
+        "status": { "type": "string", "enum": ["ACTIVE", "SUSPENDED", "PENDING"], "description": "Account status" },
+        "isEmailVerified": { "type": "boolean", "description": "Whether email is verified" },
+        "isPhoneVerified": { "type": "boolean", "description": "Whether phone is verified" },
+        "avatarUrl": { "type": "string", "description": "Avatar image URL" },
+        "totalSpent": { "type": "number", "description": "Aggregated purchase volume" },
+        "orderCount": { "type": "number", "description": "Number of placed orders" },
+        "isWholesaleCustomer": { "type": "boolean", "description": "B2B wholesale tier" },
+        "wholesaleCompany": { "type": "string", "description": "Wholesale company business name" },
+        "createdAt": { "type": "string", "description": "ISO timestamp created" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp modified" }
+      },
+      "required": ["id", "email", "firstName", "lastName", "role", "status", "createdAt"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Administrative authority record mapping uid to admin role",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "description": "Admin email address" },
+        "role": { "type": "string", "description": "Admin role designation" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["email", "role"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Hookah catalog item with specifications, stock, and pricing",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique product SKU or identifier" },
+        "name": { "type": "string", "description": "Product display name" },
+        "slug": { "type": "string", "description": "URL slug" },
+        "sku": { "type": "string", "description": "Stock keeping unit" },
+        "description": { "type": "string", "description": "Full product description" },
+        "shortDescription": { "type": "string", "description": "Short marketing summary" },
+        "price": { "type": "number", "description": "Retail price" },
+        "salePrice": { "type": "number", "description": "Discounted promotional price" },
+        "currency": { "type": "string", "description": "Currency code e.g. USD" },
+        "brand": { "type": "string", "description": "Brand name" },
+        "brandSlug": { "type": "string", "description": "Brand URL slug" },
+        "category": { "type": "string", "description": "Category name" },
+        "categorySlug": { "type": "string", "description": "Category URL slug" },
+        "subcategory": { "type": "string", "description": "Subcategory name" },
+        "images": { "type": "array", "description": "Product image gallery" },
+        "stock": { "type": "number", "description": "Inventory units available" },
+        "lowStockThreshold": { "type": "number", "description": "Threshold for low stock warnings" },
+        "rating": { "type": "number", "description": "Customer average rating" },
+        "reviewCount": { "type": "number", "description": "Number of customer reviews" },
+        "isFeatured": { "type": "boolean", "description": "Featured on home / showcase" },
+        "isNewArrival": { "type": "boolean", "description": "New release badge" },
+        "isBestSeller": { "type": "boolean", "description": "Top-selling badge" },
+        "isOnSale": { "type": "boolean", "description": "Promotional sale badge" },
+        "isActive": { "type": "boolean", "description": "Active in storefront" },
+        "ageRestricted": { "type": "boolean", "description": "21+ age gated product" },
+        "createdAt": { "type": "string", "description": "Created timestamp" },
+        "updatedAt": { "type": "string", "description": "Updated timestamp" }
+      },
+      "required": ["id", "name", "slug", "price", "brand", "category", "stock", "isActive"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Store category with metadata and subcategories",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Category ID" },
+        "name": { "type": "string", "description": "Category display name" },
+        "slug": { "type": "string", "description": "URL slug" },
+        "description": { "type": "string", "description": "Category description" },
+        "imageUrl": { "type": "string", "description": "Banner or tile image" },
+        "subcategories": { "type": "array", "description": "List of subcategory names" },
+        "productCount": { "type": "number", "description": "Total active products in category" },
+        "isActive": { "type": "boolean", "description": "Whether category is active" },
+        "sortOrder": { "type": "number", "description": "Ordering priority" }
+      },
+      "required": ["id", "name", "slug", "isActive"]
+    },
+    "Brand": {
+      "title": "Brand",
+      "description": "Manufacturer or artisanal brand profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Brand ID" },
+        "name": { "type": "string", "description": "Brand display name" },
+        "slug": { "type": "string", "description": "Brand URL slug" },
+        "origin": { "type": "string", "description": "Country of origin" },
+        "description": { "type": "string", "description": "Brand story" },
+        "logoUrl": { "type": "string", "description": "Logo URL" },
+        "productCount": { "type": "number", "description": "Total catalog items" },
+        "isActive": { "type": "boolean", "description": "Whether brand is visible" }
+      },
+      "required": ["id", "name", "slug", "isActive"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer purchase order with line items and status",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Order unique ID" },
+        "orderNumber": { "type": "string", "description": "Human readable order number" },
+        "userId": { "type": "string", "description": "Customer UID or guest ID" },
+        "customerName": { "type": "string", "description": "Customer full name" },
+        "customerEmail": { "type": "string", "description": "Notification email" },
+        "customerPhone": { "type": "string", "description": "Customer phone" },
+        "items": { "type": "array", "description": "Ordered line items" },
+        "shippingAddress": { "type": "object", "description": "Delivery address" },
+        "billingAddress": { "type": "object", "description": "Billing address" },
+        "subtotal": { "type": "number", "description": "Cart subtotal" },
+        "discount": { "type": "number", "description": "Discounts applied" },
+        "shippingFee": { "type": "number", "description": "Shipping rate" },
+        "tax": { "type": "number", "description": "Estimated tax" },
+        "total": { "type": "number", "description": "Grand total charged" },
+        "couponCode": { "type": "string", "description": "Coupon applied" },
+        "paymentMethod": { "type": "string", "description": "Payment gateway" },
+        "paymentStatus": { "type": "string", "enum": ["PENDING", "PAID", "FAILED", "REFUNDED"], "description": "Payment state" },
+        "orderStatus": { "type": "string", "enum": ["PLACED", "PAYMENT_CONFIRMED", "PROCESSING", "PACKED", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"], "description": "Order fulfillment status" },
+        "trackingNumber": { "type": "string", "description": "Courier tracking number" },
+        "carrier": { "type": "string", "description": "Courier service" },
+        "createdAt": { "type": "string", "description": "Order creation ISO date" },
+        "updatedAt": { "type": "string", "description": "Order update ISO date" }
+      },
+      "required": ["id", "orderNumber", "userId", "customerEmail", "items", "total", "orderStatus", "paymentStatus", "createdAt"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Product review and rating submitted by verified customers",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Review unique ID" },
+        "productId": { "type": "string", "description": "Target product ID" },
+        "productName": { "type": "string", "description": "Target product name" },
+        "userId": { "type": "string", "description": "Author UID" },
+        "userName": { "type": "string", "description": "Author display name" },
+        "rating": { "type": "number", "description": "1 to 5 star rating" },
+        "title": { "type": "string", "description": "Review headline" },
+        "comment": { "type": "string", "description": "Review commentary" },
+        "isVerifiedPurchase": { "type": "boolean", "description": "Verified buyer badge" },
+        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED", "HIDDEN"], "description": "Moderation state" },
+        "createdAt": { "type": "string", "description": "Submission ISO timestamp" }
+      },
+      "required": ["id", "productId", "userId", "userName", "rating", "comment", "status", "createdAt"]
+    },
+    "Coupon": {
+      "title": "Coupon",
+      "description": "Store discount code with validation rules",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Coupon ID" },
+        "code": { "type": "string", "description": "Uppercase coupon code" },
+        "description": { "type": "string", "description": "Offer description" },
+        "discountType": { "type": "string", "enum": ["PERCENTAGE", "FIXED"], "description": "Discount calculation method" },
+        "discountValue": { "type": "number", "description": "Discount value (% or $)" },
+        "minOrderAmount": { "type": "number", "description": "Minimum subtotal required" },
+        "maxDiscountAmount": { "type": "number", "description": "Max cap on percentage discount" },
+        "usageCount": { "type": "number", "description": "Times redeemed" },
+        "isActive": { "type": "boolean", "description": "Active status" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["id", "code", "discountType", "discountValue", "isActive"]
+    },
+    "WholesaleApplication": {
+      "title": "WholesaleApplication",
+      "description": "B2B wholesale and lounge partnership request",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Application ID" },
+        "companyName": { "type": "string", "description": "Business legal entity" },
+        "contactName": { "type": "string", "description": "Contact representative" },
+        "email": { "type": "string", "format": "email", "description": "Business email" },
+        "phone": { "type": "string", "description": "Business phone" },
+        "businessType": { "type": "string", "description": "Business sector" },
+        "taxId": { "type": "string", "description": "Tax ID or EIN" },
+        "website": { "type": "string", "description": "Website URL" },
+        "estimatedMonthlyVolume": { "type": "string", "description": "Expected order volume" },
+        "notes": { "type": "string", "description": "Application message" },
+        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED"], "description": "Review status" },
+        "createdAt": { "type": "string", "description": "Submission timestamp" },
+        "updatedAt": { "type": "string", "description": "Last update timestamp" }
+      },
+      "required": ["id", "companyName", "contactName", "email", "phone", "businessType", "status", "createdAt"]
+    },
+    "Wishlist": {
+      "title": "Wishlist",
+      "description": "Saved product items per user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner UID" },
+        "productIds": { "type": "array", "description": "List of saved product IDs" },
+        "updatedAt": { "type": "string", "description": "Last modified timestamp" }
+      },
+      "required": ["userId", "productIds"]
+    },
+    "StoreSettings": {
+      "title": "StoreSettings",
+      "description": "Global storefront settings and configuration",
+      "type": "object",
+      "properties": {
+        "storeName": { "type": "string", "description": "Store name" },
+        "supportEmail": { "type": "string", "description": "Support email" },
+        "currency": { "type": "string", "description": "Default currency" },
+        "freeShippingThreshold": { "type": "number", "description": "Free shipping order threshold" },
+        "standardShippingFee": { "type": "number", "description": "Standard shipping rate" },
+        "ageVerificationRequired": { "type": "boolean", "description": "Enforce 21+ check" },
+        "minimumPurchaseAge": { "type": "number", "description": "Minimum legal age" }
+      },
+      "required": ["storeName", "currency"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Individual customer profiles"
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/Admin" },
+      "description": "Privileged admin directory mapping UID to admin authority"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Storefront product items and inventory"
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Storefront categories"
+    },
+    "/brands/{brandId}": {
+      "schema": { "$ref": "#/entities/Brand" },
+      "description": "Hookah brands and manufacturers"
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer orders and fulfillment"
+    },
+    "/reviews/{reviewId}": {
+      "schema": { "$ref": "#/entities/Review" },
+      "description": "Product ratings and reviews"
+    },
+    "/coupons/{couponId}": {
+      "schema": { "$ref": "#/entities/Coupon" },
+      "description": "Promotional discount codes"
+    },
+    "/wholesaleApplications/{appId}": {
+      "schema": { "$ref": "#/entities/WholesaleApplication" },
+      "description": "Lounge & wholesale B2B applications"
+    },
+    "/wishlists/{userId}": {
+      "schema": { "$ref": "#/entities/Wishlist" },
+      "description": "Customer saved wishlist items"
+    },
+    "/storeSettings/{settingId}": {
+      "schema": { "$ref": "#/entities/StoreSettings" },
+      "description": "Store configuration parameters"
+    }
+  }
+}

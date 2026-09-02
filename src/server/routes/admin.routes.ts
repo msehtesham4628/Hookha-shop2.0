@@ -612,6 +612,43 @@ router.post('/categories', requirePermission('categories.create'), (req: Authent
   return res.status(201).json({ success: true, data: cat });
 });
 
+router.put('/categories/:id', (req: AuthenticatedRequest, res) => {
+  const user = req.user!;
+  const { id } = req.params;
+  const { name, description, imageUrl, bannerUrl, subcategories, isActive } = req.body;
+
+  const cat = db.categories.find(c => c.id === id || c.slug === id);
+  if (!cat) {
+    return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Category not found' } });
+  }
+
+  if (name) {
+    cat.name = name;
+    cat.slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  }
+  if (description !== undefined) cat.description = description;
+  if (imageUrl !== undefined) cat.imageUrl = imageUrl;
+  if (bannerUrl !== undefined) cat.bannerUrl = bannerUrl;
+  if (Array.isArray(subcategories)) cat.subcategories = subcategories;
+  if (isActive !== undefined) cat.isActive = isActive;
+
+  db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_UPDATED_CATEGORY', 'CATEGORY', cat.id, { name: cat.name });
+  return res.json({ success: true, data: cat });
+});
+
+router.delete('/categories/:id', (req: AuthenticatedRequest, res) => {
+  const user = req.user!;
+  const { id } = req.params;
+  const index = db.categories.findIndex(c => c.id === id || c.slug === id);
+  if (index === -1) {
+    return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Category not found' } });
+  }
+
+  const removed = db.categories.splice(index, 1)[0];
+  db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_DELETED_CATEGORY', 'CATEGORY', id, { name: removed.name });
+  return res.json({ success: true, message: `Category "${removed.name}" deleted successfully` });
+});
+
 router.get('/brands', requirePermission('brands.view'), (req, res) => {
   return res.json({ success: true, data: db.brands });
 });
@@ -635,6 +672,42 @@ router.post('/brands', requirePermission('brands.create'), (req: AuthenticatedRe
   db.brands.push(brand);
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_CREATED_BRAND', 'BRAND', brand.id, { name });
   return res.status(201).json({ success: true, data: brand });
+});
+
+router.put('/brands/:id', (req: AuthenticatedRequest, res) => {
+  const user = req.user!;
+  const { id } = req.params;
+  const { name, origin, description, logoUrl, isActive } = req.body;
+
+  const brand = db.brands.find(b => b.id === id || b.slug === id);
+  if (!brand) {
+    return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Brand not found' } });
+  }
+
+  if (name) {
+    brand.name = name;
+    brand.slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  }
+  if (origin !== undefined) brand.origin = origin;
+  if (description !== undefined) brand.description = description;
+  if (logoUrl !== undefined) brand.logoUrl = logoUrl;
+  if (isActive !== undefined) brand.isActive = isActive;
+
+  db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_UPDATED_BRAND', 'BRAND', brand.id, { name: brand.name });
+  return res.json({ success: true, data: brand });
+});
+
+router.delete('/brands/:id', (req: AuthenticatedRequest, res) => {
+  const user = req.user!;
+  const { id } = req.params;
+  const index = db.brands.findIndex(b => b.id === id || b.slug === id);
+  if (index === -1) {
+    return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Brand not found' } });
+  }
+
+  const removed = db.brands.splice(index, 1)[0];
+  db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_DELETED_BRAND', 'BRAND', id, { name: removed.name });
+  return res.json({ success: true, message: `Brand "${removed.name}" deleted successfully` });
 });
 
 // ==========================================

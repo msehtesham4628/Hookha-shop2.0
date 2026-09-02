@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { api } from '../services/api.js';
 import { useStore } from '../store/useStore.js';
+import { submitWholesaleApplication as submitCloudWholesale } from '../services/firebase.js';
 import {
   ShieldCheck,
   Building2,
@@ -39,6 +40,24 @@ export const WholesalePage: React.FC<WholesalePageProps> = ({ onNavigate }) => {
 
     try {
       setIsSubmitting(true);
+      
+      // Submit to Firebase Firestore
+      try {
+        await submitCloudWholesale({
+          companyName: businessName,
+          contactName,
+          email,
+          phone: phone || '',
+          businessType: (businessType as any) || 'LOUNGE',
+          taxId: taxId || undefined,
+          website: website || undefined,
+          estimatedMonthlyVolume: estimatedMonthlySpend,
+          notes: notes || undefined
+        });
+      } catch (cloudErr) {
+        console.warn('Firebase wholesale submission note:', cloudErr);
+      }
+
       const res = await api.submitWholesaleApplication({
         businessName,
         businessType,

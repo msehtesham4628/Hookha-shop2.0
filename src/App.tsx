@@ -62,6 +62,7 @@ export default function App() {
     if (pathOnly === '/shop') {
       return (
         <ShopPage
+          key={currentPath}
           initialCategory={queryParams.get('category') || undefined}
           initialBrand={queryParams.get('brand') || undefined}
           initialSearch={queryParams.get('search') || queryParams.get('q') || undefined}

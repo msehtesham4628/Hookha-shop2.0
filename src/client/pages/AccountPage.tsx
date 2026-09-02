@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore.js';
 import { api } from '../services/api.js';
+import { getUserOrders } from '../services/firebase.js';
 import { Order, Product } from '../../types/index.js';
 import { ProductCard } from '../components/ProductCard.js';
 import {
@@ -46,14 +47,33 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
       try {
         setLoading(true);
         const [orderRes, wishRes] = await Promise.all([
-          api.getMyOrders(),
-          api.getWishlist()
+          api.getMyOrders().catch(() => ({ success: false, data: [] })),
+          api.getWishlist().catch(() => ({ success: false, data: { items: [] } }))
         ]);
 
+        let combinedOrders: Order[] = [];
         if (orderRes.success && orderRes.data) {
-          const ordersList = Array.isArray(orderRes.data) ? orderRes.data : (orderRes.data as any).orders || [];
-          setOrders(ordersList);
+          combinedOrders = Array.isArray(orderRes.data) ? orderRes.data : (orderRes.data as any).orders || [];
         }
+
+        // Also fetch from Firebase if user is authenticated
+        if (user?.id) {
+          try {
+            const cloudOrders = await getUserOrders(user.id);
+            if (cloudOrders && cloudOrders.length > 0) {
+              const existingIds = new Set(combinedOrders.map(o => o.id));
+              for (const co of cloudOrders) {
+                if (!existingIds.has(co.id)) {
+                  combinedOrders.push(co);
+                }
+              }
+            }
+          } catch (cloudErr) {
+            console.warn('Firebase orders load notice:', cloudErr);
+          }
+        }
+
+        setOrders(combinedOrders);
 
         if (wishRes.success && wishRes.data) {
           setWishlistProducts(wishRes.data.items || []);
@@ -264,7 +284,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                     </button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {wishlistProducts.map((p) => (
                       <ProductCard
                         key={p.id}

@@ -161,24 +161,20 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
     }
   };
 
-  // 7. Google Fast Auth Simulation
+  // 7. Google Firebase Fast Auth
   const handleGoogleAuth = async () => {
     setErrorMsg('');
     try {
       setLoading(true);
-      const res = await api.googleLogin({
-        email: 'google.connoisseur@gmail.com',
-        name: 'Julian Vance (Google VIP)',
-        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200'
-      });
-      if (res.success && res.data) {
-        localStorage.setItem('sultan_auth_token', res.data.token);
-        setUser(res.data.user, []);
-        showToast('Signed in via Google Workspace!', 'success');
+      const { loginWithGoogle } = useStore.getState();
+      const user = await loginWithGoogle();
+      if (user.role !== 'CUSTOMER') {
+        onNavigate('/admin');
+      } else {
         onNavigate('/account');
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Google login failed.');
+      setErrorMsg(err.message || 'Google sign-in was cancelled or failed.');
     } finally {
       setLoading(false);
     }

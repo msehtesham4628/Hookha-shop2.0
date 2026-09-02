@@ -43,7 +43,11 @@ import {
   Clock,
   RefreshCw,
   Sliders,
-  ExternalLink
+  ExternalLink,
+  Tag,
+  Globe,
+  FolderPlus,
+  Award
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -52,7 +56,7 @@ interface AdminDashboardProps {
 
 export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const { user, userPermissions, logout, showToast, isAdmin, isAuthLoading, setUser } = useStore();
-  const [activeTab, setActiveTab] = useState<'analytics' | 'products' | 'orders' | 'customers' | 'wholesale' | 'rbac' | 'audit' | 'settings'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'products' | 'categories' | 'brands' | 'orders' | 'customers' | 'wholesale' | 'rbac' | 'audit' | 'settings'>('analytics');
 
   // Admin Login State for Gateway
   const [adminLoginEmail, setAdminLoginEmail] = useState('admin@worldhookahmarket.com');
@@ -81,6 +85,23 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
   const [selectedOrderForTracking, setSelectedOrderForTracking] = useState<Order | null>(null);
   const [newTrackingNumber, setNewTrackingNumber] = useState('');
+
+  // Category Modal & Form State
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [catName, setCatName] = useState('');
+  const [catDesc, setCatDesc] = useState('');
+  const [catImageUrl, setCatImageUrl] = useState('');
+  const [catBannerUrl, setCatBannerUrl] = useState('');
+  const [catSubcategoriesStr, setCatSubcategoriesStr] = useState('');
+
+  // Brand Modal & Form State
+  const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
+  const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
+  const [brandName, setBrandName] = useState('');
+  const [brandOrigin, setBrandOrigin] = useState('');
+  const [brandDesc, setBrandDesc] = useState('');
+  const [brandLogoUrl, setBrandLogoUrl] = useState('');
 
   // Product Form Fields
   const [prodName, setProdName] = useState('');
@@ -294,6 +315,142 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       }
     } catch (err: any) {
       showToast(err.message || 'Failed to delete product', 'error');
+    }
+  };
+
+  // Handlers for Category Management
+  const handleOpenCreateCategory = () => {
+    setEditingCategory(null);
+    setCatName('');
+    setCatDesc('');
+    setCatImageUrl('https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800');
+    setCatBannerUrl('https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200');
+    setCatSubcategoriesStr('');
+    setIsCategoryModalOpen(true);
+  };
+
+  const handleOpenEditCategory = (cat: Category) => {
+    setEditingCategory(cat);
+    setCatName(cat.name);
+    setCatDesc(cat.description || '');
+    setCatImageUrl(cat.imageUrl || '');
+    setCatBannerUrl(cat.bannerUrl || '');
+    setCatSubcategoriesStr(cat.subcategories ? cat.subcategories.join(', ') : '');
+    setIsCategoryModalOpen(true);
+  };
+
+  const handleSaveCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!catName.trim()) {
+      showToast('Category name is required', 'error');
+      return;
+    }
+    try {
+      const subcategories = catSubcategoriesStr
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      const payload: Partial<Category> = {
+        name: catName.trim(),
+        description: catDesc.trim(),
+        imageUrl: catImageUrl.trim() || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800',
+        bannerUrl: catBannerUrl.trim() || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200',
+        subcategories
+      };
+
+      if (editingCategory) {
+        const res = await api.updateAdminCategory(editingCategory.id, payload);
+        if (res.success) {
+          showToast(`Category "${catName}" updated successfully!`, 'success');
+        }
+      } else {
+        const res = await api.createAdminCategory(payload);
+        if (res.success) {
+          showToast(`New category "${catName}" created!`, 'success');
+        }
+      }
+      setIsCategoryModalOpen(false);
+      loadAllAdminData();
+    } catch (err: any) {
+      showToast(err.message || 'Failed to save category', 'error');
+    }
+  };
+
+  const handleDeleteCategory = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you wish to delete category "${name}"?`)) return;
+    try {
+      const res = await api.deleteAdminCategory(id);
+      if (res.success) {
+        showToast(`Category "${name}" removed`, 'info');
+        loadAllAdminData();
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to delete category', 'error');
+    }
+  };
+
+  // Handlers for Brand Management
+  const handleOpenCreateBrand = () => {
+    setEditingBrand(null);
+    setBrandName('');
+    setBrandOrigin('Russia');
+    setBrandDesc('Premium hookah and shisha craftsmanship.');
+    setBrandLogoUrl('https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=400');
+    setIsBrandModalOpen(true);
+  };
+
+  const handleOpenEditBrand = (brand: Brand) => {
+    setEditingBrand(brand);
+    setBrandName(brand.name);
+    setBrandOrigin(brand.origin || '');
+    setBrandDesc(brand.description || '');
+    setBrandLogoUrl(brand.logoUrl || '');
+    setIsBrandModalOpen(true);
+  };
+
+  const handleSaveBrand = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!brandName.trim()) {
+      showToast('Brand name is required', 'error');
+      return;
+    }
+    try {
+      const payload: Partial<Brand> = {
+        name: brandName.trim(),
+        origin: brandOrigin.trim() || 'Global',
+        description: brandDesc.trim(),
+        logoUrl: brandLogoUrl.trim() || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=400'
+      };
+
+      if (editingBrand) {
+        const res = await api.updateAdminBrand(editingBrand.id, payload);
+        if (res.success) {
+          showToast(`Brand "${brandName}" updated successfully!`, 'success');
+        }
+      } else {
+        const res = await api.createAdminBrand(payload);
+        if (res.success) {
+          showToast(`New brand "${brandName}" created!`, 'success');
+        }
+      }
+      setIsBrandModalOpen(false);
+      loadAllAdminData();
+    } catch (err: any) {
+      showToast(err.message || 'Failed to save brand', 'error');
+    }
+  };
+
+  const handleDeleteBrand = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you wish to delete brand "${name}"?`)) return;
+    try {
+      const res = await api.deleteAdminBrand(id);
+      if (res.success) {
+        showToast(`Brand "${name}" removed`, 'info');
+        loadAllAdminData();
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to delete brand', 'error');
     }
   };
 
@@ -577,6 +734,18 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           Products ({products.length})
         </button>
         <button
+          onClick={() => setActiveTab('categories')}
+          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'categories' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
+        >
+          Categories ({categories.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('brands')}
+          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'brands' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
+        >
+          Brands ({brands.length})
+        </button>
+        <button
           onClick={() => setActiveTab('orders')}
           className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'orders' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
         >
@@ -645,6 +814,36 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
             </div>
             <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'products' ? 'bg-amber-800 text-amber-100' : 'bg-stone-100 text-stone-600'}`}>
               {products.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('categories')}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
+              activeTab === 'categories' ? 'bg-amber-900 text-white shadow-xs' : 'text-stone-700 hover:bg-stone-100'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Layers className="w-4 h-4" />
+              <span>Categories & Hierarchy</span>
+            </div>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'categories' ? 'bg-amber-800 text-amber-100' : 'bg-stone-100 text-stone-600'}`}>
+              {categories.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('brands')}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
+              activeTab === 'brands' ? 'bg-amber-900 text-white shadow-xs' : 'text-stone-700 hover:bg-stone-100'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Tag className="w-4 h-4" />
+              <span>Brands & Manufacturers</span>
+            </div>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'brands' ? 'bg-amber-800 text-amber-100' : 'bg-stone-100 text-stone-600'}`}>
+              {brands.length}
             </span>
           </button>
 
@@ -849,14 +1048,30 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                       <h2 className="font-serif text-2xl font-bold text-stone-900">Catalog & Media Matrix</h2>
                       <p className="text-xs text-stone-500">Manage Russian hookahs, dark leaf tobacco, clay bowls, bases, and prices.</p>
                     </div>
-                    <button
-                      id="admin-create-product-btn"
-                      onClick={handleOpenCreateProduct}
-                      className="bg-amber-900 hover:bg-amber-800 text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xs transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>Add New Product</span>
-                    </button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={handleOpenCreateCategory}
+                        className="bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold px-3 py-2 rounded-xs transition-colors flex items-center gap-1.5 border border-stone-300 cursor-pointer"
+                      >
+                        <Layers className="w-3.5 h-3.5 text-amber-800" />
+                        <span>Add Category</span>
+                      </button>
+                      <button
+                        onClick={handleOpenCreateBrand}
+                        className="bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold px-3 py-2 rounded-xs transition-colors flex items-center gap-1.5 border border-stone-300 cursor-pointer"
+                      >
+                        <Tag className="w-3.5 h-3.5 text-amber-800" />
+                        <span>Add Brand</span>
+                      </button>
+                      <button
+                        id="admin-create-product-btn"
+                        onClick={handleOpenCreateProduct}
+                        className="bg-amber-900 hover:bg-amber-800 text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xs transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Add New Product</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Search Bar */}
@@ -926,6 +1141,225 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                         ))}
                       </tbody>
                     </table>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: CATEGORIES MANAGEMENT */}
+              {activeTab === 'categories' && (
+                <div className="space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2 className="font-serif text-2xl font-bold text-stone-900">Categories & Taxonomy Hierarchy</h2>
+                        <span className="bg-amber-100 text-amber-900 text-xs font-bold px-2 py-0.5 rounded-xs font-mono">
+                          {categories.length} Total
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-500">Configure storefront categories, hero media banners, and subcategory taxonomy filters.</p>
+                    </div>
+                    <button
+                      onClick={handleOpenCreateCategory}
+                      className="bg-amber-900 hover:bg-amber-800 text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xs transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Add New Category</span>
+                    </button>
+                  </div>
+
+                  {/* Search categories */}
+                  <div className="bg-white border border-stone-200 p-4 rounded-xs flex items-center gap-3 shadow-2xs">
+                    <Search className="w-4 h-4 text-stone-400" />
+                    <input
+                      type="text"
+                      placeholder="Filter categories by name, slug, or subcategory..."
+                      value={adminSearch}
+                      onChange={(e) => setAdminSearch(e.target.value)}
+                      className="w-full text-xs text-stone-800 bg-transparent focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Categories Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {categories
+                      .filter(c => !adminSearch || c.name.toLowerCase().includes(adminSearch.toLowerCase()) || (c.subcategories && c.subcategories.some(s => s.toLowerCase().includes(adminSearch.toLowerCase()))))
+                      .map((cat) => {
+                        const matchingProductsCount = products.filter(p => p.category.toLowerCase() === cat.name.toLowerCase() || p.categoryId === cat.id).length;
+                        return (
+                          <div key={cat.id} className="bg-white border border-stone-200 rounded-xs overflow-hidden shadow-xs flex flex-col justify-between hover:border-amber-300 transition-colors">
+                            <div>
+                              <div className="h-32 bg-stone-100 relative overflow-hidden border-b border-stone-100">
+                                <img
+                                  src={cat.imageUrl || cat.bannerUrl || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800'}
+                                  alt={cat.name}
+                                  className="w-full h-full object-cover"
+                                  referrerPolicy="no-referrer"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
+                                  <div>
+                                    <span className="text-[10px] font-mono uppercase tracking-wider text-amber-300 bg-stone-900/80 px-2 py-0.5 rounded-xs">
+                                      /{cat.slug}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="p-4 space-y-2">
+                                <div className="flex items-start justify-between gap-2">
+                                  <h3 className="font-serif text-lg font-bold text-stone-900">{cat.name}</h3>
+                                  <span className="text-[11px] font-mono font-bold bg-stone-100 text-stone-700 px-2 py-0.5 rounded-xs shrink-0">
+                                    {matchingProductsCount} {matchingProductsCount === 1 ? 'Product' : 'Products'}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed">
+                                  {cat.description || 'No description provided.'}
+                                </p>
+                                
+                                {cat.subcategories && cat.subcategories.length > 0 && (
+                                  <div className="pt-2">
+                                    <span className="text-[10px] font-bold uppercase text-stone-400 tracking-wider block mb-1.5">Subcategories</span>
+                                    <div className="flex flex-wrap gap-1">
+                                      {cat.subcategories.map((sub, i) => (
+                                        <span key={i} className="text-[10px] bg-stone-100 text-stone-700 px-2 py-0.5 rounded-xs border border-stone-200">
+                                          {sub}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="p-3 bg-stone-50 border-t border-stone-200 flex items-center justify-between text-xs">
+                              <button
+                                onClick={() => onNavigate(`/shop?category=${encodeURIComponent(cat.name)}`)}
+                                className="text-amber-900 hover:text-amber-700 font-semibold flex items-center gap-1 text-[11px] cursor-pointer"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                                <span>Shop View</span>
+                              </button>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleOpenEditCategory(cat)}
+                                  className="p-1.5 bg-white border border-stone-200 hover:bg-amber-50 hover:text-amber-900 text-stone-700 rounded-xs transition-colors cursor-pointer"
+                                  title="Edit Category"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteCategory(cat.id, cat.name)}
+                                  className="p-1.5 bg-white border border-stone-200 hover:bg-rose-50 hover:text-rose-700 text-stone-400 rounded-xs transition-colors cursor-pointer"
+                                  title="Delete Category"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: BRANDS MANAGEMENT */}
+              {activeTab === 'brands' && (
+                <div className="space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2 className="font-serif text-2xl font-bold text-stone-900">Brands & Authorized Makers</h2>
+                        <span className="bg-amber-100 text-amber-900 text-xs font-bold px-2 py-0.5 rounded-xs font-mono">
+                          {brands.length} Brands
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-500">Curate hookah manufacturers, Russian dark leaf masters, and artisan craft studios.</p>
+                    </div>
+                    <button
+                      onClick={handleOpenCreateBrand}
+                      className="bg-amber-900 hover:bg-amber-800 text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xs transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Add New Brand</span>
+                    </button>
+                  </div>
+
+                  {/* Search brands */}
+                  <div className="bg-white border border-stone-200 p-4 rounded-xs flex items-center gap-3 shadow-2xs">
+                    <Search className="w-4 h-4 text-stone-400" />
+                    <input
+                      type="text"
+                      placeholder="Filter brands by name, country of origin (e.g. Russia, Germany, USA), or description..."
+                      value={adminSearch}
+                      onChange={(e) => setAdminSearch(e.target.value)}
+                      className="w-full text-xs text-stone-800 bg-transparent focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Brands Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {brands
+                      .filter(b => !adminSearch || b.name.toLowerCase().includes(adminSearch.toLowerCase()) || (b.origin && b.origin.toLowerCase().includes(adminSearch.toLowerCase())))
+                      .map((brand) => {
+                        const matchingProductsCount = products.filter(p => p.brand.toLowerCase() === brand.name.toLowerCase()).length;
+                        return (
+                          <div key={brand.id} className="bg-white border border-stone-200 rounded-xs overflow-hidden shadow-xs flex flex-col justify-between hover:border-amber-300 transition-colors">
+                            <div className="p-4 space-y-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-xs border border-stone-200 bg-stone-50 p-1 flex items-center justify-center overflow-hidden shrink-0">
+                                  {brand.logoUrl ? (
+                                    <img src={brand.logoUrl} alt={brand.name} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                                  ) : (
+                                    <Award className="w-6 h-6 text-amber-900" />
+                                  )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center justify-between gap-1">
+                                    <h3 className="font-serif text-base font-bold text-stone-900 truncate">{brand.name}</h3>
+                                  </div>
+                                  <div className="flex items-center gap-1.5 mt-0.5">
+                                    <span className="text-[10px] uppercase font-bold text-amber-900 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded-xs">
+                                      {brand.origin || 'Global'}
+                                    </span>
+                                    <span className="text-[10px] text-stone-400 font-mono">
+                                      {matchingProductsCount} {matchingProductsCount === 1 ? 'item' : 'items'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <p className="text-xs text-stone-600 line-clamp-3 leading-relaxed">
+                                {brand.description || 'Authentic manufacturer with certified distribution.'}
+                              </p>
+                            </div>
+
+                            <div className="p-3 bg-stone-50 border-t border-stone-200 flex items-center justify-between text-xs">
+                              <button
+                                onClick={() => onNavigate(`/shop?brand=${encodeURIComponent(brand.name)}`)}
+                                className="text-amber-900 hover:text-amber-700 font-semibold flex items-center gap-1 text-[11px] cursor-pointer"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                                <span>Browse Catalog</span>
+                              </button>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleOpenEditBrand(brand)}
+                                  className="p-1.5 bg-white border border-stone-200 hover:bg-amber-50 hover:text-amber-900 text-stone-700 rounded-xs transition-colors cursor-pointer"
+                                  title="Edit Brand"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteBrand(brand.id, brand.name)}
+                                  className="p-1.5 bg-white border border-stone-200 hover:bg-rose-50 hover:text-rose-700 text-stone-400 rounded-xs transition-colors cursor-pointer"
+                                  title="Delete Brand"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               )}
@@ -1308,30 +1742,64 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-stone-700 mb-1">Brand</label>
-                  <input
-                    type="text"
-                    required
-                    value={prodBrand}
-                    onChange={(e) => setProdBrand(e.target.value)}
-                    placeholder="e.g. Alpha Hookah, MustHave, DarkSide"
-                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
-                  />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-semibold text-stone-700">Brand *</label>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenCreateBrand()}
+                      className="text-[11px] text-amber-900 hover:text-amber-700 font-semibold cursor-pointer"
+                    >
+                      + Add New Brand
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      list="admin-brand-options"
+                      value={prodBrand}
+                      onChange={(e) => setProdBrand(e.target.value)}
+                      placeholder="Select or enter brand name..."
+                      className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                    />
+                    <datalist id="admin-brand-options">
+                      {brands.map(b => (
+                        <option key={b.id} value={b.name}>{b.origin ? `${b.name} (${b.origin})` : b.name}</option>
+                      ))}
+                    </datalist>
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-stone-700 mb-1">Category</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-semibold text-stone-700">Category *</label>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenCreateCategory()}
+                      className="text-[11px] text-amber-900 hover:text-amber-700 font-semibold cursor-pointer"
+                    >
+                      + Add New Category
+                    </button>
+                  </div>
                   <select
                     value={prodCategory}
                     onChange={(e) => setProdCategory(e.target.value)}
                     className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
                   >
-                    <option value="Hookahs">Hookahs</option>
-                    <option value="Shisha Tobacco">Shisha Tobacco</option>
-                    <option value="Hookah Bowls">Hookah Bowls</option>
-                    <option value="Bases & Glass">Bases & Glass</option>
-                    <option value="Charcoal & Heat">Charcoal & Heat</option>
-                    <option value="Accessories & HMD">Accessories & HMD</option>
+                    {categories.length > 0 ? (
+                      categories.map(c => (
+                        <option key={c.id} value={c.name}>{c.name}</option>
+                      ))
+                    ) : (
+                      <>
+                        <option value="Hookahs">Hookahs</option>
+                        <option value="Shisha Tobacco">Shisha Tobacco</option>
+                        <option value="Hookah Bowls">Hookah Bowls</option>
+                        <option value="Bases & Glass">Bases & Glass</option>
+                        <option value="Charcoal & Heat">Charcoal & Heat</option>
+                        <option value="Accessories & HMD">Accessories & HMD</option>
+                      </>
+                    )}
                   </select>
                 </div>
 
@@ -1532,6 +2000,184 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                   className="bg-amber-900 text-white font-semibold px-5 py-2 rounded-xs cursor-pointer"
                 >
                   Generate Credentials
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CREATE / EDIT CATEGORY MODAL */}
+      {isCategoryModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-lg w-full p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Layers className="w-5 h-5 text-amber-900" />
+                <h3 className="font-serif text-lg font-bold text-stone-900">
+                  {editingCategory ? 'Edit Store Category' : 'Create New Category'}
+                </h3>
+              </div>
+              <button onClick={() => setIsCategoryModalOpen(false)} className="text-stone-400 hover:text-stone-700 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCategory} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Category Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={catName}
+                  onChange={(e) => setCatName(e.target.value)}
+                  placeholder="e.g. Russian Stainless Hookahs"
+                  className="w-full bg-stone-50 border border-stone-300 p-2.5 rounded-xs font-semibold text-stone-900"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Description</label>
+                <textarea
+                  rows={2}
+                  value={catDesc}
+                  onChange={(e) => setCatDesc(e.target.value)}
+                  placeholder="Brief description for customer taxonomy exploration..."
+                  className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Cover Image URL</label>
+                <input
+                  type="text"
+                  value={catImageUrl}
+                  onChange={(e) => setCatImageUrl(e.target.value)}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono text-[11px]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Hero Banner URL (Optional)</label>
+                <input
+                  type="text"
+                  value={catBannerUrl}
+                  onChange={(e) => setCatBannerUrl(e.target.value)}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono text-[11px]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Subcategories (Comma-separated)</label>
+                <input
+                  type="text"
+                  value={catSubcategoriesStr}
+                  onChange={(e) => setCatSubcategoriesStr(e.target.value)}
+                  placeholder="e.g. Classic, Travel Mini, Heavy Stainless, Artistic Glass"
+                  className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                />
+                <span className="text-[10px] text-stone-400 mt-1 block">Separate subcategory tags with commas.</span>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => setIsCategoryModalOpen(false)}
+                  className="bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold px-4 py-2 rounded-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-stone-900 hover:bg-amber-900 text-white font-semibold px-5 py-2 rounded-xs cursor-pointer transition-colors"
+                >
+                  {editingCategory ? 'Update Category' : 'Create Category'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CREATE / EDIT BRAND MODAL */}
+      {isBrandModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-lg w-full p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Tag className="w-5 h-5 text-amber-900" />
+                <h3 className="font-serif text-lg font-bold text-stone-900">
+                  {editingBrand ? 'Edit Manufacturer Brand' : 'Register New Brand'}
+                </h3>
+              </div>
+              <button onClick={() => setIsBrandModalOpen(false)} className="text-stone-400 hover:text-stone-700 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveBrand} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Brand Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={brandName}
+                    onChange={(e) => setBrandName(e.target.value)}
+                    placeholder="e.g. Alpha Hookah"
+                    className="w-full bg-stone-50 border border-stone-300 p-2.5 rounded-xs font-semibold text-stone-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Origin Country</label>
+                  <input
+                    type="text"
+                    value={brandOrigin}
+                    onChange={(e) => setBrandOrigin(e.target.value)}
+                    placeholder="e.g. Russia, Germany, USA, UAE"
+                    className="w-full bg-stone-50 border border-stone-300 p-2.5 rounded-xs"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Brand Logo / Visual URL</label>
+                <input
+                  type="text"
+                  value={brandLogoUrl}
+                  onChange={(e) => setBrandLogoUrl(e.target.value)}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono text-[11px]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Brand Description & Heritage</label>
+                <textarea
+                  rows={3}
+                  value={brandDesc}
+                  onChange={(e) => setBrandDesc(e.target.value)}
+                  placeholder="History, engineering pedigree, and product specialization..."
+                  className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => setIsBrandModalOpen(false)}
+                  className="bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold px-4 py-2 rounded-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-stone-900 hover:bg-amber-900 text-white font-semibold px-5 py-2 rounded-xs cursor-pointer transition-colors"
+                >
+                  {editingBrand ? 'Update Brand' : 'Register Brand'}
                 </button>
               </div>
             </form>

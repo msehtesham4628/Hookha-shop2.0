@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore.js';
 import { api } from '../services/api.js';
+import { createCloudOrder } from '../services/firebase.js';
 import {
   ShieldCheck,
   CreditCard,
@@ -112,6 +113,15 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       });
 
       if (res.success && res.data) {
+        // Sync order with Firebase Firestore
+        if (res.data.order) {
+          try {
+            await createCloudOrder(res.data.order);
+          } catch (cloudErr) {
+            console.warn('Firebase order sync notice:', cloudErr);
+          }
+        }
+
         // Clear local cart
         await loadCart();
         showToast('Order confirmed! Welcome to Sultan Reserve.', 'success');

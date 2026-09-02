@@ -56,7 +56,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   const [onSaleOnly, setOnSaleOnly] = useState(initialOnSale || false);
   const [newArrivalOnly, setNewArrivalOnly] = useState(initialNewArrival || false);
   const [sortBy, setSortBy] = useState<string>('popularity');
-  const [gridColumns, setGridColumns] = useState<3 | 4>(3);
+  const [gridColumns, setGridColumns] = useState<3 | 4>(4);
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
@@ -79,11 +79,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
   // Update on prop changes
   useEffect(() => {
-    if (initialCategory !== undefined) setSelectedCategory(initialCategory);
-    if (initialBrand !== undefined) setSelectedBrand(initialBrand);
-    if (initialSearch !== undefined) setSearchQuery(initialSearch);
-    if (initialOnSale !== undefined) setOnSaleOnly(initialOnSale);
-    if (initialNewArrival !== undefined) setNewArrivalOnly(initialNewArrival);
+    setSelectedCategory(initialCategory || '');
+    setSelectedBrand(initialBrand || '');
+    setSearchQuery(initialSearch || '');
+    setOnSaleOnly(initialOnSale || false);
+    setNewArrivalOnly(initialNewArrival || false);
     setSelectedSubcategory('');
     setCurrentPage(1);
   }, [initialCategory, initialBrand, initialSearch, initialOnSale, initialNewArrival]);
@@ -103,7 +103,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         onSale: onSaleOnly ? 'true' : undefined,
         newArrival: newArrivalOnly ? 'true' : undefined,
         sort: sortBy,
-        limit: 48
+        limit: 100
       };
 
       const res = await api.getProducts(params);
@@ -204,8 +204,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           </button>
           <ChevronRight className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
           <button
-            onClick={() => { setSelectedCategory(''); setSelectedBrand(''); }}
-            className={`hover:text-amber-900 transition-colors ${!selectedCategory && !selectedBrand ? 'text-amber-950 font-bold' : ''}`}
+            onClick={() => {
+              setSelectedCategory('');
+              setSelectedBrand('');
+              setSelectedSubcategory('');
+              setSearchQuery('');
+              onNavigate('/shop');
+            }}
+            className={`hover:text-amber-900 transition-colors cursor-pointer ${!selectedCategory && !selectedBrand ? 'text-amber-950 font-bold' : ''}`}
           >
             {t('nav.all_products', 'All Products')}
           </button>
@@ -338,21 +344,34 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               <span>{t('common.apply_filters', 'Filters')} {hasActiveFilters && '(Active)'}</span>
             </button>
 
-            {/* Grid Density Switcher */}
-            <div className="hidden sm:flex items-center gap-1 border border-stone-200 rounded-xs p-1 bg-stone-50">
+            {/* Grid Density Switcher (3* or 4* Columns) */}
+            <div className="flex items-center gap-1 border border-stone-200 rounded-xs p-1 bg-stone-50">
+              <span className="text-[10px] uppercase font-bold text-stone-400 px-1.5 hidden md:inline">Grid:</span>
               <button
+                id="grid-3-col-btn"
                 onClick={() => setGridColumns(3)}
-                className={`p-1.5 rounded-2xs transition-colors ${gridColumns === 3 ? 'bg-white shadow-2xs text-amber-900' : 'text-stone-400 hover:text-stone-700'}`}
-                title="3 Columns Grid"
+                className={`flex items-center gap-1 px-2 py-1 rounded-2xs text-xs font-bold transition-all cursor-pointer ${
+                  gridColumns === 3
+                    ? 'bg-white shadow-2xs text-amber-900 border border-amber-800/30'
+                    : 'text-stone-500 hover:text-stone-800'
+                }`}
+                title="3 Columns Grid (3*)"
               >
-                <Grid3X3 className="w-4 h-4" />
+                <Grid3X3 className="w-3.5 h-3.5" />
+                <span>3×</span>
               </button>
               <button
+                id="grid-4-col-btn"
                 onClick={() => setGridColumns(4)}
-                className={`p-1.5 rounded-2xs transition-colors ${gridColumns === 4 ? 'bg-white shadow-2xs text-amber-900' : 'text-stone-400 hover:text-stone-700'}`}
-                title="4 Columns Dense Grid"
+                className={`flex items-center gap-1 px-2 py-1 rounded-2xs text-xs font-bold transition-all cursor-pointer ${
+                  gridColumns === 4
+                    ? 'bg-white shadow-2xs text-amber-900 border border-amber-800/30'
+                    : 'text-stone-500 hover:text-stone-800'
+                }`}
+                title="4 Columns Dense Grid (4*)"
               >
-                <LayoutGrid className="w-4 h-4" />
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span>4×</span>
               </button>
             </div>
           </div>
@@ -589,12 +608,12 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           {/* Product Grid Area */}
           <main className="lg:col-span-9">
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white border border-stone-200 rounded-sm p-4 animate-pulse aspect-3/4 flex flex-col justify-between">
-                    <div className="bg-stone-200 aspect-square rounded-xs mb-4" />
+              <div className={`grid grid-cols-2 sm:grid-cols-3 ${gridColumns === 4 ? 'lg:grid-cols-4 xl:grid-cols-4' : 'lg:grid-cols-3 xl:grid-cols-3'} gap-3 sm:gap-4 md:gap-5`}>
+                {[...Array(gridColumns === 4 ? 8 : 6)].map((_, i) => (
+                  <div key={i} className="bg-white border border-stone-200 rounded-sm p-3.5 animate-pulse aspect-3/4 flex flex-col justify-between shadow-2xs">
+                    <div className="bg-stone-200 aspect-square rounded-xs mb-3" />
                     <div className="space-y-2">
-                      <div className="h-4 bg-stone-200 rounded-xs w-3/4" />
+                      <div className="h-3.5 bg-stone-200 rounded-xs w-3/4" />
                       <div className="h-3 bg-stone-200 rounded-xs w-1/2" />
                     </div>
                   </div>
@@ -617,7 +636,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               </div>
             ) : (
               <div>
-                <div className={`grid grid-cols-1 sm:grid-cols-2 ${gridColumns === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4 sm:gap-6`}>
+                <div className={`grid grid-cols-2 sm:grid-cols-3 ${gridColumns === 4 ? 'lg:grid-cols-4 xl:grid-cols-4' : 'lg:grid-cols-3 xl:grid-cols-3'} gap-3 sm:gap-4 md:gap-5`}>
                   {products.map((product) => (
                     <ProductCard
                       key={product.id}

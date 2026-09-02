@@ -372,6 +372,56 @@ class ApiClient {
     });
   }
 
+  // Categories Admin
+  public async getAdminCategories() {
+    return this.request<{ success: boolean; data: Category[] }>('/admin/categories');
+  }
+
+  public async createAdminCategory(category: Partial<Category>) {
+    return this.request<{ success: boolean; data: Category }>('/admin/categories', {
+      method: 'POST',
+      body: JSON.stringify(category)
+    });
+  }
+
+  public async updateAdminCategory(id: string, category: Partial<Category>) {
+    return this.request<{ success: boolean; data: Category }>(`/admin/categories/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(category)
+    });
+  }
+
+  public async deleteAdminCategory(id: string) {
+    return this.request<{ success: boolean; message: string }>(`/admin/categories/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Brands Admin
+  public async getAdminBrands() {
+    return this.request<{ success: boolean; data: Brand[] }>('/admin/brands');
+  }
+
+  public async createAdminBrand(brand: Partial<Brand>) {
+    return this.request<{ success: boolean; data: Brand }>('/admin/brands', {
+      method: 'POST',
+      body: JSON.stringify(brand)
+    });
+  }
+
+  public async updateAdminBrand(id: string, brand: Partial<Brand>) {
+    return this.request<{ success: boolean; data: Brand }>(`/admin/brands/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(brand)
+    });
+  }
+
+  public async deleteAdminBrand(id: string) {
+    return this.request<{ success: boolean; message: string }>(`/admin/brands/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
   public async getAdminReviews() {
     return this.request<{ success: boolean; data: Review[] }>('/admin/reviews');
   }

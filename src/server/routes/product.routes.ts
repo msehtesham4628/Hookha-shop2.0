@@ -142,7 +142,7 @@ router.get('/', (req, res) => {
 
     // Pagination
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10) || 16));
+    const limitNum = Math.min(200, Math.max(1, parseInt(limit, 10) || 24));
     const totalCount = result.length;
     const totalPages = Math.ceil(totalCount / limitNum);
     const offset = (pageNum - 1) * limitNum;
