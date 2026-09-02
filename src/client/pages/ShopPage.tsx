@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
 import { ProductCard } from '../components/ProductCard.js';
-import { CategoryBrandGrid } from '../components/CategoryBrandGrid.js';
-import { CategoryStories } from '../components/CategoryStories.js';
-import { CategoryMixologyWidget } from '../components/CategoryMixologyWidget.js';
-import { CategoryBuyersGuide } from '../components/CategoryBuyersGuide.js';
+import { CategoryBrandBadges } from '../components/CategoryBrandBadges.js';
 import { CategoryHeroBanner } from '../components/CategoryHeroBanner.js';
 import { Product, Category, Brand } from '../../types/index.js';
 import { useTranslation } from '../i18n/LanguageContext.js';
@@ -218,22 +215,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           }}
         />
 
-        {/* 1. Inside Category: Educational Guides & Stories Carousel */}
-        <CategoryStories categorySlug={selectedCategory || 'all'} />
-
-        {/* 2. Inside Category: Brand Houses Directory Grid */}
-        <CategoryBrandGrid
-          categorySlug={selectedCategory || 'tobacco'}
-          categoryName={currentCategoryObj?.name || 'Shisha'}
-          brands={brands}
+        {/* 1. Inside Category: Brand Badges Ribbon (Matching Homepage Badges) */}
+        <CategoryBrandBadges
+          categorySlug={selectedCategory}
+          categoryName={currentCategoryObj?.name || 'Category'}
           selectedBrand={selectedBrand}
           onSelectBrand={(brandSlug) => setSelectedBrand(brandSlug)}
         />
-
-        {/* 3. Inside Category: Interactive Shisha Mixology Lab (Shown for Tobacco or All) */}
-        {(!selectedCategory || selectedCategory === 'tobacco') && (
-          <CategoryMixologyWidget />
-        )}
 
         {/* Sorting & Filter Trigger Bar - Matching Authentic World Hookah Market */}
         <div className="mb-6 bg-white border border-stone-200/90 rounded-sm p-3 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-2xs">
@@ -609,8 +597,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               </div>
             )}
 
-            {/* 4. Inside Category: Bottom SEO & Buyer's Knowledge Guide Accordion */}
-            <CategoryBuyersGuide categorySlug={selectedCategory || 'default'} />
+
           </main>
 
         </div>
