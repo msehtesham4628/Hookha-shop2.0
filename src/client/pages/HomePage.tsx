@@ -141,13 +141,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
   // Top Brands matching screenshots
   const tobaccoBrands: BrandAvatar[] = [
-    { name: 'Russian Hookah Tobacco', slug: 'russian-hookah-tobacco', bgClass: 'bg-red-600', textColor: 'text-white', badgeText: 'RHT' },
+    { name: 'Russian Hookah Tobacco', slug: 'russian-hookah-tobacco', bgClass: 'bg-red-700', textColor: 'text-white', badgeText: 'RHT' },
     { name: 'MustHave Tobacco', slug: 'musthave-tobacco', bgClass: 'bg-white', textColor: 'text-stone-900', borderClass: 'border border-stone-300 shadow-xs', badgeText: 'MUSTHAVE' },
-    { name: 'Adalya Tobacco', slug: 'adalya-tobacco', bgClass: 'bg-stone-900', textColor: 'text-amber-400', badgeText: 'ADALYA' },
-    { name: 'Serbetli tobacco', slug: 'serbetli-tobacco', bgClass: 'bg-rose-100', textColor: 'text-rose-700', borderClass: 'border border-rose-200', badgeText: 'Serbetli' },
-    { name: 'Banger Hookah Tobacco', slug: 'banger-tobacco', bgClass: 'bg-amber-400', textColor: 'text-stone-900', badgeText: 'BANGER' },
-    { name: 'DarkSide Tobacco', slug: 'darkside-tobacco', bgClass: 'bg-stone-950', textColor: 'text-white', badgeText: 'DARKSIDE' },
-    { name: 'BlackBurn Tobacco', slug: 'blackburn-tobacco', bgClass: 'bg-black', textColor: 'text-yellow-400', badgeText: 'BLACKBURN' },
+    { name: 'Adalya Tobacco', slug: 'adalya-tobacco', bgClass: 'bg-red-900', textColor: 'text-white', badgeText: 'ADALYA' },
+    { name: 'Serbetli tobacco', slug: 'serbetli-tobacco', bgClass: 'bg-rose-50', textColor: 'text-rose-800', borderClass: 'border border-rose-200', badgeText: 'Serbetli' },
+    { name: 'Banger Hookah Tobacco', slug: 'banger-tobacco', bgClass: 'bg-amber-900', textColor: 'text-amber-100', badgeText: 'BANGER' },
+    { name: 'DarkSide Tobacco', slug: 'darkside-tobacco', bgClass: 'bg-stone-900', textColor: 'text-white', badgeText: 'DARKSIDE' },
+    { name: 'BlackBurn Tobacco', slug: 'blackburn-tobacco', bgClass: 'bg-stone-900', textColor: 'text-stone-100', borderClass: 'border border-stone-700 shadow-xs', badgeText: 'BLACKBURN' },
     { name: 'Tangiers', slug: 'tangiers', bgClass: 'bg-emerald-950', textColor: 'text-emerald-300', badgeText: 'TANGIERS' }
   ];
 

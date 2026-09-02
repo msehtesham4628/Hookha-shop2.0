@@ -1186,7 +1186,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                       .map((cat) => {
                         const matchingProductsCount = products.filter(p => p.category.toLowerCase() === cat.name.toLowerCase() || p.categoryId === cat.id).length;
                         return (
-                          <div key={cat.id} className="bg-white border border-stone-200 rounded-xs overflow-hidden shadow-xs flex flex-col justify-between hover:border-amber-300 transition-colors">
+                          <div key={cat.id} className="bg-white border border-stone-200 rounded-xs overflow-hidden shadow-xs flex flex-col justify-between hover:border-amber-800/60 transition-colors">
                             <div>
                               <div className="h-32 bg-stone-100 relative overflow-hidden border-b border-stone-100">
                                 <img
@@ -1197,7 +1197,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
                                   <div>
-                                    <span className="text-[10px] font-mono uppercase tracking-wider text-amber-300 bg-stone-900/80 px-2 py-0.5 rounded-xs">
+                                    <span className="text-[10px] font-mono uppercase tracking-wider text-white bg-stone-900/90 px-2 py-0.5 rounded-xs border border-white/10">
                                       /{cat.slug}
                                     </span>
                                   </div>

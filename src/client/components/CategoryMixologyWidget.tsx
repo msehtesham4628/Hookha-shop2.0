@@ -77,17 +77,17 @@ export const CategoryMixologyWidget: React.FC = () => {
   };
 
   return (
-    <div className="mb-8 bg-gradient-to-br from-stone-900 via-stone-900 to-amber-950 text-white rounded-sm p-5 sm:p-6 border border-stone-800 shadow-lg">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-stone-800">
+    <div className="mb-8 bg-white border border-stone-200/90 text-stone-900 rounded-sm p-5 sm:p-6 shadow-2xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-stone-100">
         <div>
-          <div className="inline-flex items-center gap-1.5 bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-xs mb-1.5">
-            <Sparkles className="w-3 h-3" />
+          <div className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-900 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-xs mb-1.5 border border-amber-200/60">
+            <Sparkles className="w-3 h-3 text-amber-800" />
             <span>{t('category.mixology_title', 'Shisha Mixology Lab')}</span>
           </div>
-          <h3 className="font-serif text-lg sm:text-xl font-bold tracking-wide text-white">
+          <h3 className="font-serif text-lg sm:text-xl font-bold tracking-wide text-stone-900">
             {t('mixology.recommended_mixes', 'Lounge Master Signature Mixes')}
           </h3>
-          <p className="text-xs text-stone-300 mt-1 max-w-xl">
+          <p className="text-xs text-stone-500 mt-1 max-w-xl">
             {t('category.mixology_subtitle', 'Curated flavor blends with exact bowl ratios. Add all ingredients to your bag in one click.')}
           </p>
         </div>
@@ -98,10 +98,10 @@ export const CategoryMixologyWidget: React.FC = () => {
             <button
               key={mix.name}
               onClick={() => setSelectedMixIndex(idx)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-xs transition-colors whitespace-nowrap cursor-pointer ${
+              className={`px-3.5 py-1.5 text-xs font-semibold rounded-xs transition-colors whitespace-nowrap cursor-pointer ${
                 selectedMixIndex === idx
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'bg-stone-800 hover:bg-stone-700 text-stone-300'
+                  ? 'bg-amber-900 text-white shadow-xs'
+                  : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
               }`}
             >
               {mix.name}
@@ -115,11 +115,11 @@ export const CategoryMixologyWidget: React.FC = () => {
         {/* Ingredients & Ratios */}
         <div className="lg:col-span-8 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-stone-400">
+            <span className="text-xs font-medium text-stone-600">
               {activeMix.tagline}
             </span>
-            <span className="inline-flex items-center gap-1 bg-stone-800 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-xs border border-amber-500/30">
-              <Flame className="w-3 h-3 text-amber-400" />
+            <span className="inline-flex items-center gap-1 bg-stone-100 text-stone-800 text-[10px] font-bold px-2 py-0.5 rounded-xs border border-stone-200">
+              <Flame className="w-3 h-3 text-amber-800" />
               {activeMix.strength}
             </span>
           </div>
@@ -128,31 +128,31 @@ export const CategoryMixologyWidget: React.FC = () => {
             {activeMix.ingredients.map((item, i) => (
               <div
                 key={i}
-                className="bg-stone-800/80 border border-stone-700/80 rounded-xs p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                className="bg-stone-50/80 border border-stone-200/90 rounded-xs p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-amber-900/60 border border-amber-600/40 flex items-center justify-center text-xs font-bold text-amber-300">
+                  <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-950 font-mono font-bold flex items-center justify-center text-xs border border-amber-200/60 shrink-0">
                     {item.ratio}%
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] uppercase tracking-wider text-amber-400 font-bold font-mono">
+                      <span className="text-[10px] uppercase tracking-wider text-amber-900 font-bold font-mono">
                         {item.brand}
                       </span>
                       <span className="text-[10px] text-stone-400 font-medium">
                         ${item.price.toFixed(2)}
                       </span>
                     </div>
-                    <p className="text-xs font-semibold text-white">
+                    <p className="text-xs font-bold text-stone-900">
                       {item.flavor}
                     </p>
                   </div>
                 </div>
 
                 {/* Ratio Bar */}
-                <div className="w-full sm:w-36 bg-stone-700 h-2 rounded-full overflow-hidden">
+                <div className="w-full sm:w-36 bg-stone-200 h-2 rounded-full overflow-hidden">
                   <div
-                    className="bg-amber-500 h-full rounded-full"
+                    className="bg-amber-800 h-full rounded-full transition-all duration-300"
                     style={{ width: `${item.ratio}%` }}
                   />
                 </div>
@@ -162,21 +162,21 @@ export const CategoryMixologyWidget: React.FC = () => {
         </div>
 
         {/* Action Panel */}
-        <div className="lg:col-span-4 bg-stone-800/90 border border-amber-500/30 rounded-xs p-4 flex flex-col justify-between h-full space-y-4">
+        <div className="lg:col-span-4 bg-stone-50 border border-stone-200 rounded-xs p-5 flex flex-col justify-between h-full space-y-4 shadow-2xs">
           <div>
-            <div className="text-[10px] uppercase font-bold tracking-widest text-amber-400 mb-1">
+            <div className="text-[10px] uppercase font-bold tracking-widest text-amber-900 mb-1">
               Bundle Summary
             </div>
-            <h4 className="font-serif text-base font-bold text-white">
+            <h4 className="font-serif text-base font-bold text-stone-900">
               {activeMix.name} Bundle
             </h4>
             <div className="flex items-baseline gap-2 mt-2">
-              <span className="text-2xl font-bold font-serif text-amber-300">
+              <span className="text-2xl font-bold font-serif text-stone-950">
                 ${totalPrice.toFixed(2)}
               </span>
-              <span className="text-xs text-stone-400">for 3 x 200g jars</span>
+              <span className="text-xs text-stone-500">for 3 x 200g jars</span>
             </div>
-            <p className="text-[11px] text-stone-300 mt-2 leading-relaxed">
+            <p className="text-[11px] text-stone-600 mt-2 leading-relaxed">
               Provides approximately 30-35 premium lounge-grade bowl packings.
             </p>
           </div>
@@ -186,8 +186,8 @@ export const CategoryMixologyWidget: React.FC = () => {
             disabled={isAddingAll}
             className={`w-full py-2.5 px-4 rounded-xs font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
               addedSuccess
-                ? 'bg-emerald-600 text-white'
-                : 'bg-amber-600 hover:bg-amber-500 text-white shadow-md hover:shadow-amber-500/20'
+                ? 'bg-emerald-700 text-white'
+                : 'bg-amber-900 hover:bg-amber-800 text-white shadow-xs'
             }`}
           >
             {addedSuccess ? (

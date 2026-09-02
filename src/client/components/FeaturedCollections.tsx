@@ -172,12 +172,12 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ onNavi
         };
       case 'amber':
         return {
-          borderHover: 'hover:border-amber-500/70',
-          badgeBg: 'bg-amber-400/95 text-stone-950 font-bold',
-          pillBg: 'bg-amber-950/70 text-amber-200 border-amber-800/60',
-          btnHover: 'group-hover:bg-amber-400 group-hover:text-stone-950',
-          glow: 'group-hover:shadow-[0_0_25px_rgba(251,191,36,0.25)]',
-          dot: 'bg-amber-400'
+          borderHover: 'hover:border-amber-700/70',
+          badgeBg: 'bg-amber-900 text-white font-medium',
+          pillBg: 'bg-stone-900/80 text-stone-200 border-stone-700/60',
+          btnHover: 'group-hover:bg-amber-900 group-hover:text-white',
+          glow: 'group-hover:shadow-[0_0_20px_rgba(180,83,9,0.15)]',
+          dot: 'bg-amber-500'
         };
       case 'purple':
       default:
