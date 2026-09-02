@@ -23,12 +23,21 @@ interface NavbarProps {
   onNavigate: (path: string) => void;
 }
 
+interface CategoryNavItem {
+  label: string;
+  path: string;
+  categorySlug?: string;
+  brands?: { name: string; slug: string }[];
+}
+
 export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
   const { user, isAdmin, cart, wishlistIds, setCartOpen, setSearchOpen, logout } = useStore();
   const { t } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  const [expandedMobileCategory, setExpandedMobileCategory] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,15 +47,105 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
-    { label: t('nav.all_products', 'All Products'), path: '/shop' },
-    { label: t('nav.hookahs', 'Hookahs'), path: '/shop?category=hookahs' },
-    { label: t('nav.tobacco', 'Shisha Tobacco'), path: '/shop?category=tobacco' },
-    { label: t('nav.bowls', 'Hookah Bowls'), path: '/shop?category=bowls' },
-    { label: t('nav.bases', 'Bases & Vases'), path: '/shop?category=bases' },
-    { label: t('nav.charcoal', 'Charcoal & Heat'), path: '/shop?category=coal' },
-    { label: t('nav.accessories', 'Accessories'), path: '/shop?category=accessories' },
-    { label: t('nav.wholesale', 'Wholesale B2B'), path: '/wholesale' }
+  const navLinks: CategoryNavItem[] = [
+    {
+      label: t('nav.hookahs', 'Hookahs'),
+      path: '/shop?category=hookahs',
+      categorySlug: 'hookahs',
+      brands: [
+        { name: 'Alpha Hookah', slug: 'alpha-hookah' },
+        { name: 'El Bomber', slug: 'el-bomber' },
+        { name: 'MattPear', slug: 'mattpear' },
+        { name: 'Maklaud Hookah', slug: 'maklaud-hookah' },
+        { name: 'WOOKAH', slug: 'wookah' },
+        { name: 'Japona Hookah', slug: 'japona-hookah' },
+        { name: 'Steamulation', slug: 'steamulation-hookah' }
+      ]
+    },
+    {
+      label: t('nav.tobacco', 'Shisha Tobacco'),
+      path: '/shop?category=tobacco',
+      categorySlug: 'tobacco',
+      brands: [
+        { name: 'MustHave Tobacco', slug: 'musthave-tobacco' },
+        { name: 'DarkSide Tobacco', slug: 'darkside-tobacco' },
+        { name: 'BlackBurn Tobacco', slug: 'blackburn-tobacco' },
+        { name: 'Bonche Tobacco', slug: 'bonche-tobacco' },
+        { name: 'Tangiers', slug: 'tangiers' },
+        { name: 'Adalya Tobacco', slug: 'adalya-tobacco' },
+        { name: 'Serbetli tobacco', slug: 'serbetli-tobacco' },
+        { name: 'Banger Hookah Tobacco', slug: 'banger-tobacco' },
+        { name: 'Element Tobacco', slug: 'element-tobacco' }
+      ]
+    },
+    {
+      label: t('nav.bowls', 'Hookah Bowls'),
+      path: '/shop?category=bowls',
+      categorySlug: 'bowls',
+      brands: [
+        { name: 'Oblako Bowls', slug: 'oblako-bowls' },
+        { name: 'Kong Bowls', slug: 'kong-bowls' },
+        { name: 'Alpaca Bowls', slug: 'alpaca-bowls' },
+        { name: 'Solaris Bowls', slug: 'solaris-bowls' },
+        { name: 'Target Bowls', slug: 'target-bowls' }
+      ]
+    },
+    {
+      label: t('nav.bases', 'Bases & Glass'),
+      path: '/shop?category=bases',
+      categorySlug: 'bases',
+      brands: [
+        { name: 'Caesar Crystal', slug: 'caesar-crystal' },
+        { name: 'Craft Glass', slug: 'craft-glass' },
+        { name: 'WOOKAH Crystal', slug: 'wookah' }
+      ]
+    },
+    {
+      label: t('nav.charcoal', 'Charcoal & Heat'),
+      path: '/shop?category=coal',
+      categorySlug: 'coal',
+      brands: [
+        { name: 'Coco Loco', slug: 'coco-loco' },
+        { name: 'One Nation', slug: 'one-nation' },
+        { name: 'Oasis Charcoal', slug: 'oasis-charcoal' }
+      ]
+    },
+    {
+      label: t('nav.accessories', 'Accessories'),
+      path: '/shop?category=accessories',
+      categorySlug: 'accessories',
+      brands: [
+        { name: 'Kaloud', slug: 'kaloud' },
+        { name: 'Na Grani', slug: 'na-grani' },
+        { name: 'Blade Hookah', slug: 'blade-hookah' },
+        { name: 'Alpha Accessories', slug: 'alpha-hookah' }
+      ]
+    },
+    {
+      label: t('nav.ehookah', 'E-Hookah'),
+      path: '/shop?category=e-hookah',
+      categorySlug: 'e-hookah',
+      brands: [
+        { name: 'Ooka', slug: 'ooka' },
+        { name: 'Aspire Proteus', slug: 'aspire-proteus' }
+      ]
+    },
+    {
+      label: t('nav.vapes', 'Vapes'),
+      path: '/shop?category=vapes',
+      categorySlug: 'vapes',
+      brands: [
+        { name: 'GeekVape', slug: 'geekvape' },
+        { name: 'Vaporesso', slug: 'vaporesso' },
+        { name: 'Lost Mary', slug: 'lost-mary' },
+        { name: 'Elf Bar', slug: 'elf-bar' },
+        { name: 'SMOK', slug: 'smok' }
+      ]
+    },
+    {
+      label: t('nav.wholesale', 'Wholesale B2B'),
+      path: '/wholesale'
+    }
   ];
 
   return (
@@ -264,24 +363,68 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
       </div>
 
       {/* Desktop Navigation Links */}
-      <nav className="hidden lg:block bg-white border-b border-stone-200/90 shadow-2xs">
+      <nav className="hidden lg:block bg-white border-b border-stone-200/90 shadow-2xs relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ul className="flex items-center justify-center gap-8 py-2.5 text-xs uppercase font-medium tracking-widest text-stone-700">
+          <ul className="flex items-center justify-center gap-6 xl:gap-8 py-2.5 text-xs uppercase font-medium tracking-widest text-stone-700">
             {navLinks.map((link) => {
-              const isActive = currentPath === link.path || (link.path.startsWith('/shop') && currentPath.startsWith('/shop'));
+              const isActive = currentPath === link.path || (link.categorySlug && currentPath.includes(`category=${link.categorySlug}`));
+              const hasBrands = link.brands && link.brands.length > 0;
+
               return (
-                <li key={link.path}>
+                <li
+                  key={link.path}
+                  className="relative group"
+                  onMouseEnter={() => setHoveredCategory(link.categorySlug || null)}
+                  onMouseLeave={() => setHoveredCategory(null)}
+                >
                   <button
                     onClick={() => onNavigate(link.path)}
-                    className={`hover:text-amber-900 transition-colors py-1 relative cursor-pointer ${
+                    className={`flex items-center gap-1 hover:text-amber-900 transition-colors py-1 relative cursor-pointer ${
                       isActive ? 'text-amber-900 font-bold' : ''
                     }`}
                   >
-                    {link.label}
+                    <span>{link.label}</span>
+                    {hasBrands && (
+                      <ChevronDown className="w-3 h-3 text-stone-400 group-hover:text-amber-800 transition-transform group-hover:rotate-180" />
+                    )}
                     {isActive && (
                       <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-800 rounded-full" />
                     )}
                   </button>
+
+                  {/* Desktop Dropdown for Category Brands / Subcategories */}
+                  {hasBrands && hoveredCategory === link.categorySlug && (
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-64 bg-white border border-stone-200 shadow-xl rounded-xs p-3 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                      <div className="flex items-center justify-between pb-2 mb-2 border-b border-stone-100">
+                        <span className="text-[10px] font-bold tracking-wider text-amber-900 uppercase">
+                          {link.label} Brands
+                        </span>
+                        <button
+                          onClick={() => { setHoveredCategory(null); onNavigate(link.path); }}
+                          className="text-[10px] text-stone-500 hover:text-amber-800 lowercase hover:underline"
+                        >
+                          view all →
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 gap-1">
+                        {link.brands?.map((brand) => (
+                          <button
+                            key={brand.slug}
+                            onClick={() => {
+                              setHoveredCategory(null);
+                              onNavigate(`/shop?category=${link.categorySlug}&brand=${brand.slug}`);
+                            }}
+                            className="w-full text-left px-2.5 py-1.5 text-xs normal-case font-normal text-stone-700 hover:text-amber-950 hover:bg-amber-50/80 rounded-xs transition-colors flex items-center justify-between group/item cursor-pointer"
+                          >
+                            <span>{brand.name}</span>
+                            <span className="text-[10px] text-stone-400 group-hover/item:text-amber-700 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                              →
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </li>
               );
             })}
@@ -304,21 +447,64 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
                 </button>
               </div>
 
-              <ul className="space-y-4 text-sm font-medium text-stone-800">
-                {navLinks.map((link) => (
-                  <li key={link.path} className="border-b border-stone-100 pb-2">
-                    <button
-                      onClick={() => { onNavigate(link.path); setMobileMenuOpen(false); }}
-                      className="w-full text-left uppercase tracking-wider text-xs font-semibold hover:text-amber-800 cursor-pointer"
-                    >
-                      {link.label}
-                    </button>
-                  </li>
-                ))}
+              <ul className="space-y-3 text-sm font-medium text-stone-800">
+                {navLinks.map((link) => {
+                  const hasBrands = link.brands && link.brands.length > 0;
+                  const isExpanded = expandedMobileCategory === link.categorySlug;
+
+                  return (
+                    <li key={link.path} className="border-b border-stone-100 pb-2.5">
+                      <div className="flex items-center justify-between">
+                        <button
+                          onClick={() => { onNavigate(link.path); setMobileMenuOpen(false); }}
+                          className="text-left uppercase tracking-wider text-xs font-semibold hover:text-amber-800 cursor-pointer flex-1"
+                        >
+                          {link.label}
+                        </button>
+                        {hasBrands && (
+                          <button
+                            onClick={() => setExpandedMobileCategory(isExpanded ? null : (link.categorySlug || null))}
+                            className="p-1 text-stone-400 hover:text-stone-800 cursor-pointer"
+                            aria-label={`Toggle ${link.label} subcategories`}
+                          >
+                            <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180 text-amber-800' : ''}`} />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Expanded Mobile Subcategory Brands */}
+                      {hasBrands && isExpanded && (
+                        <div className="mt-2 pl-3 border-l-2 border-amber-200 space-y-1.5 py-1">
+                          <button
+                            onClick={() => { onNavigate(link.path); setMobileMenuOpen(false); }}
+                            className="w-full text-left text-xs font-bold text-amber-900 py-1 hover:underline"
+                          >
+                            View All {link.label} →
+                          </button>
+                          {link.brands?.map((brand) => (
+                            <button
+                              key={brand.slug}
+                              onClick={() => {
+                                onNavigate(`/shop?category=${link.categorySlug}&brand=${brand.slug}`);
+                                setMobileMenuOpen(false);
+                              }}
+                              className="w-full text-left text-xs text-stone-600 hover:text-stone-950 py-1 flex items-center justify-between"
+                            >
+                              <span>{brand.name}</span>
+                              <span className="text-[10px] text-stone-400">→</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
 
               {/* Language Selector in Mobile Drawer */}
-              <LanguageSelector variant="drawer" />
+              <div className="mt-4">
+                <LanguageSelector variant="drawer" />
+              </div>
             </div>
 
             <div className="pt-6 border-t border-stone-200">

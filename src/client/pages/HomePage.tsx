@@ -47,6 +47,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [tobaccoProducts, setTobaccoProducts] = useState<Product[]>([]);
   const [hookahProducts, setHookahProducts] = useState<Product[]>([]);
   const [bowlProducts, setBowlProducts] = useState<Product[]>([]);
+  const [baseProducts, setBaseProducts] = useState<Product[]>([]);
+  const [coalProducts, setCoalProducts] = useState<Product[]>([]);
+  const [accessoryProducts, setAccessoryProducts] = useState<Product[]>([]);
+  const [ehookahProducts, setEhookahProducts] = useState<Product[]>([]);
+  const [vapeProducts, setVapeProducts] = useState<Product[]>([]);
   const [newInProducts, setNewInProducts] = useState<Product[]>([]);
   const [bestSellers, setBestSellers] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,6 +70,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const tobaccoScrollRef = useRef<HTMLDivElement>(null);
   const hookahScrollRef = useRef<HTMLDivElement>(null);
   const bowlScrollRef = useRef<HTMLDivElement>(null);
+  const baseScrollRef = useRef<HTMLDivElement>(null);
+  const coalScrollRef = useRef<HTMLDivElement>(null);
+  const accessoryScrollRef = useRef<HTMLDivElement>(null);
+  const ehookahScrollRef = useRef<HTMLDivElement>(null);
+  const vapeScrollRef = useRef<HTMLDivElement>(null);
   const postsScrollRef = useRef<HTMLDivElement>(null);
 
   const scrollContainer = (ref: React.RefObject<HTMLDivElement | null>, direction: 'left' | 'right') => {
@@ -78,7 +88,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     const loadHomeData = async () => {
       try {
         setLoading(true);
-        const prodRes = await api.getProducts({ limit: 60 });
+        const prodRes = await api.getProducts({ limit: 100 });
 
         if (prodRes.success && prodRes.data) {
           const prods = prodRes.data.products;
@@ -87,7 +97,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           const tobacco = prods.filter(p => 
             p.categorySlug === 'tobacco' || 
             p.categorySlug === 'shisha-tobacco' || 
-            p.subcategory?.includes('Tobacco') ||
+            p.subcategory?.toLowerCase().includes('tobacco') ||
+            p.brandSlug?.includes('tobacco') ||
             p.tags?.includes('musthave') ||
             p.tags?.includes('darkside') ||
             p.tags?.includes('blackburn')
@@ -97,10 +108,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           // 2. Hookahs
           const hookahs = prods.filter(p => 
             p.categorySlug === 'hookahs' || 
-            p.subcategory?.includes('Hookahs') ||
-            p.tags?.includes('maklaud') ||
-            p.tags?.includes('alpha-hookah') ||
-            p.tags?.includes('el-bomber')
+            p.subcategory?.toLowerCase().includes('hookah') ||
+            ['alpha-hookah', 'el-bomber', 'mattpear', 'maklaud-hookah', 'wookah', 'japona-hookah', 'steamulation-hookah'].includes(p.brandSlug || '')
           );
           setHookahProducts(hookahs);
 
@@ -108,26 +117,68 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           const bowls = prods.filter(p => 
             p.categorySlug === 'bowls' || 
             p.categorySlug === 'hookahs-bowls' || 
-            p.name.toLowerCase().includes('bowl')
+            p.name.toLowerCase().includes('bowl') ||
+            ['oblako-bowls', 'kong-bowls', 'alpaca-bowls', 'solaris-bowls', 'target-bowls'].includes(p.brandSlug || '')
           );
           setBowlProducts(bowls);
 
-          // 4. New In (DarkSide Xperience and fresh drops)
-          const newIn = prods.filter(p =>
-            p.tags?.includes('new-arrival') ||
-            p.tags?.includes('darkside') ||
-            p.isFeatured
-          ).slice(0, 9);
-          setNewInProducts(newIn.length > 0 ? newIn : prods.slice(0, 9));
+          // 4. Bases & Glass
+          const bases = prods.filter(p =>
+            p.categorySlug === 'bases' ||
+            p.categorySlug === 'bases-vases' ||
+            p.name.toLowerCase().includes('base') ||
+            p.name.toLowerCase().includes('vase') ||
+            p.brandSlug === 'caesar-crystal' ||
+            p.brandSlug === 'craft-glass'
+          );
+          setBaseProducts(bases.length > 0 ? bases : prods.slice(0, 4));
 
-          // 5. Best Sellers (MustHave, Coco Loco, BlackCoco, Adalya)
-          const best = prods.filter(p =>
-            p.isBestSeller ||
-            p.tags?.includes('musthave') ||
-            p.tags?.includes('charcoal') ||
-            p.tags?.includes('adalya')
-          ).slice(0, 9);
-          setBestSellers(best.length > 0 ? best : prods.slice(0, 9));
+          // 5. Charcoal & Heat
+          const coals = prods.filter(p =>
+            p.categorySlug === 'coal' ||
+            p.name.toLowerCase().includes('charcoal') ||
+            p.name.toLowerCase().includes('coal') ||
+            ['coco-loco', 'one-nation', 'oasis-charcoal'].includes(p.brandSlug || '')
+          );
+          setCoalProducts(coals);
+
+          // 6. Accessories & HMD
+          const accessories = prods.filter(p =>
+            p.categorySlug === 'accessories' ||
+            p.name.toLowerCase().includes('hmd') ||
+            p.name.toLowerCase().includes('tongs') ||
+            p.name.toLowerCase().includes('kaloud') ||
+            ['kaloud', 'na-grani', 'blade-hookah'].includes(p.brandSlug || '')
+          );
+          setAccessoryProducts(accessories);
+
+          // 7. E-Hookah
+          const ehookah = prods.filter(p =>
+            p.categorySlug === 'e-hookah' ||
+            p.categorySlug === 'ehookah' ||
+            p.name.toLowerCase().includes('e-hookah') ||
+            p.name.toLowerCase().includes('ooka') ||
+            p.brandSlug === 'ooka' ||
+            p.brandSlug === 'aspire-proteus'
+          );
+          setEhookahProducts(ehookah);
+
+          // 8. Vapes
+          const vapes = prods.filter(p =>
+            p.categorySlug === 'vapes' ||
+            p.name.toLowerCase().includes('vape') ||
+            p.name.toLowerCase().includes('xros') ||
+            p.name.toLowerCase().includes('disposable') ||
+            ['geekvape', 'vaporesso', 'lost-mary', 'elf-bar', 'smok'].includes(p.brandSlug || '')
+          );
+          setVapeProducts(vapes);
+
+          // New In & Best Sellers
+          const newIn = prods.filter(p => p.isNewArrival || p.isFeatured).slice(0, 8);
+          setNewInProducts(newIn.length > 0 ? newIn : prods.slice(0, 8));
+
+          const best = prods.filter(p => p.isBestSeller).slice(0, 8);
+          setBestSellers(best.length > 0 ? best : prods.slice(0, 8));
         }
       } catch (err) {
         console.error('Failed to load homepage data:', err);
@@ -139,32 +190,67 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     loadHomeData();
   }, []);
 
-  // Top Brands matching screenshots
+  // Top Brands / Subcategories for each category
   const tobaccoBrands: BrandAvatar[] = [
-    { name: 'Russian Hookah Tobacco', slug: 'russian-hookah-tobacco', bgClass: 'bg-red-700', textColor: 'text-white', badgeText: 'RHT' },
     { name: 'MustHave Tobacco', slug: 'musthave-tobacco', bgClass: 'bg-white', textColor: 'text-stone-900', borderClass: 'border border-stone-300 shadow-xs', badgeText: 'MUSTHAVE' },
+    { name: 'DarkSide Tobacco', slug: 'darkside-tobacco', bgClass: 'bg-stone-900', textColor: 'text-white', badgeText: 'DARKSIDE' },
+    { name: 'BlackBurn Tobacco', slug: 'blackburn-tobacco', bgClass: 'bg-stone-900', textColor: 'text-stone-100', borderClass: 'border border-stone-700 shadow-xs', badgeText: 'BLACKBURN' },
+    { name: 'Bonche Tobacco', slug: 'bonche-tobacco', bgClass: 'bg-stone-800', textColor: 'text-amber-200', badgeText: 'BONCHE' },
+    { name: 'Tangiers', slug: 'tangiers', bgClass: 'bg-emerald-950', textColor: 'text-emerald-300', badgeText: 'TANGIERS' },
     { name: 'Adalya Tobacco', slug: 'adalya-tobacco', bgClass: 'bg-red-900', textColor: 'text-white', badgeText: 'ADALYA' },
     { name: 'Serbetli tobacco', slug: 'serbetli-tobacco', bgClass: 'bg-rose-50', textColor: 'text-rose-800', borderClass: 'border border-rose-200', badgeText: 'Serbetli' },
     { name: 'Banger Hookah Tobacco', slug: 'banger-tobacco', bgClass: 'bg-amber-900', textColor: 'text-amber-100', badgeText: 'BANGER' },
-    { name: 'DarkSide Tobacco', slug: 'darkside-tobacco', bgClass: 'bg-stone-900', textColor: 'text-white', badgeText: 'DARKSIDE' },
-    { name: 'BlackBurn Tobacco', slug: 'blackburn-tobacco', bgClass: 'bg-stone-900', textColor: 'text-stone-100', borderClass: 'border border-stone-700 shadow-xs', badgeText: 'BLACKBURN' },
-    { name: 'Tangiers', slug: 'tangiers', bgClass: 'bg-emerald-950', textColor: 'text-emerald-300', badgeText: 'TANGIERS' }
+    { name: 'Element Tobacco', slug: 'element-tobacco', bgClass: 'bg-cyan-900', textColor: 'text-cyan-100', badgeText: 'ELEMENT' }
   ];
 
   const hookahBrands: BrandAvatar[] = [
     { name: 'Alpha Hookah', slug: 'alpha-hookah', bgClass: 'bg-white', textColor: 'text-stone-900', borderClass: 'border border-stone-300 shadow-xs', badgeText: 'ALPHA' },
     { name: 'El Bomber Hookah', slug: 'el-bomber', bgClass: 'bg-stone-900', textColor: 'text-red-500', badgeText: 'EL BOMBER' },
+    { name: 'MattPear Hookah', slug: 'mattpear', bgClass: 'bg-emerald-900', textColor: 'text-emerald-100', badgeText: 'MATTPEAR' },
+    { name: 'Maklaud Hookah', slug: 'maklaud-hookah', bgClass: 'bg-stone-950', textColor: 'text-amber-400', badgeText: 'MAKLAUD' },
     { name: 'WOOKAH Hookah', slug: 'wookah', bgClass: 'bg-amber-900', textColor: 'text-amber-100', badgeText: 'WOOKAH' },
     { name: 'Japona Hookah', slug: 'japona-hookah', bgClass: 'bg-stone-800', textColor: 'text-stone-100', badgeText: 'JAPONA' },
     { name: 'Steamulation Hookah', slug: 'steamulation-hookah', bgClass: 'bg-slate-100', textColor: 'text-slate-900', borderClass: 'border border-slate-300', badgeText: 'STEAM' }
   ];
 
   const bowlBrands: BrandAvatar[] = [
-    { name: 'Alpha Bowls', slug: 'alpha-hookah', bgClass: 'bg-stone-900', textColor: 'text-white', badgeText: 'ALPHA' },
     { name: 'Oblako bowls', slug: 'oblako-bowls', bgClass: 'bg-sky-50', textColor: 'text-sky-800', borderClass: 'border border-sky-300', badgeText: 'OBLAKO' },
-    { name: 'Japona Bowls', slug: 'japona-hookah', bgClass: 'bg-amber-900', textColor: 'text-amber-200', badgeText: 'JAPONA' },
     { name: 'Kong Bowls', slug: 'kong-bowls', bgClass: 'bg-orange-950', textColor: 'text-orange-400', badgeText: 'KONG' },
-    { name: 'Don', slug: 'don-bowls', bgClass: 'bg-stone-800', textColor: 'text-stone-200', badgeText: 'DON' }
+    { name: 'Alpaca Bowls', slug: 'alpaca-bowls', bgClass: 'bg-stone-800', textColor: 'text-stone-100', badgeText: 'ALPACA' },
+    { name: 'Solaris Bowls', slug: 'solaris-bowls', bgClass: 'bg-indigo-900', textColor: 'text-indigo-200', badgeText: 'SOLARIS' },
+    { name: 'Target Bowls', slug: 'target-bowls', bgClass: 'bg-rose-950', textColor: 'text-rose-300', badgeText: 'TARGET' }
+  ];
+
+  const baseBrands: BrandAvatar[] = [
+    { name: 'Caesar Crystal', slug: 'caesar-crystal', bgClass: 'bg-blue-950', textColor: 'text-blue-200', badgeText: 'CAESAR' },
+    { name: 'Craft Glass', slug: 'craft-glass', bgClass: 'bg-stone-800', textColor: 'text-amber-300', badgeText: 'CRAFT' },
+    { name: 'WOOKAH Crystal', slug: 'wookah', bgClass: 'bg-amber-900', textColor: 'text-amber-100', badgeText: 'WOOKAH' }
+  ];
+
+  const coalBrands: BrandAvatar[] = [
+    { name: 'Coco Loco', slug: 'coco-loco', bgClass: 'bg-stone-900', textColor: 'text-amber-400', badgeText: 'COCO LOCO' },
+    { name: 'One Nation', slug: 'one-nation', bgClass: 'bg-red-950', textColor: 'text-red-200', badgeText: '1 NATION' },
+    { name: 'Oasis Charcoal', slug: 'oasis-charcoal', bgClass: 'bg-emerald-900', textColor: 'text-emerald-100', badgeText: 'OASIS' }
+  ];
+
+  const accessoryBrands: BrandAvatar[] = [
+    { name: 'Kaloud', slug: 'kaloud', bgClass: 'bg-white', textColor: 'text-stone-950', borderClass: 'border border-stone-300', badgeText: 'KALOUD' },
+    { name: 'Na Grani HMD', slug: 'na-grani', bgClass: 'bg-stone-900', textColor: 'text-stone-200', badgeText: 'NA GRANI' },
+    { name: 'Blade Hookah', slug: 'blade-hookah', bgClass: 'bg-purple-950', textColor: 'text-purple-200', badgeText: 'BLADE' },
+    { name: 'Alpha Tongs', slug: 'alpha-hookah', bgClass: 'bg-stone-800', textColor: 'text-amber-400', badgeText: 'ALPHA' }
+  ];
+
+  const ehookahBrands: BrandAvatar[] = [
+    { name: 'Ooka', slug: 'ooka', bgClass: 'bg-stone-950', textColor: 'text-cyan-400', badgeText: 'OOKA' },
+    { name: 'Aspire Proteus', slug: 'aspire-proteus', bgClass: 'bg-orange-950', textColor: 'text-orange-300', badgeText: 'ASPIRE' }
+  ];
+
+  const vapeBrands: BrandAvatar[] = [
+    { name: 'GeekVape', slug: 'geekvape', bgClass: 'bg-amber-600', textColor: 'text-white', badgeText: 'GEEKVAPE' },
+    { name: 'Vaporesso', slug: 'vaporesso', bgClass: 'bg-blue-900', textColor: 'text-blue-100', badgeText: 'VAPORESSO' },
+    { name: 'Lost Mary', slug: 'lost-mary', bgClass: 'bg-rose-900', textColor: 'text-rose-100', badgeText: 'LOST MARY' },
+    { name: 'Elf Bar', slug: 'elf-bar', bgClass: 'bg-purple-900', textColor: 'text-purple-100', badgeText: 'ELF BAR' },
+    { name: 'SMOK', slug: 'smok', bgClass: 'bg-stone-900', textColor: 'text-red-500', badgeText: 'SMOK' }
   ];
 
   // Blog posts matching Screenshot 6
@@ -493,6 +579,386 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           </div>
         </div>
 
+      </section>
+
+      {/* 6. SECTION: BASES & GLASS */}
+      <section id="section-bases" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
+        <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
+          <div className="relative">
+            <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
+              BASES & GLASS
+            </h2>
+            <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#3b82f6] z-10"></div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                onClick={() => scrollContainer(baseScrollRef, 'left')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Previous"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => scrollContainer(baseScrollRef, 'right')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Next"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <button
+              onClick={() => onNavigate('/shop?category=bases')}
+              className="text-xs font-bold text-stone-600 hover:text-[#3b82f6] transition-colors uppercase tracking-wider"
+            >
+              ― View All
+            </button>
+          </div>
+        </div>
+
+        <div
+          ref={baseScrollRef}
+          className="flex gap-4 overflow-x-auto pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory"
+        >
+          {baseProducts.map((product) => (
+            <div key={product.id} className="w-[230px] sm:w-[250px] md:w-[270px] shrink-0 snap-start">
+              <ProductCard
+                product={product}
+                onNavigate={(slug) => onNavigate(`/product/${slug}`)}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-stone-200">
+          <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
+            Top Base & Crystal Brands
+          </h3>
+          <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
+            {baseBrands.map((brand) => (
+              <div
+                key={brand.slug}
+                onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
+                className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
+              >
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor}`}>
+                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
+                    {brand.badgeText}
+                  </span>
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#3b82f6] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
+                  {brand.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 7. SECTION: CHARCOAL & HEAT */}
+      <section id="section-coal" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
+        <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
+          <div className="relative">
+            <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
+              CHARCOAL & HEAT
+            </h2>
+            <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#f97316] z-10"></div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                onClick={() => scrollContainer(coalScrollRef, 'left')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Previous"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => scrollContainer(coalScrollRef, 'right')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Next"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <button
+              onClick={() => onNavigate('/shop?category=coal')}
+              className="text-xs font-bold text-stone-600 hover:text-[#f97316] transition-colors uppercase tracking-wider"
+            >
+              ― View All
+            </button>
+          </div>
+        </div>
+
+        <div
+          ref={coalScrollRef}
+          className="flex gap-4 overflow-x-auto pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory"
+        >
+          {coalProducts.map((product) => (
+            <div key={product.id} className="w-[230px] sm:w-[250px] md:w-[270px] shrink-0 snap-start">
+              <ProductCard
+                product={product}
+                onNavigate={(slug) => onNavigate(`/product/${slug}`)}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-stone-200">
+          <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
+            Top Coconut Charcoal Brands
+          </h3>
+          <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
+            {coalBrands.map((brand) => (
+              <div
+                key={brand.slug}
+                onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
+                className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
+              >
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor}`}>
+                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
+                    {brand.badgeText}
+                  </span>
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#f97316] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
+                  {brand.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 8. SECTION: ACCESSORIES & HMD */}
+      <section id="section-accessories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
+        <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
+          <div className="relative">
+            <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
+              ACCESSORIES & HMD
+            </h2>
+            <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#8b5cf6] z-10"></div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                onClick={() => scrollContainer(accessoryScrollRef, 'left')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Previous"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => scrollContainer(accessoryScrollRef, 'right')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Next"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <button
+              onClick={() => onNavigate('/shop?category=accessories')}
+              className="text-xs font-bold text-stone-600 hover:text-[#8b5cf6] transition-colors uppercase tracking-wider"
+            >
+              ― View All
+            </button>
+          </div>
+        </div>
+
+        <div
+          ref={accessoryScrollRef}
+          className="flex gap-4 overflow-x-auto pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory"
+        >
+          {accessoryProducts.map((product) => (
+            <div key={product.id} className="w-[230px] sm:w-[250px] md:w-[270px] shrink-0 snap-start">
+              <ProductCard
+                product={product}
+                onNavigate={(slug) => onNavigate(`/product/${slug}`)}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-stone-200">
+          <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
+            Top Accessories Brands
+          </h3>
+          <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
+            {accessoryBrands.map((brand) => (
+              <div
+                key={brand.slug}
+                onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
+                className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
+              >
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor} ${brand.borderClass || ''}`}>
+                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
+                    {brand.badgeText}
+                  </span>
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#8b5cf6] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
+                  {brand.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 9. SECTION: E-HOOKAH */}
+      <section id="section-ehookah" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
+        <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
+          <div className="relative">
+            <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
+              E-HOOKAH & ELECTRONIC
+            </h2>
+            <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#06b6d4] z-10"></div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                onClick={() => scrollContainer(ehookahScrollRef, 'left')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Previous"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => scrollContainer(ehookahScrollRef, 'right')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Next"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <button
+              onClick={() => onNavigate('/shop?category=e-hookah')}
+              className="text-xs font-bold text-stone-600 hover:text-[#06b6d4] transition-colors uppercase tracking-wider"
+            >
+              ― View All
+            </button>
+          </div>
+        </div>
+
+        <div
+          ref={ehookahScrollRef}
+          className="flex gap-4 overflow-x-auto pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory"
+        >
+          {ehookahProducts.map((product) => (
+            <div key={product.id} className="w-[230px] sm:w-[250px] md:w-[270px] shrink-0 snap-start">
+              <ProductCard
+                product={product}
+                onNavigate={(slug) => onNavigate(`/product/${slug}`)}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-stone-200">
+          <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
+            Top E-Hookah Brands
+          </h3>
+          <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
+            {ehookahBrands.map((brand) => (
+              <div
+                key={brand.slug}
+                onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
+                className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
+              >
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor}`}>
+                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
+                    {brand.badgeText}
+                  </span>
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#06b6d4] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
+                  {brand.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 10. SECTION: VAPES */}
+      <section id="section-vapes" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
+        <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
+          <div className="relative">
+            <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
+              VAPES & POD SYSTEMS
+            </h2>
+            <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#ec4899] z-10"></div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                onClick={() => scrollContainer(vapeScrollRef, 'left')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Previous"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => scrollContainer(vapeScrollRef, 'right')}
+                className="w-7 h-7 rounded-full border border-stone-300 bg-white hover:bg-stone-100 flex items-center justify-center text-stone-700 transition-colors shadow-2xs"
+                title="Next"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <button
+              onClick={() => onNavigate('/shop?category=vapes')}
+              className="text-xs font-bold text-stone-600 hover:text-[#ec4899] transition-colors uppercase tracking-wider"
+            >
+              ― View All
+            </button>
+          </div>
+        </div>
+
+        <div
+          ref={vapeScrollRef}
+          className="flex gap-4 overflow-x-auto pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory"
+        >
+          {vapeProducts.map((product) => (
+            <div key={product.id} className="w-[230px] sm:w-[250px] md:w-[270px] shrink-0 snap-start">
+              <ProductCard
+                product={product}
+                onNavigate={(slug) => onNavigate(`/product/${slug}`)}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-stone-200">
+          <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
+            Top Vape Brands
+          </h3>
+          <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
+            {vapeBrands.map((brand) => (
+              <div
+                key={brand.slug}
+                onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
+                className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
+              >
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor}`}>
+                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
+                    {brand.badgeText}
+                  </span>
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#ec4899] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
+                  {brand.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* 6. THREE SERVICE VALUE GUARANTEE BOXES (Screenshots 3 & 4) */}

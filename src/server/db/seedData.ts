@@ -270,8 +270,8 @@ export const INITIAL_CATEGORIES: Category[] = [
     description: 'Precision engineered modern and Russian hookahs crafted from aerospace-grade AISI 304 stainless steel, polyacetal, and artisanal crystal.',
     imageUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800&auto=format&fit=crop',
     bannerUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1600&auto=format&fit=crop',
-    subcategories: ['Modern Hookahs', 'Russian Hookahs', 'Stainless Steel', 'Luxury Wooden Hookahs', 'Compact & Travel Hookahs'],
-    productCount: 14,
+    subcategories: ['Alpha Hookah', 'El Bomber', 'MattPear', 'Maklaud Hookah', 'WOOKAH', 'Japona Hookah', 'Steamulation', 'Modern Hookahs', 'Russian Hookahs', 'Stainless Steel'],
+    productCount: 18,
     isActive: true,
     sortOrder: 1,
     seoTitle: 'Buy Hookahs Online | Alpha Hookah, El Bomber, MattPear, Wookah',
@@ -281,11 +281,11 @@ export const INITIAL_CATEGORIES: Category[] = [
     id: 'cat-tobacco',
     name: 'Shisha Tobacco',
     slug: 'tobacco',
-    description: 'Dark leaf, blonde leaf, and whole-leaf cigar shisha tobacco blends featuring world-renowned brands like MustHave, DarkSide, BlackBurn, and Tangiers.',
+    description: 'Dark leaf, blonde leaf, and whole-leaf cigar shisha tobacco blends featuring world-renowned brands like MustHave, DarkSide, BlackBurn, Tangiers, and Adalya.',
     imageUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=800&auto=format&fit=crop',
     bannerUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1600&auto=format&fit=crop',
-    subcategories: ['Dark Leaf Tobacco', 'Blonde Leaf Tobacco', 'Cigar Tobacco', 'Fruity & Sweet', 'Mint & Cooling', 'Dessert & Spices', 'Herbal & Non-Tobacco'],
-    productCount: 22,
+    subcategories: ['MustHave Tobacco', 'DarkSide Tobacco', 'BlackBurn Tobacco', 'Bonche Tobacco', 'Tangiers', 'Adalya Tobacco', 'Serbetli tobacco', 'Banger Hookah Tobacco', 'Element Tobacco', 'Russian Hookah Tobacco', 'Dark Leaf Tobacco', 'Blonde Leaf Tobacco'],
+    productCount: 26,
     isActive: true,
     sortOrder: 2,
     seoTitle: 'Shisha Tobacco | MustHave, DarkSide, BlackBurn, Bonche, Tangiers',
@@ -298,8 +298,8 @@ export const INITIAL_CATEGORIES: Category[] = [
     description: 'Handcrafted clay, semi-porcelain, and character art bowls designed for high thermal retention, pure flavor, and dense smoke output.',
     imageUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=800&auto=format&fit=crop',
     bannerUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1600&auto=format&fit=crop',
-    subcategories: ['Phunnel Bowls', 'Turkish / Killer Bowls', 'Art & Character Bowls', 'Glazed Bowls', 'Clay & Semi-Porcelain'],
-    productCount: 12,
+    subcategories: ['Oblako Bowls', 'Kong Bowls', 'Alpaca Bowls', 'Solaris Bowls', 'Japona Bowls', 'Cosmo Bowl', 'Target Bowls', 'Phunnel Bowls', 'Turkish / Killer Bowls'],
+    productCount: 16,
     isActive: true,
     sortOrder: 3,
     seoTitle: 'Hookah Bowls | Oblako, Kong, Alpaca, Cosmo, Big Maks',
@@ -307,12 +307,12 @@ export const INITIAL_CATEGORIES: Category[] = [
   },
   {
     id: 'cat-bases',
-    name: 'Bases & Vases',
+    name: 'Bases & Glass',
     slug: 'bases',
     description: 'Russian drop vases, craft glass, and hand-cut Bohemian crystal bases engineered for maximum stability and visual elegance.',
     imageUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=800&auto=format&fit=crop',
-    subcategories: ['Russian Drop Bases', 'Bohemian Crystal', 'Craft Glass Vases', 'Mini & Compact Bases'],
-    productCount: 6,
+    subcategories: ['Craft Glass Vases', 'Bohemian Crystal', 'Russian Drop Bases', 'Caesar Crystal', 'Big Maks Bases', 'WOOKAH Crystal', 'Alpha Base', 'Mini & Compact Bases'],
+    productCount: 10,
     isActive: true,
     sortOrder: 4
   },
@@ -322,8 +322,8 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'coal',
     description: '100% natural coconut charcoal cubes, flats, and circle cuts with low ash, zero sulfur chemicals, and up to 90 minutes burn time.',
     imageUrl: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=800&auto=format&fit=crop',
-    subcategories: ['26mm Coconut Cubes', '28mm Jumbo Cubes', 'HMD Quarter Circles', 'Charcoal Burners', 'Master Lounge Cases'],
-    productCount: 6,
+    subcategories: ['Coco Loco', 'One Nation', 'Oasis Charcoal', 'Shaman Coal', '26mm Coconut Cubes', '28mm Jumbo Cubes', 'Charcoal Burners'],
+    productCount: 8,
     isActive: true,
     sortOrder: 5
   },
@@ -333,8 +333,8 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'accessories',
     description: 'Heat Management Devices (Kaloud, Na Grani), medical-grade silicone hoses, precision tongs, molasses catchers, and cleaning supplies.',
     imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=800&auto=format&fit=crop',
-    subcategories: ['Heat Management Devices (HMD)', 'Silicone Hoses & Handles', 'Precision Tongs', 'Molasses Catchers', 'Forks & Pokers', 'Grommets & Mouthpieces'],
-    productCount: 10,
+    subcategories: ['Kaloud', 'Na Grani HMD', 'Alpha Tongs & Hoses', 'Blade Hookah', 'Silicone Hoses & Handles', 'Molasses Catchers', 'Forks & Pokers', 'Grommets & Mouthpieces'],
+    productCount: 12,
     isActive: true,
     sortOrder: 6
   },
@@ -342,12 +342,23 @@ export const INITIAL_CATEGORIES: Category[] = [
     id: 'cat-ehookah',
     name: 'E-Hookah & Electronic',
     slug: 'e-hookah',
-    description: 'Electronic hookah heads and portable shisha vaporizers for convenient, smoke-free modern sessions.',
+    description: 'Electronic hookah heads and portable shisha vaporizers for convenient, clean, and smoke-free modern sessions.',
     imageUrl: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=800&auto=format&fit=crop',
-    subcategories: ['E-Heads', 'Pod Systems', 'Cartridges'],
-    productCount: 3,
+    subcategories: ['Ooka', 'Kangerm', 'Aspire Proteus', 'Starbuzz Wireless E-Head', 'E-Heads', 'Pod Systems', 'E-Hookah Refills'],
+    productCount: 6,
     isActive: true,
     sortOrder: 7
+  },
+  {
+    id: 'cat-vapes',
+    name: 'Vapes & Pod Systems',
+    slug: 'vapes',
+    description: 'High performance pod mods, premium disposable vapes, replacement coils, and nic salt devices from world leading vape manufacturers.',
+    imageUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-800?q=80&w=800&auto=format&fit=crop',
+    subcategories: ['GeekVape', 'Vaporesso', 'Lost Mary', 'Elf Bar', 'SMOK', 'VOOPOO', 'OXVA', 'Disposable Vapes', 'Pod Systems', 'Nicotine Salt Liquids'],
+    productCount: 10,
+    isActive: true,
+    sortOrder: 8
   },
   {
     id: 'cat-wholesale',
@@ -358,7 +369,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     subcategories: ['1kg Shisha Tins', '20kg Master Coal Cases', 'Disposable Lounge Mouthpieces', 'Commercial Starter Sets'],
     productCount: 4,
     isActive: true,
-    sortOrder: 8
+    sortOrder: 9
   }
 ];
 
@@ -600,6 +611,136 @@ export const INITIAL_BRANDS: Brand[] = [
     origin: 'Russia',
     description: 'Precision grooved clay and semi-porcelain phunnel bowls with heat lock ribs.',
     logoUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
+  },
+  {
+    id: 'brand-caesar',
+    name: 'Caesar Crystal',
+    slug: 'caesar-crystal',
+    origin: 'Czech Republic',
+    description: 'Hand-blown 24% leaded Bohemian crystal hookah bases cut by European master glass artisans.',
+    logoUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=300&auto=format&fit=crop',
+    productCount: 5,
+    isActive: true
+  },
+  {
+    id: 'brand-craft-glass',
+    name: 'Craft Glass',
+    slug: 'craft-glass',
+    origin: 'Russia',
+    description: 'Heavy Russian drop-shaped craft glass vases compatible with all modern plug-in grommet hookahs.',
+    logoUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=300&auto=format&fit=crop',
+    productCount: 5,
+    isActive: true
+  },
+  {
+    id: 'brand-na-grani',
+    name: 'Na Grani',
+    slug: 'na-grani',
+    origin: 'Russia',
+    description: 'High-grade stainless steel Heat Management Devices and precision tongs engineered for intense dark leaf heat.',
+    logoUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
+  },
+  {
+    id: 'brand-blade',
+    name: 'Blade Hookah',
+    slug: 'blade-hookah',
+    origin: 'Russia',
+    description: 'Anodized titanium-finish tongs, molasses catchers, and luxury personal mouthpieces.',
+    logoUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
+  },
+  {
+    id: 'brand-one-nation',
+    name: 'One Nation',
+    slug: 'one-nation',
+    origin: 'Germany / Indonesia',
+    description: 'Premium natural coconut charcoal cubes 26mm and 28mm for even, clean burn without odor.',
+    logoUrl: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
+  },
+  {
+    id: 'brand-oasis',
+    name: 'Oasis Charcoal',
+    slug: 'oasis-charcoal',
+    origin: 'Russia / Indonesia',
+    description: 'High thermal output natural coconut coals engineered specifically for Russian dark leaf sessions.',
+    logoUrl: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
+  },
+  {
+    id: 'brand-ooka',
+    name: 'Ooka',
+    slug: 'ooka',
+    origin: 'UAE',
+    description: 'Innovative charcoal-free electronic shisha device utilizing pressurized heat pods for real molasses vapor.',
+    logoUrl: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
+  },
+  {
+    id: 'brand-aspire',
+    name: 'Aspire',
+    slug: 'aspire-proteus',
+    origin: 'China',
+    description: 'The iconic Proteus electronic hookah head system transforming any traditional water pipe into an e-shisha.',
+    logoUrl: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=300&auto=format&fit=crop',
+    productCount: 3,
+    isActive: true
+  },
+  {
+    id: 'brand-geekvape',
+    name: 'GeekVape',
+    slug: 'geekvape',
+    origin: 'China / Global',
+    description: 'IP68 waterproof and shockproof Aegis pod mods and Z-Series sub-ohm flavor tanks.',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+    productCount: 6,
+    isActive: true
+  },
+  {
+    id: 'brand-vaporesso',
+    name: 'Vaporesso',
+    slug: 'vaporesso',
+    origin: 'Global',
+    description: 'Corex heating tech and AXON chipset pod systems including the best-selling XROS series.',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+    productCount: 6,
+    isActive: true
+  },
+  {
+    id: 'brand-lost-mary',
+    name: 'Lost Mary',
+    slug: 'lost-mary',
+    origin: 'Global',
+    description: 'Rechargeable dual mesh coil disposables and pod kits with hyper-concentrated fruit flavors.',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+    productCount: 5,
+    isActive: true
+  },
+  {
+    id: 'brand-elf-bar',
+    name: 'Elf Bar',
+    slug: 'elf-bar',
+    origin: 'Global',
+    description: 'World-famous disposable vape pens and smart power screen devices.',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+    productCount: 5,
+    isActive: true
+  },
+  {
+    id: 'brand-smok',
+    name: 'SMOK',
+    slug: 'smok',
+    origin: 'Global',
+    description: 'Legendary vape hardware pioneers known for Nord and Novo refillable pod kits.',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
     productCount: 4,
     isActive: true
   }
@@ -2002,6 +2143,388 @@ export const INITIAL_PRODUCTS: Product[] = [
     ageRestricted: false,
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-01-01T00:00:00Z'
+  },
+
+  // 23. E-HOOKAH: OOKA Charcoal-Free Modern Shisha Device
+  {
+    id: 'prod-ooka-device',
+    name: 'Ooka Clean Heat Electronic Shisha System (Matte Obsidian)',
+    slug: 'ooka-clean-heat-electronic-shisha-system',
+    sku: 'EHK-OOKA-01',
+    description: 'The world’s first charcoal-free heating pod electronic shisha system. Delivers instant smooth molasses vapor in under 5 minutes without charcoal, ash, carbon monoxide, or mess. Features dual rechargeable lithium-ion battery packs.',
+    shortDescription: 'Charcoal-free electronic shisha with pressurized flavor pod tech and 100% real molasses.',
+    price: 349.00,
+    salePrice: 319.00,
+    currency: 'USD',
+    brand: 'Ooka',
+    brandSlug: 'ooka',
+    category: 'E-Hookah & Electronic',
+    categorySlug: 'e-hookah',
+    subcategory: 'Ooka',
+    images: [
+      {
+        id: 'img-ooka-1',
+        url: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=300&auto=format&fit=crop',
+        alt: 'Ooka Electronic Shisha Device',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 25,
+    lowStockThreshold: 4,
+    weight: 3200,
+    color: 'Matte Obsidian',
+    material: 'Anodized Aluminum & Tempered Glass',
+    tags: ['e-hookah', 'ooka', 'electronic-shisha', 'charcoal-free', 'bestseller'],
+    specifications: [
+      { label: 'Heating Method', value: 'Micro-Convection Heat Chamber' },
+      { label: 'Heat-up Time', value: 'Under 5 Minutes' },
+      { label: 'Session Time', value: 'Up to 70 Minutes per Pod' },
+      { label: 'Battery Capacity', value: 'Rechargeable Dual Cell USB-C' }
+    ],
+    rating: 4.96,
+    reviewCount: 38,
+    isFeatured: true,
+    isNewArrival: true,
+    isBestSeller: true,
+    isOnSale: true,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-15T00:00:00Z',
+    updatedAt: '2026-01-15T00:00:00Z'
+  },
+
+  // 24. E-HOOKAH: Aspire Proteus E-Hookah Head Kit
+  {
+    id: 'prod-aspire-proteus-head',
+    name: 'Aspire Proteus Universal Electronic Hookah Head Kit',
+    slug: 'aspire-proteus-universal-electronic-hookah-head-kit',
+    sku: 'EHK-ASP-PRT',
+    description: 'Converts any traditional or modern water pipe into a high-vapor electronic shisha. Features a 18ml refillable e-liquid tank, 0.25 ohm organic cotton coils, and dual 18650 replaceable batteries.',
+    shortDescription: 'Universal e-hookah head conversion kit with 18ml tank capacity and sub-ohm coils.',
+    price: 89.99,
+    currency: 'USD',
+    brand: 'Aspire',
+    brandSlug: 'aspire-proteus',
+    category: 'E-Hookah & Electronic',
+    categorySlug: 'e-hookah',
+    subcategory: 'Aspire Proteus',
+    images: [
+      {
+        id: 'img-asp-1',
+        url: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=300&auto=format&fit=crop',
+        alt: 'Aspire Proteus E-Head',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 45,
+    lowStockThreshold: 8,
+    weight: 450,
+    tags: ['e-hookah', 'aspire', 'proteus', 'e-head'],
+    specifications: [
+      { label: 'Tank Capacity', value: '18 ml Refillable Pyrex Glass' },
+      { label: 'Coil Resistance', value: '0.25 ohm Organic Cotton' },
+      { label: 'Compatibility', value: 'Universal Hookah Stem Bowl Grommet' }
+    ],
+    rating: 4.88,
+    reviewCount: 42,
+    isFeatured: true,
+    isNewArrival: false,
+    isBestSeller: false,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-10T00:00:00Z',
+    updatedAt: '2026-01-10T00:00:00Z'
+  },
+
+  // 25. VAPES: GeekVape Aegis Legend 3 Kit
+  {
+    id: 'prod-geekvape-legend-3',
+    name: 'GeekVape Aegis Legend 3 200W Starter Kit with Z Fli Tank',
+    slug: 'geekvape-aegis-legend-3-200w-starter-kit',
+    sku: 'VAP-GKV-LGD3',
+    description: 'The indestructible flagship vape mod with IP68 tri-proof water, dust, and shock resistance. Powered by AS Chip 4.0 with Memory Mode, Smart Lock, and the top-airflow leakproof Z Fli Sub-Ohm Tank.',
+    shortDescription: 'IP68 waterproof 200W dual 18650 box mod kit with top-airflow Z Fli leakproof tank.',
+    price: 79.99,
+    salePrice: 69.99,
+    currency: 'USD',
+    brand: 'GeekVape',
+    brandSlug: 'geekvape',
+    category: 'Vapes & Pod Systems',
+    categorySlug: 'vapes',
+    subcategory: 'GeekVape',
+    images: [
+      {
+        id: 'img-gkv-1',
+        url: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-1200?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+        alt: 'GeekVape Aegis Legend 3',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 60,
+    lowStockThreshold: 10,
+    weight: 350,
+    color: 'Titanium Grey & Leather',
+    tags: ['vapes', 'geekvape', 'aegis', 'box-mod', 'bestseller'],
+    specifications: [
+      { label: 'Max Output', value: '200 Watts' },
+      { label: 'Protection', value: 'IP68 Water, Dust & Shock Proof' },
+      { label: 'Tank Capacity', value: '5.5 ml Bubble Glass' }
+    ],
+    rating: 4.97,
+    reviewCount: 89,
+    isFeatured: true,
+    isNewArrival: true,
+    isBestSeller: true,
+    isOnSale: true,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-05T00:00:00Z',
+    updatedAt: '2026-01-05T00:00:00Z'
+  },
+
+  // 26. VAPES: Vaporesso XROS 4 Pod Kit
+  {
+    id: 'prod-vaporesso-xros-4',
+    name: 'Vaporesso XROS 4 Pod System Kit (1000mAh)',
+    slug: 'vaporesso-xros-4-pod-system-kit',
+    sku: 'VAP-VAP-XRS4',
+    description: 'Upgraded COREX 2.0 heating technology providing 30% richer flavor reproduction and 30% longer pod lifespan. Features 3 output modes, pulse mode boost, and a precision airflow toggle for MTL to RDL.',
+    shortDescription: 'Aluminum unibody 1000mAh pod kit with COREX 2.0 aroma reproduction technology.',
+    price: 34.99,
+    currency: 'USD',
+    brand: 'Vaporesso',
+    brandSlug: 'vaporesso',
+    category: 'Vapes & Pod Systems',
+    categorySlug: 'vapes',
+    subcategory: 'Vaporesso',
+    images: [
+      {
+        id: 'img-vap-1',
+        url: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-1200?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+        alt: 'Vaporesso XROS 4 Pod Kit',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 120,
+    lowStockThreshold: 15,
+    weight: 90,
+    color: 'Cosmic Blue',
+    tags: ['vapes', 'vaporesso', 'xros', 'pod-system', 'bestseller'],
+    specifications: [
+      { label: 'Battery Capacity', value: '1000 mAh High-Density Cell' },
+      { label: 'Charging', value: '2A USB-C Quick Charge (30 min full)' },
+      { label: 'Pod Compatibility', value: 'All XROS Series Mesh Pods' }
+    ],
+    rating: 4.95,
+    reviewCount: 114,
+    isFeatured: true,
+    isNewArrival: true,
+    isBestSeller: true,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-08T00:00:00Z',
+    updatedAt: '2026-01-08T00:00:00Z'
+  },
+
+  // 27. VAPES: Lost Mary OS5000 Disposable Vape
+  {
+    id: 'prod-lost-mary-os5000',
+    name: 'Lost Mary OS5000 Rechargeable Disposable (5000 Puffs)',
+    slug: 'lost-mary-os5000-rechargeable-disposable',
+    sku: 'VAP-LST-5000',
+    description: 'Ergonomic planetary surface finish disposable with mesh coil for consistent flavor. 13ml pre-filled nic salt e-liquid with 3-level battery LED indicator and USB Type-C rechargeability.',
+    shortDescription: '5000 puff rechargeable mesh coil disposable with 5% salt nicotine.',
+    price: 18.99,
+    salePrice: 15.99,
+    currency: 'USD',
+    brand: 'Lost Mary',
+    brandSlug: 'lost-mary',
+    category: 'Vapes & Pod Systems',
+    categorySlug: 'vapes',
+    subcategory: 'Lost Mary',
+    images: [
+      {
+        id: 'img-lst-1',
+        url: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-1200?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+        alt: 'Lost Mary OS5000',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 200,
+    lowStockThreshold: 30,
+    weight: 65,
+    flavor: 'Blue Cotton Candy',
+    tags: ['vapes', 'lost-mary', 'disposable', 'mesh-coil'],
+    specifications: [
+      { label: 'Puff Count', value: '5,000+ Puffs' },
+      { label: 'Nicotine Strength', value: '50 mg / 5% Salt Nic' },
+      { label: 'E-Liquid Capacity', value: '13 ml' }
+    ],
+    rating: 4.91,
+    reviewCount: 95,
+    isFeatured: false,
+    isNewArrival: false,
+    isBestSeller: true,
+    isOnSale: true,
+    isActive: true,
+    ageRestricted: true,
+    createdAt: '2026-01-12T00:00:00Z',
+    updatedAt: '2026-01-12T00:00:00Z'
+  },
+
+  // 28. BASES: Caesar Crystal Bohemiae Floe Cut Base
+  {
+    id: 'prod-caesar-crystal-floe',
+    name: 'Caesar Crystal Bohemiae Floe Cut Artisan Flask (45mm Neck)',
+    slug: 'caesar-crystal-bohemiae-floe-cut-artisan-flask',
+    sku: 'BAS-CSR-FLOE',
+    description: 'Handcrafted in the Czech Republic by royal master glassmakers. Made of authentic 24% leaded Bohemian crystal with intricate diamond cuts that refract light across the water table.',
+    shortDescription: 'Masterpiece 24% lead Bohemian crystal hand-cut vase with universal 45mm neck.',
+    price: 189.00,
+    currency: 'USD',
+    brand: 'Caesar Crystal',
+    brandSlug: 'caesar-crystal',
+    category: 'Bases & Glass',
+    categorySlug: 'bases',
+    subcategory: 'Caesar Crystal',
+    images: [
+      {
+        id: 'img-csr-1',
+        url: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=300&auto=format&fit=crop',
+        alt: 'Caesar Crystal Bohemiae Base',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 15,
+    lowStockThreshold: 3,
+    weight: 3100,
+    material: '24% Leaded Bohemian Crystal Glass',
+    color: 'Clear Diamond Cut',
+    tags: ['bases', 'caesar-crystal', 'bohemian-crystal', 'luxury'],
+    specifications: [
+      { label: 'Origin', value: 'Czech Republic (Handmade)' },
+      { label: 'Height', value: '26.5 cm' },
+      { label: 'Neck Fit', value: '45mm Standard Plug-in' }
+    ],
+    rating: 4.98,
+    reviewCount: 31,
+    isFeatured: true,
+    isNewArrival: true,
+    isBestSeller: false,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: false,
+    createdAt: '2026-01-25T00:00:00Z',
+    updatedAt: '2026-01-25T00:00:00Z'
+  },
+
+  // 29. ACCESSORIES: Na Grani Stainless Steel Heat Management Device
+  {
+    id: 'prod-na-grani-hmd',
+    name: 'Na Grani Stainless Steel Heat Management Device (HMD)',
+    slug: 'na-grani-stainless-steel-heat-management-device',
+    sku: 'ACC-NGR-HMD',
+    description: 'Milled from a single block of heavy food-grade AISI 304 stainless steel. Provides pure, smooth heat distribution for dark leaf tobacco without melting risks associated with aluminum.',
+    shortDescription: 'Solid 100% AISI 304 stainless steel HMD designed for dark leaf heat retention.',
+    price: 49.99,
+    salePrice: 44.99,
+    currency: 'USD',
+    brand: 'Na Grani',
+    brandSlug: 'na-grani',
+    category: 'Accessories & HMD',
+    categorySlug: 'accessories',
+    subcategory: 'Na Grani HMD',
+    images: [
+      {
+        id: 'img-ngr-1',
+        url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=300&auto=format&fit=crop',
+        alt: 'Na Grani Stainless Steel HMD',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 75,
+    lowStockThreshold: 12,
+    weight: 220,
+    material: 'AISI 304 Stainless Steel',
+    tags: ['accessories', 'hmd', 'na-grani', 'stainless-steel', 'bestseller'],
+    specifications: [
+      { label: 'Material', value: '100% Solid AISI 304 Stainless Steel' },
+      { label: 'Coal Capacity', value: '2-3 x 26mm Coals' },
+      { label: 'Heat Profile', value: 'Deep thermal soak for Burley leaves' }
+    ],
+    rating: 4.96,
+    reviewCount: 64,
+    isFeatured: true,
+    isNewArrival: false,
+    isBestSeller: true,
+    isOnSale: true,
+    isActive: true,
+    ageRestricted: false,
+    createdAt: '2026-01-18T00:00:00Z',
+    updatedAt: '2026-01-18T00:00:00Z'
+  },
+
+  // 30. COAL: One Nation Natural Coconut Charcoal 26mm (1kg)
+  {
+    id: 'prod-one-nation-26mm',
+    name: 'One Nation Premium Coconut Charcoal Cubes (26mm - 1kg)',
+    slug: 'one-nation-premium-coconut-charcoal-26mm-1kg',
+    sku: 'COA-ONN-26MM',
+    description: 'German quality engineered charcoal crafted from 100% natural Indonesian coconut shells. Zero spark emissions, no odor or fumes during ignition, and leaves a compact light grey ash residue under 2.5%.',
+    shortDescription: '72 premium 26mm coconut cubes with high heat and 90+ minutes burn time.',
+    price: 14.99,
+    currency: 'USD',
+    brand: 'One Nation',
+    brandSlug: 'one-nation',
+    category: 'Charcoal & Heat',
+    categorySlug: 'coal',
+    subcategory: 'One Nation',
+    images: [
+      {
+        id: 'img-onn-1',
+        url: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=300&auto=format&fit=crop',
+        alt: 'One Nation 26mm Charcoal Box',
+        isPrimary: true,
+        sortOrder: 1
+      }
+    ],
+    stock: 160,
+    lowStockThreshold: 25,
+    weight: 1000,
+    material: 'Natural Coconut Shells',
+    tags: ['coal', 'charcoal', 'one-nation', '26mm', 'bestseller'],
+    specifications: [
+      { label: 'Box Weight', value: '1 Kilogram (72 Cubes)' },
+      { label: 'Size', value: '26 x 26 x 26 mm' },
+      { label: 'Burn Duration', value: '90 - 105 min' }
+    ],
+    rating: 4.93,
+    reviewCount: 58,
+    isFeatured: true,
+    isNewArrival: false,
+    isBestSeller: true,
+    isOnSale: false,
+    isActive: true,
+    ageRestricted: false,
+    createdAt: '2026-01-14T00:00:00Z',
+    updatedAt: '2026-01-14T00:00:00Z'
   }
 ];
 

@@ -13,29 +13,58 @@ interface CategoryBrandGridProps {
 
 // Map brands to realistic category counts & logo icons
 const BRAND_METRICS: Record<string, { logoIcon: string; countryCode: string }> = {
+  // Tobacco
   'musthave-tobacco': { logoIcon: '🍓', countryCode: 'RU' },
   'darkside-tobacco': { logoIcon: '🌑', countryCode: 'RU' },
   'blackburn-tobacco': { logoIcon: '🔥', countryCode: 'RU' },
   'bonche-tobacco': { logoIcon: '🍂', countryCode: 'RU' },
   'tangiers': { logoIcon: '👑', countryCode: 'US' },
-  'al-fakher': { logoIcon: '🍎', countryCode: 'AE' },
-  'starbuzz': { logoIcon: '⭐', countryCode: 'US' },
+  'adalya-tobacco': { logoIcon: '🍇', countryCode: 'TR' },
+  'serbetli-tobacco': { logoIcon: '🍯', countryCode: 'TR' },
+  'banger-tobacco': { logoIcon: '💥', countryCode: 'RU' },
   'element-tobacco': { logoIcon: '💧', countryCode: 'RU' },
-  'chabacco': { logoIcon: '🍵', countryCode: 'RU' },
-  'fumari': { logoIcon: '💨', countryCode: 'US' },
-  'adalya': { logoIcon: '🍇', countryCode: 'TR' },
-  'afzal': { logoIcon: '🌿', countryCode: 'IN' },
+  'russian-hookah-tobacco': { logoIcon: '🇷🇺', countryCode: 'RU' },
+
+  // Hookahs
   'alpha-hookah': { logoIcon: '⚡', countryCode: 'RU' },
   'el-bomber': { logoIcon: '⚔️', countryCode: 'RU' },
   'mattpear': { logoIcon: '🍐', countryCode: 'RU' },
   'maklaud-hookah': { logoIcon: '🐲', countryCode: 'RU' },
   'wookah': { logoIcon: '🪵', countryCode: 'PL' },
+  'japona-hookah': { logoIcon: '⛩️', countryCode: 'RU' },
+  'steamulation-hookah': { logoIcon: '⚙️', countryCode: 'DE' },
+
+  // Bowls
   'oblako-bowls': { logoIcon: '☁️', countryCode: 'RU' },
   'kong-bowls': { logoIcon: '🦍', countryCode: 'RU' },
   'alpaca-bowls': { logoIcon: '🦙', countryCode: 'US' },
-  'cosmo-bowl': { logoIcon: '🪐', countryCode: 'RU' },
-  'kaloud': { logoIcon: '💎', countryCode: 'US' },
-  'cocourth': { logoIcon: '🥥', countryCode: 'ID' }
+  'solaris-bowls': { logoIcon: '🪐', countryCode: 'UA' },
+  'target-bowls': { logoIcon: '🎯', countryCode: 'RU' },
+
+  // Bases
+  'caesar-crystal': { logoIcon: '💎', countryCode: 'CZ' },
+  'craft-glass': { logoIcon: '🏺', countryCode: 'RU' },
+
+  // Coal
+  'coco-loco': { logoIcon: '🥥', countryCode: 'ID' },
+  'one-nation': { logoIcon: '🇩🇪', countryCode: 'DE' },
+  'oasis-charcoal': { logoIcon: '🌴', countryCode: 'ID' },
+
+  // Accessories
+  'kaloud': { logoIcon: '👑', countryCode: 'US' },
+  'na-grani': { logoIcon: '🛡️', countryCode: 'RU' },
+  'blade-hookah': { logoIcon: '🗡️', countryCode: 'RU' },
+
+  // E-Hookah
+  'ooka': { logoIcon: '🔋', countryCode: 'AE' },
+  'aspire-proteus': { logoIcon: '💨', countryCode: 'CN' },
+
+  // Vapes
+  'geekvape': { logoIcon: '⚡', countryCode: 'GL' },
+  'vaporesso': { logoIcon: '✨', countryCode: 'GL' },
+  'lost-mary': { logoIcon: '🍬', countryCode: 'GL' },
+  'elf-bar': { logoIcon: '🫐', countryCode: 'GL' },
+  'smok': { logoIcon: '🔥', countryCode: 'GL' }
 };
 
 export const CategoryBrandGrid: React.FC<CategoryBrandGridProps> = ({
@@ -50,16 +79,31 @@ export const CategoryBrandGrid: React.FC<CategoryBrandGridProps> = ({
   // Filter relevant brands based on category
   const relevantBrands = brands.filter(b => {
     if (categorySlug === 'tobacco') {
-      return b.slug.includes('tobacco') || ['tangiers', 'al-fakher', 'starbuzz', 'fumari', 'adalya', 'afzal', 'chabacco', 'element-tobacco'].includes(b.slug);
+      return (
+        b.slug.includes('tobacco') ||
+        ['musthave-tobacco', 'darkside-tobacco', 'blackburn-tobacco', 'bonche-tobacco', 'tangiers', 'adalya-tobacco', 'serbetli-tobacco', 'banger-tobacco', 'element-tobacco', 'russian-hookah-tobacco'].includes(b.slug)
+      );
     }
     if (categorySlug === 'hookahs') {
-      return ['alpha-hookah', 'el-bomber', 'mattpear', 'maklaud-hookah', 'wookah'].includes(b.slug);
+      return ['alpha-hookah', 'el-bomber', 'mattpear', 'maklaud-hookah', 'wookah', 'japona-hookah', 'steamulation-hookah'].includes(b.slug);
     }
     if (categorySlug === 'bowls') {
-      return ['oblako-bowls', 'kong-bowls', 'alpaca-bowls', 'cosmo-bowl'].includes(b.slug);
+      return ['oblako-bowls', 'kong-bowls', 'alpaca-bowls', 'solaris-bowls', 'target-bowls', 'japona-hookah'].includes(b.slug);
+    }
+    if (categorySlug === 'bases') {
+      return ['caesar-crystal', 'craft-glass', 'wookah'].includes(b.slug);
     }
     if (categorySlug === 'coal') {
-      return ['cocourth', 'kaloud'].includes(b.slug);
+      return ['coco-loco', 'one-nation', 'oasis-charcoal'].includes(b.slug);
+    }
+    if (categorySlug === 'accessories') {
+      return ['kaloud', 'na-grani', 'blade-hookah', 'alpha-hookah'].includes(b.slug);
+    }
+    if (categorySlug === 'e-hookah') {
+      return ['ooka', 'aspire-proteus'].includes(b.slug);
+    }
+    if (categorySlug === 'vapes') {
+      return ['geekvape', 'vaporesso', 'lost-mary', 'elf-bar', 'smok'].includes(b.slug);
     }
     return true;
   });
