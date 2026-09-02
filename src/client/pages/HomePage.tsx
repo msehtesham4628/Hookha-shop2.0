@@ -325,14 +325,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       {/* 1. HERO IMAGE CAROUSEL (3 Scrolling Visual Slides matching Screenshot 1) */}
       <HeroCarousel onNavigate={onNavigate} />
 
-      {/* 2. SECTION: BUY HOOKAH TOBACCO AND SHISHA (Screenshot 1 & 2) */}
+      {/* 2. SECTION: TOBACCO (Screenshot 1 & 2) */}
       <section id="section-tobacco" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8">
         
         {/* Section Header with Blue Accent Bar */}
         <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
           <div className="relative">
             <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
-              BUY HOOKAH TOBACCO AND SHISHA
+              TOBACCO
             </h2>
             {/* Solid Royal Blue Underline Bar */}
             <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#0088cc] z-10"></div>
@@ -411,14 +411,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
       </section>
 
-      {/* 4. SECTION: BUY HOOKAHS (Screenshot 2 & 3) */}
+      {/* 4. SECTION: HOOKAHS (Screenshot 2 & 3) */}
       <section id="section-hookahs" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
         
         {/* Section Header with Teal Accent Bar */}
         <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
           <div className="relative">
             <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
-              BUY HOOKAHS
+              HOOKAHS
             </h2>
             {/* Solid Cyan/Teal Underline Bar */}
             <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#00b5ad] z-10"></div>
@@ -496,14 +496,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
       </section>
 
-      {/* 5. SECTION: BUY HOOKAH BOWLS (Screenshot 3) */}
+      {/* 5. SECTION: BOWLS (Screenshot 3) */}
       <section id="section-bowls" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
         
         {/* Section Header with Coral Accent Bar */}
         <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
           <div className="relative">
             <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
-              BUY HOOKAH BOWLS
+              BOWLS
             </h2>
             {/* Solid Coral Underline Bar */}
             <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#f26c60] z-10"></div>
@@ -581,12 +581,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
       </section>
 
-      {/* 6. SECTION: BASES & GLASS */}
+      {/* 6. SECTION: BASES */}
       <section id="section-bases" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
         <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
           <div className="relative">
             <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
-              BASES & GLASS
+              BASES
             </h2>
             <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#3b82f6] z-10"></div>
           </div>
@@ -634,7 +634,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
         <div className="mt-8 pt-6 border-t border-stone-200">
           <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
-            Top Base & Crystal Brands
+            Top Base Brands
           </h3>
           <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
             {baseBrands.map((brand) => (
@@ -657,12 +657,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* 7. SECTION: CHARCOAL & HEAT */}
+      {/* 7. SECTION: COAL */}
       <section id="section-coal" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
         <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
           <div className="relative">
             <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
-              CHARCOAL & HEAT
+              COAL
             </h2>
             <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#f97316] z-10"></div>
           </div>
@@ -710,7 +710,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
         <div className="mt-8 pt-6 border-t border-stone-200">
           <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
-            Top Coconut Charcoal Brands
+            Top Coal Brands
           </h3>
           <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
             {coalBrands.map((brand) => (
@@ -733,12 +733,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* 8. SECTION: ACCESSORIES & HMD */}
+      {/* 8. SECTION: ACCESSORIES */}
       <section id="section-accessories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
         <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
           <div className="relative">
             <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
-              ACCESSORIES & HMD
+              ACCESSORIES
             </h2>
             <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#8b5cf6] z-10"></div>
           </div>
@@ -786,7 +786,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
         <div className="mt-8 pt-6 border-t border-stone-200">
           <h3 className="text-left text-sm font-bold uppercase tracking-wider text-stone-800 mb-5">
-            Top Accessories Brands
+            Top Accessory Brands
           </h3>
           <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
             {accessoryBrands.map((brand) => (
@@ -814,7 +814,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
           <div className="relative">
             <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
-              E-HOOKAH & ELECTRONIC
+              E-HOOKAH
             </h2>
             <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#06b6d4] z-10"></div>
           </div>
@@ -890,7 +890,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
           <div className="relative">
             <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
-              VAPES & POD SYSTEMS
+              VAPES
             </h2>
             <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#ec4899] z-10"></div>
           </div>

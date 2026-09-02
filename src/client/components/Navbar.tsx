@@ -63,7 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
       ]
     },
     {
-      label: t('nav.tobacco', 'Shisha Tobacco'),
+      label: t('nav.tobacco', 'Tobacco'),
       path: '/shop?category=tobacco',
       categorySlug: 'tobacco',
       brands: [
@@ -79,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
       ]
     },
     {
-      label: t('nav.bowls', 'Hookah Bowls'),
+      label: t('nav.bowls', 'Bowls'),
       path: '/shop?category=bowls',
       categorySlug: 'bowls',
       brands: [
@@ -91,7 +91,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
       ]
     },
     {
-      label: t('nav.bases', 'Bases & Glass'),
+      label: t('nav.bases', 'Bases'),
       path: '/shop?category=bases',
       categorySlug: 'bases',
       brands: [
@@ -101,7 +101,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
       ]
     },
     {
-      label: t('nav.charcoal', 'Charcoal & Heat'),
+      label: t('nav.charcoal', 'Coal'),
       path: '/shop?category=coal',
       categorySlug: 'coal',
       brands: [

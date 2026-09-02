@@ -71,7 +71,7 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ onNavi
   const collections: EnrichedCollection[] = [
     {
       id: 'collection-artisan-bases',
-      title: 'Artisan Bases',
+      title: 'Bases',
       subtitle: 'Bohemian Crystal & Russian Drop Vases',
       slug: basesCategory?.slug || 'bases',
       categorySlug: basesCategory?.slug || 'bases',
@@ -85,7 +85,7 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ onNavi
     },
     {
       id: 'collection-handcrafted-bowls',
-      title: 'Handcrafted Bowls',
+      title: 'Bowls',
       subtitle: 'Clay, Glazed Phunnels & Art Series',
       slug: bowlsCategory?.slug || 'bowls',
       categorySlug: bowlsCategory?.slug || 'bowls',
@@ -99,7 +99,7 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ onNavi
     },
     {
       id: 'collection-precision-hookahs',
-      title: 'Precision Hookahs',
+      title: 'Hookahs',
       subtitle: 'Modern Engineering & Aerospace Inox',
       slug: hookahsCategory?.slug || 'hookahs',
       categorySlug: hookahsCategory?.slug || 'hookahs',
@@ -113,7 +113,7 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ onNavi
     },
     {
       id: 'collection-dark-leaf-tobacco',
-      title: 'Dark & Blonde Leaf Shisha',
+      title: 'Tobacco',
       subtitle: 'Authentic Russian & American Blends',
       slug: tobaccoCategory?.slug || 'tobacco',
       categorySlug: tobaccoCategory?.slug || 'tobacco',
@@ -127,7 +127,7 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ onNavi
     },
     {
       id: 'collection-hmd-accessories',
-      title: 'HMD & Accessories',
+      title: 'Accessories',
       subtitle: 'Kaloud, Na Grani & Medical Silicone',
       slug: accessoriesCategory?.slug || 'accessories',
       categorySlug: accessoriesCategory?.slug || 'accessories',

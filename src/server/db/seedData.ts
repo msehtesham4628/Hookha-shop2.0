@@ -279,7 +279,7 @@ export const INITIAL_CATEGORIES: Category[] = [
   },
   {
     id: 'cat-tobacco',
-    name: 'Shisha Tobacco',
+    name: 'Tobacco',
     slug: 'tobacco',
     description: 'Dark leaf, blonde leaf, and whole-leaf cigar shisha tobacco blends featuring world-renowned brands like MustHave, DarkSide, BlackBurn, Tangiers, and Adalya.',
     imageUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=800&auto=format&fit=crop',
@@ -288,12 +288,12 @@ export const INITIAL_CATEGORIES: Category[] = [
     productCount: 26,
     isActive: true,
     sortOrder: 2,
-    seoTitle: 'Shisha Tobacco | MustHave, DarkSide, BlackBurn, Bonche, Tangiers',
+    seoTitle: 'Tobacco | MustHave, DarkSide, BlackBurn, Bonche, Tangiers',
     seoDescription: 'Largest online collection of Russian dark leaf and American shisha tobacco flavors with guaranteed freshness.'
   },
   {
     id: 'cat-bowls',
-    name: 'Hookah Bowls',
+    name: 'Bowls',
     slug: 'bowls',
     description: 'Handcrafted clay, semi-porcelain, and character art bowls designed for high thermal retention, pure flavor, and dense smoke output.',
     imageUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=800&auto=format&fit=crop',
@@ -302,12 +302,12 @@ export const INITIAL_CATEGORIES: Category[] = [
     productCount: 16,
     isActive: true,
     sortOrder: 3,
-    seoTitle: 'Hookah Bowls | Oblako, Kong, Alpaca, Cosmo, Big Maks',
-    seoDescription: 'Shop top-rated hookah phunnel and Turkish bowls from Oblako, Kong, Alpaca, and Cosmo Bowl.'
+    seoTitle: 'Bowls | Oblako, Kong, Alpaca, Cosmo, Big Maks',
+    seoDescription: 'Shop top-rated phunnel and Turkish bowls from Oblako, Kong, Alpaca, and Cosmo Bowl.'
   },
   {
     id: 'cat-bases',
-    name: 'Bases & Glass',
+    name: 'Bases',
     slug: 'bases',
     description: 'Russian drop vases, craft glass, and hand-cut Bohemian crystal bases engineered for maximum stability and visual elegance.',
     imageUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=800&auto=format&fit=crop',
@@ -318,7 +318,7 @@ export const INITIAL_CATEGORIES: Category[] = [
   },
   {
     id: 'cat-coal',
-    name: 'Charcoal & Heat',
+    name: 'Coal',
     slug: 'coal',
     description: '100% natural coconut charcoal cubes, flats, and circle cuts with low ash, zero sulfur chemicals, and up to 90 minutes burn time.',
     imageUrl: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=800&auto=format&fit=crop',
@@ -329,7 +329,7 @@ export const INITIAL_CATEGORIES: Category[] = [
   },
   {
     id: 'cat-accessories',
-    name: 'Accessories & HMD',
+    name: 'Accessories',
     slug: 'accessories',
     description: 'Heat Management Devices (Kaloud, Na Grani), medical-grade silicone hoses, precision tongs, molasses catchers, and cleaning supplies.',
     imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=800&auto=format&fit=crop',
@@ -340,7 +340,7 @@ export const INITIAL_CATEGORIES: Category[] = [
   },
   {
     id: 'cat-ehookah',
-    name: 'E-Hookah & Electronic',
+    name: 'E-Hookah',
     slug: 'e-hookah',
     description: 'Electronic hookah heads and portable shisha vaporizers for convenient, clean, and smoke-free modern sessions.',
     imageUrl: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=800&auto=format&fit=crop',
@@ -351,7 +351,7 @@ export const INITIAL_CATEGORIES: Category[] = [
   },
   {
     id: 'cat-vapes',
-    name: 'Vapes & Pod Systems',
+    name: 'Vapes',
     slug: 'vapes',
     description: 'High performance pod mods, premium disposable vapes, replacement coils, and nic salt devices from world leading vape manufacturers.',
     imageUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-800?q=80&w=800&auto=format&fit=crop',
