@@ -414,9 +414,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
                         </button>
                       </div>
                       <div className="grid grid-cols-1 gap-1">
-                        {link.brands?.map((brand) => (
+                        {link.brands?.map((brand, bIdx) => (
                           <button
-                            key={brand.slug}
+                            key={`${link.categorySlug}-${brand.slug}-${bIdx}`}
                             onClick={() => {
                               setHoveredCategory(null);
                               onNavigate(`/shop?category=${link.categorySlug}&brand=${brand.slug}`);
@@ -488,9 +488,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
                           >
                             View All {link.label} →
                           </button>
-                          {link.brands?.map((brand) => (
+                          {link.brands?.map((brand, bIdx) => (
                             <button
-                              key={brand.slug}
+                              key={`mob-${link.categorySlug}-${brand.slug}-${bIdx}`}
                               onClick={() => {
                                 onNavigate(`/shop?category=${link.categorySlug}&brand=${brand.slug}`);
                                 setMobileMenuOpen(false);

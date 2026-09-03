@@ -326,6 +326,23 @@ class ApiClient {
     });
   }
 
+  public async bulkUpdateProducts(updates: any[]) {
+    return this.request<{
+      success: boolean;
+      data: {
+        total: number;
+        updated: number;
+        skipped: number;
+        updatedItems: any[];
+        errors: string[];
+      };
+      message: string;
+    }>('/admin/products/bulk-update', {
+      method: 'POST',
+      body: JSON.stringify({ updates })
+    });
+  }
+
   public async getAdminOrders(params?: any) {
     const qs = new URLSearchParams(params || {}).toString();
     return this.request<{ success: boolean; data: Order[] }>(`/admin/orders?${qs}`);
@@ -510,6 +527,42 @@ class ApiClient {
       body: JSON.stringify(settings)
     });
   }
+
+  // --- MongoDB Operations ---
+  public async getMongoStatus() {
+    return this.request<{
+      success: boolean;
+      data: {
+        isConnected: boolean;
+        isConnecting: boolean;
+        uriConfigured: boolean;
+        dbName: string;
+        collectionCounts: Record<string, number>;
+        lastSyncAt: string | null;
+        lastError: string | null;
+      };
+    }>('/admin/mongodb/status');
+  }
+
+  public async syncMongo() {
+    return this.request<{
+      success: boolean;
+      message: string;
+      data: any;
+    }>('/admin/mongodb/sync', {
+      method: 'POST'
+    });
+  }
+
+  public async reconnectMongo() {
+    return this.request<{
+      success: boolean;
+      data: any;
+    }>('/admin/mongodb/reconnect', {
+      method: 'POST'
+    });
+  }
+
   public async loginWithPassword(email: string, password: string) {
     return this.login({ email, password });
   }

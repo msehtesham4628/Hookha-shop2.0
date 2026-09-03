@@ -65,6 +65,7 @@ router.post('/register', authRateLimiter, async (req, res) => {
     };
 
     db.users.push(newUser);
+    db.persist('users', newUser);
 
     const accessToken = authService.generateAccessToken(newUser);
     const refreshToken = authService.generateRefreshToken(newUser);

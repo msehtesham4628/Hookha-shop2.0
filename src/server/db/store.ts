@@ -28,6 +28,7 @@ import {
   INITIAL_COUPONS,
   INITIAL_REVIEWS
 } from './seedData.js';
+import { mongoService } from './mongodb.js';
 
 interface StoredOTP {
   identifier: string; // email or phone
@@ -109,7 +110,16 @@ export class DatabaseStore {
       console.warn('[Store] Could not load scrapedProducts.json:', e);
     }
 
-    this.products = catalogProducts.length > 0 ? catalogProducts : [...INITIAL_PRODUCTS];
+    // Merge INITIAL_PRODUCTS and catalogProducts, prioritizing enriched catalog and deduplicating by ID
+    const productMap = new Map<string, Product>();
+    for (const p of INITIAL_PRODUCTS) {
+      productMap.set(p.id, p);
+    }
+    for (const p of catalogProducts) {
+      productMap.set(p.id, p);
+    }
+    this.products = Array.from(productMap.values());
+    console.log(`[Store] Master catalog initialized with ${this.products.length} products.`);
 
     // Sanitize image URLs (strip broken -916x916 WordPress thumbnails and deduplicate)
     this.products.forEach(p => {
@@ -145,31 +155,73 @@ export class DatabaseStore {
       ).length;
     });
 
-    // Populate and compute brand catalog
-    const brandMap = new Map<string, Brand>();
-    INITIAL_BRANDS.forEach(b => brandMap.set(b.name.toLowerCase(), { ...b, productCount: 0 }));
+    // Populate and compute brand catalog with strict deduplication
+    const brandsById = new Map<string, Brand>();
+    const brandLookup = new Map<string, string>(); // alias / name / slug / root -> brand.id
+
+    const registerLookup = (brand: Brand) => {
+      brandsById.set(brand.id, brand);
+      brandLookup.set(brand.id.toLowerCase(), brand.id);
+      brandLookup.set(brand.name.toLowerCase(), brand.id);
+      brandLookup.set(brand.slug.toLowerCase(), brand.id);
+
+      // Normalized base name without common category suffixes
+      const stripped = brand.name
+        .toLowerCase()
+        .replace(/\s+(hookah|tobacco|bowls|bowl|vapes|vape|charcoal|crystal|accessories|coals)$/i, '')
+        .trim();
+      if (stripped) {
+        brandLookup.set(stripped, brand.id);
+      }
+
+      const idRoot = brand.id.replace(/^brand-/, '').toLowerCase();
+      if (idRoot) {
+        brandLookup.set(idRoot, brand.id);
+      }
+    };
+
+    INITIAL_BRANDS.forEach(b => {
+      registerLookup({ ...b, productCount: 0 });
+    });
 
     this.products.forEach(p => {
-      const bName = p.brand || 'Fumare Hookah';
-      const key = bName.toLowerCase();
-      if (!brandMap.has(key)) {
-        const slug = p.brandSlug || bName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        brandMap.set(key, {
-          id: `brand-${slug}`,
+      const bName = (p.brand || 'Fumare Hookah').trim();
+      const slug = p.brandSlug || bName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const brandId = `brand-${slug}`;
+      const searchKey = bName.toLowerCase();
+      const strippedSearchKey = searchKey
+        .replace(/\s+(hookah|tobacco|bowls|bowl|vapes|vape|charcoal|crystal|accessories|coals)$/i, '')
+        .trim();
+
+      // Find matching brand by name, slug, brandId, or stripped root
+      const matchedId =
+        brandLookup.get(searchKey) ||
+        brandLookup.get(strippedSearchKey) ||
+        brandLookup.get(slug) ||
+        brandLookup.get(brandId.toLowerCase());
+
+      if (matchedId && brandsById.has(matchedId)) {
+        const brand = brandsById.get(matchedId)!;
+        brand.productCount = (brand.productCount || 0) + 1;
+      } else if (!brandsById.has(brandId)) {
+        const newBrand: Brand = {
+          id: brandId,
           name: bName,
           slug,
           origin: 'Global Artisan',
           description: `Certified authentic ${bName} merchandise, flavors, and luxury accessories.`,
           logoUrl: p.images[0]?.url || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400',
-          productCount: 0,
+          productCount: 1,
           isActive: true
-        });
+        };
+        registerLookup(newBrand);
+      } else {
+        const brand = brandsById.get(brandId)!;
+        brand.productCount = (brand.productCount || 0) + 1;
       }
-      const existing = brandMap.get(key)!;
-      existing.productCount = (existing.productCount || 0) + 1;
     });
 
-    this.brands = Array.from(brandMap.values()).sort((a, b) => b.productCount - a.productCount);
+    this.brands = Array.from(brandsById.values()).sort((a, b) => b.productCount - a.productCount);
 
     this.coupons = [...INITIAL_COUPONS];
     this.reviews = [...INITIAL_REVIEWS];
@@ -535,6 +587,24 @@ export class DatabaseStore {
     ];
 
     this.isInitialized = true;
+
+    // Asynchronously connect to MongoDB and sync all collections
+    setTimeout(() => {
+      mongoService.syncWithStore(this).catch(() => {});
+    }, 100);
+  }
+
+  // MongoDB Write-Through Persistence
+  public persist<T extends { id?: string }>(collection: string, doc: T) {
+    if (mongoService.getStatus().isConnected) {
+      mongoService.saveDocument(collection, doc).catch(() => {});
+    }
+  }
+
+  public deletePersisted(collection: string, filter: Record<string, any>) {
+    if (mongoService.getStatus().isConnected) {
+      mongoService.deleteDocument(collection, filter).catch(() => {});
+    }
   }
 
   // Audit Logging helper

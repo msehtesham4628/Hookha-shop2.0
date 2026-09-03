@@ -180,12 +180,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
     }
   };
 
-  // 8. Quick Demo Staff / Super Admin Logins
-  const handleQuickDemoLogin = (demoEmail: string, demoPass: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-  };
-
   return (
     <div className="w-full bg-stone-50/50 py-12 min-h-screen flex items-center justify-center">
       <div className="max-w-md w-full mx-auto px-4">
@@ -208,36 +202,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
               {mode === 'otp-sms' && 'SMS One-Time Code'}
               {mode === 'forgot' && 'Reset Vault Password'}
             </h1>
-          </div>
-
-          {/* Quick Demo Selector */}
-          <div className="bg-amber-50/70 border border-amber-200/80 p-3 rounded-xs text-[11px] text-stone-700">
-            <div className="font-bold text-amber-950 flex items-center justify-between mb-1.5">
-              <span>⚡ One-Click Demo Credentials:</span>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('admin@sultanhookah.com', 'Sultan@Admin2026!')}
-                className="bg-amber-900 text-amber-50 px-2 py-1 rounded-xs font-semibold hover:bg-amber-800"
-              >
-                Super Admin
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('manager@sultanhookah.com', 'Sultan@Manager2026!')}
-                className="bg-stone-800 text-white px-2 py-1 rounded-xs font-semibold hover:bg-stone-700"
-              >
-                Store Manager
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('vip@sultanhookah.com', 'Sultan@Vip2026!')}
-                className="bg-stone-200 text-stone-800 px-2 py-1 rounded-xs font-semibold hover:bg-stone-300"
-              >
-                VIP Customer
-              </button>
-            </div>
           </div>
 
           {/* Mode Switch Tabs */}

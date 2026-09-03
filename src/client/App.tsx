@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from './store/useStore.js';
+import { onSync } from './services/sync.js';
 import { LanguageProvider } from './i18n/LanguageContext.js';
 import { Navbar } from './components/Navbar.js';
 import { Footer } from './components/Footer.js';
@@ -33,12 +34,23 @@ export default function App() {
     loadWishlist();
     loadSettings();
 
+    const unsubSync = onSync('*', (event) => {
+      if (event.type === 'SETTINGS_UPDATED') {
+        loadSettings();
+      } else if (event.type === 'ORDER_PLACED' || event.type === 'INVENTORY_UPDATED') {
+        loadCart();
+      }
+    });
+
     const handlePopState = () => {
       setCurrentPath(window.location.pathname + window.location.search);
     };
 
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    return () => {
+      unsubSync();
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, []);
 
   // Router navigation helper
@@ -120,8 +132,8 @@ export default function App() {
       return <ContactPage onNavigate={navigate} />;
     }
 
-    // 10. Admin Suite
-    if (pathOnly === '/admin') {
+    // 10. Admin Suite (Direct /dashboard and /admin routes)
+    if (pathOnly === '/dashboard' || pathOnly === '/admin') {
       return <AdminDashboardPage onNavigate={navigate} />;
     }
 
@@ -129,7 +141,7 @@ export default function App() {
     return <HomePage onNavigate={navigate} />;
   };
 
-  const isAdminRoute = currentPath.startsWith('/admin');
+  const isAdminRoute = currentPath.startsWith('/dashboard') || currentPath.startsWith('/admin');
 
   return (
     <LanguageProvider>

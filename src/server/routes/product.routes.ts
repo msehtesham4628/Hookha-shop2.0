@@ -43,23 +43,62 @@ router.get('/', (req, res) => {
 
     // Category filter
     if (category) {
-      result = result.filter(p => p.categorySlug === category || p.category.toLowerCase() === category.toLowerCase());
-    }
-
-    // Subcategory filter
-    if (subcategory) {
-      const subLower = subcategory.toLowerCase();
+      const catLower = category.toLowerCase().trim();
       result = result.filter(p =>
-        p.subcategory?.toLowerCase() === subLower ||
-        p.subcategory?.toLowerCase().includes(subLower) ||
-        p.tags.some(t => t.toLowerCase().includes(subLower)) ||
-        p.name.toLowerCase().includes(subLower)
+        p.categorySlug === catLower ||
+        p.category.toLowerCase() === catLower ||
+        p.categorySlug.replace(/-/g, ' ') === catLower.replace(/-/g, ' ') ||
+        p.category.toLowerCase().replace(/\s+/g, '-') === catLower
       );
     }
 
-    // Brand filter
+    // Subcategory filter (supports direct subcategory matches, brand-based subcategories, and cleaned term variations)
+    if (subcategory) {
+      const subLower = subcategory.toLowerCase().trim();
+      const subClean = subLower.replace(/\b(tobacco|hookahs?|bowls?|vases?|bases?|charcoals?|coals?|hmd|supplies|accessories)\b/gi, '').trim();
+      result = result.filter(p => {
+        const pSub = (p.subcategory || '').toLowerCase();
+        const pBrand = (p.brand || '').toLowerCase();
+        const pBrandSlug = (p.brandSlug || '').toLowerCase();
+        const pName = (p.name || '').toLowerCase();
+        const pTags = (p.tags || []).map(t => t.toLowerCase());
+
+        return (
+          pSub === subLower ||
+          pSub.includes(subLower) ||
+          (pSub.length > 3 && subLower.includes(pSub)) ||
+          (subClean.length >= 3 && (
+            pSub.includes(subClean) ||
+            pBrand.includes(subClean) ||
+            (pBrand.length >= 3 && subClean.includes(pBrand)) ||
+            pBrandSlug.includes(subClean.replace(/\s+/g, '-')) ||
+            pName.includes(subClean) ||
+            pTags.some(t => t.includes(subClean))
+          )) ||
+          pTags.some(t => t.includes(subLower)) ||
+          pName.includes(subLower)
+        );
+      });
+    }
+
+    // Brand filter (matches brandSlug, exact brand name, and normalized brand slug aliases)
     if (brand) {
-      result = result.filter(p => p.brandSlug === brand || p.brand.toLowerCase() === brand.toLowerCase());
+      const brandLower = brand.toLowerCase().trim();
+      const brandClean = brandLower.replace(/-(tobacco|hookah|bowls|vapes|shisha)$/i, '').replace(/-/g, ' ').trim();
+      result = result.filter(p => {
+        const pBrand = (p.brand || '').toLowerCase();
+        const pBrandSlug = (p.brandSlug || '').toLowerCase();
+        return (
+          pBrandSlug === brandLower ||
+          pBrand === brandLower ||
+          pBrand.replace(/\s+/g, '-') === brandLower ||
+          (brandClean.length >= 3 && (
+            pBrand.includes(brandClean) ||
+            (pBrand.length >= 3 && brandClean.includes(pBrand)) ||
+            pBrandSlug.includes(brandClean.replace(/\s+/g, '-'))
+          ))
+        );
+      });
     }
 
     // Price range

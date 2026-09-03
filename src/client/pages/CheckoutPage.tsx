@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../store/useStore.js';
 import { api } from '../services/api.js';
 import { createCloudOrder } from '../services/firebase.js';
+import { broadcastSync } from '../services/sync.js';
 import {
   ShieldCheck,
   CreditCard,
@@ -113,8 +114,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       });
 
       if (res.success && res.data) {
-        // Sync order with Firebase Firestore
+        // Broadcast new order event so Admin Dashboard and other views reflect immediately
         if (res.data.order) {
+          broadcastSync('ORDER_PLACED', { order: res.data.order });
           try {
             await createCloudOrder(res.data.order);
           } catch (cloudErr) {

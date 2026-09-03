@@ -1,5 +1,6 @@
 import React from 'react';
 import { Shield, Sparkles, Award, Globe, Heart, CheckCircle2 } from 'lucide-react';
+import { SEOHead } from '../components/SEOHead.js';
 
 interface AboutPageProps {
   onNavigate: (path: string) => void;
@@ -8,6 +9,15 @@ interface AboutPageProps {
 export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
   return (
     <div className="w-full bg-stone-50/50 py-12 min-h-screen">
+      <SEOHead
+        title="About Fumare Hookah | Official Master Distributor USA & Russia"
+        ruTitle="О компании Fumare Hookah | Официальный мастер-дистрибьютор в США и РФ"
+        description="Learn about Fumare Hookah, the premier bridge uniting Russian craftsmanship and global hookah enthusiasts with authentic Alpha Hookah, MustHave, DarkSide, and Oblako."
+        ruDescription="Fumare Hookah — крупнейший официальный поставщик и дистрибьютор оригинальных российских кальянов, табака и чаш в США и по всему миру с 2018 года."
+        keywords={['about Fumare Hookah', 'Russian hookahs USA', 'Alpha Hookah distributor', 'MustHave distributor', 'о магазине кальянов', 'Fumare отзывы']}
+        canonicalPath="/about"
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         
         {/* Header Hero */}

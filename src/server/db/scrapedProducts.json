@@ -460932,5 +460932,3544 @@
     "ageRestricted": true,
     "createdAt": "2026-09-03T02:58:25.621Z",
     "updatedAt": "2026-09-03T02:58:25.621Z"
+  },
+  {
+    "id": "prod-wh-musthave-pinkman-1kg",
+    "name": "MustHave 1KG Master Lounge Tin - Pinkman",
+    "slug": "musthave-1kg-master-lounge-tin-pinkman",
+    "sku": "WH-MH-1KG-001",
+    "description": "Commercial wholesale 1000g hermetic lounge tin of world-famous MustHave Pinkman. Authentic Toasted Burley leaf shisha infused with wild strawberries, raspberries, and juicy pink grapefruit. Engineered for high-volume commercial shisha lounges requiring maximum flavor stability and shelf longevity.",
+    "shortDescription": "Wholesale commercial 1KG tin of MustHave Pinkman for professional hookah lounges.",
+    "price": 115.0,
+    "currency": "USD",
+    "brand": "MustHave Tobacco",
+    "brandSlug": "musthave-tobacco",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "1kg Shisha Tins",
+    "images": [
+      {
+        "id": "img-musthave-1kg-master-lounge-tin-pinkman-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "alt": "MustHave 1KG Master Lounge Tin - Pinkman",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-musthave-1kg-master-lounge-tin-pinkman-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+        "alt": "MustHave 1KG Master Lounge Tin - Pinkman",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 45,
+    "lowStockThreshold": 5,
+    "material": "Aged Toasted Burley Leaf",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "1kg Shisha Tins",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "Pinkman",
+      "1KG",
+      "Lounge",
+      "Dark Leaf",
+      "MustHave Tobacco",
+      "MustHave"
+    ],
+    "specifications": [
+      {
+        "label": "Package Size",
+        "value": "1000g / 1KG"
+      },
+      {
+        "label": "Leaf Type",
+        "value": "Toasted Burley"
+      },
+      {
+        "label": "Strength",
+        "value": "Medium-High"
+      },
+      {
+        "label": "Yield",
+        "value": "55-65 Lounge Bowls"
+      },
+      {
+        "label": "Origin",
+        "value": "Russia"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 32,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": true,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-musthave-space-1kg",
+    "name": "MustHave 1KG Master Lounge Tin - Space Flavour",
+    "slug": "musthave-1kg-master-lounge-tin-space-flavour",
+    "sku": "WH-MH-1KG-002",
+    "description": "Commercial 1000g master lounge tin of MustHave Space Flavour. Exotic cosmic fusion of ripe Alphonso mango, tart passionfruit, and sweet lychee. Provides consistent flavor payoff throughout 90+ minute commercial sessions.",
+    "shortDescription": "Wholesale commercial 1KG tin of MustHave Space Flavour mango & passionfruit.",
+    "price": 115.0,
+    "currency": "USD",
+    "brand": "MustHave Tobacco",
+    "brandSlug": "musthave-tobacco",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "1kg Shisha Tins",
+    "images": [
+      {
+        "id": "img-musthave-1kg-master-lounge-tin-space-flavour-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "alt": "MustHave 1KG Master Lounge Tin - Space Flavour",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-musthave-1kg-master-lounge-tin-space-flavour-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+        "alt": "MustHave 1KG Master Lounge Tin - Space Flavour",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 38,
+    "lowStockThreshold": 5,
+    "material": "Aged Toasted Burley Leaf",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "MustHave Tobacco",
+      "1kg Shisha Tins",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "1KG",
+      "Lounge",
+      "Dark Leaf",
+      "Space Flavour",
+      "MustHave"
+    ],
+    "specifications": [
+      {
+        "label": "Package Size",
+        "value": "1000g / 1KG"
+      },
+      {
+        "label": "Leaf Type",
+        "value": "Toasted Burley"
+      },
+      {
+        "label": "Strength",
+        "value": "Medium-High"
+      },
+      {
+        "label": "Yield",
+        "value": "55-65 Bowls"
+      },
+      {
+        "label": "Origin",
+        "value": "Russia"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 24,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": true,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-darkside-supernova-1kg",
+    "name": "DarkSide 1KG Commercial Lounge Tin - Supernova",
+    "slug": "darkside-1kg-commercial-lounge-tin-supernova",
+    "sku": "WH-DS-1KG-001",
+    "description": "Wholesale 1000g master container of DarkSide Core Supernova. Pure cryogenic sub-zero frost menthol without peppermint sweetness. The #1 mixer in professional Russian and European shisha lounges for adding cooling sensation to any signature blend.",
+    "shortDescription": "Wholesale commercial 1KG DarkSide Supernova extreme cryogenic frost mixer.",
+    "price": 118.0,
+    "currency": "USD",
+    "brand": "DarkSide Tobacco",
+    "brandSlug": "darkside-tobacco",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "1kg Shisha Tins",
+    "images": [
+      {
+        "id": "img-darkside-1kg-commercial-lounge-tin-supernova-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+        "alt": "DarkSide 1KG Commercial Lounge Tin - Supernova",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-darkside-1kg-commercial-lounge-tin-supernova-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "alt": "DarkSide 1KG Commercial Lounge Tin - Supernova",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 50,
+    "lowStockThreshold": 5,
+    "material": "Unwashed Boiled Burley Leaf",
+    "tags": [
+      "Supernova",
+      "Wholesale",
+      "DarkSide Tobacco",
+      "Authentic",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "1KG",
+      "Core Line",
+      "Lounge",
+      "DarkSide",
+      "1kg Shisha Tins"
+    ],
+    "specifications": [
+      {
+        "label": "Package Size",
+        "value": "1000g / 1KG"
+      },
+      {
+        "label": "Leaf Type",
+        "value": "Boiled Burley"
+      },
+      {
+        "label": "Strength",
+        "value": "Core (Medium-High)"
+      },
+      {
+        "label": "Function",
+        "value": "Master Mixer / Chilling"
+      },
+      {
+        "label": "Origin",
+        "value": "Russia"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 48,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": true,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-darkside-falling-star-1kg",
+    "name": "DarkSide 1KG Commercial Lounge Tin - Falling Star",
+    "slug": "darkside-1kg-commercial-lounge-tin-falling-star",
+    "sku": "WH-DS-1KG-002",
+    "description": "Professional 1000g commercial bucket of DarkSide Falling Star. Refreshing tropical blend of ripe sweet mango and vibrant passionfruit pulp on dark Burley leaf.",
+    "shortDescription": "Wholesale 1KG DarkSide Falling Star mango & passionfruit commercial tin.",
+    "price": 118.0,
+    "currency": "USD",
+    "brand": "DarkSide Tobacco",
+    "brandSlug": "darkside-tobacco",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "1kg Shisha Tins",
+    "images": [
+      {
+        "id": "img-darkside-1kg-commercial-lounge-tin-falling-star-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+        "alt": "DarkSide 1KG Commercial Lounge Tin - Falling Star",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-darkside-1kg-commercial-lounge-tin-falling-star-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "alt": "DarkSide 1KG Commercial Lounge Tin - Falling Star",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 40,
+    "lowStockThreshold": 5,
+    "material": "Boiled Burley Leaf",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "DarkSide Tobacco",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "Falling Star",
+      "1KG",
+      "Lounge",
+      "DarkSide",
+      "1kg Shisha Tins"
+    ],
+    "specifications": [
+      {
+        "label": "Package Size",
+        "value": "1000g / 1KG"
+      },
+      {
+        "label": "Strength",
+        "value": "Core Line"
+      },
+      {
+        "label": "Yield",
+        "value": "55-65 Bowls"
+      },
+      {
+        "label": "Origin",
+        "value": "Russia"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 19,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": true,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-tangiers-cane-mint-1kg",
+    "name": "Tangiers Noir 1KG Master Lounge Cask - Cane Mint",
+    "slug": "tangiers-noir-1kg-master-lounge-cask-cane-mint",
+    "sku": "WH-TG-1KG-001",
+    "description": "Original American 1000g master lounge cask of legendary Tangiers Noir Cane Mint. Unwashed high-nicotine American dark leaf with intense natural peppermint candy cane oil. The international standard of heavy dark leaf hookah smoking.",
+    "shortDescription": "Authentic 1KG master cask of Tangiers Cane Mint Noir for hookah lounges.",
+    "price": 125.0,
+    "currency": "USD",
+    "brand": "Tangiers",
+    "brandSlug": "tangiers",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "1kg Shisha Tins",
+    "images": [
+      {
+        "id": "img-tangiers-noir-1kg-master-lounge-cask-cane-mint-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/04/tangiers_cane_mint_noir-scaled-324x324.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/04/tangiers_cane_mint_noir-scaled-324x324.jpg.webp",
+        "alt": "Tangiers Noir 1KG Master Lounge Cask - Cane Mint",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-tangiers-noir-1kg-master-lounge-cask-cane-mint-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+        "alt": "Tangiers Noir 1KG Master Lounge Cask - Cane Mint",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 30,
+    "lowStockThreshold": 5,
+    "material": "Unwashed American Dark Leaf",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "Cane Mint",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "Noir",
+      "1KG",
+      "Tangiers",
+      "Lounge",
+      "1kg Shisha Tins"
+    ],
+    "specifications": [
+      {
+        "label": "Package Size",
+        "value": "1000g / 1KG"
+      },
+      {
+        "label": "Leaf",
+        "value": "Unwashed US Dark Leaf"
+      },
+      {
+        "label": "Strength",
+        "value": "Very High"
+      },
+      {
+        "label": "Pack Style",
+        "value": "Dense Pack"
+      },
+      {
+        "label": "Origin",
+        "value": "San Diego, USA"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 55,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": true,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-blackburn-ananas-1kg",
+    "name": "BlackBurn 1KG Overdose Bulk Lounge Tin - Ananas Shock",
+    "slug": "blackburn-1kg-overdose-bulk-lounge-tin-ananas-shock",
+    "sku": "WH-BB-1KG-001",
+    "description": "Commercial 1000g bulk tin of BlackBurn Ananas Shock. Hyper-sour, candy-sweet pineapple pulp engineered for heavy dark leaf lovers. Unyielding heat resistance under 3-4 26mm coals.",
+    "shortDescription": "Wholesale 1KG BlackBurn Ananas Shock sour pineapple dark leaf shisha.",
+    "price": 115.0,
+    "currency": "USD",
+    "brand": "BlackBurn Tobacco",
+    "brandSlug": "blackburn-tobacco",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "1kg Shisha Tins",
+    "images": [
+      {
+        "id": "img-blackburn-1kg-overdose-bulk-lounge-tin-ananas-shock-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/06/blackburn_ananas.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/06/blackburn_ananas.jpg.webp",
+        "alt": "BlackBurn 1KG Overdose Bulk Lounge Tin - Ananas Shock",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-blackburn-1kg-overdose-bulk-lounge-tin-ananas-shock-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "alt": "BlackBurn 1KG Overdose Bulk Lounge Tin - Ananas Shock",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 35,
+    "lowStockThreshold": 5,
+    "material": "Fermented Dark Leaf Blend",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "1kg Shisha Tins",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "1KG",
+      "BlackBurn Tobacco",
+      "BlackBurn",
+      "Overdose",
+      "Ananas Shock"
+    ],
+    "specifications": [
+      {
+        "label": "Package Size",
+        "value": "1000g / 1KG"
+      },
+      {
+        "label": "Flavor Profile",
+        "value": "Sour Candied Pineapple"
+      },
+      {
+        "label": "Heat Tolerance",
+        "value": "Ultra High"
+      },
+      {
+        "label": "Origin",
+        "value": "Russia"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 28,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": true,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-alfakher-two-apples-1kg",
+    "name": "Al Fakher 1KG Commercial Lounge Bucket - Two Apples",
+    "slug": "al-fakher-1kg-commercial-lounge-bucket-two-apples",
+    "sku": "WH-AF-1KG-001",
+    "description": "The legendary global benchmark: Al Fakher Two Apples with Anise in a 1000g commercial lounge tub. Premium golden Virginia leaf with traditional double apple sweetness and rich herbal anise finish.",
+    "shortDescription": "Wholesale 1000g bucket of authentic Al Fakher Two Apples shisha.",
+    "price": 68.0,
+    "currency": "USD",
+    "brand": "Al Fakher Shisha",
+    "brandSlug": "al-fakher-shisha",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "1kg Shisha Tins",
+    "images": [
+      {
+        "id": "img-al-fakher-1kg-commercial-lounge-bucket-two-apples-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/alfakher-two-apples.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/alfakher-two-apples.jpg.webp",
+        "alt": "Al Fakher 1KG Commercial Lounge Bucket - Two Apples",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-al-fakher-1kg-commercial-lounge-bucket-two-apples-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "alt": "Al Fakher 1KG Commercial Lounge Bucket - Two Apples",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 75,
+    "lowStockThreshold": 5,
+    "material": "Golden Virginia Leaf",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "Two Apples",
+      "Double Apple",
+      "Al Fakher",
+      "Blonde Leaf",
+      "1KG",
+      "Al Fakher Shisha",
+      "1kg Shisha Tins"
+    ],
+    "specifications": [
+      {
+        "label": "Package Size",
+        "value": "1000g / 1KG"
+      },
+      {
+        "label": "Leaf Type",
+        "value": "French Virginia"
+      },
+      {
+        "label": "Strength",
+        "value": "Mild-Medium"
+      },
+      {
+        "label": "Origin",
+        "value": "Ajman, UAE"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 64,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": true,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-element-moroz-1kg",
+    "name": "Element Earth 1KG Master Lounge Tin - Moroz Cooling",
+    "slug": "element-earth-1kg-master-lounge-tin-moroz-cooling",
+    "sku": "WH-EL-1KG-001",
+    "description": "Wholesale 1000g master container of Element Earth Moroz. Deep Russian winter chill additive that adds crisp frosty coldness without altering the underlying shisha flavor notes.",
+    "shortDescription": "Wholesale 1KG Element Earth Moroz frost cooling additive.",
+    "price": 110.0,
+    "currency": "USD",
+    "brand": "Element Tobacco",
+    "brandSlug": "element-tobacco",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "1kg Shisha Tins",
+    "images": [
+      {
+        "id": "img-element-earth-1kg-master-lounge-tin-moroz-cooling-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/07/element_moroz.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/07/element_moroz.jpg.webp",
+        "alt": "Element Earth 1KG Master Lounge Tin - Moroz Cooling",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-element-earth-1kg-master-lounge-tin-moroz-cooling-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+        "alt": "Element Earth 1KG Master Lounge Tin - Moroz Cooling",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 40,
+    "lowStockThreshold": 5,
+    "material": "Burley Earth Line",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "Element Tobacco",
+      "1KG",
+      "Lounge",
+      "1kg Shisha Tins",
+      "Earth Line",
+      "Element",
+      "Moroz"
+    ],
+    "specifications": [
+      {
+        "label": "Package Size",
+        "value": "1000g / 1KG"
+      },
+      {
+        "label": "Line",
+        "value": "Earth"
+      },
+      {
+        "label": "Function",
+        "value": "Cooling Enhancer"
+      },
+      {
+        "label": "Origin",
+        "value": "Russia"
+      }
+    ],
+    "rating": 4.8,
+    "reviewCount": 21,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": true,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-cocoloco-20kg-case",
+    "name": "Coco Loco 20kg Master Lounge Carton - 26mm Coconut Charcoal",
+    "slug": "coco-loco-20kg-master-lounge-carton-26mm",
+    "sku": "WH-CL-20KG-001",
+    "description": "Master bulk wholesale box containing 20 individual 1kg boxes (1,440 premium 26mm natural coconut cubes). Zero odor, less than 2% white ash residue, and 90+ minutes burning duration. Certified for continuous commercial lounge use.",
+    "shortDescription": "Wholesale 20kg master case of Coco Loco 26mm natural coconut hookah charcoal.",
+    "price": 119.0,
+    "currency": "USD",
+    "brand": "Coco Loco",
+    "brandSlug": "coco-loco",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "20kg Master Coal Cases",
+    "images": [
+      {
+        "id": "img-coco-loco-20kg-master-lounge-carton-26mm-0",
+        "url": "https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Coco Loco 20kg Master Lounge Carton - 26mm Coconut Charcoal",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-coco-loco-20kg-master-lounge-carton-26mm-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "alt": "Coco Loco 20kg Master Lounge Carton - 26mm Coconut Charcoal",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 85,
+    "lowStockThreshold": 5,
+    "material": "100% Compressed Coconut Shells",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "Master Case",
+      "20kg Master Coal Cases",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "20KG",
+      "Lounge",
+      "Coconut Charcoal",
+      "Coco Loco"
+    ],
+    "specifications": [
+      {
+        "label": "Total Weight",
+        "value": "20 Kilograms (44.1 lbs)"
+      },
+      {
+        "label": "Cube Size",
+        "value": "26x26x26 mm"
+      },
+      {
+        "label": "Cube Count",
+        "value": "1,440 pieces"
+      },
+      {
+        "label": "Ash Content",
+        "value": "< 2.0%"
+      },
+      {
+        "label": "Origin",
+        "value": "Indonesia"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 82,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-onenation-20kg-case",
+    "name": "One Nation 20kg Commercial Lounge Carton - 26mm Cubes",
+    "slug": "one-nation-20kg-commercial-lounge-carton-26mm",
+    "sku": "WH-ON-20KG-001",
+    "description": "German engineered 20kg master carton containing 20x 1kg packs of One Nation 26mm premium natural coconut charcoal. Uniform cube density ensures zero cracking or sparking on commercial spiral burners.",
+    "shortDescription": "Wholesale 20kg master carton of One Nation 26mm coconut charcoal cubes.",
+    "price": 115.0,
+    "currency": "USD",
+    "brand": "One Nation",
+    "brandSlug": "one-nation",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "20kg Master Coal Cases",
+    "images": [
+      {
+        "id": "img-one-nation-20kg-commercial-lounge-carton-26mm-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/11/one_nation_26mm.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/11/one_nation_26mm.jpg.webp",
+        "alt": "One Nation 20kg Commercial Lounge Carton - 26mm Cubes",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-one-nation-20kg-commercial-lounge-carton-26mm-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "alt": "One Nation 20kg Commercial Lounge Carton - 26mm Cubes",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 60,
+    "lowStockThreshold": 5,
+    "material": "100% Natural Coconut Shell",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "Fumare Hookah",
+      "One Nation",
+      "Wholesale Lounge Supplies",
+      "20KG",
+      "26mm",
+      "Lounge",
+      "20kg Master Coal Cases",
+      "Master Carton"
+    ],
+    "specifications": [
+      {
+        "label": "Total Weight",
+        "value": "20 Kilograms"
+      },
+      {
+        "label": "Cube Size",
+        "value": "26mm"
+      },
+      {
+        "label": "Box Count",
+        "value": "20 x 1kg boxes"
+      },
+      {
+        "label": "Origin",
+        "value": "Indonesia / Germany"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 44,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-oasis-20kg-case",
+    "name": "Oasis Charcoal 20kg Commercial Case - 28mm Jumbo Cubes",
+    "slug": "oasis-charcoal-20kg-commercial-case-28mm",
+    "sku": "WH-OA-20KG-001",
+    "description": "Heavy thermal output 20kg master carton of Oasis 28mm Jumbo coconut cubes. Ideal for high-heat Russian dark leaf bowls (MustHave, DarkSide, BlackBurn) where maximum heat retention and minimal coal changes are demanded.",
+    "shortDescription": "Wholesale 20kg master case of Oasis 28mm Jumbo coconut hookah coals.",
+    "price": 122.0,
+    "currency": "USD",
+    "brand": "Oasis Charcoal",
+    "brandSlug": "oasis-charcoal",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "20kg Master Coal Cases",
+    "images": [
+      {
+        "id": "img-oasis-charcoal-20kg-commercial-case-28mm-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/10/oasis_charcoal_26mm.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/10/oasis_charcoal_26mm.jpg.webp",
+        "alt": "Oasis Charcoal 20kg Commercial Case - 28mm Jumbo Cubes",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-oasis-charcoal-20kg-commercial-case-28mm-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "alt": "Oasis Charcoal 20kg Commercial Case - 28mm Jumbo Cubes",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 50,
+    "lowStockThreshold": 5,
+    "material": "100% Compressed Coconut Shells",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "Oasis Charcoal",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "High Heat",
+      "20KG",
+      "20kg Master Coal Cases",
+      "28mm Jumbo"
+    ],
+    "specifications": [
+      {
+        "label": "Total Weight",
+        "value": "20 Kilograms"
+      },
+      {
+        "label": "Cube Size",
+        "value": "28x28x28 mm Jumbo"
+      },
+      {
+        "label": "Burn Duration",
+        "value": "100+ minutes"
+      },
+      {
+        "label": "Origin",
+        "value": "Indonesia"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 37,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-shaman-20kg-case",
+    "name": "Shaman Charcoal 20kg Commercial Lounge Box - 26mm",
+    "slug": "shaman-charcoal-20kg-commercial-lounge-box-26mm",
+    "sku": "WH-SH-20KG-001",
+    "description": "Commercial 20kg bulk lounge master case of Shaman 26mm coconut coals. Ultra-dense briquettes producing minimal white ash and odorless combustion. Perfect for busy shisha bars.",
+    "shortDescription": "Wholesale 20kg master box of Shaman 26mm coconut coals.",
+    "price": 112.0,
+    "currency": "USD",
+    "brand": "Shaman Coal",
+    "brandSlug": "shaman-coal",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "20kg Master Coal Cases",
+    "images": [
+      {
+        "id": "img-shaman-charcoal-20kg-commercial-lounge-box-26mm-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/09/shaman_coal_26.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/09/shaman_coal_26.jpg.webp",
+        "alt": "Shaman Charcoal 20kg Commercial Lounge Box - 26mm",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-shaman-charcoal-20kg-commercial-lounge-box-26mm-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "alt": "Shaman Charcoal 20kg Commercial Lounge Box - 26mm",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 45,
+    "lowStockThreshold": 5,
+    "material": "Natural Coconut Shell",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "20KG",
+      "Shaman Coal",
+      "Lounge",
+      "20kg Master Coal Cases"
+    ],
+    "specifications": [
+      {
+        "label": "Total Weight",
+        "value": "20kg"
+      },
+      {
+        "label": "Cube Size",
+        "value": "26mm"
+      },
+      {
+        "label": "Ash",
+        "value": "< 2.2%"
+      },
+      {
+        "label": "Origin",
+        "value": "Indonesia"
+      }
+    ],
+    "rating": 4.8,
+    "reviewCount": 26,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-alpha-tips-500",
+    "name": "Alpha Hookah Bulk Disposable Tips (500-Pack Dispensary)",
+    "slug": "alpha-hookah-bulk-disposable-tips-500-pack",
+    "sku": "WH-ACC-TIPS-500",
+    "description": "Commercial dispensary carton containing 500 individually wrapped hygienic mouthpiece tips from Alpha Hookah. Engineered with dual-diameter fitment compatible with all slim and wide hookah handles.",
+    "shortDescription": "500-pack individually wrapped Alpha Hookah hygienic disposable tips.",
+    "price": 34.99,
+    "currency": "USD",
+    "brand": "Alpha Hookah",
+    "brandSlug": "alpha-hookah",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "Disposable Lounge Mouthpieces",
+    "images": [
+      {
+        "id": "img-alpha-hookah-bulk-disposable-tips-500-pack-0",
+        "url": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Alpha Hookah Bulk Disposable Tips (500-Pack Dispensary)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-alpha-hookah-bulk-disposable-tips-500-pack-1",
+        "url": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Alpha Hookah Bulk Disposable Tips (500-Pack Dispensary)",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 120,
+    "lowStockThreshold": 5,
+    "material": "Food-Grade Recyclable PP Plastic",
+    "tags": [
+      "Authentic",
+      "Alpha Hookah",
+      "Hygienic",
+      "Wholesale",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "Mouthpieces",
+      "Disposable Tips",
+      "500 Pack",
+      "Disposable Lounge Mouthpieces"
+    ],
+    "specifications": [
+      {
+        "label": "Quantity",
+        "value": "500 Pieces"
+      },
+      {
+        "label": "Packaging",
+        "value": "Individually Heat Sealed"
+      },
+      {
+        "label": "Fitment",
+        "value": "Universal Conical"
+      },
+      {
+        "label": "Certification",
+        "value": "FDA Food Contact Safe"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 52,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-fumare-hygienic-1000",
+    "name": "Fumare Individually Wrapped Lounge Mouthpieces (1,000-Pack Master Box)",
+    "slug": "fumare-individually-wrapped-lounge-mouthpieces-1000",
+    "sku": "WH-FUM-TIPS-1000",
+    "description": "Master commercial case containing 1,000 individually sealed food-grade polypropylene hookah tips. Ergonomic curved rim prevents mouth fatigue while maintaining sanitary safety standards.",
+    "shortDescription": "Wholesale 1000-pack individually wrapped hygienic hookah mouthpieces.",
+    "price": 48.0,
+    "currency": "USD",
+    "brand": "Fumare Hookah",
+    "brandSlug": "fumare-hookah",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "Disposable Lounge Mouthpieces",
+    "images": [
+      {
+        "id": "img-fumare-individually-wrapped-lounge-mouthpieces-1000-0",
+        "url": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Fumare Individually Wrapped Lounge Mouthpieces (1,000-Pack Master Box)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-fumare-individually-wrapped-lounge-mouthpieces-1000-1",
+        "url": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Fumare Individually Wrapped Lounge Mouthpieces (1,000-Pack Master Box)",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 150,
+    "lowStockThreshold": 5,
+    "material": "BPA-Free Food Grade Polypropylene",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "Hygienic",
+      "Fumare",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "Sanitary",
+      "Mouthpieces",
+      "1000 Pack",
+      "Disposable Lounge Mouthpieces"
+    ],
+    "specifications": [
+      {
+        "label": "Quantity",
+        "value": "1,000 Individually Wrapped Tips"
+      },
+      {
+        "label": "Color",
+        "value": "Crystal Clear & Neon Mix"
+      },
+      {
+        "label": "Compliance",
+        "value": "HACCP Sanitary Certified"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 74,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-silicone-neon-tips-250",
+    "name": "Neon Soft-Touch Silicone Lounge Tip Assortment (250-Pack)",
+    "slug": "neon-soft-touch-silicone-lounge-tip-assortment-250",
+    "sku": "WH-SIL-TIPS-250",
+    "description": "Premium ultra-soft medical silicone personal tips in vibrant UV neon colors. Soft on lips, washable, and flexible enough to fit tightly over both metal and resin mouthpieces.",
+    "shortDescription": "250-pack neon soft silicone hygienic mouthpieces for VIP lounge service.",
+    "price": 39.5,
+    "currency": "USD",
+    "brand": "Blade Hookah",
+    "brandSlug": "blade-hookah",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "Disposable Lounge Mouthpieces",
+    "images": [
+      {
+        "id": "img-neon-soft-touch-silicone-lounge-tip-assortment-250-0",
+        "url": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Neon Soft-Touch Silicone Lounge Tip Assortment (250-Pack)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-neon-soft-touch-silicone-lounge-tip-assortment-250-1",
+        "url": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Neon Soft-Touch Silicone Lounge Tip Assortment (250-Pack)",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 90,
+    "lowStockThreshold": 5,
+    "material": "Medical Grade Silicone",
+    "tags": [
+      "Soft Touch",
+      "Authentic",
+      "Wholesale",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "Silicone Tips",
+      "Disposable Lounge Mouthpieces",
+      "VIP Lounge",
+      "Blade Hookah",
+      "Neon"
+    ],
+    "specifications": [
+      {
+        "label": "Quantity",
+        "value": "250 Units"
+      },
+      {
+        "label": "Material",
+        "value": "100% Medical Grade Soft Silicone"
+      },
+      {
+        "label": "Features",
+        "value": "Soft-Touch, UV Neon Glow"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 31,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-lounge-starter-pro-5x",
+    "name": "Lounge Pro Commercial Hookah Starter System (5x Hookahs + Bowls + HMDs + 20kg Coal)",
+    "slug": "lounge-pro-commercial-hookah-starter-system-5x",
+    "sku": "WH-SET-PRO-5X",
+    "description": "Turnkey commercial hookah setup package for new and expanding shisha lounges. Includes 5x Alpha Hookah Model X stems, 5x Russian craft drop glass vases, 5x Oblako Phunnel bowls, 5x Na Grani stainless steel HMDs, 5x soft-touch silicone hose sets, and 1x 20kg master box of Coco Loco 26mm coals.",
+    "shortDescription": "Complete 5-station turnkey commercial hookah lounge starter package.",
+    "price": 1190.0,
+    "currency": "USD",
+    "brand": "Alpha Hookah",
+    "brandSlug": "alpha-hookah",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "Commercial Starter Sets",
+    "images": [
+      {
+        "id": "img-lounge-pro-commercial-hookah-starter-system-5x-0",
+        "url": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Lounge Pro Commercial Hookah Starter System (5x Hookahs + Bowls + HMDs + 20kg Coal)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-lounge-pro-commercial-hookah-starter-system-5x-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/alpha_hookah_beat_grey_base_3_web.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/alpha_hookah_beat_grey_base_3_web.jpg.webp",
+        "alt": "Lounge Pro Commercial Hookah Starter System (5x Hookahs + Bowls + HMDs + 20kg Coal)",
+        "isPrimary": false,
+        "sortOrder": 2
+      },
+      {
+        "id": "img-lounge-pro-commercial-hookah-starter-system-5x-2",
+        "url": "https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Lounge Pro Commercial Hookah Starter System (5x Hookahs + Bowls + HMDs + 20kg Coal)",
+        "isPrimary": false,
+        "sortOrder": 3
+      }
+    ],
+    "stock": 15,
+    "lowStockThreshold": 5,
+    "material": "AISI 304 Stainless Steel & German Polyacetal",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "Alpha Hookah",
+      "Commercial Starter Sets",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "Turnkey Set",
+      "Commercial Hookahs",
+      "Lounge Starter",
+      "5 Pack"
+    ],
+    "specifications": [
+      {
+        "label": "Hookah Units",
+        "value": "5x Alpha Hookah Model X Complete"
+      },
+      {
+        "label": "Bases",
+        "value": "5x Russian Heavy Craft Drop Bases"
+      },
+      {
+        "label": "Bowls",
+        "value": "5x Oblako Phunnel M"
+      },
+      {
+        "label": "HMDs",
+        "value": "5x Na Grani Stainless"
+      },
+      {
+        "label": "Charcoal",
+        "value": "1x 20kg Coco Loco Master Case"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 19,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-commercial-burner-3000w",
+    "name": "Commercial High-Output Double-Tier 3000W Charcoal Burner",
+    "slug": "commercial-high-output-double-tier-3000w-charcoal-burner",
+    "sku": "WH-BURN-3000W",
+    "description": "Heavy-duty stainless steel commercial hookah charcoal stove with dual-tier heating coils. Ignites up to 60 26mm coconut cubes simultaneously in under 7 minutes. Built with safety thermal cutoff and removable heat shield.",
+    "shortDescription": "High-power 3000W commercial double-tier shisha charcoal burner.",
+    "price": 165.0,
+    "currency": "USD",
+    "brand": "Fumare Hookah",
+    "brandSlug": "fumare-hookah",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "Commercial Starter Sets",
+    "images": [
+      {
+        "id": "img-commercial-high-output-double-tier-3000w-charcoal-burner-0",
+        "url": "https://images.unsplash.com/photo-1584905066893-7d5c142ba4e1?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1584905066893-7d5c142ba4e1?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Commercial High-Output Double-Tier 3000W Charcoal Burner",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-commercial-high-output-double-tier-3000w-charcoal-burner-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "alt": "Commercial High-Output Double-Tier 3000W Charcoal Burner",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 28,
+    "lowStockThreshold": 5,
+    "material": "Heavy Duty Stainless Steel",
+    "tags": [
+      "3000W",
+      "Authentic",
+      "Commercial Starter Sets",
+      "Lounge Hardware",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "Coal Stove",
+      "Commercial Burner",
+      "Double Tier"
+    ],
+    "specifications": [
+      {
+        "label": "Power",
+        "value": "3,000 Watts (220V/110V Commercial)"
+      },
+      {
+        "label": "Capacity",
+        "value": "60 Cubes Simultaneously"
+      },
+      {
+        "label": "Ignition Time",
+        "value": "6-8 Minutes"
+      },
+      {
+        "label": "Construction",
+        "value": "Brushed Stainless Chassis"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 35,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-wh-hmd-master-pack-10x",
+    "name": "Heat Management Master Lounge Pack (10x Na Grani Stainless HMDs)",
+    "slug": "heat-management-master-lounge-pack-10x-na-grani",
+    "sku": "WH-HMD-10X",
+    "description": "Lounge wholesale value bundle of 10 authentic Na Grani Heat Management Devices crafted from solid AISI 304 stainless steel. Will never warp, oxidize, or lose thermal conductivity under continuous commercial use.",
+    "shortDescription": "Commercial 10-pack of Na Grani stainless steel heat management devices.",
+    "price": 380.0,
+    "currency": "USD",
+    "brand": "Na Grani",
+    "brandSlug": "na-grani",
+    "category": "Wholesale Lounge Supplies",
+    "categorySlug": "wholesale-supplies",
+    "subcategory": "Commercial Starter Sets",
+    "images": [
+      {
+        "id": "img-heat-management-master-lounge-pack-10x-na-grani-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/05/3oxk1m5pb7dwuja19nv80umyciasxkbb.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/05/3oxk1m5pb7dwuja19nv80umyciasxkbb.jpg.webp",
+        "alt": "Heat Management Master Lounge Pack (10x Na Grani Stainless HMDs)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-heat-management-master-lounge-pack-10x-na-grani-1",
+        "url": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Heat Management Master Lounge Pack (10x Na Grani Stainless HMDs)",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 25,
+    "lowStockThreshold": 5,
+    "material": "Solid AISI 304 Stainless Steel",
+    "tags": [
+      "Authentic",
+      "Wholesale",
+      "Commercial Starter Sets",
+      "Fumare Hookah",
+      "Wholesale Lounge Supplies",
+      "Commercial",
+      "Heat Management",
+      "Na Grani",
+      "HMD 10 Pack"
+    ],
+    "specifications": [
+      {
+        "label": "Quantity",
+        "value": "10x Na Grani HMDs"
+      },
+      {
+        "label": "Material",
+        "value": "Solid Stainless Steel"
+      },
+      {
+        "label": "Savings",
+        "value": "Save 25% vs single unit MSRP"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 22,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-coal-onenation-26mm-1kg",
+    "name": "One Nation 26mm Natural Coconut Charcoal (1kg / 72 Cubes)",
+    "slug": "one-nation-26mm-natural-coconut-charcoal-1kg",
+    "sku": "COAL-ON-26-1KG",
+    "description": "Premium German-designed natural coconut shisha charcoal. 26mm cubic briquettes pressed from 100% natural coconut husk. Produces dense white ash, zero chemical fumes, and odorless burn for up to 85 minutes.",
+    "shortDescription": "One Nation 26mm coconut charcoal cubes 1kg box (72 pieces).",
+    "price": 12.99,
+    "currency": "USD",
+    "brand": "One Nation",
+    "brandSlug": "one-nation",
+    "category": "Coal",
+    "categorySlug": "coal",
+    "subcategory": "One Nation",
+    "images": [
+      {
+        "id": "img-one-nation-26mm-natural-coconut-charcoal-1kg-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/11/one_nation_26mm.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/11/one_nation_26mm.jpg.webp",
+        "alt": "One Nation 26mm Natural Coconut Charcoal (1kg / 72 Cubes)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-one-nation-26mm-natural-coconut-charcoal-1kg-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "alt": "One Nation 26mm Natural Coconut Charcoal (1kg / 72 Cubes)",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 180,
+    "lowStockThreshold": 5,
+    "material": "100% Compressed Coconut Husk",
+    "tags": [
+      "Authentic",
+      "Fumare Hookah",
+      "One Nation",
+      "26mm",
+      "Coal",
+      "26mm Coconut Cubes",
+      "72 Cubes",
+      "Coconut Charcoal"
+    ],
+    "specifications": [
+      {
+        "label": "Weight",
+        "value": "1 Kilogram (2.2 lbs)"
+      },
+      {
+        "label": "Cube Size",
+        "value": "26x26x26 mm"
+      },
+      {
+        "label": "Piece Count",
+        "value": "72 Cubes"
+      },
+      {
+        "label": "Ash",
+        "value": "< 2%"
+      },
+      {
+        "label": "Origin",
+        "value": "Indonesia / Germany"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 45,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-coal-onenation-28mm-1kg",
+    "name": "One Nation 28mm Jumbo Coconut Charcoal (1kg / 48 Cubes)",
+    "slug": "one-nation-28mm-jumbo-coconut-charcoal-1kg",
+    "sku": "COAL-ON-28-1KG",
+    "description": "Jumbo 28mm natural coconut charcoal cubes from One Nation. Designed for heavy dark leaf bowls and open-air smoking where higher thermal output and extended session duration are needed.",
+    "shortDescription": "One Nation 28mm Jumbo natural coconut charcoal cubes 1kg box.",
+    "price": 13.99,
+    "currency": "USD",
+    "brand": "One Nation",
+    "brandSlug": "one-nation",
+    "category": "Coal",
+    "categorySlug": "coal",
+    "subcategory": "28mm Jumbo Cubes",
+    "images": [
+      {
+        "id": "img-one-nation-28mm-jumbo-coconut-charcoal-1kg-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/11/one_nation_26mm.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/11/one_nation_26mm.jpg.webp",
+        "alt": "One Nation 28mm Jumbo Coconut Charcoal (1kg / 48 Cubes)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-one-nation-28mm-jumbo-coconut-charcoal-1kg-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "alt": "One Nation 28mm Jumbo Coconut Charcoal (1kg / 48 Cubes)",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 120,
+    "lowStockThreshold": 5,
+    "material": "100% Natural Coconut Shell",
+    "tags": [
+      "Authentic",
+      "Fumare Hookah",
+      "One Nation",
+      "Jumbo Cubes",
+      "High Heat",
+      "28mm Jumbo Cubes",
+      "Coal",
+      "28mm Jumbo"
+    ],
+    "specifications": [
+      {
+        "label": "Weight",
+        "value": "1kg"
+      },
+      {
+        "label": "Cube Size",
+        "value": "28x28x28 mm"
+      },
+      {
+        "label": "Burn Time",
+        "value": "95+ minutes"
+      },
+      {
+        "label": "Origin",
+        "value": "Indonesia"
+      }
+    ],
+    "rating": 4.8,
+    "reviewCount": 32,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-coal-oasis-26mm-1kg",
+    "name": "Oasis Charcoal 26mm Natural Coconut Charcoal (1kg / 72 Cubes)",
+    "slug": "oasis-charcoal-26mm-natural-coconut-charcoal-1kg",
+    "sku": "COAL-OA-26-1KG",
+    "description": "High-calorific natural coconut hookah briquettes formulated in Russia and manufactured in Sumatra. Offers razor-sharp cube edges that resist breaking when handled with tongs.",
+    "shortDescription": "Oasis 26mm coconut charcoal cubes 1kg box.",
+    "price": 12.5,
+    "currency": "USD",
+    "brand": "Oasis Charcoal",
+    "brandSlug": "oasis-charcoal",
+    "category": "Coal",
+    "categorySlug": "coal",
+    "subcategory": "Oasis Charcoal",
+    "images": [
+      {
+        "id": "img-oasis-charcoal-26mm-natural-coconut-charcoal-1kg-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/10/oasis_charcoal_26mm.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/10/oasis_charcoal_26mm.jpg.webp",
+        "alt": "Oasis Charcoal 26mm Natural Coconut Charcoal (1kg / 72 Cubes)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-oasis-charcoal-26mm-natural-coconut-charcoal-1kg-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "alt": "Oasis Charcoal 26mm Natural Coconut Charcoal (1kg / 72 Cubes)",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 150,
+    "lowStockThreshold": 5,
+    "material": "Pure Coconut Shell",
+    "tags": [
+      "Authentic",
+      "Oasis Charcoal",
+      "Fumare Hookah",
+      "26mm",
+      "Coal",
+      "26mm Coconut Cubes",
+      "Russian Standard"
+    ],
+    "specifications": [
+      {
+        "label": "Weight",
+        "value": "1kg"
+      },
+      {
+        "label": "Size",
+        "value": "26mm"
+      },
+      {
+        "label": "Calorific Value",
+        "value": "> 7500 kcal/kg"
+      },
+      {
+        "label": "Origin",
+        "value": "Indonesia / Russia"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 39,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-coal-shaman-26mm-1kg",
+    "name": "Shaman 26mm Premium Natural Coconut Charcoal (1kg)",
+    "slug": "shaman-26mm-premium-natural-coconut-charcoal-1kg",
+    "sku": "COAL-SH-26-1KG",
+    "description": "Shaman 26mm coconut cubes made with extra-fine triple-milled coconut charcoal. Minimal ash, neutral taste, and exceptional longevity under Heat Management Devices.",
+    "shortDescription": "Shaman premium natural coconut charcoal 26mm 1kg.",
+    "price": 11.99,
+    "currency": "USD",
+    "brand": "Shaman Coal",
+    "brandSlug": "shaman-coal",
+    "category": "Coal",
+    "categorySlug": "coal",
+    "subcategory": "Shaman Coal",
+    "images": [
+      {
+        "id": "img-shaman-26mm-premium-natural-coconut-charcoal-1kg-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/09/shaman_coal_26.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/09/shaman_coal_26.jpg.webp",
+        "alt": "Shaman 26mm Premium Natural Coconut Charcoal (1kg)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-shaman-26mm-premium-natural-coconut-charcoal-1kg-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "alt": "Shaman 26mm Premium Natural Coconut Charcoal (1kg)",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 140,
+    "lowStockThreshold": 5,
+    "material": "100% Compressed Coconut Shell",
+    "tags": [
+      "Coconut Coals",
+      "Authentic",
+      "Fumare Hookah",
+      "Shaman Coal",
+      "26mm",
+      "Coal",
+      "26mm Coconut Cubes"
+    ],
+    "specifications": [
+      {
+        "label": "Weight",
+        "value": "1kg"
+      },
+      {
+        "label": "Pieces",
+        "value": "72 Cubes"
+      },
+      {
+        "label": "Ash",
+        "value": "Light Gray < 2.3%"
+      },
+      {
+        "label": "Origin",
+        "value": "Indonesia"
+      }
+    ],
+    "rating": 4.8,
+    "reviewCount": 29,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-coal-cocoloco-28mm-1kg",
+    "name": "Coco Loco 28mm Jumbo Coconut Charcoal (1kg / 48 Cubes)",
+    "slug": "coco-loco-28mm-jumbo-coconut-charcoal-1kg",
+    "sku": "COAL-CL-28-1KG",
+    "description": "Coco Loco's heavyweight 28mm jumbo cubes. Supplies steady, intense heat without blackening on the bottom when placed in Kaloud or Na Grani HMDs.",
+    "shortDescription": "Coco Loco 28mm Jumbo natural coconut charcoal 1kg.",
+    "price": 13.99,
+    "currency": "USD",
+    "brand": "Coco Loco",
+    "brandSlug": "coco-loco",
+    "category": "Coal",
+    "categorySlug": "coal",
+    "subcategory": "28mm Jumbo Cubes",
+    "images": [
+      {
+        "id": "img-coco-loco-28mm-jumbo-coconut-charcoal-1kg-0",
+        "url": "https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Coco Loco 28mm Jumbo Coconut Charcoal (1kg / 48 Cubes)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-coco-loco-28mm-jumbo-coconut-charcoal-1kg-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "alt": "Coco Loco 28mm Jumbo Coconut Charcoal (1kg / 48 Cubes)",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 160,
+    "lowStockThreshold": 5,
+    "material": "Coconut Shell Briquettes",
+    "tags": [
+      "Authentic",
+      "Fumare Hookah",
+      "High Heat",
+      "28mm Jumbo Cubes",
+      "Coal",
+      "Coco Loco",
+      "28mm Jumbo"
+    ],
+    "specifications": [
+      {
+        "label": "Weight",
+        "value": "1kg"
+      },
+      {
+        "label": "Cube Size",
+        "value": "28mm"
+      },
+      {
+        "label": "Piece Count",
+        "value": "48 Cubes"
+      },
+      {
+        "label": "Origin",
+        "value": "Indonesia"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 61,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-coal-burner-1000w",
+    "name": "Heavy-Duty Spiral Electric Charcoal Burner (1000W)",
+    "slug": "heavy-duty-spiral-electric-charcoal-burner-1000w",
+    "sku": "ACC-BURN-1000W",
+    "description": "High-speed spiral single-burner stove engineered specifically for lighting natural coconut charcoal. Reaches maximum heat in 60 seconds with 5-stage adjustable thermostat.",
+    "shortDescription": "1000W electric spiral hookah charcoal starter burner.",
+    "price": 24.99,
+    "currency": "USD",
+    "brand": "Fumare Hookah",
+    "brandSlug": "fumare-hookah",
+    "category": "Coal",
+    "categorySlug": "coal",
+    "subcategory": "Charcoal Burners",
+    "images": [
+      {
+        "id": "img-heavy-duty-spiral-electric-charcoal-burner-1000w-0",
+        "url": "https://images.unsplash.com/photo-1584905066893-7d5c142ba4e1?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1584905066893-7d5c142ba4e1?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Heavy-Duty Spiral Electric Charcoal Burner (1000W)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-heavy-duty-spiral-electric-charcoal-burner-1000w-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/03/31b0cb5e-c6ec-45cc-a94f-86a2bda3b92b.jpeg.webp",
+        "alt": "Heavy-Duty Spiral Electric Charcoal Burner (1000W)",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 95,
+    "lowStockThreshold": 5,
+    "material": "Cast Iron Spiral & Powder-Coated Steel",
+    "tags": [
+      "Electric Stove",
+      "Charcoal Burner",
+      "1000W",
+      "Charcoal Burners",
+      "Authentic",
+      "Fumare Hookah",
+      "Coal",
+      "Coal Starter"
+    ],
+    "specifications": [
+      {
+        "label": "Power",
+        "value": "1,000 Watts"
+      },
+      {
+        "label": "Coil",
+        "value": "Heavy Duty Incoloy Heating Spiral"
+      },
+      {
+        "label": "Capacity",
+        "value": "8-10 Coals"
+      },
+      {
+        "label": "Warranty",
+        "value": "1 Year"
+      }
+    ],
+    "rating": 4.8,
+    "reviewCount": 43,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-base-caesar-floe-clear",
+    "name": "Caesar Crystal Bohemiao Floe Clear Hand-Cut Crystal Base",
+    "slug": "caesar-crystal-bohemiao-floe-clear-base",
+    "sku": "BASE-CSR-FLOE-CLR",
+    "description": "Mastercrafted in the Czech Republic from authentic 24% lead crystal. The Floe pattern showcases intricate geometric diamond cuts that refract light dramatically when submerged in water. Compatible with all modern grommet hookahs.",
+    "shortDescription": "Authentic Caesar Crystal Floe hand-cut Bohemian crystal hookah base.",
+    "price": 240.0,
+    "currency": "USD",
+    "brand": "Caesar Crystal",
+    "brandSlug": "caesar-crystal",
+    "category": "Bases",
+    "categorySlug": "bases",
+    "subcategory": "Caesar Crystal",
+    "images": [
+      {
+        "id": "img-caesar-crystal-bohemiao-floe-clear-base-0",
+        "url": "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Caesar Crystal Bohemiao Floe Clear Hand-Cut Crystal Base",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-caesar-crystal-bohemiao-floe-clear-base-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/11/b62b1mv1yg5adzq2k1n03qn84ubpk1qg.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/11/b62b1mv1yg5adzq2k1n03qn84ubpk1qg.jpg.webp",
+        "alt": "Caesar Crystal Bohemiao Floe Clear Hand-Cut Crystal Base",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 18,
+    "lowStockThreshold": 5,
+    "material": "24% Leaded Bohemian Crystal Glass",
+    "tags": [
+      "Authentic",
+      "Bohemian Crystal",
+      "Floe",
+      "Fumare Hookah",
+      "Bases",
+      "Luxury Base",
+      "Hand Cut",
+      "Caesar Crystal"
+    ],
+    "specifications": [
+      {
+        "label": "Height",
+        "value": "26 cm (10.2 in)"
+      },
+      {
+        "label": "Neck Inner Diameter",
+        "value": "45 mm (Standard Drop)"
+      },
+      {
+        "label": "Weight",
+        "value": "2.8 kg"
+      },
+      {
+        "label": "Origin",
+        "value": "Czech Republic"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 34,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-base-caesar-cone-black",
+    "name": "Caesar Crystal Rock Cone Black Hand-Cut Crystal Base",
+    "slug": "caesar-crystal-rock-cone-black-base",
+    "sku": "BASE-CSR-ROCK-BLK",
+    "description": "Stunning obsidian-black flashed Bohemian crystal featuring raw chiseled 'Rock' facets. High optical clarity with a weighted 18mm crystal base bottom for supreme hookah stability.",
+    "shortDescription": "Caesar Crystal Rock Cone Black Bohemian hand-cut crystal vase.",
+    "price": 275.0,
+    "currency": "USD",
+    "brand": "Caesar Crystal",
+    "brandSlug": "caesar-crystal",
+    "category": "Bases",
+    "categorySlug": "bases",
+    "subcategory": "Caesar Crystal",
+    "images": [
+      {
+        "id": "img-caesar-crystal-rock-cone-black-base-0",
+        "url": "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Caesar Crystal Rock Cone Black Hand-Cut Crystal Base",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-caesar-crystal-rock-cone-black-base-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/11/b62b1mv1yg5adzq2k1n03qn84ubpk1qg.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/11/b62b1mv1yg5adzq2k1n03qn84ubpk1qg.jpg.webp",
+        "alt": "Caesar Crystal Rock Cone Black Hand-Cut Crystal Base",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 12,
+    "lowStockThreshold": 5,
+    "material": "24% Leaded Crystal with Black Flashing",
+    "tags": [
+      "Authentic",
+      "Fumare Hookah",
+      "Bases",
+      "Luxury",
+      "Black Crystal",
+      "Rock Cone",
+      "Caesar Crystal"
+    ],
+    "specifications": [
+      {
+        "label": "Height",
+        "value": "25 cm"
+      },
+      {
+        "label": "Neck ID",
+        "value": "45 mm"
+      },
+      {
+        "label": "Weight",
+        "value": "3.1 kg"
+      },
+      {
+        "label": "Origin",
+        "value": "Czech Republic"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 27,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-base-craft-drop-clear",
+    "name": "Craft Glass Russian Drop Base - Ultra Clear",
+    "slug": "craft-glass-russian-drop-base-ultra-clear",
+    "sku": "BASE-CRF-DRP-CLR",
+    "description": "The modern industry standard: Russian Drop-shaped heavy craft glass base. Perfectly balanced conical teardrop profile with extra thick bottom glass. Universally fits Alpha Hookah, MattPear, Union, Geometry, and Maklaud.",
+    "shortDescription": "Authentic Craft Glass Russian drop clear hookah base.",
+    "price": 38.0,
+    "currency": "USD",
+    "brand": "Craft Glass",
+    "brandSlug": "craft-glass",
+    "category": "Bases",
+    "categorySlug": "bases",
+    "subcategory": "Craft Glass Vases",
+    "images": [
+      {
+        "id": "img-craft-glass-russian-drop-base-ultra-clear-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/11/b62b1mv1yg5adzq2k1n03qn84ubpk1qg.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/11/b62b1mv1yg5adzq2k1n03qn84ubpk1qg.jpg.webp",
+        "alt": "Craft Glass Russian Drop Base - Ultra Clear",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-craft-glass-russian-drop-base-ultra-clear-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/alpha_hookah_beat_grey_base_3_web.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/alpha_hookah_beat_grey_base_3_web.jpg.webp",
+        "alt": "Craft Glass Russian Drop Base - Ultra Clear",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 65,
+    "lowStockThreshold": 5,
+    "material": "Heavy-Wall Hand-Blown Bohemian Float Glass",
+    "tags": [
+      "Authentic",
+      "Craft Glass",
+      "Fumare Hookah",
+      "Bases",
+      "Russian Drop",
+      "Universal Fit",
+      "Clear Base",
+      "Craft Glass Vases",
+      "Russian Drop Bases"
+    ],
+    "specifications": [
+      {
+        "label": "Height",
+        "value": "26 cm"
+      },
+      {
+        "label": "Neck ID",
+        "value": "45 mm"
+      },
+      {
+        "label": "Base Diameter",
+        "value": "20 cm"
+      },
+      {
+        "label": "Compatibility",
+        "value": "All 45mm Grommet Stems"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 58,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-base-craft-drop-smoke",
+    "name": "Craft Glass Russian Drop Base - Gradient Smoke Gray",
+    "slug": "craft-glass-russian-drop-base-smoke-gray",
+    "sku": "BASE-CRF-DRP-SMK",
+    "description": "Smoky gradient tint fading from dark graphite at the bottom to transparent at the neck. Provides an aggressive, modern look that matches dark stainless steel and titanium stems.",
+    "shortDescription": "Craft Glass Russian drop base in gradient smoke gray.",
+    "price": 42.0,
+    "currency": "USD",
+    "brand": "Craft Glass",
+    "brandSlug": "craft-glass",
+    "category": "Bases",
+    "categorySlug": "bases",
+    "subcategory": "Craft Glass Vases",
+    "images": [
+      {
+        "id": "img-craft-glass-russian-drop-base-smoke-gray-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/11/b62b1mv1yg5adzq2k1n03qn84ubpk1qg.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/11/b62b1mv1yg5adzq2k1n03qn84ubpk1qg.jpg.webp",
+        "alt": "Craft Glass Russian Drop Base - Gradient Smoke Gray",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-craft-glass-russian-drop-base-smoke-gray-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/alpha_hookah_beat_grey_base_3_web.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/alpha_hookah_beat_grey_base_3_web.jpg.webp",
+        "alt": "Craft Glass Russian Drop Base - Gradient Smoke Gray",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 48,
+    "lowStockThreshold": 5,
+    "material": "Hand-Blown Tinted Glass",
+    "tags": [
+      "Authentic",
+      "Craft Glass",
+      "Fumare Hookah",
+      "Bases",
+      "Smoke Gray",
+      "Russian Drop",
+      "Craft Glass Vases",
+      "Russian Drop Bases"
+    ],
+    "specifications": [
+      {
+        "label": "Height",
+        "value": "26 cm"
+      },
+      {
+        "label": "Neck ID",
+        "value": "45 mm"
+      },
+      {
+        "label": "Finish",
+        "value": "Gradient Smoke Tint"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 36,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-base-alpha-drop-clear",
+    "name": "Alpha Hookah Model X Drop Base - Ultra Clear",
+    "slug": "alpha-hookah-model-x-drop-base-ultra-clear",
+    "sku": "BASE-ALP-X-CLR",
+    "description": "Official factory replacement base designed by Alpha Hookah. Engineered specifically with the exact volume and water line markings tailored to the Model X and Artist stems.",
+    "shortDescription": "Official Alpha Hookah Model X clear drop replacement base.",
+    "price": 45.0,
+    "currency": "USD",
+    "brand": "Alpha Hookah",
+    "brandSlug": "alpha-hookah",
+    "category": "Bases",
+    "categorySlug": "bases",
+    "subcategory": "Alpha Base",
+    "images": [
+      {
+        "id": "img-alpha-hookah-model-x-drop-base-ultra-clear-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/alpha_hookah_beat_grey_base_3_web.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/alpha_hookah_beat_grey_base_3_web.jpg.webp",
+        "alt": "Alpha Hookah Model X Drop Base - Ultra Clear",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-alpha-hookah-model-x-drop-base-ultra-clear-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/11/b62b1mv1yg5adzq2k1n03qn84ubpk1qg.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/11/b62b1mv1yg5adzq2k1n03qn84ubpk1qg.jpg.webp",
+        "alt": "Alpha Hookah Model X Drop Base - Ultra Clear",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 55,
+    "lowStockThreshold": 5,
+    "material": "Reinforced Russian Float Glass",
+    "tags": [
+      "Clear",
+      "Alpha Hookah",
+      "Authentic",
+      "Fumare Hookah",
+      "Bases",
+      "Alpha Base",
+      "Model X",
+      "Russian Drop Bases"
+    ],
+    "specifications": [
+      {
+        "label": "Height",
+        "value": "25.5 cm"
+      },
+      {
+        "label": "Neck ID",
+        "value": "45 mm"
+      },
+      {
+        "label": "Manufacturer",
+        "value": "Alpha Hookah (St. Petersburg)"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 49,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-base-alpha-beat-mini",
+    "name": "Alpha Hookah Beat Mini Drop Base - Clear",
+    "slug": "alpha-hookah-beat-mini-drop-base-clear",
+    "sku": "BASE-ALP-BEAT-CLR",
+    "description": "Compact miniature drop base engineered for the Alpha Hookah Beat and compact travel pipes. Lower center of gravity with stable broad stance.",
+    "shortDescription": "Alpha Hookah Beat mini compact hookah base.",
+    "price": 38.0,
+    "currency": "USD",
+    "brand": "Alpha Hookah",
+    "brandSlug": "alpha-hookah",
+    "category": "Bases",
+    "categorySlug": "bases",
+    "subcategory": "Mini & Compact Bases",
+    "images": [
+      {
+        "id": "img-alpha-hookah-beat-mini-drop-base-clear-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/alpha_hookah_beat_grey_base_3_web.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/alpha_hookah_beat_grey_base_3_web.jpg.webp",
+        "alt": "Alpha Hookah Beat Mini Drop Base - Clear",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-alpha-hookah-beat-mini-drop-base-clear-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/11/b62b1mv1yg5adzq2k1n03qn84ubpk1qg.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/11/b62b1mv1yg5adzq2k1n03qn84ubpk1qg.jpg.webp",
+        "alt": "Alpha Hookah Beat Mini Drop Base - Clear",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 40,
+    "lowStockThreshold": 5,
+    "material": "Hand-Blown Craft Glass",
+    "tags": [
+      "Authentic",
+      "Alpha Hookah",
+      "Fumare Hookah",
+      "Compact",
+      "Alpha Beat",
+      "Bases",
+      "Mini & Compact Bases",
+      "Mini Base"
+    ],
+    "specifications": [
+      {
+        "label": "Height",
+        "value": "19 cm (7.5 in)"
+      },
+      {
+        "label": "Neck ID",
+        "value": "45 mm"
+      },
+      {
+        "label": "Compatibility",
+        "value": "Alpha Beat, travel stems"
+      }
+    ],
+    "rating": 4.8,
+    "reviewCount": 24,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-base-wookah-crystal-olives",
+    "name": "WOOKAH Hand-Cut Crystal Base - Olives Cut",
+    "slug": "wookah-hand-cut-crystal-base-olives-cut",
+    "sku": "BASE-WOO-CRY-OLV",
+    "description": "Exquisite hand-cut lead-free crystal base from WOOKAH in Poland. The Olives pattern combines elliptical olive facets with sparkling vertical flutes. Comes fitted with WOOKAH quick-lock click ring.",
+    "shortDescription": "WOOKAH hand-cut crystal vase in Olives pattern.",
+    "price": 195.0,
+    "currency": "USD",
+    "brand": "Wookah",
+    "brandSlug": "wookah",
+    "category": "Bases",
+    "categorySlug": "bases",
+    "subcategory": "WOOKAH Crystal",
+    "images": [
+      {
+        "id": "img-wookah-hand-cut-crystal-base-olives-cut-0",
+        "url": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=1200&auto=format&fit=crop",
+        "alt": "WOOKAH Hand-Cut Crystal Base - Olives Cut",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-wookah-hand-cut-crystal-base-olives-cut-1",
+        "url": "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200&auto=format&fit=crop",
+        "alt": "WOOKAH Hand-Cut Crystal Base - Olives Cut",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 20,
+    "lowStockThreshold": 5,
+    "material": "Lead-Free Polish Crystal Glass",
+    "tags": [
+      "Authentic",
+      "Crystal Base",
+      "Fumare Hookah",
+      "Olives",
+      "WOOKAH",
+      "WOOKAH Crystal",
+      "Hand Cut",
+      "Wookah",
+      "Bases"
+    ],
+    "specifications": [
+      {
+        "label": "Height",
+        "value": "28 cm"
+      },
+      {
+        "label": "Mounting",
+        "value": "WOOKAH Quick Click Lock"
+      },
+      {
+        "label": "Origin",
+        "value": "Poland"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 31,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-bowl-alpaca-symphony",
+    "name": "Alpaca Symphony Phunnel Bowl",
+    "slug": "alpaca-symphony-phunnel-bowl",
+    "sku": "BWL-ALP-SYM-001",
+    "description": "Handcrafted in California using proprietary dense white stoneware clay. Features a center bridge over the spire to prevent aluminum foil drag and optimize airflow with Heat Management Devices.",
+    "shortDescription": "Alpaca Symphony handmade clay phunnel hookah bowl.",
+    "price": 32.0,
+    "currency": "USD",
+    "brand": "Alpaca Bowls",
+    "brandSlug": "alpaca-bowls",
+    "category": "Bowls",
+    "categorySlug": "bowls",
+    "subcategory": "Alpaca Bowls",
+    "images": [
+      {
+        "id": "img-alpaca-symphony-phunnel-bowl-0",
+        "url": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Alpaca Symphony Phunnel Bowl",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-alpaca-symphony-phunnel-bowl-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/02/oblako_phunnel_m.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/02/oblako_phunnel_m.jpg.webp",
+        "alt": "Alpaca Symphony Phunnel Bowl",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 45,
+    "lowStockThreshold": 5,
+    "material": "California White Stoneware Clay",
+    "tags": [
+      "Symphony",
+      "Handmade",
+      "Authentic",
+      "Fumare Hookah",
+      "Phunnel Bowls",
+      "Bowls",
+      "Phunnel",
+      "Alpaca Bowls"
+    ],
+    "specifications": [
+      {
+        "label": "Capacity",
+        "value": "15-20 Grams"
+      },
+      {
+        "label": "Clay Type",
+        "value": "Dense White Stoneware"
+      },
+      {
+        "label": "Origin",
+        "value": "USA"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 42,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-bowl-alpaca-mini-rook",
+    "name": "Alpaca Mini Rook Phunnel Bowl",
+    "slug": "alpaca-mini-rook-phunnel-bowl",
+    "sku": "BWL-ALP-ROOK-001",
+    "description": "The world-renowned low-capacity phunnel bowl from Alpaca. Spire features 4 notched castle turrets that elevate airflow and eliminate foil lock. Perfect for dense dark leaf packs (Tangiers, DarkSide).",
+    "shortDescription": "Alpaca Mini Rook handmade stoneware phunnel bowl.",
+    "price": 34.0,
+    "currency": "USD",
+    "brand": "Alpaca Bowls",
+    "brandSlug": "alpaca-bowls",
+    "category": "Bowls",
+    "categorySlug": "bowls",
+    "subcategory": "Alpaca Bowls",
+    "images": [
+      {
+        "id": "img-alpaca-mini-rook-phunnel-bowl-0",
+        "url": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Alpaca Mini Rook Phunnel Bowl",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-alpaca-mini-rook-phunnel-bowl-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/02/oblako_phunnel_m.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/02/oblako_phunnel_m.jpg.webp",
+        "alt": "Alpaca Mini Rook Phunnel Bowl",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 50,
+    "lowStockThreshold": 5,
+    "material": "Glazed Stoneware Clay",
+    "tags": [
+      "Authentic",
+      "Fumare Hookah",
+      "Phunnel Bowls",
+      "Mini Rook",
+      "Bowls",
+      "Phunnel",
+      "Alpaca Bowls",
+      "Low Capacity"
+    ],
+    "specifications": [
+      {
+        "label": "Capacity",
+        "value": "10-15 Grams (Conserves Shisha)"
+      },
+      {
+        "label": "Spire",
+        "value": "Castellated Notched Rook"
+      },
+      {
+        "label": "Origin",
+        "value": "USA"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 67,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-bowl-solaris-moon",
+    "name": "Solaris Moon Glazed Turkish Shisha Bowl",
+    "slug": "solaris-moon-glazed-turkish-shisha-bowl",
+    "sku": "BWL-SOL-MOON-001",
+    "description": "Hand-thrown Ukrainian red clay bowl with cratered celestial Moon aesthetic. Thick-walled Turkish multi-hole design provides unmatched thermal mass, preventing dark leaf shisha from burning.",
+    "shortDescription": "Solaris Moon thick-walled glazed Turkish clay hookah bowl.",
+    "price": 22.0,
+    "currency": "USD",
+    "brand": "Solaris Bowls",
+    "brandSlug": "solaris-bowls",
+    "category": "Bowls",
+    "categorySlug": "bowls",
+    "subcategory": "Solaris Bowls",
+    "images": [
+      {
+        "id": "img-solaris-moon-glazed-turkish-shisha-bowl-0",
+        "url": "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Solaris Moon Glazed Turkish Shisha Bowl",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-solaris-moon-glazed-turkish-shisha-bowl-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/02/oblako_phunnel_m.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/02/oblako_phunnel_m.jpg.webp",
+        "alt": "Solaris Moon Glazed Turkish Shisha Bowl",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 60,
+    "lowStockThreshold": 5,
+    "material": "Heavy Natural Red Clay & Ceramic Glaze",
+    "tags": [
+      "Authentic",
+      "Turkish / Killer Bowls",
+      "Killer Bowl",
+      "Fumare Hookah",
+      "Solaris Bowls",
+      "Solaris Moon",
+      "Turkish Bowl",
+      "Bowls"
+    ],
+    "specifications": [
+      {
+        "label": "Capacity",
+        "value": "16-20 Grams"
+      },
+      {
+        "label": "Design",
+        "value": "7-Hole Turkish Flat Bottom"
+      },
+      {
+        "label": "Origin",
+        "value": "Ukraine"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 38,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-bowl-target-phunnel",
+    "name": "Target Phunnel Modern Clay Bowl",
+    "slug": "target-phunnel-modern-clay-bowl",
+    "sku": "BWL-TGT-PHN-001",
+    "description": "Russian engineered semi-porcelain phunnel bowl from Target. Features precision-milled concentric heat ridges on the lip to anchor Kaloud and Na Grani HMDs securely without slippage.",
+    "shortDescription": "Target Phunnel modern semi-porcelain clay bowl.",
+    "price": 24.0,
+    "currency": "USD",
+    "brand": "Target Bowls",
+    "brandSlug": "target-bowls",
+    "category": "Bowls",
+    "categorySlug": "bowls",
+    "subcategory": "Target Bowls",
+    "images": [
+      {
+        "id": "img-target-phunnel-modern-clay-bowl-0",
+        "url": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Target Phunnel Modern Clay Bowl",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-target-phunnel-modern-clay-bowl-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/02/oblako_phunnel_m.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/02/oblako_phunnel_m.jpg.webp",
+        "alt": "Target Phunnel Modern Clay Bowl",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 55,
+    "lowStockThreshold": 5,
+    "material": "Semi-Porcelain White Clay",
+    "tags": [
+      "Authentic",
+      "Fumare Hookah",
+      "Phunnel Bowls",
+      "Target Phunnel",
+      "Target Bowls",
+      "Bowls",
+      "Phunnel",
+      "HMD Lip"
+    ],
+    "specifications": [
+      {
+        "label": "Capacity",
+        "value": "14-18 Grams"
+      },
+      {
+        "label": "Rim Feature",
+        "value": "Non-Slip HMD Groove"
+      },
+      {
+        "label": "Origin",
+        "value": "Russia"
+      }
+    ],
+    "rating": 4.8,
+    "reviewCount": 29,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-bowl-japona-mummy",
+    "name": "Japona Mummy Phunnel Bowl with Woven Cord",
+    "slug": "japona-mummy-phunnel-bowl-woven-cord",
+    "sku": "BWL-JAP-MUM-001",
+    "description": "Artisanal Japanese-inspired red clay phunnel bowl adorned with hand-wound textured cordage around the base. Flawless heat absorption and distribution for complex shisha aromas.",
+    "shortDescription": "Japona Mummy handcrafted ceramic phunnel bowl with traditional cord.",
+    "price": 36.0,
+    "currency": "USD",
+    "brand": "Japona Hookah",
+    "brandSlug": "japona-hookah",
+    "category": "Bowls",
+    "categorySlug": "bowls",
+    "subcategory": "Japona Bowls",
+    "images": [
+      {
+        "id": "img-japona-mummy-phunnel-bowl-woven-cord-0",
+        "url": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Japona Mummy Phunnel Bowl with Woven Cord",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-japona-mummy-phunnel-bowl-woven-cord-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/02/oblako_phunnel_m.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2025/02/oblako_phunnel_m.jpg.webp",
+        "alt": "Japona Mummy Phunnel Bowl with Woven Cord",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 35,
+    "lowStockThreshold": 5,
+    "material": "Terracotta Red Clay & Cord",
+    "tags": [
+      "Authentic",
+      "Fumare Hookah",
+      "Phunnel Bowls",
+      "Japona Mummy",
+      "Artisan Bowl",
+      "Japona Hookah",
+      "Bowls",
+      "Japona Bowls"
+    ],
+    "specifications": [
+      {
+        "label": "Capacity",
+        "value": "15-18 Grams"
+      },
+      {
+        "label": "Aesthetic",
+        "value": "Handcrafted Japanese Cord Wrap"
+      },
+      {
+        "label": "Origin",
+        "value": "Russia"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 33,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-acc-nagrani-hmd-v2",
+    "name": "Na Grani Stainless Steel Heat Management Device V2",
+    "slug": "na-grani-stainless-steel-heat-management-device-v2",
+    "sku": "ACC-NG-HMD-V2",
+    "description": "The undisputed king of Russian dark leaf sessions. Precision-machined from a solid billet of AISI 304 food-grade stainless steel. Delivers pure, direct thermal transfer without hot spots.",
+    "shortDescription": "Na Grani V2 solid stainless steel heat management device.",
+    "price": 42.0,
+    "currency": "USD",
+    "brand": "Na Grani",
+    "brandSlug": "na-grani",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Na Grani HMD",
+    "images": [
+      {
+        "id": "img-na-grani-stainless-steel-heat-management-device-v2-0",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/05/3oxk1m5pb7dwuja19nv80umyciasxkbb.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/05/3oxk1m5pb7dwuja19nv80umyciasxkbb.jpg.webp",
+        "alt": "Na Grani Stainless Steel Heat Management Device V2",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-na-grani-stainless-steel-heat-management-device-v2-1",
+        "url": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Na Grani Stainless Steel Heat Management Device V2",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 85,
+    "lowStockThreshold": 5,
+    "material": "AISI 304 Solid Stainless Steel",
+    "tags": [
+      "Authentic",
+      "HMD",
+      "Na Grani HMD",
+      "Fumare Hookah",
+      "Heat Management",
+      "Stainless Steel",
+      "Accessories",
+      "Na Grani"
+    ],
+    "specifications": [
+      {
+        "label": "Material",
+        "value": "Solid AISI 304 Stainless"
+      },
+      {
+        "label": "Coal Capacity",
+        "value": "2 to 3 26mm Cubes"
+      },
+      {
+        "label": "Origin",
+        "value": "Russia"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 78,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-acc-kaloud-lotus-plus-silver",
+    "name": "Kaloud Lotus I+ Heat Management Device - Silver",
+    "slug": "kaloud-lotus-i-plus-silver",
+    "sku": "ACC-KLD-LTS-SLV",
+    "description": "The iconic original heat management regulator redesigned with raised grooved bottom plates that prevent coal blackening. Dual-tier rotating vents regulate temperature precisely.",
+    "shortDescription": "Authentic Kaloud Lotus I+ Silver heat management system.",
+    "price": 49.95,
+    "currency": "USD",
+    "brand": "Kaloud",
+    "brandSlug": "kaloud",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Kaloud",
+    "images": [
+      {
+        "id": "img-kaloud-lotus-i-plus-silver-0",
+        "url": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Kaloud Lotus I+ Heat Management Device - Silver",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-kaloud-lotus-i-plus-silver-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/05/3oxk1m5pb7dwuja19nv80umyciasxkbb.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/05/3oxk1m5pb7dwuja19nv80umyciasxkbb.jpg.webp",
+        "alt": "Kaloud Lotus I+ Heat Management Device - Silver",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 70,
+    "lowStockThreshold": 5,
+    "material": "Aerospace Grade Aluminum Alloy",
+    "tags": [
+      "Authentic",
+      "Fumare Hookah",
+      "Lotus I+",
+      "Kaloud",
+      "Heat Management",
+      "Original",
+      "Accessories"
+    ],
+    "specifications": [
+      {
+        "label": "Material",
+        "value": "Aerospace Grade Aluminum"
+      },
+      {
+        "label": "Vents",
+        "value": "Adjustable Rotating Dome"
+      },
+      {
+        "label": "Origin",
+        "value": "USA"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 92,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-acc-alpha-cyber-tongs",
+    "name": "Alpha Hookah Cyber Tongs - Matte Black",
+    "slug": "alpha-hookah-cyber-tongs-matte-black",
+    "sku": "ACC-ALP-CYB-BLK",
+    "description": "Ergonomic, cyberpunk-inspired stainless steel charcoal tongs from Alpha Hookah. Laser cut with industrial skeleton cutouts and powder coated in heat-resistant matte black.",
+    "shortDescription": "Alpha Hookah Cyber stainless steel charcoal tongs matte black.",
+    "price": 28.0,
+    "currency": "USD",
+    "brand": "Alpha Hookah",
+    "brandSlug": "alpha-hookah",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Alpha Tongs & Hoses",
+    "images": [
+      {
+        "id": "img-alpha-hookah-cyber-tongs-matte-black-0",
+        "url": "https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Alpha Hookah Cyber Tongs - Matte Black",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-alpha-hookah-cyber-tongs-matte-black-1",
+        "url": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Alpha Hookah Cyber Tongs - Matte Black",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 65,
+    "lowStockThreshold": 5,
+    "material": "Laser-Cut Stainless Steel with Heat Coating",
+    "tags": [
+      "Authentic",
+      "Alpha Hookah",
+      "Cyber Tongs",
+      "Fumare Hookah",
+      "Tongs",
+      "Accessories",
+      "Alpha Tongs & Hoses"
+    ],
+    "specifications": [
+      {
+        "label": "Length",
+        "value": "23 cm (9 in)"
+      },
+      {
+        "label": "Finish",
+        "value": "Tactile Matte Black"
+      },
+      {
+        "label": "Grip",
+        "value": "Non-Slip Precision Tip"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 41,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-acc-blade-tongs-v2",
+    "name": "Blade Hookah Stainless Steel Tongs V2 - Titanium Black",
+    "slug": "blade-hookah-stainless-steel-tongs-v2-black",
+    "sku": "ACC-BLD-TNG-BLK",
+    "description": "Heavyweight precision tongs from Blade Hookah featuring an integrated piercing poker needle at the tail. Finished in scratch-resistant titanium PVD.",
+    "shortDescription": "Blade Hookah V2 luxury stainless steel charcoal tongs.",
+    "price": 34.0,
+    "currency": "USD",
+    "brand": "Blade Hookah",
+    "brandSlug": "blade-hookah",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Blade Hookah",
+    "images": [
+      {
+        "id": "img-blade-hookah-stainless-steel-tongs-v2-black-0",
+        "url": "https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Blade Hookah Stainless Steel Tongs V2 - Titanium Black",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-blade-hookah-stainless-steel-tongs-v2-black-1",
+        "url": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Blade Hookah Stainless Steel Tongs V2 - Titanium Black",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 50,
+    "lowStockThreshold": 5,
+    "material": "PVD-Coated High Strength Stainless Steel",
+    "tags": [
+      "Authentic",
+      "Fumare Hookah",
+      "Tongs",
+      "Blade Hookah",
+      "Accessories",
+      "Titanium"
+    ],
+    "specifications": [
+      {
+        "label": "Length",
+        "value": "24 cm"
+      },
+      {
+        "label": "Features",
+        "value": "Integrated Poker Needle, PVD Titanium Coating"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 37,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-acc-alpha-silicone-hose-kit",
+    "name": "Alpha Hookah Soft-Touch Silicone Hose Kit with Matte Handle",
+    "slug": "alpha-hookah-soft-touch-silicone-hose-kit",
+    "sku": "ACC-ALP-HSE-KIT",
+    "description": "Medical grade anti-static soft-touch silicone hose paired with an ergonomic anodized aluminum Model X handle. Resists lint, dust, and ghost flavors.",
+    "shortDescription": "Alpha Hookah soft-touch silicone hose and aluminum handle set.",
+    "price": 35.0,
+    "currency": "USD",
+    "brand": "Alpha Hookah",
+    "brandSlug": "alpha-hookah",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Silicone Hoses & Handles",
+    "images": [
+      {
+        "id": "img-alpha-hookah-soft-touch-silicone-hose-kit-0",
+        "url": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Alpha Hookah Soft-Touch Silicone Hose Kit with Matte Handle",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-alpha-hookah-soft-touch-silicone-hose-kit-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/alpha_hookah_beat_grey_base_3_web.jpg.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/alpha_hookah_beat_grey_base_3_web.jpg.webp",
+        "alt": "Alpha Hookah Soft-Touch Silicone Hose Kit with Matte Handle",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 60,
+    "lowStockThreshold": 5,
+    "material": "Anti-Static Silicone & Anodized Aluminum",
+    "tags": [
+      "Hose Kit",
+      "Alpha Hookah",
+      "Authentic",
+      "Fumare Hookah",
+      "Accessories",
+      "Silicone Hoses & Handles",
+      "Silicone Hose"
+    ],
+    "specifications": [
+      {
+        "label": "Hose Length",
+        "value": "150 cm (5 ft)"
+      },
+      {
+        "label": "Handle Length",
+        "value": "30 cm"
+      },
+      {
+        "label": "Texture",
+        "value": "Soft-Touch Silk Matte"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 45,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-eh-ooka-device-gray",
+    "name": "Ooka Clean Heat Charcoal-Free Electronic Shisha Device (Space Gray)",
+    "slug": "ooka-clean-heat-electronic-shisha-device-space-gray",
+    "sku": "EH-OOKA-DEV-GRY",
+    "description": "The revolutionary cordless electronic shisha system. Operates with zero charcoal, zero carbon monoxide, and clean convection heating. Features a rechargeable lithium battery providing up to 4 consecutive sessions.",
+    "shortDescription": "Ooka charcoal-free smart electronic shisha device in Space Gray.",
+    "price": 299.0,
+    "currency": "USD",
+    "brand": "Ooka",
+    "brandSlug": "ooka",
+    "category": "E-Hookah",
+    "categorySlug": "e-hookah",
+    "subcategory": "Ooka",
+    "images": [
+      {
+        "id": "img-ooka-clean-heat-electronic-shisha-device-space-gray-0",
+        "url": "https://worldhookahmarket.com/wp-content/uploads/2025/08/ENSO_pr_1close.png.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/uploads/2025/08/ENSO_pr_1close.png.webp",
+        "alt": "Ooka Clean Heat Charcoal-Free Electronic Shisha Device (Space Gray)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-ooka-clean-heat-electronic-shisha-device-space-gray-1",
+        "url": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Ooka Clean Heat Charcoal-Free Electronic Shisha Device (Space Gray)",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 30,
+    "lowStockThreshold": 5,
+    "material": "Aviation Grade Aluminum & Borosilicate Glass",
+    "tags": [
+      "Authentic",
+      "Electronic Shisha",
+      "Charcoal Free",
+      "Fumare Hookah",
+      "E-Hookah Devices",
+      "Ooka",
+      "E-Hookah",
+      "Clean Heat"
+    ],
+    "specifications": [
+      {
+        "label": "Heating",
+        "value": "Convection Smart Pod Chamber"
+      },
+      {
+        "label": "Battery",
+        "value": "High-Capacity Rechargeable Li-Ion"
+      },
+      {
+        "label": "Sessions",
+        "value": "Up to 4 per charge"
+      },
+      {
+        "label": "Warranty",
+        "value": "2-Year Official Ooka Warranty"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 48,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-eh-ooka-pods-twoapples",
+    "name": "Ooka Two Apples 4-Pack Molasses Vapor Pods",
+    "slug": "ooka-two-apples-4-pack-molasses-vapor-pods",
+    "sku": "EH-OOKA-POD-2APP",
+    "description": "Convenient 4-pack of hermetically sealed Ooka pods loaded with premium real tobacco molasses infused with classic sweet Two Apples and fresh star anise. Simply drop into the Ooka chamber for 60+ minutes of dense vapor.",
+    "shortDescription": "Ooka 4-pack Two Apples authentic shisha flavor pods.",
+    "price": 24.99,
+    "currency": "USD",
+    "brand": "Ooka",
+    "brandSlug": "ooka",
+    "category": "E-Hookah",
+    "categorySlug": "e-hookah",
+    "subcategory": "E-Hookah Pods & Cartridges",
+    "images": [
+      {
+        "id": "img-ooka-two-apples-4-pack-molasses-vapor-pods-0",
+        "url": "https://worldhookahmarket.com/wp-content/uploads/2025/08/ENSO_pr_1close.png.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/uploads/2025/08/ENSO_pr_1close.png.webp",
+        "alt": "Ooka Two Apples 4-Pack Molasses Vapor Pods",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-ooka-two-apples-4-pack-molasses-vapor-pods-1",
+        "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2026/08/musthave-pinkman-324x324.png.webp",
+        "alt": "Ooka Two Apples 4-Pack Molasses Vapor Pods",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 85,
+    "lowStockThreshold": 5,
+    "material": "Food-Grade Sealed Aluminum Capsules",
+    "tags": [
+      "Authentic",
+      "Pods",
+      "Fumare Hookah",
+      "Two Apples",
+      "E-Hookah Pods & Cartridges",
+      "Ooka",
+      "E-Hookah"
+    ],
+    "specifications": [
+      {
+        "label": "Pack Size",
+        "value": "4 Pods"
+      },
+      {
+        "label": "Duration",
+        "value": "60-70 Mins per pod"
+      },
+      {
+        "label": "Origin",
+        "value": "UAE"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 39,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": true,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-eh-aspire-coils-3pack",
+    "name": "Aspire Proteus Neo Replacement Mesh Coils 0.17 ohm (3-Pack)",
+    "slug": "aspire-proteus-neo-replacement-mesh-coils-3pack",
+    "sku": "EH-ASP-COIL-3PK",
+    "description": "Official 3-pack of genuine Aspire Proteus Neo sub-ohm mesh coils (0.17 ohm). Woven with organic Japanese cotton for massive cloud density and crisp flavor reproduction.",
+    "shortDescription": "Aspire Proteus Neo 0.17 ohm replacement mesh coils 3-pack.",
+    "price": 16.99,
+    "currency": "USD",
+    "brand": "Aspire",
+    "brandSlug": "aspire-proteus",
+    "category": "E-Hookah",
+    "categorySlug": "e-hookah",
+    "subcategory": "Coils & Replacement Parts",
+    "images": [
+      {
+        "id": "img-aspire-proteus-neo-replacement-mesh-coils-3pack-0",
+        "url": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Aspire Proteus Neo Replacement Mesh Coils 0.17 ohm (3-Pack)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-aspire-proteus-neo-replacement-mesh-coils-3pack-1",
+        "url": "https://worldhookahmarket.com/wp-content/uploads/2025/08/ENSO_pr_1close.png.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/uploads/2025/08/ENSO_pr_1close.png.webp",
+        "alt": "Aspire Proteus Neo Replacement Mesh Coils 0.17 ohm (3-Pack)",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 95,
+    "lowStockThreshold": 5,
+    "material": "Mesh Kanthal & Organic Cotton",
+    "tags": [
+      "Authentic",
+      "Aspire",
+      "Fumare Hookah",
+      "Replacement Parts",
+      "Proteus Coils",
+      "Mesh",
+      "Coils & Replacement Parts",
+      "E-Hookah"
+    ],
+    "specifications": [
+      {
+        "label": "Pack Count",
+        "value": "3 Coils"
+      },
+      {
+        "label": "Resistance",
+        "value": "0.17 Ohm"
+      },
+      {
+        "label": "Compatibility",
+        "value": "Aspire Proteus Neo"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 36,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": false,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-vp-alfakher-crownbar-magic",
+    "name": "Al Fakher Crown Bar 8000 Puffs Disposable - Magic Love",
+    "slug": "al-fakher-crown-bar-8000-puffs-disposable-magic-love",
+    "sku": "VP-AF-CB-8K-ML",
+    "description": "Direct-to-lung (DTL) rechargeable disposable vape created by Al Fakher. Infused with 18ml of authentic Magic Love shisha flavor (sweet honeydew melon, passionfruit, and icy spearmint). Features digital battery & liquid display.",
+    "shortDescription": "Al Fakher Crown Bar 8000 puffs rechargeable disposable vape - Magic Love.",
+    "price": 19.99,
+    "currency": "USD",
+    "brand": "Al Fakher Vapes",
+    "brandSlug": "al-fakher-vapes",
+    "category": "Vapes",
+    "categorySlug": "vapes",
+    "subcategory": "Disposable Vapes",
+    "images": [
+      {
+        "id": "img-al-fakher-crown-bar-8000-puffs-disposable-magic-love-0",
+        "url": "https://worldhookahmarket.com/wp-content/uploads/2026/06/crown-bar-12k-group-shot.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/uploads/2026/06/crown-bar-12k-group-shot.webp",
+        "alt": "Al Fakher Crown Bar 8000 Puffs Disposable - Magic Love",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-al-fakher-crown-bar-8000-puffs-disposable-magic-love-1",
+        "url": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Al Fakher Crown Bar 8000 Puffs Disposable - Magic Love",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 120,
+    "lowStockThreshold": 5,
+    "material": "Ergonomic Rubberized Chassis",
+    "tags": [
+      "Authentic",
+      "DTL Vape",
+      "Disposable Vapes",
+      "Fumare Hookah",
+      "Crown Bar",
+      "8000 Puffs",
+      "Magic Love",
+      "Al Fakher",
+      "Vapes",
+      "Al Fakher Vapes"
+    ],
+    "specifications": [
+      {
+        "label": "Puff Count",
+        "value": "8,000 Puffs"
+      },
+      {
+        "label": "E-Liquid",
+        "value": "18ml Pre-filled"
+      },
+      {
+        "label": "Battery",
+        "value": "600mAh Type-C Rechargeable"
+      },
+      {
+        "label": "Nicotine",
+        "value": "5% (50mg)"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 68,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": true,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-vp-geekbar-pulse-dragon",
+    "name": "Geek Bar Pulse 15000 Puffs Disposable - Dragon Melon",
+    "slug": "geek-bar-pulse-15000-puffs-dragon-melon",
+    "sku": "VP-GB-PLS-DRG",
+    "description": "The world's first full-screen smart disposable vape. Dual mesh coil system offers Regular Mode (15,000 puffs) and Pulse Mode (7,500 puffs / 20W high boost). Vibrant dragon fruit paired with juicy watermelon.",
+    "shortDescription": "Geek Bar Pulse 15000 puffs smart screen disposable vape - Dragon Melon.",
+    "price": 21.99,
+    "currency": "USD",
+    "brand": "Geek Bar",
+    "brandSlug": "geek-bar",
+    "category": "Vapes",
+    "categorySlug": "vapes",
+    "subcategory": "Disposable Vapes",
+    "images": [
+      {
+        "id": "img-geek-bar-pulse-15000-puffs-dragon-melon-0",
+        "url": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Geek Bar Pulse 15000 Puffs Disposable - Dragon Melon",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-geek-bar-pulse-15000-puffs-dragon-melon-1",
+        "url": "https://worldhookahmarket.com/wp-content/uploads/2026/06/crown-bar-12k-group-shot.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/uploads/2026/06/crown-bar-12k-group-shot.webp",
+        "alt": "Geek Bar Pulse 15000 Puffs Disposable - Dragon Melon",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 110,
+    "lowStockThreshold": 5,
+    "material": "Clear Acrylic & LED Display",
+    "tags": [
+      "Authentic",
+      "Disposable Vapes",
+      "Fumare Hookah",
+      "Pulse 15000",
+      "Dragon Melon",
+      "Vapes",
+      "Geek Bar",
+      "Smart Screen"
+    ],
+    "specifications": [
+      {
+        "label": "Modes",
+        "value": "Regular (15K Puffs) / Pulse (7.5K Puffs)"
+      },
+      {
+        "label": "Display",
+        "value": "Capsule Screen with Battery & Juice %"
+      },
+      {
+        "label": "Coil",
+        "value": "Dual Mesh Coil"
+      },
+      {
+        "label": "Nicotine",
+        "value": "5%"
+      }
+    ],
+    "rating": 5.0,
+    "reviewCount": 84,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": true,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-vp-geekvape-aegis-legend-3",
+    "name": "GeekVape Aegis Legend 3 200W Box Mod Starter Kit",
+    "slug": "geekvape-aegis-legend-3-200w-kit",
+    "sku": "VP-GV-LEG3-KIT",
+    "description": "IP68 tri-proof water, dust, and shock-resistant legend. Dual 18650 battery powerhouse paired with the sub-ohm Z Fli Tank and Smart Touch lock mechanism.",
+    "shortDescription": "GeekVape Aegis Legend 3 200W IP68 box mod kit.",
+    "price": 74.99,
+    "currency": "USD",
+    "brand": "GeekVape",
+    "brandSlug": "geekvape",
+    "category": "Vapes",
+    "categorySlug": "vapes",
+    "subcategory": "Box Mod Kits",
+    "images": [
+      {
+        "id": "img-geekvape-aegis-legend-3-200w-kit-0",
+        "url": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=1200&auto=format&fit=crop",
+        "alt": "GeekVape Aegis Legend 3 200W Box Mod Starter Kit",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-geekvape-aegis-legend-3-200w-kit-1",
+        "url": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1200&auto=format&fit=crop",
+        "alt": "GeekVape Aegis Legend 3 200W Box Mod Starter Kit",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 35,
+    "lowStockThreshold": 5,
+    "material": "Zinc Alloy, Leather & Silicone",
+    "tags": [
+      "Authentic",
+      "Aegis Legend 3",
+      "200W Box Mod",
+      "Fumare Hookah",
+      "Box Mod Kits",
+      "Vapes",
+      "GeekVape",
+      "IP68"
+    ],
+    "specifications": [
+      {
+        "label": "Max Wattage",
+        "value": "200 Watts"
+      },
+      {
+        "label": "Batteries",
+        "value": "Dual 18650 (Sold Separately)"
+      },
+      {
+        "label": "Tank",
+        "value": "Z Fli Top Airflow Leakproof"
+      },
+      {
+        "label": "Rating",
+        "value": "IP68 Tri-Proof"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 38,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": true,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
+  },
+  {
+    "id": "prod-vp-nasty-juice-cushman-salts",
+    "name": "Nasty Juice Cush Man Mango Shisha Series Nicotine Salts (30ml)",
+    "slug": "nasty-juice-cush-man-mango-nicotine-salts-30ml",
+    "sku": "VP-NST-CUSH-30",
+    "description": "World-famous Malaysian mango e-liquid. Ripe sweet tropical mango layered with a gentle low-mint wave. Specially formulated for pod devices and low-wattage mouth-to-lung systems.",
+    "shortDescription": "Nasty Juice Cush Man Mango nicotine salts 30ml.",
+    "price": 16.99,
+    "currency": "USD",
+    "brand": "Nasty Juice",
+    "brandSlug": "nasty-juice",
+    "category": "Vapes",
+    "categorySlug": "vapes",
+    "subcategory": "Nicotine Salts & E-Liquids",
+    "images": [
+      {
+        "id": "img-nasty-juice-cush-man-mango-nicotine-salts-30ml-0",
+        "url": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=1200&auto=format&fit=crop",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=1200&auto=format&fit=crop",
+        "alt": "Nasty Juice Cush Man Mango Shisha Series Nicotine Salts (30ml)",
+        "isPrimary": true,
+        "sortOrder": 1
+      },
+      {
+        "id": "img-nasty-juice-cush-man-mango-nicotine-salts-30ml-1",
+        "url": "https://worldhookahmarket.com/wp-content/uploads/2026/06/crown-bar-12k-group-shot.webp",
+        "thumbnailUrl": "https://worldhookahmarket.com/wp-content/uploads/2026/06/crown-bar-12k-group-shot.webp",
+        "alt": "Nasty Juice Cush Man Mango Shisha Series Nicotine Salts (30ml)",
+        "isPrimary": false,
+        "sortOrder": 2
+      }
+    ],
+    "stock": 85,
+    "lowStockThreshold": 5,
+    "material": "Chubby Gorilla 30ml Bottle",
+    "tags": [
+      "Authentic",
+      "Nic Salt",
+      "Mango",
+      "Cush Man",
+      "Fumare Hookah",
+      "Nasty Juice",
+      "30ml",
+      "Vapes",
+      "Nicotine Salts & E-Liquids"
+    ],
+    "specifications": [
+      {
+        "label": "Volume",
+        "value": "30ml"
+      },
+      {
+        "label": "Nicotine",
+        "value": "35mg / 50mg Salt Nicotine"
+      },
+      {
+        "label": "VG/PG",
+        "value": "50/50"
+      },
+      {
+        "label": "Origin",
+        "value": "Malaysia"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 49,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "isOnSale": false,
+    "isActive": true,
+    "ageRestricted": true,
+    "createdAt": "2026-09-01T00:00:00.000Z",
+    "updatedAt": "2026-09-03T00:00:00.000Z"
   }
 ]

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore.js';
 import { api } from '../services/api.js';
+import { broadcastSync, onSync } from '../services/sync.js';
 import {
   Product,
   Order,
@@ -30,7 +31,6 @@ import {
   DollarSign,
   AlertTriangle,
   RotateCcw,
-  Sparkles,
   ArrowRight,
   Eye,
   LogOut,
@@ -47,8 +47,12 @@ import {
   Tag,
   Globe,
   FolderPlus,
-  Award
+  Award,
+  Database,
+  UploadCloud,
+  FileSpreadsheet
 } from 'lucide-react';
+import { BulkProductUpdateModal } from '../components/BulkProductUpdateModal.js';
 
 interface AdminDashboardProps {
   onNavigate: (path: string) => void;
@@ -79,8 +83,21 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // MongoDB Cloud Storage State
+  const [mongoStatus, setMongoStatus] = useState<{
+    isConnected: boolean;
+    isConnecting: boolean;
+    uriConfigured: boolean;
+    dbName: string;
+    collectionCounts: Record<string, number>;
+    lastSyncAt: string | null;
+    lastError: string | null;
+  } | null>(null);
+  const [mongoSyncing, setMongoSyncing] = useState(false);
+
   // Modals & Sub-forms
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isBulkUpdateModalOpen, setIsBulkUpdateModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isStaffModalOpen, setIsStaffModalOpen] = useState(false);
   const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
@@ -134,6 +151,52 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   // Search & Filter within Admin Tables
   const [adminSearch, setAdminSearch] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('ALL');
+
+  // Real-Time Live Order Alert & Highlight
+  const [highlightedOrderId, setHighlightedOrderId] = useState<string | null>(null);
+
+  // Store Settings Editable Fields
+  const [settingStoreName, setSettingStoreName] = useState('World Hookah Market');
+  const [settingTaxRate, setSettingTaxRate] = useState('8.25');
+  const [settingFreeShipping, setSettingFreeShipping] = useState('150');
+  const [settingAnnouncement, setSettingAnnouncement] = useState('Free shipping on luxury orders above $150 • Authentic Russian & European Hookahs');
+  const [settingsSaving, setSettingsSaving] = useState(false);
+
+  // Synthesized notification chime for instant order feedback
+  const playOrderChime = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const now = ctx.currentTime;
+
+      // Note 1 (D5)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(587.33, now);
+      gain1.gain.setValueAtTime(0.2, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.35);
+
+      // Note 2 (A5)
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(880, now + 0.12);
+      gain2.gain.setValueAtTime(0.2, now + 0.12);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.12);
+      osc2.stop(now + 0.65);
+    } catch {
+      // AudioContext autoplay restrictions are handled silently
+    }
+  };
 
   const handleAdminLogin = async (e?: React.FormEvent, customEmail?: string, customPass?: string) => {
     if (e) e.preventDefault();
@@ -227,6 +290,10 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       }
       if (settingsRes.success && settingsRes.data) {
         setSettings(settingsRes.data);
+        if (settingsRes.data.storeName) setSettingStoreName(settingsRes.data.storeName);
+        if (settingsRes.data.taxRate !== undefined) setSettingTaxRate(((settingsRes.data.taxRate || 0) * 100).toFixed(2));
+        if (settingsRes.data.freeShippingThreshold !== undefined) setSettingFreeShipping(settingsRes.data.freeShippingThreshold.toString());
+        if (settingsRes.data.announcement) setSettingAnnouncement(settingsRes.data.announcement);
       }
       if (catsRes.success && catsRes.data) {
         setCategories(catsRes.data || []);
@@ -234,6 +301,11 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       if (brandsRes.success && brandsRes.data) {
         setBrands(brandsRes.data || []);
       }
+
+      // Fetch MongoDB connection & collection metrics
+      api.getMongoStatus().then(res => {
+        if (res.success && res.data) setMongoStatus(res.data);
+      }).catch(() => {});
     } catch (err) {
       console.error('Failed to load admin suite data:', err);
     } finally {
@@ -241,10 +313,147 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
-  useEffect(() => {
-    if (isAdmin) {
-      loadAllAdminData();
+  const handleSaveStoreSettings = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setSettingsSaving(true);
+    try {
+      const parsedTax = (parseFloat(settingTaxRate) || 0) / 100;
+      const parsedFreeShip = parseFloat(settingFreeShipping) || 150;
+      const payload: Partial<StoreSettings> = {
+        storeName: settingStoreName.trim() || 'World Hookah Market',
+        taxRate: parsedTax,
+        freeShippingThreshold: parsedFreeShip,
+        announcement: settingAnnouncement.trim()
+      };
+      const res = await api.updateAdminSettings(payload);
+      if (res.success && res.data) {
+        setSettings(res.data);
+        showToast('Storefront configurations saved & synchronized live!', 'success');
+        broadcastSync('SETTINGS_UPDATED', { settings: res.data });
+      } else {
+        showToast('Storefront settings updated', 'success');
+        broadcastSync('SETTINGS_UPDATED', { settings: payload });
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to save store settings', 'error');
+    } finally {
+      setSettingsSaving(false);
     }
+  };
+
+  const handleTriggerMongoSync = async () => {
+    setMongoSyncing(true);
+    try {
+      const res = await api.syncMongo();
+      if (res.success) {
+        showToast(res.message || 'Data successfully persisted to MongoDB', 'success');
+        if (res.data) setMongoStatus(res.data);
+      } else {
+        showToast('MongoDB sync notice (verify MONGODB_URI in settings)', 'info');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to sync to MongoDB', 'error');
+    } finally {
+      setMongoSyncing(false);
+    }
+  };
+
+  const handleReconnectMongo = async () => {
+    setMongoSyncing(true);
+    try {
+      const res = await api.reconnectMongo();
+      if (res.success) {
+        showToast('Connected to MongoDB database cluster', 'success');
+        if (res.data) setMongoStatus(res.data);
+      } else {
+        showToast('Unable to reach MongoDB cluster. Running in resilient local cache mode.', 'info');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'MongoDB connection error', 'error');
+    } finally {
+      setMongoSyncing(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    // Initial load
+    loadAllAdminData();
+
+    // 1. Listen for real-time broadcast events (same-window or other tabs/devices)
+    const unsub = onSync('*', (event) => {
+      if (event.type === 'ORDER_PLACED' && event.payload?.order) {
+        const newOrd = event.payload.order;
+        setOrders(prev => {
+          if (prev.some(o => o.id === newOrd.id)) return prev;
+          return [newOrd, ...prev];
+        });
+        setHighlightedOrderId(newOrd.id);
+        playOrderChime();
+        showToast(`🔔 New Order #${newOrd.orderNumber} placed by ${newOrd.customerName} ($${(newOrd.grandTotal || newOrd.total || 0).toFixed(2)})!`, 'success');
+        setTimeout(() => setHighlightedOrderId(null), 10000);
+
+        // Refresh analytics metrics in background
+        api.getAnalytics().then(aRes => {
+          if (aRes.success && aRes.data) setAnalytics(aRes.data);
+        }).catch(() => {});
+      } else if (event.type === 'INVENTORY_UPDATED' || event.type === 'PRODUCT_UPDATED') {
+        // Refresh catalog inventory table
+        api.getProducts({ limit: 500 }).then(pRes => {
+          if (pRes.success && pRes.data) setProducts(pRes.data.products || []);
+        }).catch(() => {});
+      }
+    });
+
+    // 2. Continuous real-time polling: Every 4 seconds, check for any newly placed orders
+    const pollInterval = setInterval(async () => {
+      try {
+        const res = await api.getAdminOrders({ limit: 50 });
+        if (res.success && res.data) {
+          const freshOrders = res.data;
+          setOrders(prev => {
+            const prevIds = new Set(prev.map(o => o.id));
+            const brandNewOrders = freshOrders.filter(o => !prevIds.has(o.id));
+            if (brandNewOrders.length > 0) {
+              const newest = brandNewOrders[0];
+              playOrderChime();
+              showToast(`🔔 New Order #${newest.orderNumber} placed by ${newest.customerName} ($${(newest.grandTotal || newest.total || 0).toFixed(2)})!`, 'success');
+              setHighlightedOrderId(newest.id);
+              setTimeout(() => setHighlightedOrderId(null), 10000);
+              api.getAnalytics().then(aRes => {
+                if (aRes.success && aRes.data) setAnalytics(aRes.data);
+              }).catch(() => {});
+              return freshOrders;
+            }
+            return freshOrders;
+          });
+        }
+      } catch {
+        // silent polling catch
+      }
+    }, 4000);
+
+    // 3. Tab visibility / window focus listener (refreshes immediately when admin opens or focuses tab)
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        api.getAdminOrders({ limit: 50 }).then(res => {
+          if (res.success && res.data) setOrders(res.data);
+        }).catch(() => {});
+        api.getAnalytics().then(res => {
+          if (res.success && res.data) setAnalytics(res.data);
+        }).catch(() => {});
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleVisibility);
+
+    return () => {
+      unsub();
+      clearInterval(pollInterval);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleVisibility);
+    };
   }, [isAdmin]);
 
   // Derived stats with safe fallbacks
@@ -314,6 +523,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       if (res.success) {
         setProducts(prev => prev.map(p => p.id === product.id ? { ...p, stock: newStock } : p));
         showToast(`${product.name}: stock updated to ${newStock}`, 'success');
+        broadcastSync('INVENTORY_UPDATED', { productId: product.id, newStock });
       }
     } catch (err: any) {
       showToast(err.message || 'Stock update failed', 'error');
@@ -359,11 +569,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         const res = await api.updateProduct(editingProduct.id, payload);
         if (res.success) {
           showToast(`Product "${prodName}" updated successfully!`, 'success');
+          broadcastSync('PRODUCT_UPDATED', { product: res.data, action: 'update' });
         }
       } else {
         const res = await api.createProduct(payload);
         if (res.success) {
           showToast(`New product "${prodName}" added to catalog!`, 'success');
+          broadcastSync('PRODUCT_UPDATED', { product: res.data, action: 'create' });
         }
       }
       setIsProductModalOpen(false);
@@ -379,6 +591,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       const res = await api.deleteProduct(id);
       if (res.success) {
         showToast('Product decommissioned', 'info');
+        broadcastSync('PRODUCT_UPDATED', { id, action: 'delete' });
         loadAllAdminData();
       }
     } catch (err: any) {
@@ -431,11 +644,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         const res = await api.updateAdminCategory(editingCategory.id, payload);
         if (res.success) {
           showToast(`Category "${catName}" updated successfully!`, 'success');
+          broadcastSync('CATEGORY_UPDATED', { category: res.data, action: 'update' });
         }
       } else {
         const res = await api.createAdminCategory(payload);
         if (res.success) {
           showToast(`New category "${catName}" created!`, 'success');
+          broadcastSync('CATEGORY_UPDATED', { category: res.data, action: 'create' });
         }
       }
       setIsCategoryModalOpen(false);
@@ -451,6 +666,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       const res = await api.deleteAdminCategory(id);
       if (res.success) {
         showToast(`Category "${name}" removed`, 'info');
+        broadcastSync('CATEGORY_UPDATED', { id, action: 'delete' });
         loadAllAdminData();
       }
     } catch (err: any) {
@@ -495,11 +711,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         const res = await api.updateAdminBrand(editingBrand.id, payload);
         if (res.success) {
           showToast(`Brand "${brandName}" updated successfully!`, 'success');
+          broadcastSync('CATEGORY_UPDATED', { brand: res.data });
         }
       } else {
         const res = await api.createAdminBrand(payload);
         if (res.success) {
           showToast(`New brand "${brandName}" created!`, 'success');
+          broadcastSync('CATEGORY_UPDATED', { brand: res.data });
         }
       }
       setIsBrandModalOpen(false);
@@ -515,6 +733,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       const res = await api.deleteAdminBrand(id);
       if (res.success) {
         showToast(`Brand "${name}" removed`, 'info');
+        broadcastSync('CATEGORY_UPDATED', { id, action: 'delete' });
         loadAllAdminData();
       }
     } catch (err: any) {
@@ -528,6 +747,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       const res = await api.updateOrderStatus(orderId, status);
       if (res.success) {
         showToast(`Order status updated to ${status}`, 'success');
+        broadcastSync('ORDER_UPDATED', { orderId, status });
         loadAllAdminData();
       }
     } catch (err: any) {
@@ -542,6 +762,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       const res = await api.updateOrderStatus(selectedOrderForTracking.id, 'SHIPPED', newTrackingNumber);
       if (res.success) {
         showToast(`Tracking number ${newTrackingNumber} assigned!`, 'success');
+        broadcastSync('ORDER_UPDATED', { orderId: selectedOrderForTracking.id, status: 'SHIPPED', trackingNumber: newTrackingNumber });
         setIsTrackingModalOpen(false);
         loadAllAdminData();
       }
@@ -628,65 +849,22 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       <div className="w-full min-h-screen bg-stone-950 text-stone-100 flex flex-col justify-between p-4 sm:p-8">
         <div className="max-w-md w-full mx-auto my-auto py-12 space-y-6">
           {/* Header */}
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-2.5">
             <div className="w-12 h-12 bg-amber-950/80 border border-amber-600/40 text-amber-400 rounded-xs flex items-center justify-center mx-auto shadow-lg">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-amber-500">
-              Restricted Gateway
-            </span>
-            <h1 className="font-serif text-2xl font-bold text-white tracking-wide uppercase">
-              World Hookah Admin
-            </h1>
-            <p className="text-xs text-stone-400">
-              Authorized personnel only. Sign in with executive or staff credentials.
-            </p>
-          </div>
+            
+            <div className="inline-flex items-center gap-2 bg-stone-900 border border-amber-900/60 px-3 py-1 rounded-full text-[10px] font-mono text-amber-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Operations Portal: domainname.com/dashboard</span>
+            </div>
 
-          {/* 1-Click Quick Demo Switchers */}
-          <div className="bg-stone-900 border border-stone-800 rounded-xs p-4 space-y-3">
-            <div className="text-[11px] font-semibold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Instant 1-Click Access</span>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <button
-                type="button"
-                onClick={() => handleAdminLogin(undefined, 'ehtesham4628@gmail.com', 'Admin123!')}
-                disabled={adminLoginLoading}
-                className="bg-amber-950 hover:bg-amber-900 text-amber-100 p-2.5 rounded-xs text-xs font-semibold text-center border border-amber-600 transition-all flex flex-col items-center gap-1 cursor-pointer"
-              >
-                <span className="font-bold">⚡ Owner (Ehtesham)</span>
-                <span className="text-[9px] text-amber-300">Root Super Admin</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleAdminLogin(undefined, 'admin@worldhookahmarket.com', 'Admin123!')}
-                disabled={adminLoginLoading}
-                className="bg-amber-900 hover:bg-amber-800 text-amber-50 p-2.5 rounded-xs text-xs font-semibold text-center border border-amber-700/50 transition-all flex flex-col items-center gap-1 cursor-pointer"
-              >
-                <span className="font-bold">👑 Super Admin</span>
-                <span className="text-[9px] text-amber-200">Full Suite</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleAdminLogin(undefined, 'pm@sultan.com', 'Staff123!')}
-                disabled={adminLoginLoading}
-                className="bg-stone-800 hover:bg-stone-700 text-stone-200 p-2.5 rounded-xs text-xs font-semibold text-center border border-stone-700 transition-all flex flex-col items-center gap-1 cursor-pointer"
-              >
-                <span className="font-bold">📦 Catalog Lead</span>
-                <span className="text-[9px] text-stone-400">Products</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleAdminLogin(undefined, 'admin@sultan.com', 'Admin123!')}
-                disabled={adminLoginLoading}
-                className="bg-stone-800 hover:bg-stone-700 text-stone-200 p-2.5 rounded-xs text-xs font-semibold text-center border border-stone-700 transition-all flex flex-col items-center gap-1 cursor-pointer"
-              >
-                <span className="font-bold">👑 Sultan Admin</span>
-                <span className="text-[9px] text-stone-400">Executive</span>
-              </button>
-            </div>
+            <h1 className="font-serif text-2xl font-bold text-white tracking-wide uppercase">
+              Staff & Executive Operations
+            </h1>
+            <p className="text-xs text-stone-400 max-w-sm mx-auto">
+              Secure staff and administration gateway. Direct portal access at <code className="text-amber-400 font-mono">/dashboard</code> for real-time inventory, orders, wholesale B2B, and MongoDB controls.
+            </p>
           </div>
 
           {/* Form */}
@@ -773,7 +951,23 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </div>
 
         <div className="flex items-center gap-3 text-xs">
-          <div className="hidden sm:flex items-center gap-2 bg-stone-800 px-3 py-1.5 rounded-xs border border-stone-700">
+          {/* MongoDB Cloud State Pill & Sync Trigger */}
+          <div className="flex items-center gap-2 bg-stone-800/90 border border-stone-700 px-2.5 py-1.5 rounded-xs">
+            <Database className={`w-3.5 h-3.5 ${mongoStatus?.isConnected ? 'text-emerald-400' : 'text-amber-400'}`} />
+            <span className="text-[11px] text-stone-200 font-medium font-mono hidden sm:inline">
+              {mongoStatus?.isConnected ? `MongoDB (${mongoStatus.dbName})` : 'MongoDB: Active'}
+            </span>
+            <button
+              onClick={handleTriggerMongoSync}
+              disabled={mongoSyncing}
+              title="Synchronize all data to MongoDB"
+              className="text-[10px] uppercase font-bold text-amber-300 hover:text-amber-100 bg-amber-950/80 hover:bg-amber-900 border border-amber-800 px-2 py-0.5 rounded-xs cursor-pointer transition-colors"
+            >
+              {mongoSyncing ? 'Syncing...' : 'Sync to MongoDB'}
+            </button>
+          </div>
+
+          <div className="hidden lg:flex items-center gap-2 bg-stone-800 px-3 py-1.5 rounded-xs border border-stone-700">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-stone-300">API: Operational</span>
           </div>
@@ -1066,12 +1260,26 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                       <span className="text-[11px] text-amber-800 font-semibold mt-1 block">Master distributor tier</span>
                     </div>
 
-                    <div className="bg-white border border-stone-200 p-5 rounded-xs shadow-xs">
-                      <span className="text-[11px] uppercase font-bold text-stone-500 tracking-wider">Inventory Health</span>
-                      <div className="text-2xl font-bold text-stone-900 mt-1 font-sans">
-                        {statsLowStock} items
+                    <div className="bg-white border border-stone-200 p-5 rounded-xs shadow-xs flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] uppercase font-bold text-stone-500 tracking-wider">Inventory Health</span>
+                          <button
+                            onClick={() => {
+                              setActiveTab('products');
+                              setIsBulkUpdateModalOpen(true);
+                            }}
+                            className="text-[10px] text-amber-800 hover:text-amber-900 font-bold underline cursor-pointer"
+                            title="Open bulk stock updater"
+                          >
+                            Bulk Sync
+                          </button>
+                        </div>
+                        <div className="text-2xl font-bold text-stone-900 mt-1 font-sans">
+                          {statsLowStock} items
+                        </div>
+                        <span className="text-[11px] text-amber-700 font-semibold mt-1 block">Requires supplier replenishment</span>
                       </div>
-                      <span className="text-[11px] text-amber-700 font-semibold mt-1 block">Requires supplier replenishment</span>
                     </div>
                   </div>
 
@@ -1139,6 +1347,15 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                       >
                         <Tag className="w-3.5 h-3.5 text-amber-800" />
                         <span>Add Brand</span>
+                      </button>
+                      <button
+                        id="admin-bulk-update-btn"
+                        onClick={() => setIsBulkUpdateModalOpen(true)}
+                        className="bg-stone-900 hover:bg-stone-800 text-amber-300 text-xs font-semibold px-3.5 py-2 rounded-xs transition-colors flex items-center gap-1.5 border border-stone-700 shadow-xs cursor-pointer"
+                        title="Bulk update catalog stock levels and pricing using CSV or JSON"
+                      >
+                        <FileSpreadsheet className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Bulk CSV/JSON Update</span>
                       </button>
                       <button
                         id="admin-create-product-btn"
@@ -1424,10 +1641,10 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {brands
                       .filter(b => !adminSearch || b.name.toLowerCase().includes(adminSearch.toLowerCase()) || (b.origin && b.origin.toLowerCase().includes(adminSearch.toLowerCase())))
-                      .map((brand) => {
+                      .map((brand, bIdx) => {
                         const matchingProductsCount = products.filter(p => p.brand.toLowerCase() === brand.name.toLowerCase()).length;
                         return (
-                          <div key={brand.id} className="bg-white border border-stone-200 rounded-xs overflow-hidden shadow-xs flex flex-col justify-between hover:border-amber-300 transition-colors">
+                          <div key={`${brand.id}-${brand.slug || bIdx}`} className="bg-white border border-stone-200 rounded-xs overflow-hidden shadow-xs flex flex-col justify-between hover:border-amber-300 transition-colors">
                             <div className="p-4 space-y-3">
                               <div className="flex items-center gap-3">
                                 <div className="w-12 h-12 rounded-xs border border-stone-200 bg-stone-50 p-1 flex items-center justify-center overflow-hidden shrink-0">
@@ -1530,10 +1747,26 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                       </thead>
                       <tbody className="divide-y divide-stone-100">
                         {filteredOrders.map((ord) => (
-                          <tr key={ord.id} className="hover:bg-stone-50/70 transition-colors">
+                          <tr
+                            key={ord.id}
+                            className={`transition-all duration-700 ${
+                              highlightedOrderId === ord.id
+                                ? 'bg-amber-100/90 ring-2 ring-amber-500 shadow-sm'
+                                : 'hover:bg-stone-50/70'
+                            }`}
+                          >
                             <td className="py-3 px-4">
-                              <p className="font-bold text-stone-900">{ord.orderNumber}</p>
-                              <p className="text-[10px] text-stone-400">{new Date(ord.createdAt).toLocaleDateString()}</p>
+                              <div className="flex items-center gap-2">
+                                <p className="font-bold text-stone-900">{ord.orderNumber}</p>
+                                {highlightedOrderId === ord.id && (
+                                  <span className="bg-amber-600 text-white text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-xs animate-pulse shadow-xs">
+                                    Just Placed!
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[10px] text-stone-400">
+                                {new Date(ord.createdAt).toLocaleDateString()} • {new Date(ord.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </p>
                             </td>
                             <td className="py-3 px-4">
                               <p className="font-semibold text-stone-800">{ord.customerName}</p>
@@ -1788,13 +2021,25 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     Storefront Global Configuration
                   </h2>
 
-                  <div className="space-y-4 text-xs">
+                  <form onSubmit={handleSaveStoreSettings} className="space-y-4 text-xs">
                     <div>
                       <label className="block font-semibold text-stone-700 mb-1">Store Name</label>
                       <input
                         type="text"
-                        defaultValue={settings?.storeName || 'World Hookah Market'}
-                        className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                        value={settingStoreName}
+                        onChange={(e) => setSettingStoreName(e.target.value)}
+                        className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs focus:ring-1 focus:ring-amber-800 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-stone-700 mb-1">Announcement Top Banner</label>
+                      <input
+                        type="text"
+                        value={settingAnnouncement}
+                        onChange={(e) => setSettingAnnouncement(e.target.value)}
+                        className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs focus:ring-1 focus:ring-amber-800 focus:outline-none"
+                        placeholder="e.g. Free shipping on orders over $150"
                       />
                     </div>
 
@@ -1803,8 +2048,9 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                         <label className="block font-semibold text-stone-700 mb-1">Free Shipping Threshold ($)</label>
                         <input
                           type="number"
-                          defaultValue={settings?.freeShippingThreshold || 99}
-                          className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono"
+                          value={settingFreeShipping}
+                          onChange={(e) => setSettingFreeShipping(e.target.value)}
+                          className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono focus:ring-1 focus:ring-amber-800 focus:outline-none"
                         />
                       </div>
 
@@ -1812,8 +2058,10 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                         <label className="block font-semibold text-stone-700 mb-1">Standard Sales Tax (%)</label>
                         <input
                           type="number"
-                          defaultValue={((settings?.taxRate || 0.0825) * 100).toFixed(1)}
-                          className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono"
+                          step="0.01"
+                          value={settingTaxRate}
+                          onChange={(e) => setSettingTaxRate(e.target.value)}
+                          className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono focus:ring-1 focus:ring-amber-800 focus:outline-none"
                         />
                       </div>
                     </div>
@@ -1824,12 +2072,94 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </div>
 
                     <button
-                      type="button"
-                      onClick={() => showToast('Storefront configurations saved successfully', 'success')}
-                      className="bg-stone-900 hover:bg-amber-900 text-white font-semibold py-2.5 px-6 rounded-xs transition-colors cursor-pointer"
+                      type="submit"
+                      disabled={settingsSaving}
+                      className="bg-stone-900 hover:bg-amber-900 text-white font-semibold py-2.5 px-6 rounded-xs transition-colors cursor-pointer flex items-center gap-2"
                     >
-                      Save Store Settings
+                      {settingsSaving && <RefreshCw className="w-4 h-4 animate-spin" />}
+                      <span>{settingsSaving ? 'Saving Configurations...' : 'Save & Broadcast Store Settings'}</span>
                     </button>
+                  </form>
+
+                  {/* MongoDB Cluster & Storage Card */}
+                  <div className="border-t border-stone-200 pt-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Database className="w-5 h-5 text-amber-700" />
+                        <div>
+                          <h3 className="font-serif text-base font-bold text-stone-900">
+                            MongoDB Cloud Persistence & Collections
+                          </h3>
+                          <p className="text-xs text-stone-500">
+                            Centralized database storing catalog products, customer profiles, orders, and wholesale records.
+                          </p>
+                        </div>
+                      </div>
+
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${mongoStatus?.isConnected ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                        <span className={`w-2 h-2 rounded-full ${mongoStatus?.isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                        <span>{mongoStatus?.isConnected ? 'MongoDB Active' : 'Cache Fallback'}</span>
+                      </span>
+                    </div>
+
+                    <div className="bg-stone-50 border border-stone-200 rounded-xs p-4 space-y-3 text-xs">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
+                        <div className="bg-white p-2.5 rounded border border-stone-200">
+                          <span className="text-[10px] text-stone-500 block uppercase">Database</span>
+                          <span className="font-bold text-stone-900">{mongoStatus?.dbName || 'sultan_hookah'}</span>
+                        </div>
+                        <div className="bg-white p-2.5 rounded border border-stone-200">
+                          <span className="text-[10px] text-stone-500 block uppercase">Catalog Items</span>
+                          <span className="font-bold text-amber-800">
+                            {(mongoStatus?.collectionCounts?.products ?? totalProductsCount).toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="bg-white p-2.5 rounded border border-stone-200">
+                          <span className="text-[10px] text-stone-500 block uppercase">Orders</span>
+                          <span className="font-bold text-stone-900">
+                            {mongoStatus?.collectionCounts?.orders ?? orders.length}
+                          </span>
+                        </div>
+                        <div className="bg-white p-2.5 rounded border border-stone-200">
+                          <span className="text-[10px] text-stone-500 block uppercase">Users & Staff</span>
+                          <span className="font-bold text-stone-900">
+                            {mongoStatus?.collectionCounts?.users ?? customers.length}
+                          </span>
+                        </div>
+                      </div>
+
+                      {mongoStatus?.lastSyncAt && (
+                        <p className="text-[11px] text-stone-500">
+                          Last synchronized: {new Date(mongoStatus.lastSyncAt).toLocaleString()}
+                        </p>
+                      )}
+
+                      {mongoStatus?.lastError && !mongoStatus?.isConnected && (
+                        <div className="bg-amber-50 border border-amber-200 rounded p-2 text-[11px] text-amber-800">
+                          <span className="font-semibold">Notice:</span> {mongoStatus.lastError}
+                        </div>
+                      )}
+
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={handleTriggerMongoSync}
+                          disabled={mongoSyncing}
+                          className="bg-amber-800 hover:bg-amber-900 disabled:opacity-50 text-white font-semibold py-2 px-4 rounded-xs text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 ${mongoSyncing ? 'animate-spin' : ''}`} />
+                          <span>{mongoSyncing ? 'Synchronizing with MongoDB...' : 'Sync All Data to MongoDB'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleReconnectMongo}
+                          disabled={mongoSyncing}
+                          className="bg-stone-200 hover:bg-stone-300 text-stone-800 font-semibold py-2 px-4 rounded-xs text-xs transition-colors cursor-pointer"
+                        >
+                          Test / Reconnect Cluster
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1893,8 +2223,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                       className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
                     />
                     <datalist id="admin-brand-options">
-                      {brands.map(b => (
-                        <option key={b.id} value={b.name}>{b.origin ? `${b.name} (${b.origin})` : b.name}</option>
+                      {brands.map((b, bIdx) => (
+                        <option key={`${b.id}-${b.slug || bIdx}`} value={b.name}>{b.origin ? `${b.name} (${b.origin})` : b.name}</option>
                       ))}
                     </datalist>
                   </div>
@@ -2420,6 +2750,20 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
             </form>
           </div>
         </div>
+      )}
+
+      {/* BULK CSV / JSON STOCK & PRICE UPDATE MODAL */}
+      {isBulkUpdateModalOpen && (
+        <BulkProductUpdateModal
+          isOpen={isBulkUpdateModalOpen}
+          onClose={() => setIsBulkUpdateModalOpen(false)}
+          products={products}
+          onSuccess={(msg) => {
+            showToast(msg || 'Bulk update completed successfully!', 'success');
+            loadAllAdminData();
+            broadcastSync('INVENTORY_UPDATED', { action: 'bulk-csv-update' });
+          }}
+        />
       )}
 
     </div>

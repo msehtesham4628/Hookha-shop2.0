@@ -131,13 +131,13 @@ export const CategoryBrandGrid: React.FC<CategoryBrandGridProps> = ({
 
       {/* Brand Cards Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
-        {displayBrands.map((brand) => {
+        {displayBrands.map((brand, bIdx) => {
           const isSelected = selectedBrand === brand.slug;
           const meta = BRAND_METRICS[brand.slug] || { logoIcon: '🏷️', countryCode: brand.origin?.includes('Russia') ? 'RU' : 'US' };
 
           return (
             <button
-              key={brand.id}
+              key={`${brand.id}-${brand.slug}-${bIdx}`}
               onClick={() => onSelectBrand(isSelected ? '' : brand.slug)}
               className={`group relative flex flex-col items-center text-center p-3 sm:p-3.5 rounded-xl border transition-all duration-300 cursor-pointer ${
                 isSelected

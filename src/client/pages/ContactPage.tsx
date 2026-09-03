@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { api } from '../services/api.js';
 import { useStore } from '../store/useStore.js';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle2 } from 'lucide-react';
+import { SEOHead } from '../components/SEOHead.js';
 
 interface ContactPageProps {
   onNavigate: (path: string) => void;
@@ -47,6 +48,15 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
 
   return (
     <div className="w-full bg-stone-50/50 py-12 min-h-screen">
+      <SEOHead
+        title="Contact Us & Concierge Support | Fumare Hookah"
+        ruTitle="Контакты и клиентская поддержка | Fumare Hookah"
+        description="Contact Fumare Hookah customer concierge and international wholesale team in Miami, FL. Phone: +1-800-785-8260, Email: support@fumarehookah.com."
+        ruDescription="Служба заботы о клиентах и оптовый отдел Fumare Hookah. Консультации по кальянам, табаку и оптовым заказам."
+        keywords={['contact Fumare Hookah', 'hookah customer support', 'контакты магазина кальянов', 'Fumare телефон']}
+        canonicalPath="/contact"
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}

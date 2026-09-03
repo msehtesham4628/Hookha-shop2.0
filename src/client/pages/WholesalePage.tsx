@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { api } from '../services/api.js';
 import { useStore } from '../store/useStore.js';
 import { submitWholesaleApplication as submitCloudWholesale } from '../services/firebase.js';
+import { SEOHead } from '../components/SEOHead.js';
 import {
   ShieldCheck,
   Building2,
@@ -83,6 +84,24 @@ export const WholesalePage: React.FC<WholesalePageProps> = ({ onNavigate }) => {
 
   return (
     <div className="w-full bg-stone-50/50 py-12 min-h-screen">
+      <SEOHead
+        title="Hookah Lounge Wholesale & B2B Master Distributor USA & Russia"
+        ruTitle="Оптовые поставки кальянов и табака для лаунжей и шопов"
+        description="Wholesale hookah lounge distributor. Master cases for 1kg shisha tins, 20kg coconut coals, Alpha Hookah and Kong bowls at tier-1 distributor prices."
+        ruDescription="Оптовые цены на табак 1кг, угли в коробках 20кг, кальяны Alpha Hookah, MattPear и чаши для кальянных заведений по США и РФ."
+        keywords={[
+          'hookah wholesale',
+          'shisha lounge supplier USA',
+          'wholesale hookah tobacco 1kg',
+          'оптовые поставки кальянов',
+          'табак для кальяна оптом',
+          'уголь для кальяна опт',
+          'Alpha Hookah wholesale',
+          'Fumare Hookah B2B'
+        ]}
+        canonicalPath="/wholesale"
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Hero */}

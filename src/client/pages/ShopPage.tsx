@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
+import { onSync } from '../services/sync.js';
 import { ProductCard } from '../components/ProductCard.js';
 import { CategoryBrandBadges } from '../components/CategoryBrandBadges.js';
 import { CategoryHeroBanner } from '../components/CategoryHeroBanner.js';
 import { Product, Category, Brand } from '../../types/index.js';
 import { useTranslation } from '../i18n/LanguageContext.js';
+import { SEOHead } from '../components/SEOHead.js';
+import { getItemListSchema, MARKET_KEYWORDS } from '../../shared/seoConstants.js';
 import {
   SlidersHorizontal,
   X,
@@ -177,6 +180,35 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     currentPage
   ]);
 
+  // Real-time synchronization when admin updates products, stock, or categories
+  useEffect(() => {
+    const unsub = onSync('*', (event) => {
+      if (
+        event.type === 'PRODUCT_UPDATED' ||
+        event.type === 'INVENTORY_UPDATED' ||
+        event.type === 'ORDER_PLACED' ||
+        event.type === 'CATEGORY_UPDATED' ||
+        event.type === 'REFRESH_ALL'
+      ) {
+        fetchProducts();
+        if (event.type === 'CATEGORY_UPDATED') {
+          api.getCategories().then(res => { if (res.success && res.data) setCategories(res.data); }).catch(() => {});
+          api.getBrands().then(res => { if (res.success && res.data) setBrands(res.data); }).catch(() => {});
+        }
+      }
+    });
+
+    const handleFocus = () => {
+      fetchProducts();
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      unsub();
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
   const handleResetFilters = () => {
     setSelectedCategory('');
     setSelectedSubcategory('');
@@ -229,8 +261,29 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     { label: t('category.sort_price_high', 'Expensive'), value: 'price-high-low' }
   ];
 
+  // Calculate dynamic SEO parameters
+  const seoTitle = currentCategoryObj?.seoTitle || (currentCategoryObj ? `${currentCategoryObj.name} | Buy Online USA & Russia` : currentBrandObj?.seoTitle || (currentBrandObj ? `${currentBrandObj.name} Store | Official Master Distributor` : searchQuery ? `Search Results for "${searchQuery}"` : 'Shop Premier Hookahs, Shisha Tobacco, Bowls & Accessories'));
+  const seoRuTitle = currentCategoryObj ? `Купить ${currentCategoryObj.name} | Кальяны и табак с доставкой в США и РФ` : currentBrandObj ? `${currentBrandObj.name} купить в США и РФ | Официальный каталог` : searchQuery ? `Результаты поиска "${searchQuery}" | Fumare Hookah` : 'Каталог кальянов, табака для кальяна и аксессуаров';
+  const seoDesc = currentCategoryObj?.seoDescription || (currentCategoryObj ? `Shop authentic ${currentCategoryObj.name} featuring Alpha Hookah, MustHave, DarkSide, Oblako and Kong. Fast USA & international delivery.` : currentBrandObj?.seoDescription || (currentBrandObj ? `Official ${currentBrandObj.name} store at Fumare Hookah. Factory direct master distribution, 100% genuine with fast shipping.` : 'Browse over 5,000+ authentic Russian hookahs, dark leaf shisha tobacco, bowls, and coal. Express shipping across USA and worldwide.'));
+  const seoRuDesc = currentCategoryObj ? `Большой выбор в категории ${currentCategoryObj.name}. Официальная продукция с гарантией качества и быстрой доставкой по США и РФ.` : currentBrandObj ? `Оригинальная продукция ${currentBrandObj.name} от официального дистрибьютора. Доставка по США, РФ и СНГ.` : 'Каталог премиальных кальянов, табака для кальяна MustHave, DarkSide, чаш Oblako, Kong и аксессуаров.';
+  const seoPath = selectedCategory ? `/shop?category=${selectedCategory}` : selectedBrand ? `/shop?brand=${selectedBrand}` : searchQuery ? `/shop?search=${encodeURIComponent(searchQuery)}` : '/shop';
+  const categoryKeywords = selectedCategory && MARKET_KEYWORDS.categories[selectedCategory as keyof typeof MARKET_KEYWORDS.categories]
+    ? MARKET_KEYWORDS.categories[selectedCategory as keyof typeof MARKET_KEYWORDS.categories].en
+    : [];
+
   return (
     <div className="w-full bg-stone-50/50 min-h-screen py-6 sm:py-8">
+      {/* Dynamic SEO Meta & Structured Data */}
+      <SEOHead
+        title={seoTitle}
+        ruTitle={seoRuTitle}
+        description={seoDesc}
+        ruDescription={seoRuDesc}
+        keywords={[...categoryKeywords, currentCategoryObj?.name || '', currentBrandObj?.name || '', 'Fumare Hookah', 'buy hookah online'].filter(Boolean)}
+        canonicalPath={seoPath}
+        jsonLd={getItemListSchema(currentCategoryObj?.name || currentBrandObj?.name || 'Catalog', products.map(p => ({ name: p.name, url: `/product/${p.slug}`, image: p.images?.[0]?.url })))}
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Category Hero Banner with Rich Photography & Specs */}
@@ -455,9 +508,9 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                 {t('category.filter_brand', 'Brand House')}
               </h4>
               <div className="space-y-1.5 text-xs text-stone-700 max-h-52 overflow-y-auto pr-1">
-                {brands.map((b) => (
+                {brands.map((b, bIdx) => (
                   <label
-                    key={b.id}
+                    key={`${b.id}-${b.slug || bIdx}`}
                     className="flex items-center gap-2 cursor-pointer py-1 px-1 rounded-xs hover:bg-stone-50"
                   >
                     <input

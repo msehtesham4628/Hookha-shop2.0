@@ -144,6 +144,7 @@ router.post('/create-payment', optionalAuthenticateToken, async (req: Authentica
       const prod = db.products.find(p => p.id === item.productId)!;
       const prevStock = prod.stock;
       prod.stock -= item.quantity;
+      db.persist('products', prod);
 
       orderItems.push({
         productId: prod.id,
@@ -157,7 +158,7 @@ router.post('/create-payment', optionalAuthenticateToken, async (req: Authentica
         subtotal: item.totalPrice
       });
 
-      db.inventoryTransactions.push({
+      const invRecord = {
         id: `inv-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
         productId: prod.id,
         productName: prod.name,
@@ -165,11 +166,13 @@ router.post('/create-payment', optionalAuthenticateToken, async (req: Authentica
         previousStock: prevStock,
         newStock: prod.stock,
         adjustment: -item.quantity,
-        reason: 'ORDER_PLACED',
+        reason: 'ORDER_PLACED' as const,
         actor: customerName,
         notes: `Reserved for online order checkout`,
         createdAt: new Date().toISOString()
-      });
+      };
+      db.inventoryTransactions.push(invRecord);
+      db.persist('inventoryTransactions', invRecord);
     }
 
     const orderId = `ord-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
@@ -207,6 +210,15 @@ router.post('/create-payment', optionalAuthenticateToken, async (req: Authentica
     };
 
     db.orders.push(newOrder);
+    db.persist('orders', newOrder);
+
+    // Create immediate notification for the admin dashboard
+    db.createNotification(
+      'ORDER',
+      `New Order Placed: #${newOrder.orderNumber}`,
+      `${customerName} placed order #${newOrder.orderNumber} for $${newOrder.total.toFixed(2)} with ${orderItems.length} item(s).`,
+      `/dashboard`
+    );
 
     // Update coupon usage count if used
     if (cart.couponCode) {

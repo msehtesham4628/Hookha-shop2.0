@@ -10,6 +10,8 @@ import wishlistRoutes from './routes/wishlist.routes.js';
 import orderRoutes from './routes/order.routes.js';
 import miscRoutes from './routes/misc.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import seoRoutes from './routes/seo.routes.js';
+import { createSeoMiddleware } from './middleware/seoCrawlerMiddleware.js';
 
 export const app = express();
 
@@ -71,6 +73,12 @@ app.get('/api/image-proxy', async (req, res) => {
     return res.status(502).send('Failed to fetch image');
   }
 });
+
+// SEO Routes: sitemaps, robots.txt, opensearch, and SEO inspection
+app.use('/', seoRoutes);
+
+// SEO Crawler Prerendering Middleware for Search Engine Crawlers (Googlebot, Yandex, Bingbot)
+app.use(createSeoMiddleware());
 
 // Mount API Endpoints
 app.use('/api/auth', authRoutes);

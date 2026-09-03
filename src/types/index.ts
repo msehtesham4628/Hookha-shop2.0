@@ -211,16 +211,18 @@ export interface Order {
   shippingFee: number;
   tax: number;
   total: number;
+  grandTotal?: number;
   couponCode?: string;
-  paymentMethod: 'STRIPE' | 'CREDIT_CARD' | 'BANK_TRANSFER';
+  paymentMethod: 'STRIPE' | 'CREDIT_CARD' | 'BANK_TRANSFER' | string;
   paymentStatus: PaymentStatus;
   paymentIntentId?: string;
-  orderStatus: OrderStatus;
+  orderStatus: OrderStatus | string;
+  status?: string;
   trackingNumber?: string;
   carrier?: string;
   notes?: string;
   timeline: {
-    status: OrderStatus;
+    status: OrderStatus | string;
     timestamp: string;
     note?: string;
     actor?: string;
@@ -286,7 +288,7 @@ export interface InventoryTransaction {
   previousStock: number;
   newStock: number;
   adjustment: number;
-  reason: 'ORDER_PLACED' | 'ORDER_CANCELLED' | 'MANUAL_ADJUSTMENT' | 'RESTOCK' | 'DAMAGE_WRITE_OFF';
+  reason: 'ORDER_PLACED' | 'ORDER_CANCELLED' | 'MANUAL_ADJUSTMENT' | 'RESTOCK' | 'DAMAGE_WRITE_OFF' | 'BULK_CSV_UPDATE';
   orderId?: string;
   actor: string;
   notes?: string;
@@ -314,14 +316,17 @@ export interface StoreSettings {
   currencySymbol: string;
   freeShippingThreshold: number;
   standardShippingFee: number;
-  taxRatePercent: number;
-  ageVerificationRequired: boolean;
-  minimumPurchaseAge: number;
-  stripeEnabled: boolean;
-  resendEnabled: boolean;
-  smsProvider: 'twilio' | 'msg91' | 'mock';
-  bannerAnnouncement: string;
-  maintenanceMode: boolean;
+  taxRatePercent?: number;
+  taxRate?: number;
+  ageVerificationRequired?: boolean;
+  minimumPurchaseAge?: number;
+  stripeEnabled?: boolean;
+  resendEnabled?: boolean;
+  smsProvider?: 'twilio' | 'msg91' | 'mock';
+  bannerAnnouncement?: string;
+  announcement?: string;
+  maintenanceMode?: boolean;
+  [key: string]: any;
 }
 
 export interface AdminNotification {

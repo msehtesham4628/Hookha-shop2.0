@@ -101,11 +101,11 @@ export const CategoryBrandBadges: React.FC<CategoryBrandBadgesProps> = ({
           </span>
         </div>
 
-        {brands.map((brand) => {
+        {brands.map((brand, bIdx) => {
           const isSelected = selectedBrand === brand.slug;
           return (
             <div
-              key={brand.slug}
+              key={`${brand.slug || brand.name}-${bIdx}`}
               onClick={() => onSelectBrand(isSelected ? '' : brand.slug)}
               className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0 relative"
             >

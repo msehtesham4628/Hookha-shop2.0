@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../services/api.js';
+import { onSync } from '../services/sync.js';
 import { ProductCard } from '../components/ProductCard.js';
 import { HeroCarousel } from '../components/HeroCarousel.js';
 import { Product } from '../../types/index.js';
 import { useStore } from '../store/useStore.js';
+import { SEOHead } from '../components/SEOHead.js';
+import { getWebSiteSchema, getOrganizationSchema, getFAQSchema, MARKET_KEYWORDS } from '../../shared/seoConstants.js';
 import {
   ChevronLeft,
   ChevronRight,
@@ -84,62 +87,85 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     }
   };
 
-  useEffect(() => {
-    const loadHomeData = async () => {
-      try {
-        setLoading(true);
-        const [
-          tobaccoRes,
-          hookahsRes,
-          bowlsRes,
-          basesRes,
-          coalsRes,
-          accessoriesRes,
-          newInRes,
-          bestRes
-        ] = await Promise.all([
-          api.getProducts({ category: 'tobacco', limit: 12 }),
-          api.getProducts({ category: 'hookahs', limit: 12 }),
-          api.getProducts({ category: 'bowls', limit: 12 }),
-          api.getProducts({ category: 'bases', limit: 12 }),
-          api.getProducts({ category: 'coal', limit: 12 }),
-          api.getProducts({ category: 'accessories', limit: 12 }),
-          api.getProducts({ newArrival: true, limit: 8 }),
-          api.getProducts({ bestSeller: true, limit: 8 })
-        ]);
+  const loadHomeData = async () => {
+    try {
+      const [
+        tobaccoRes,
+        hookahsRes,
+        bowlsRes,
+        basesRes,
+        coalsRes,
+        accessoriesRes,
+        newInRes,
+        bestRes
+      ] = await Promise.all([
+        api.getProducts({ category: 'tobacco', limit: 12 }),
+        api.getProducts({ category: 'hookahs', limit: 12 }),
+        api.getProducts({ category: 'bowls', limit: 12 }),
+        api.getProducts({ category: 'bases', limit: 12 }),
+        api.getProducts({ category: 'coal', limit: 12 }),
+        api.getProducts({ category: 'accessories', limit: 12 }),
+        api.getProducts({ newArrival: true, limit: 8 }),
+        api.getProducts({ bestSeller: true, limit: 8 })
+      ]);
 
-        if (tobaccoRes.success && tobaccoRes.data) {
-          setTobaccoProducts(tobaccoRes.data.products);
-        }
-        if (hookahsRes.success && hookahsRes.data) {
-          setHookahProducts(hookahsRes.data.products);
-        }
-        if (bowlsRes.success && bowlsRes.data) {
-          setBowlProducts(bowlsRes.data.products);
-        }
-        if (basesRes.success && basesRes.data) {
-          setBaseProducts(basesRes.data.products);
-        }
-        if (coalsRes.success && coalsRes.data) {
-          setCoalProducts(coalsRes.data.products);
-        }
-        if (accessoriesRes.success && accessoriesRes.data) {
-          setAccessoryProducts(accessoriesRes.data.products);
-        }
-        if (newInRes.success && newInRes.data) {
-          setNewInProducts(newInRes.data.products);
-        }
-        if (bestRes.success && bestRes.data) {
-          setBestSellers(bestRes.data.products);
-        }
-      } catch (err) {
-        console.error('Failed to load homepage data:', err);
-      } finally {
-        setLoading(false);
+      if (tobaccoRes.success && tobaccoRes.data) {
+        setTobaccoProducts(tobaccoRes.data.products);
       }
-    };
+      if (hookahsRes.success && hookahsRes.data) {
+        setHookahProducts(hookahsRes.data.products);
+      }
+      if (bowlsRes.success && bowlsRes.data) {
+        setBowlProducts(bowlsRes.data.products);
+      }
+      if (basesRes.success && basesRes.data) {
+        setBaseProducts(basesRes.data.products);
+      }
+      if (coalsRes.success && coalsRes.data) {
+        setCoalProducts(coalsRes.data.products);
+      }
+      if (accessoriesRes.success && accessoriesRes.data) {
+        setAccessoryProducts(accessoriesRes.data.products);
+      }
+      if (newInRes.success && newInRes.data) {
+        setNewInProducts(newInRes.data.products);
+      }
+      if (bestRes.success && bestRes.data) {
+        setBestSellers(bestRes.data.products);
+      }
+    } catch (err) {
+      console.error('Failed to load homepage data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadHomeData();
+
+    // Instant sync whenever admin changes products, inventory, or categories
+    const unsub = onSync('*', (event) => {
+      if (
+        event.type === 'PRODUCT_UPDATED' ||
+        event.type === 'INVENTORY_UPDATED' ||
+        event.type === 'ORDER_PLACED' ||
+        event.type === 'CATEGORY_UPDATED' ||
+        event.type === 'REFRESH_ALL'
+      ) {
+        loadHomeData();
+      }
+    });
+
+    // Refresh when switching back to tab
+    const handleFocus = () => {
+      loadHomeData();
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      unsub();
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   // Top Brands / Subcategories for each category
@@ -273,6 +299,16 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
   return (
     <div className="w-full bg-[#f8f9fa] pb-20 text-stone-900 font-sans">
+      {/* Search Engine Optimization for USA & Russia (#1 Ranking Architecture) */}
+      <SEOHead
+        title="Fumare Hookah - Premier Hookahs, Shisha Tobacco, Bowls & Accessories"
+        ruTitle="Fumare Hookah - Официальный магазин кальянов и табака | Доставка в США и РФ"
+        description="The leading online store and master distributor for Alpha Hookah, MustHave, DarkSide, Oblako, Kong, MattPear, Wookah, Kaloud & premium shisha tobacco in USA & Russia."
+        ruDescription="Официальный мастер-дистрибьютор Alpha Hookah, MustHave, DarkSide, Oblako, Kong, MattPear и элитного табака для кальяна. Быстрая доставка по США и РФ."
+        keywords={MARKET_KEYWORDS.global}
+        canonicalPath="/"
+        jsonLd={[getWebSiteSchema(), getOrganizationSchema(), getFAQSchema()]}
+      />
       
       {/* 1. HERO IMAGE CAROUSEL (3 Scrolling Visual Slides matching Screenshot 1) */}
       <HeroCarousel onNavigate={onNavigate} />
@@ -340,9 +376,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           </h3>
 
           <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
-            {tobaccoBrands.map((brand) => (
+            {tobaccoBrands.map((brand, bIdx) => (
               <div
-                key={brand.slug}
+                key={`hp-tobacco-${brand.slug}-${bIdx}`}
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
@@ -425,9 +461,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           </h3>
 
           <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
-            {hookahBrands.map((brand) => (
+            {hookahBrands.map((brand, bIdx) => (
               <div
-                key={brand.slug}
+                key={`hp-hookah-${brand.slug}-${bIdx}`}
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
@@ -510,9 +546,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           </h3>
 
           <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
-            {bowlBrands.map((brand) => (
+            {bowlBrands.map((brand, bIdx) => (
               <div
-                key={brand.slug}
+                key={`hp-bowl-${brand.slug}-${bIdx}`}
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
@@ -590,9 +626,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             Top Base Brands
           </h3>
           <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
-            {baseBrands.map((brand) => (
+            {baseBrands.map((brand, bIdx) => (
               <div
-                key={brand.slug}
+                key={`hp-base-${brand.slug}-${bIdx}`}
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
@@ -667,9 +703,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             Top Coal Brands
           </h3>
           <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
-            {coalBrands.map((brand) => (
+            {coalBrands.map((brand, bIdx) => (
               <div
-                key={brand.slug}
+                key={`hp-coal-${brand.slug}-${bIdx}`}
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
@@ -744,9 +780,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             Top Accessory Brands
           </h3>
           <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
-            {accessoryBrands.map((brand) => (
+            {accessoryBrands.map((brand, bIdx) => (
               <div
-                key={brand.slug}
+                key={`hp-acc-${brand.slug}-${bIdx}`}
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
@@ -821,9 +857,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             Top E-Hookah Brands
           </h3>
           <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
-            {ehookahBrands.map((brand) => (
+            {ehookahBrands.map((brand, bIdx) => (
               <div
-                key={brand.slug}
+                key={`hp-ehookah-${brand.slug}-${bIdx}`}
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
@@ -898,9 +934,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             Top Vape Brands
           </h3>
           <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto pb-2 scrollbar-none">
-            {vapeBrands.map((brand) => (
+            {vapeBrands.map((brand, bIdx) => (
               <div
-                key={brand.slug}
+                key={`hp-vape-${brand.slug}-${bIdx}`}
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >

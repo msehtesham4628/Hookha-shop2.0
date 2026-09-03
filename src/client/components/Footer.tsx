@@ -115,11 +115,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   {t('footer.contact_us', 'Contact Us')}
                 </button>
               </li>
-              <li>
-                <button onClick={() => onNavigate('/admin')} className="text-stone-500 hover:text-cyan-400 transition-colors cursor-pointer">
-                  {t('footer.staff_portal', 'Staff Admin Login')}
-                </button>
-              </li>
             </ul>
           </div>
 
@@ -149,13 +144,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* Bottom Sub-bar with Kaani Web Credit matching Screenshot 6 */}
+        {/* Bottom Sub-bar */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-400">
           <p>© {new Date().getFullYear()} Fumare Hookah. All rights reserved.</p>
-          <div className="text-stone-400 text-xs">
-            <span>kaan! Site created by </span>
-            <span className="text-cyan-400 font-semibold">kaani web</span>
-          </div>
         </div>
 
       </div>

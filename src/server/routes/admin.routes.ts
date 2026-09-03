@@ -5,6 +5,7 @@ import { authenticateToken, AuthenticatedRequest } from '../middleware/auth.midd
 import { requirePermission, requireRole } from '../middleware/rbac.middleware.js';
 import { paymentService } from '../services/payment.service.js';
 import { Product, Role, OrderStatus, Category, Brand, Coupon } from '../../types/index.js';
+import { mongoService } from '../db/mongodb.js';
 
 const router = Router();
 
@@ -211,6 +212,7 @@ router.post('/products', requirePermission('products.create'), (req: Authenticat
   };
 
   db.products.unshift(newProduct);
+  db.persist('products', newProduct);
 
   // Record audit log
   db.logAudit(
@@ -238,6 +240,7 @@ router.put('/products/:id', requirePermission('products.update'), (req: Authenti
   const prevPrice = product.price;
 
   Object.assign(product, req.body, { updatedAt: new Date().toISOString() });
+  db.persist('products', product);
 
   // If stock adjusted, record inventory log
   if (req.body.stock !== undefined && parseInt(req.body.stock, 10) !== prevStock) {
@@ -280,6 +283,7 @@ router.delete('/products/:id', requirePermission('products.delete'), (req: Authe
 
   const deleted = db.products[index];
   db.products.splice(index, 1);
+  db.deletePersisted('products', { id });
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
@@ -374,6 +378,163 @@ router.post('/products/import', requirePermission('products.import'), (req: Auth
   });
 });
 
+// POST /api/admin/products/bulk-update (CSV / JSON bulk inventory & pricing updater)
+router.post('/products/bulk-update', requirePermission('products.update'), (req: AuthenticatedRequest, res) => {
+  const user = req.user!;
+  const { updates } = req.body;
+
+  if (!Array.isArray(updates) || updates.length === 0) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'EMPTY_PAYLOAD', message: 'Array of product updates required' }
+    });
+  }
+
+  let updatedCount = 0;
+  let skippedCount = 0;
+  const updatedItems: any[] = [];
+  const errors: string[] = [];
+
+  for (const item of updates) {
+    try {
+      const rawSku = item.sku ? String(item.sku).trim() : '';
+      const rawId = item.id ? String(item.id).trim() : '';
+      const rawName = item.name ? String(item.name).trim() : '';
+
+      if (!rawSku && !rawId && !rawName) {
+        skippedCount++;
+        errors.push('Row skipped: missing SKU, ID, or name identifier');
+        continue;
+      }
+
+      // Find matching product
+      const product = db.products.find(p =>
+        (rawSku && p.sku && p.sku.toUpperCase() === rawSku.toUpperCase()) ||
+        (rawId && p.id === rawId) ||
+        (rawName && p.name.toLowerCase() === rawName.toLowerCase())
+      );
+
+      if (!product) {
+        skippedCount++;
+        errors.push(`Product not found for "${rawSku || rawId || rawName}"`);
+        continue;
+      }
+
+      const prevStock = product.stock;
+      const prevPrice = product.price;
+      const prevSalePrice = product.salePrice;
+      let hasChanges = false;
+
+      // Update Stock if supplied
+      if (item.stock !== undefined && item.stock !== null && item.stock !== '') {
+        const parsedStock = parseInt(String(item.stock), 10);
+        if (!isNaN(parsedStock) && parsedStock >= 0 && parsedStock !== prevStock) {
+          product.stock = parsedStock;
+          hasChanges = true;
+
+          // Record inventory transaction
+          db.inventoryTransactions.unshift({
+            id: `inv-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+            productId: product.id,
+            productName: product.name,
+            sku: product.sku,
+            previousStock: prevStock,
+            newStock: product.stock,
+            adjustment: product.stock - prevStock,
+            reason: 'BULK_CSV_UPDATE',
+            actor: `${user.firstName} ${user.lastName}`,
+            notes: `Bulk updated via CSV/JSON import (${prevStock} -> ${product.stock})`,
+            createdAt: new Date().toISOString()
+          });
+        }
+      }
+
+      // Update Price if supplied
+      if (item.price !== undefined && item.price !== null && item.price !== '') {
+        const parsedPrice = parseFloat(String(item.price));
+        if (!isNaN(parsedPrice) && parsedPrice >= 0 && parsedPrice !== prevPrice) {
+          product.price = parsedPrice;
+          hasChanges = true;
+          // Recalculate sale flag
+          if (product.salePrice) {
+            product.isOnSale = product.salePrice < product.price;
+          }
+        }
+      }
+
+      // Update Sale Price if supplied
+      if (item.salePrice !== undefined) {
+        if (item.salePrice === null || item.salePrice === '' || String(item.salePrice).toLowerCase() === 'null') {
+          if (product.salePrice !== undefined) {
+            product.salePrice = undefined;
+            product.isOnSale = false;
+            hasChanges = true;
+          }
+        } else {
+          const parsedSalePrice = parseFloat(String(item.salePrice));
+          if (!isNaN(parsedSalePrice) && parsedSalePrice >= 0 && parsedSalePrice !== prevSalePrice) {
+            product.salePrice = parsedSalePrice;
+            product.isOnSale = parsedSalePrice < product.price;
+            hasChanges = true;
+          }
+        }
+      }
+
+      // Update Low Stock Threshold if supplied
+      if (item.lowStockThreshold !== undefined && item.lowStockThreshold !== null && item.lowStockThreshold !== '') {
+        const parsedThreshold = parseInt(String(item.lowStockThreshold), 10);
+        if (!isNaN(parsedThreshold) && parsedThreshold >= 0 && parsedThreshold !== product.lowStockThreshold) {
+          product.lowStockThreshold = parsedThreshold;
+          hasChanges = true;
+        }
+      }
+
+      if (hasChanges) {
+        product.updatedAt = new Date().toISOString();
+        db.persist('products', product);
+        updatedCount++;
+        updatedItems.push({
+          id: product.id,
+          sku: product.sku,
+          name: product.name,
+          oldPrice: prevPrice,
+          newPrice: product.price,
+          oldSalePrice: prevSalePrice,
+          newSalePrice: product.salePrice,
+          oldStock: prevStock,
+          newStock: product.stock
+        });
+      } else {
+        skippedCount++;
+      }
+    } catch (err: any) {
+      skippedCount++;
+      errors.push(`Row error: ${err.message}`);
+    }
+  }
+
+  // Audit log
+  db.logAudit(
+    { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
+    'ADMIN_BULK_UPDATED_PRODUCTS',
+    'CATALOG',
+    undefined,
+    { totalReceived: updates.length, updatedCount, skippedCount }
+  );
+
+  return res.json({
+    success: true,
+    message: `Bulk update complete: ${updatedCount} product(s) updated, ${skippedCount} skipped or unchanged.`,
+    data: {
+      total: updates.length,
+      updated: updatedCount,
+      skipped: skippedCount,
+      updatedItems,
+      errors: errors.slice(0, 50)
+    }
+  });
+});
+
 // ==========================================
 // 3. ORDER MANAGEMENT
 // ==========================================
@@ -429,6 +590,7 @@ router.put('/orders/:id/status', requirePermission('orders.update'), (req: Authe
     actor: `${user.firstName} ${user.lastName}`
   });
   order.updatedAt = new Date().toISOString();
+  db.persist('orders', order);
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
@@ -1037,6 +1199,7 @@ router.get('/settings', requirePermission('settings.view'), (req, res) => {
 router.put('/settings', requirePermission('settings.update'), (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   Object.assign(db.settings, req.body);
+  db.persist('settings', { id: 'store_settings', ...db.settings });
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
@@ -1059,6 +1222,60 @@ router.post('/notifications/:id/read', (req, res) => {
   const n = db.notifications.find(item => item.id === id);
   if (n) n.isRead = true;
   return res.json({ success: true });
+});
+
+// ==========================================
+// MONGODB STORAGE & CLOUD PERSISTENCE
+// ==========================================
+
+// GET /api/admin/mongodb/status
+router.get('/mongodb/status', (req, res) => {
+  const status = mongoService.getStatus();
+  return res.json({ success: true, data: status });
+});
+
+// POST /api/admin/mongodb/sync
+router.post('/mongodb/sync', async (req: AuthenticatedRequest, res) => {
+  const user = req.user!;
+  try {
+    const success = await mongoService.pushAllToMongo(db);
+    db.logAudit(
+      { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
+      'ADMIN_TRIGGERED_MONGODB_SYNC',
+      'MONGODB',
+      undefined,
+      { success }
+    );
+    const status = mongoService.getStatus();
+    return res.json({
+      success,
+      message: success ? 'Complete database synchronized to MongoDB successfully' : 'MongoDB sync failed (check connection)',
+      data: status
+    });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: { code: 'SYNC_ERROR', message: err.message } });
+  }
+});
+
+// POST /api/admin/mongodb/reconnect
+router.post('/mongodb/reconnect', async (req: AuthenticatedRequest, res) => {
+  const user = req.user!;
+  try {
+    const connected = await mongoService.connect();
+    if (connected) {
+      await mongoService.syncWithStore(db);
+    }
+    db.logAudit(
+      { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
+      'ADMIN_RECONNECTED_MONGODB',
+      'MONGODB',
+      undefined,
+      { connected }
+    );
+    return res.json({ success: connected, data: mongoService.getStatus() });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: { code: 'RECONNECT_ERROR', message: err.message } });
+  }
 });
 
 export default router;

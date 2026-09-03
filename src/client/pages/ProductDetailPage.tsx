@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '../services/api.js';
+import { onSync } from '../services/sync.js';
 import { useStore } from '../store/useStore.js';
 import { ProductCard } from '../components/ProductCard.js';
 import { Product, Review } from '../../types/index.js';
 import { sanitizeImageUrl, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/imageFallback.js';
+import { SEOHead } from '../components/SEOHead.js';
+import { getProductSchema } from '../../shared/seoConstants.js';
 import {
   Star,
   ShoppingBag,
@@ -61,9 +64,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
   }, [product?.images, failedImages]);
 
   useEffect(() => {
-    const loadProductData = async () => {
+    const loadProductData = async (silent = false) => {
       try {
-        setLoading(true);
+        if (!silent) setLoading(true);
         const res = await api.getProductBySlug(slug);
         if (res.success && res.data) {
           setProduct(res.data.product);
@@ -76,11 +79,32 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
       } catch (err) {
         console.error('Failed to load product:', err);
       } finally {
-        setLoading(false);
+        if (!silent) setLoading(false);
       }
     };
 
     loadProductData();
+
+    // Live update when dashboard modifies product or stock
+    const unsub = onSync('*', (event) => {
+      if (
+        event.type === 'PRODUCT_UPDATED' ||
+        event.type === 'INVENTORY_UPDATED' ||
+        event.type === 'ORDER_PLACED'
+      ) {
+        loadProductData(true);
+      }
+    });
+
+    const handleFocus = () => {
+      loadProductData(true);
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      unsub();
+      window.removeEventListener('focus', handleFocus);
+    };
   }, [slug]);
 
   if (loading) {
@@ -160,6 +184,30 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
 
   return (
     <div className="w-full bg-stone-50/40 py-8">
+      {/* Dynamic SEO Meta Tags & Schema.org Structured Data */}
+      <SEOHead
+        title={product.seoTitle || `${product.name} | Buy Online USA & Russia`}
+        ruTitle={`Купить ${product.name} | Оригинальный кальян/табак с доставкой`}
+        description={product.seoDescription || `Buy genuine ${product.name} by ${product.brand}. In stock with fast USA express shipping & worldwide delivery. 100% authentic with factory seal.`}
+        ruDescription={`Заказать оригинальный ${product.name} от ${product.brand}. 100% оригинал с гарантией, быстрая доставка по США, России и СНГ.`}
+        keywords={[
+          product.name,
+          product.brand,
+          product.category,
+          `buy ${product.name}`,
+          `купить ${product.name}`,
+          'купить кальян',
+          'табак для кальяна',
+          'Alpha Hookah USA',
+          'MustHave tobacco',
+          'DarkSide tobacco'
+        ]}
+        canonicalPath={`/product/${product.slug}`}
+        ogImage={activeImages[0]?.url}
+        ogType="product"
+        jsonLd={getProductSchema(product)}
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumbs */}
