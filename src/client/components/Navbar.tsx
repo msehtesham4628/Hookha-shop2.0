@@ -127,7 +127,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
       categorySlug: 'e-hookah',
       brands: [
         { name: 'Ooka', slug: 'ooka' },
-        { name: 'Aspire Proteus', slug: 'aspire-proteus' }
+        { name: 'Aspire Proteus', slug: 'aspire-proteus' },
+        { name: 'Kangerm', slug: 'kangerm' },
+        { name: 'Starbuzz', slug: 'starbuzz' },
+        { name: 'Enso', slug: 'enso' },
+        { name: 'Kori', slug: 'kori' }
       ]
     },
     {
@@ -135,10 +139,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
       path: '/shop?category=vapes',
       categorySlug: 'vapes',
       brands: [
-        { name: 'GeekVape', slug: 'geekvape' },
-        { name: 'Vaporesso', slug: 'vaporesso' },
+        { name: 'Al Fakher Vapes', slug: 'al-fakher-vapes' },
+        { name: 'Geek Bar', slug: 'geek-bar' },
         { name: 'Lost Mary', slug: 'lost-mary' },
+        { name: 'Vaporesso', slug: 'vaporesso' },
+        { name: 'GeekVape', slug: 'geekvape' },
         { name: 'Elf Bar', slug: 'elf-bar' },
+        { name: 'Nasty Juice', slug: 'nasty-juice' },
         { name: 'SMOK', slug: 'smok' }
       ]
     },

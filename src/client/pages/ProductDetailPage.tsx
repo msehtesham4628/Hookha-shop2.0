@@ -237,7 +237,52 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
               </h1>
 
               {/* Category context & Hookah link if not a full hookah pipe */}
-              {product.categorySlug !== 'hookahs' && (
+              {product.categorySlug === 'vapes' && (
+                <div className="mt-3 p-3 bg-cyan-50/70 border border-cyan-200/80 rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="text-xs text-cyan-950 flex items-center gap-2">
+                    <span className="font-bold uppercase tracking-wider text-[10px] bg-cyan-200/80 text-cyan-900 px-2 py-0.5 rounded-xs">
+                      Vapes & Pods
+                    </span>
+                    <span>
+                      This product is a <strong>vape device or e-liquid</strong> (standalone portable vapor, does not require a water pipe).
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {product.categorySlug === 'e-hookah' && (
+                <div className="mt-3 p-3 bg-teal-50/70 border border-teal-200/80 rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="text-xs text-teal-950 flex items-center gap-2">
+                    <span className="font-bold uppercase tracking-wider text-[10px] bg-teal-200/80 text-teal-900 px-2 py-0.5 rounded-xs">
+                      E-Hookah
+                    </span>
+                    <span>
+                      This product is an <strong>electronic hookah device or smart e-head</strong> (charcoal-free electronic session).
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {product.categorySlug === 'tobacco' && (
+                <div className="mt-3 p-3 bg-amber-50/70 border border-amber-200/80 rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="text-xs text-amber-950 flex items-center gap-2">
+                    <span className="font-bold uppercase tracking-wider text-[10px] bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-xs">
+                      Shisha Tobacco
+                    </span>
+                    <span>
+                      This product is <strong>shisha molasses</strong> (requires a hookah pipe, bowl, and coconut charcoal to smoke).
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => onNavigate('/shop?category=hookahs')}
+                    className="text-xs font-semibold text-amber-900 hover:text-amber-700 underline shrink-0 cursor-pointer self-start sm:self-auto"
+                  >
+                    Browse Complete Hookahs &rarr;
+                  </button>
+                </div>
+              )}
+
+              {['bowls', 'bases', 'accessories', 'coal'].includes(product.categorySlug) && (
                 <div className="mt-3 p-3 bg-amber-50/70 border border-amber-200/80 rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="text-xs text-amber-950 flex items-center gap-2">
                     <span className="font-bold uppercase tracking-wider text-[10px] bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-xs">

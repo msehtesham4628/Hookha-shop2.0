@@ -344,8 +344,8 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'e-hookah',
     description: 'Electronic hookah heads and portable shisha vaporizers for convenient, clean, and smoke-free modern sessions.',
     imageUrl: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=800&auto=format&fit=crop',
-    subcategories: ['Ooka', 'Kangerm', 'Aspire Proteus', 'Starbuzz Wireless E-Head', 'E-Heads', 'Pod Systems', 'E-Hookah Refills'],
-    productCount: 6,
+    subcategories: ['E-Hookah Devices', 'Electronic Hookah Heads (E-Heads)', 'E-Hookah Pods & Cartridges', 'Coils & Replacement Parts', 'Ooka', 'Aspire Proteus', 'Kangerm', 'Starbuzz'],
+    productCount: 20,
     isActive: true,
     sortOrder: 7
   },
@@ -355,8 +355,8 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'vapes',
     description: 'High performance pod mods, premium disposable vapes, replacement coils, and nic salt devices from world leading vape manufacturers.',
     imageUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=800&auto=format&fit=crop',
-    subcategories: ['GeekVape', 'Vaporesso', 'Lost Mary', 'Elf Bar', 'SMOK', 'VOOPOO', 'OXVA', 'Disposable Vapes', 'Pod Systems', 'Nicotine Salt Liquids'],
-    productCount: 10,
+    subcategories: ['Disposable Vapes', 'Pod Systems', 'Box Mod Kits', 'Replacement Pods & Coils', 'Nicotine Salts & E-Liquids', 'Al Fakher', 'Geek Bar', 'Lost Mary', 'Vaporesso', 'GeekVape'],
+    productCount: 32,
     isActive: true,
     sortOrder: 8
   },
@@ -741,6 +741,76 @@ export const INITIAL_BRANDS: Brand[] = [
     origin: 'Global',
     description: 'Legendary vape hardware pioneers known for Nord and Novo refillable pod kits.',
     logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=300&auto=format&fit=crop',
+    productCount: 4,
+    isActive: true
+  },
+  {
+    id: 'brand-al-fakher-vapes',
+    name: 'Al Fakher Vapes',
+    slug: 'al-fakher-vapes',
+    origin: 'UAE',
+    description: 'Direct-to-lung rechargeable disposable vapes carrying authentic Al Fakher shisha flavor profiles.',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=300&auto=format&fit=crop',
+    productCount: 24,
+    isActive: true
+  },
+  {
+    id: 'brand-geek-bar',
+    name: 'Geek Bar',
+    slug: 'geek-bar',
+    origin: 'Global',
+    description: 'Pioneering dual-mode pulse screen disposables with high puff longevity and intensive flavor reproduction.',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=300&auto=format&fit=crop',
+    productCount: 6,
+    isActive: true
+  },
+  {
+    id: 'brand-nasty-juice',
+    name: 'Nasty Juice',
+    slug: 'nasty-juice',
+    origin: 'Malaysia / Global',
+    description: 'World-renowned artisan e-liquids and authentic shisha series nicotine salts.',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=300&auto=format&fit=crop',
+    productCount: 8,
+    isActive: true
+  },
+  {
+    id: 'brand-kangerm',
+    name: 'Kangerm',
+    slug: 'kangerm',
+    origin: 'Global',
+    description: 'Precision digital electronic hookah heads and variable wattage ceramic heating systems.',
+    logoUrl: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=300&auto=format&fit=crop',
+    productCount: 3,
+    isActive: true
+  },
+  {
+    id: 'brand-starbuzz',
+    name: 'Starbuzz',
+    slug: 'starbuzz',
+    origin: 'USA',
+    description: 'American hookah staple offering iconic shisha blends and the renowned Starbuzz Wireless E-Head.',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=300&auto=format&fit=crop',
+    productCount: 8,
+    isActive: true
+  },
+  {
+    id: 'brand-enso',
+    name: 'Enso',
+    slug: 'enso',
+    origin: 'USA',
+    description: 'Modern all-in-one electronic shisha pipes with cordless ceramic induction heating.',
+    logoUrl: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=300&auto=format&fit=crop',
+    productCount: 5,
+    isActive: true
+  },
+  {
+    id: 'brand-kori',
+    name: 'Kori',
+    slug: 'kori',
+    origin: 'Global',
+    description: 'High puff capacity dual-flavor disposable hookah heads with instant fitment on any hookah pipe.',
+    logoUrl: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=300&auto=format&fit=crop',
     productCount: 4,
     isActive: true
   }

@@ -115,14 +115,36 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ onNavigate }) =>
               {quickViewProduct.name}
             </h3>
 
-            {/* Component Notice if not a full hookah pipe */}
-            {quickViewProduct.categorySlug !== 'hookahs' && (
+            {/* Context Notice based on Category */}
+            {quickViewProduct.categorySlug === 'vapes' && (
+              <div className="mt-2.5 p-2 bg-cyan-50/80 border border-cyan-200/70 rounded-xs flex items-center justify-between gap-2 text-xs">
+                <span className="text-cyan-950">
+                  <span className="font-bold uppercase text-[9px] bg-cyan-200/80 text-cyan-900 px-1.5 py-0.5 rounded-xs mr-1">
+                    Vapes & Pods
+                  </span>
+                  Vape device / portable e-liquid
+                </span>
+              </div>
+            )}
+
+            {quickViewProduct.categorySlug === 'e-hookah' && (
+              <div className="mt-2.5 p-2 bg-teal-50/80 border border-teal-200/70 rounded-xs flex items-center justify-between gap-2 text-xs">
+                <span className="text-teal-950">
+                  <span className="font-bold uppercase text-[9px] bg-teal-200/80 text-teal-900 px-1.5 py-0.5 rounded-xs mr-1">
+                    E-Hookah
+                  </span>
+                  Electronic shisha / smart e-head
+                </span>
+              </div>
+            )}
+
+            {['bowls', 'bases', 'accessories', 'coal', 'tobacco'].includes(quickViewProduct.categorySlug) && (
               <div className="mt-2.5 p-2 bg-amber-50/80 border border-amber-200/70 rounded-xs flex items-center justify-between gap-2 text-xs">
                 <span className="text-amber-950">
                   <span className="font-bold uppercase text-[9px] bg-amber-200/80 text-amber-900 px-1.5 py-0.5 rounded-xs mr-1">
                     {quickViewProduct.category}
                   </span>
-                  {quickViewProduct.category.replace(/s$/, '')} component (not a hookah pipe)
+                  {quickViewProduct.categorySlug === 'tobacco' ? 'Shisha tobacco' : `${quickViewProduct.category.replace(/s$/, '')} component`} (not a hookah pipe)
                 </span>
                 <button
                   onClick={() => {

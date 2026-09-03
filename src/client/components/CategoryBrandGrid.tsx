@@ -100,10 +100,10 @@ export const CategoryBrandGrid: React.FC<CategoryBrandGridProps> = ({
       return ['kaloud', 'na-grani', 'blade-hookah', 'alpha-hookah'].includes(b.slug);
     }
     if (categorySlug === 'e-hookah') {
-      return ['ooka', 'aspire-proteus'].includes(b.slug);
+      return ['ooka', 'aspire-proteus', 'kangerm', 'starbuzz', 'enso', 'kori'].includes(b.slug);
     }
     if (categorySlug === 'vapes') {
-      return ['geekvape', 'vaporesso', 'lost-mary', 'elf-bar', 'smok'].includes(b.slug);
+      return ['al-fakher-vapes', 'geek-bar', 'lost-mary', 'vaporesso', 'geekvape', 'elf-bar', 'nasty-juice', 'smok'].includes(b.slug);
     }
     return true;
   });

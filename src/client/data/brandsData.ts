@@ -63,13 +63,20 @@ export const CATEGORY_BRAND_MAP: Record<string, BrandAvatar[]> = {
   ],
   'e-hookah': [
     { name: 'Ooka', slug: 'ooka', category: 'e-hookah', bgClass: 'bg-stone-950', textColor: 'text-cyan-400', badgeText: 'OOKA', origin: 'UAE' },
-    { name: 'Aspire Proteus', slug: 'aspire-proteus', category: 'e-hookah', bgClass: 'bg-orange-950', textColor: 'text-orange-300', badgeText: 'ASPIRE', origin: 'CN' }
+    { name: 'Aspire Proteus', slug: 'aspire-proteus', category: 'e-hookah', bgClass: 'bg-orange-950', textColor: 'text-orange-300', badgeText: 'ASPIRE', origin: 'CN' },
+    { name: 'Kangerm', slug: 'kangerm', category: 'e-hookah', bgClass: 'bg-stone-900', textColor: 'text-blue-400', badgeText: 'KANGERM', origin: 'GL' },
+    { name: 'Starbuzz', slug: 'starbuzz', category: 'e-hookah', bgClass: 'bg-red-900', textColor: 'text-white', badgeText: 'STARBUZZ', origin: 'US' },
+    { name: 'Enso', slug: 'enso', category: 'e-hookah', bgClass: 'bg-zinc-900', textColor: 'text-teal-300', badgeText: 'ENSO', origin: 'US' },
+    { name: 'Kori', slug: 'kori', category: 'e-hookah', bgClass: 'bg-indigo-950', textColor: 'text-indigo-300', badgeText: 'KORI', origin: 'GL' }
   ],
   vapes: [
-    { name: 'GeekVape', slug: 'geekvape', category: 'vapes', bgClass: 'bg-amber-600', textColor: 'text-white', badgeText: 'GEEKVAPE', origin: 'CN' },
-    { name: 'Vaporesso', slug: 'vaporesso', category: 'vapes', bgClass: 'bg-blue-900', textColor: 'text-blue-100', badgeText: 'VAPORESSO', origin: 'CN' },
+    { name: 'Al Fakher Vapes', slug: 'al-fakher-vapes', category: 'vapes', bgClass: 'bg-red-600', textColor: 'text-white', badgeText: 'AL FAKHER', origin: 'UAE' },
+    { name: 'Geek Bar', slug: 'geek-bar', category: 'vapes', bgClass: 'bg-indigo-900', textColor: 'text-cyan-300', badgeText: 'GEEK BAR', origin: 'CN' },
     { name: 'Lost Mary', slug: 'lost-mary', category: 'vapes', bgClass: 'bg-rose-900', textColor: 'text-rose-100', badgeText: 'LOST MARY', origin: 'CN' },
+    { name: 'Vaporesso', slug: 'vaporesso', category: 'vapes', bgClass: 'bg-blue-900', textColor: 'text-blue-100', badgeText: 'VAPORESSO', origin: 'CN' },
+    { name: 'GeekVape', slug: 'geekvape', category: 'vapes', bgClass: 'bg-amber-600', textColor: 'text-white', badgeText: 'GEEKVAPE', origin: 'CN' },
     { name: 'Elf Bar', slug: 'elf-bar', category: 'vapes', bgClass: 'bg-purple-900', textColor: 'text-purple-100', badgeText: 'ELF BAR', origin: 'CN' },
+    { name: 'Nasty Juice', slug: 'nasty-juice', category: 'vapes', bgClass: 'bg-emerald-950', textColor: 'text-emerald-300', badgeText: 'NASTY', origin: 'MY' },
     { name: 'SMOK', slug: 'smok', category: 'vapes', bgClass: 'bg-stone-900', textColor: 'text-red-500', badgeText: 'SMOK', origin: 'CN' }
   ],
   'wholesale-supplies': [
