@@ -5,8 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
+    "dev:client": "vite",
+    "dev:server": "tsx src/server/standalone.ts",
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+    "build:client": "vite build",
+    "build:server": "esbuild src/server/standalone.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/api-server.cjs",
     "start": "node dist/server.cjs",
+    "start:server": "node dist/api-server.cjs",
     "seed": "tsx src/server/scripts/seed.ts",
     "create-admin": "tsx src/server/scripts/create-admin.ts",
     "preview": "vite preview",

@@ -14,7 +14,18 @@ import {
   StoreSettings
 } from '../../types/index.js';
 
-const API_BASE = '/api';
+// Base API URL configuration supporting standalone frontend deployment pointing to remote/local backend
+export const getApiBaseUrl = (): string => {
+  const metaEnv = typeof import.meta !== 'undefined' ? (import.meta as any).env : undefined;
+  const envUrl = (metaEnv?.VITE_API_BASE_URL || metaEnv?.VITE_API_URL) as string | undefined;
+  if (envUrl) {
+    const trimmed = envUrl.trim().replace(/\/+$/, '');
+    return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
+  }
+  return '/api';
+};
+
+const API_BASE = getApiBaseUrl();
 
 class ApiClient {
   private getHeaders(): HeadersInit {

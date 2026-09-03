@@ -20,9 +20,15 @@ app.use(helmet({
   crossOriginResourcePolicy: false
 }));
 
+const allowedOrigins = process.env.CORS_ORIGIN 
+  ? process.env.CORS_ORIGIN.split(',').map(s => s.trim()) 
+  : true;
+
 app.use(cors({
-  origin: true,
-  credentials: true
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-guest-id', 'Accept']
 }));
 
 app.use(cookieParser());

@@ -49,7 +49,10 @@ export function sanitizeImageUrl(url?: string): string {
   // Remove broken WP -916x916 sizing tag
   const clean = url.replace(/-916x916(?=\.(?:jpg|jpeg|png|webp))/i, '');
   if (clean.includes('worldhookahmarket.com')) {
-    return `/api/image-proxy?url=${encodeURIComponent(clean)}`;
+    const metaEnv = typeof import.meta !== 'undefined' ? (import.meta as any).env : undefined;
+    const envUrl = (metaEnv?.VITE_API_BASE_URL || metaEnv?.VITE_API_URL) as string | undefined;
+    const base = envUrl ? (envUrl.trim().replace(/\/+$/, '').endsWith('/api') ? envUrl.trim().replace(/\/+$/, '') : `${envUrl.trim().replace(/\/+$/, '')}/api`) : '/api';
+    return `${base}/image-proxy?url=${encodeURIComponent(clean)}`;
   }
   return clean;
 }
