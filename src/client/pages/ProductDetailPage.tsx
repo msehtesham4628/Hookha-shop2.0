@@ -73,7 +73,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center">
         <div className="w-12 h-12 border-4 border-amber-800 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-xs uppercase tracking-widest text-stone-500 font-bold">Unlocking Sultan Vault Artifact...</p>
+        <p className="text-xs uppercase tracking-widest text-stone-500 font-bold">Loading Fumare Hookah Artifact...</p>
       </div>
     );
   }
@@ -169,6 +169,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
                 alt={product.name}
                 className="max-h-full max-w-full object-contain"
                 referrerPolicy="no-referrer"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800';
+                }}
               />
 
               {product.isOnSale && product.salePrice && (

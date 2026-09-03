@@ -65,7 +65,7 @@ export class SMSService {
   public async sendOTP(phone: string, otpCode: string): Promise<boolean> {
     const res = await this.sendSMS({
       to: phone,
-      message: `Sultan Hookah Co. Verification Code: ${otpCode}. Valid for 10 minutes. Do not share.`
+      message: `Fumare Hookah Verification Code: ${otpCode}. Valid for 10 minutes. Do not share.`
     });
     return res.success;
   }

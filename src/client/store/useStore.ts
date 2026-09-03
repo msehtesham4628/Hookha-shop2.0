@@ -85,6 +85,20 @@ export const useStore = create<AppState>((set, get) => {
     onAuthStateChanged(auth, async (fbUser) => {
       if (fbUser) {
         try {
+          // Synchronize session token with backend API
+          try {
+            const apiRes = await api.googleLogin({
+              email: fbUser.email || '',
+              name: fbUser.displayName || 'VIP Guest',
+              avatarUrl: fbUser.photoURL || undefined
+            });
+            if (apiRes.success && apiRes.data?.token) {
+              localStorage.setItem('sultan_auth_token', apiRes.data.token);
+            }
+          } catch (syncErr) {
+            console.warn('Backend session sync note:', syncErr);
+          }
+
           const profile = await getUserProfile(fbUser.uid);
           if (profile) {
             const isBootstrappedAdmin = fbUser.email === 'ehtesham4628@gmail.com' || (fbUser.email?.endsWith('@worldhookahmarket.com') ?? false);
@@ -96,7 +110,7 @@ export const useStore = create<AppState>((set, get) => {
             return;
           }
         } catch (e) {
-          console.error('Error fetching Firebase user profile:', e);
+          console.warn('Notice on user profile initialization:', e);
         }
       }
     });
@@ -173,6 +187,18 @@ export const useStore = create<AppState>((set, get) => {
       try {
         set({ isAuthLoading: true });
         const user = await signInWithGoogle();
+        try {
+          const apiRes = await api.googleLogin({
+            email: user.email,
+            name: `${user.firstName} ${user.lastName}`,
+            avatarUrl: user.avatarUrl
+          });
+          if (apiRes.success && apiRes.data?.token) {
+            localStorage.setItem('sultan_auth_token', apiRes.data.token);
+          }
+        } catch (syncErr) {
+          console.warn('Backend sync note:', syncErr);
+        }
         get().setUser(user, user.role !== 'CUSTOMER' ? ['*'] : []);
         get().showToast(`Welcome to World Hookah Market, ${user.firstName}!`, 'success');
         await get().loadWishlist();

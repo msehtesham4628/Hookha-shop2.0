@@ -88,97 +88,49 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     const loadHomeData = async () => {
       try {
         setLoading(true);
-        const prodRes = await api.getProducts({ limit: 100 });
+        const [
+          tobaccoRes,
+          hookahsRes,
+          bowlsRes,
+          basesRes,
+          coalsRes,
+          accessoriesRes,
+          newInRes,
+          bestRes
+        ] = await Promise.all([
+          api.getProducts({ category: 'tobacco', limit: 12 }),
+          api.getProducts({ category: 'hookahs', limit: 12 }),
+          api.getProducts({ category: 'bowls', limit: 12 }),
+          api.getProducts({ category: 'bases', limit: 12 }),
+          api.getProducts({ category: 'coal', limit: 12 }),
+          api.getProducts({ category: 'accessories', limit: 12 }),
+          api.getProducts({ newArrival: true, limit: 8 }),
+          api.getProducts({ bestSeller: true, limit: 8 })
+        ]);
 
-        if (prodRes.success && prodRes.data) {
-          const prods = prodRes.data.products;
-
-          // 1. Shisha Tobacco
-          const tobacco = prods.filter(p => 
-            p.categorySlug === 'tobacco' || 
-            p.categorySlug === 'shisha-tobacco' || 
-            p.subcategory?.toLowerCase().includes('tobacco') ||
-            p.brandSlug?.includes('tobacco') ||
-            p.tags?.includes('musthave') ||
-            p.tags?.includes('darkside') ||
-            p.tags?.includes('blackburn')
-          );
-          setTobaccoProducts(tobacco);
-
-          // 2. Hookahs
-          const hookahs = prods.filter(p => 
-            p.categorySlug === 'hookahs' || 
-            p.subcategory?.toLowerCase().includes('hookah') ||
-            ['alpha-hookah', 'el-bomber', 'mattpear', 'maklaud-hookah', 'wookah', 'japona-hookah', 'steamulation-hookah'].includes(p.brandSlug || '')
-          );
-          setHookahProducts(hookahs);
-
-          // 3. Bowls
-          const bowls = prods.filter(p => 
-            p.categorySlug === 'bowls' || 
-            p.categorySlug === 'hookahs-bowls' || 
-            p.name.toLowerCase().includes('bowl') ||
-            ['oblako-bowls', 'kong-bowls', 'alpaca-bowls', 'solaris-bowls', 'target-bowls'].includes(p.brandSlug || '')
-          );
-          setBowlProducts(bowls);
-
-          // 4. Bases & Glass
-          const bases = prods.filter(p =>
-            p.categorySlug === 'bases' ||
-            p.categorySlug === 'bases-vases' ||
-            p.name.toLowerCase().includes('base') ||
-            p.name.toLowerCase().includes('vase') ||
-            p.brandSlug === 'caesar-crystal' ||
-            p.brandSlug === 'craft-glass'
-          );
-          setBaseProducts(bases.length > 0 ? bases : prods.slice(0, 4));
-
-          // 5. Charcoal & Heat
-          const coals = prods.filter(p =>
-            p.categorySlug === 'coal' ||
-            p.name.toLowerCase().includes('charcoal') ||
-            p.name.toLowerCase().includes('coal') ||
-            ['coco-loco', 'one-nation', 'oasis-charcoal'].includes(p.brandSlug || '')
-          );
-          setCoalProducts(coals);
-
-          // 6. Accessories & HMD
-          const accessories = prods.filter(p =>
-            p.categorySlug === 'accessories' ||
-            p.name.toLowerCase().includes('hmd') ||
-            p.name.toLowerCase().includes('tongs') ||
-            p.name.toLowerCase().includes('kaloud') ||
-            ['kaloud', 'na-grani', 'blade-hookah'].includes(p.brandSlug || '')
-          );
-          setAccessoryProducts(accessories);
-
-          // 7. E-Hookah
-          const ehookah = prods.filter(p =>
-            p.categorySlug === 'e-hookah' ||
-            p.categorySlug === 'ehookah' ||
-            p.name.toLowerCase().includes('e-hookah') ||
-            p.name.toLowerCase().includes('ooka') ||
-            p.brandSlug === 'ooka' ||
-            p.brandSlug === 'aspire-proteus'
-          );
-          setEhookahProducts(ehookah);
-
-          // 8. Vapes
-          const vapes = prods.filter(p =>
-            p.categorySlug === 'vapes' ||
-            p.name.toLowerCase().includes('vape') ||
-            p.name.toLowerCase().includes('xros') ||
-            p.name.toLowerCase().includes('disposable') ||
-            ['geekvape', 'vaporesso', 'lost-mary', 'elf-bar', 'smok'].includes(p.brandSlug || '')
-          );
-          setVapeProducts(vapes);
-
-          // New In & Best Sellers
-          const newIn = prods.filter(p => p.isNewArrival || p.isFeatured).slice(0, 8);
-          setNewInProducts(newIn.length > 0 ? newIn : prods.slice(0, 8));
-
-          const best = prods.filter(p => p.isBestSeller).slice(0, 8);
-          setBestSellers(best.length > 0 ? best : prods.slice(0, 8));
+        if (tobaccoRes.success && tobaccoRes.data) {
+          setTobaccoProducts(tobaccoRes.data.products);
+        }
+        if (hookahsRes.success && hookahsRes.data) {
+          setHookahProducts(hookahsRes.data.products);
+        }
+        if (bowlsRes.success && bowlsRes.data) {
+          setBowlProducts(bowlsRes.data.products);
+        }
+        if (basesRes.success && basesRes.data) {
+          setBaseProducts(basesRes.data.products);
+        }
+        if (coalsRes.success && coalsRes.data) {
+          setCoalProducts(coalsRes.data.products);
+        }
+        if (accessoriesRes.success && accessoriesRes.data) {
+          setAccessoryProducts(accessoriesRes.data.products);
+        }
+        if (newInRes.success && newInRes.data) {
+          setNewInProducts(newInRes.data.products);
+        }
+        if (bestRes.success && bestRes.data) {
+          setBestSellers(bestRes.data.products);
         }
       } catch (err) {
         console.error('Failed to load homepage data:', err);
@@ -314,7 +266,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     e.preventDefault();
     if (!newsletterEmail || !newsletterEmail.includes('@')) return;
     setNewsletterSuccess(true);
-    showToast('Subscribed to World Hookah Market newsletter!', 'success');
+    showToast('Subscribed to Fumare Hookah newsletter!', 'success');
     setNewsletterEmail('');
     setTimeout(() => setNewsletterSuccess(false), 3000);
   };
@@ -1010,7 +962,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 Save up to 50% with
               </h4>
               <p className="text-xs text-stone-500 mt-0.5">
-                World Hookah Market
+                Fumare Hookah
               </p>
             </div>
           </div>
@@ -1106,11 +1058,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       {/* 10. SECTION: SEO / ABOUT US STORY (Screenshot 6) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-stone-200 text-stone-700">
         <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-stone-900 mb-3">
-          WORLDHOOKAHMARKET IS ONLINE HOOKAH AND SHISHA STORE WITH WORLDWIDE SHIPPING.
+          FUMARE HOOKAH IS ONLINE HOOKAH AND SHISHA STORE WITH WORLDWIDE SHIPPING.
         </h2>
         <div className="space-y-3 text-xs sm:text-sm text-stone-600 leading-relaxed max-w-5xl">
           <p>
-            World Hookah Market offers an extensive selection of premium hookah products, including stems, bowls, flasks, accessories, charcoal, and world-renowned shisha tobacco brands such as MustHave, DarkSide, BlackBurn, Tangiers, and Adalya. We work directly with master manufacturers across Russia, Germany, Poland, and the USA to guarantee 100% authenticity and fresh factory packaging.
+            Fumare Hookah offers an extensive selection of premium hookah products, including stems, bowls, flasks, accessories, charcoal, and world-renowned shisha tobacco brands such as MustHave, DarkSide, BlackBurn, Tangiers, and Adalya. We work directly with master manufacturers across Russia, Germany, Poland, and the USA to guarantee 100% authenticity and fresh factory packaging.
           </p>
           <p>
             Whether you are a seasoned connoisseur seeking heavy dark leaf blends, artisan Bohemian crystal vases, or commercial hookah lounges requiring reliable bulk wholesale distribution, our dedicated fulfillment center provides same-day dispatch, secure break-free packaging, and insured global delivery.
@@ -1225,7 +1177,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <h3 className="font-bold text-lg text-stone-900">Your Feedback Matters</h3>
             </div>
             <p className="text-xs text-stone-500 mb-4">
-              Help us improve World Hookah Market. Let us know if you are looking for specific tobacco flavors, hookah models, or wholesale options.
+              Help us improve Fumare Hookah. Let us know if you are looking for specific tobacco flavors, hookah models, or wholesale options.
             </p>
 
             {feedbackSent ? (

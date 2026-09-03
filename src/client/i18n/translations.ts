@@ -107,7 +107,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'story.maintenance_care': 'How often should a hookah be cleaned?',
 
     // Footer
-    'footer.about_text': 'World Hookah Market is the premier master distributor of luxury Russian and European hookahs, dark leaf shisha tobacco, artisanal clay bowls, and heat management systems.',
+    'footer.about_text': 'Fumare Hookah is the premier master distributor of luxury Russian and European hookahs, dark leaf shisha tobacco, artisanal clay bowls, and heat management systems.',
     'footer.quick_links': 'Quick Links',
     'footer.customer_service': 'Customer Service',
     'footer.newsletter_title': 'Subscribe to Private Reserve Drops',
@@ -206,7 +206,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'story.maintenance_care': 'Как правильно ухаживать за кальяном?',
 
     // Footer
-    'footer.about_text': 'World Hookah Market — ведущий дистрибьютор премиальных кальянов, крепкого табака, глиняных чаш и систем контроля жара с международной доставкой.',
+    'footer.about_text': 'Fumare Hookah — ведущий дистрибьютор премиальных кальянов, крепкого табака, глиняных чаш и систем контроля жара с международной доставкой.',
     'footer.quick_links': 'Быстрые ссылки',
     'footer.customer_service': 'Поддержка клиентов',
     'footer.newsletter_title': 'Подписка на закрытые дропы и скидки',
@@ -305,7 +305,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'story.maintenance_care': 'كيفية تنظيف وصيانة الشيشة بشكل دوري؟',
 
     // Footer
-    'footer.about_text': 'World Hookah Market هو الموزع الرائد عالمياً لأفضل الشيش الروسية والأوروبية، معسل التبغ الفاخر، الرؤوس الفخارية، وأنظمة إدارة الحرارة.',
+    'footer.about_text': 'Fumare Hookah هو الموزع الرائد عالمياً لأفضل الشيش الروسية والأوروبية، معسل التبغ الفاخر، الرؤوس الفخارية، وأنظمة إدارة الحرارة.',
     'footer.quick_links': 'روابط سريعة',
     'footer.customer_service': 'خدمة العملاء',
     'footer.newsletter_title': 'اشترك للحصول على العروض الحصرية',
@@ -404,7 +404,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'story.maintenance_care': '¿Con qué frecuencia limpiar la cachimba?',
 
     // Footer
-    'footer.about_text': 'World Hookah Market es el distribuidor líder de cachimbas rusas y europeas de lujo, tabaco negro, cazoletas artesanales y gestores de calor.',
+    'footer.about_text': 'Fumare Hookah es el distribuidor líder de cachimbas rusas y europeas de lujo, tabaco negro, cazoletas artesanales y gestores de calor.',
     'footer.quick_links': 'Enlaces Rápidos',
     'footer.customer_service': 'Atención al Cliente',
     'footer.newsletter_title': 'Suscríbete a Novedades y Ofertas Exclusivas',
@@ -503,7 +503,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'story.maintenance_care': 'Wie oft sollte eine Shisha gereinigt werden?',
 
     // Footer
-    'footer.about_text': 'World Hookah Market ist der führende Großhändler für russische und europäische Premium-Shishas, Darkleaf-Tabak, handgefertigte Tonköpfe und HMDs.',
+    'footer.about_text': 'Fumare Hookah ist der führende Großhändler für russische und europäische Premium-Shishas, Darkleaf-Tabak, handgefertigte Tonköpfe und HMDs.',
     'footer.quick_links': 'Schnellzugriff',
     'footer.customer_service': 'Kundenservice',
     'footer.newsletter_title': 'Exklusive Drops & Angebote',
@@ -602,7 +602,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'story.maintenance_care': 'À quelle fréquence nettoyer sa chicha ?',
 
     // Footer
-    'footer.about_text': 'World Hookah Market est le distributeur exclusif de chichas de luxe russes et européennes, tabac brun, foyers artisanaux et systèmes de chauffe.',
+    'footer.about_text': 'Fumare Hookah est le distributeur exclusif de chichas de luxe russes et européennes, tabac brun, foyers artisanaux et systèmes de chauffe.',
     'footer.quick_links': 'Accès Rapide',
     'footer.customer_service': 'Service Client',
     'footer.newsletter_title': 'Abonnez-vous aux Sorties Privées',

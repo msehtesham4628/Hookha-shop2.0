@@ -116,7 +116,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onNavigate }) => {
           {query.trim() === '' ? (
             <div className="py-6 px-2 text-center">
               <Sparkles className="mx-auto h-8 w-8 text-amber-600 mb-2" />
-              <p className="text-xs font-semibold uppercase tracking-wider text-stone-800">Popular Sultan Searches</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-stone-800">Popular Fumare Searches</p>
               <div className="mt-3 flex flex-wrap justify-center gap-2">
                 {['Wookah', 'Steamulation', 'Tangiers Cane Mint', 'Alpaca Bowl', 'Kaloud Lotus', 'CocoUrth Coals', 'Darkside Supernova'].map((term) => (
                   <button

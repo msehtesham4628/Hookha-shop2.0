@@ -31,7 +31,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               V2A Surgical Stainless Steel & Bohemian Crystal
             </h2>
             <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-              Every Sultan stem is CNC-machined to microscopic tolerances in Germany and Poland. Unlike traditional brass or zinc hookahs, surgical stainless steel is completely impervious to ghosting—ensuring that even the most pungent double apple or cane mint leaves zero residual aroma after a simple rinse.
+              Every Fumare stem is CNC-machined to microscopic tolerances in Germany and Poland. Unlike traditional brass or zinc hookahs, surgical stainless steel is completely impervious to ghosting—ensuring that even the most pungent double apple or cane mint leaves zero residual aroma after a simple rinse.
             </p>
             <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
               Our crystal vases are individually mouth-blown in the historic Bohemian region of the Czech Republic, using heavy 24% leaded crystal that delivers unmatched acoustic resonance and tipping stability.

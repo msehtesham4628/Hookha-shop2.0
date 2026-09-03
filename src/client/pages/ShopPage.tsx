@@ -13,11 +13,27 @@ import {
   Search,
   Grid3X3,
   LayoutGrid,
+  ChevronLeft,
   ChevronRight,
   Sparkles,
   Flame,
   Check
 } from 'lucide-react';
+
+function getPageNumbers(current: number, total: number): (number | string)[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  const pages: (number | string)[] = [];
+  if (current <= 4) {
+    pages.push(1, 2, 3, 4, 5, '...', total);
+  } else if (current >= total - 3) {
+    pages.push(1, '...', total - 4, total - 3, total - 2, total - 1, total);
+  } else {
+    pages.push(1, '...', current - 1, current, current + 1, '...', total);
+  }
+  return pages;
+}
 
 interface ShopPageProps {
   initialCategory?: string;
@@ -38,6 +54,9 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 }) => {
   const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(5590);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(36);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,12 +105,30 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     setCurrentPage(1);
   }, [initialCategory, initialBrand, initialSearch, initialOnSale, initialNewArrival]);
 
+  // Reset to page 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    selectedCategory,
+    selectedSubcategory,
+    selectedBrand,
+    searchQuery,
+    minPrice,
+    maxPrice,
+    selectedFlavor,
+    inStockOnly,
+    onSaleOnly,
+    newArrivalOnly,
+    sortBy
+  ]);
+
   // Fetch filtered products
   const fetchProducts = async () => {
     try {
       setLoading(true);
       const params: Record<string, any> = {
         category: selectedCategory || undefined,
+        subcategory: selectedSubcategory || undefined,
         brand: selectedBrand || undefined,
         q: searchQuery || undefined,
         minPrice: minPrice || undefined,
@@ -101,20 +138,20 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         onSale: onSaleOnly ? 'true' : undefined,
         newArrival: newArrivalOnly ? 'true' : undefined,
         sort: sortBy,
-        limit: 100
+        page: currentPage,
+        limit: itemsPerPage
       };
 
       const res = await api.getProducts(params);
       if (res.success && res.data) {
-        let items = res.data.products;
-        if (selectedSubcategory) {
-          items = items.filter(p => 
-            p.subcategory?.toLowerCase().includes(selectedSubcategory.toLowerCase()) ||
-            p.tags?.some(tag => tag.toLowerCase().includes(selectedSubcategory.toLowerCase())) ||
-            p.name.toLowerCase().includes(selectedSubcategory.toLowerCase())
-          );
+        setProducts(res.data.products || []);
+        if (res.data.pagination) {
+          setTotalCount(res.data.pagination.totalCount);
+          setTotalPages(res.data.pagination.totalPages);
+        } else {
+          setTotalCount(res.data.products?.length || 0);
+          setTotalPages(1);
         }
-        setProducts(items);
       }
     } catch (err) {
       console.error('Failed to fetch filtered products:', err);
@@ -136,7 +173,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     inStockOnly,
     onSaleOnly,
     newArrivalOnly,
-    sortBy
+    sortBy,
+    currentPage
   ]);
 
   const handleResetFilters = () => {
@@ -204,7 +242,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           subcategories={selectedCategory ? subcategoryList : []}
           selectedSubcategory={selectedSubcategory}
           onSelectSubcategory={(sub) => setSelectedSubcategory(sub)}
-          productCount={products.length}
+          productCount={totalCount}
           onNavigate={onNavigate}
           onResetCategory={() => {
             setSelectedCategory('');
@@ -225,24 +263,36 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
         {/* Sorting & Filter Trigger Bar - Matching Authentic World Hookah Market */}
         <div className="mb-6 bg-white border border-stone-200/90 rounded-sm p-3 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-2xs">
-          {/* Quick Sort Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
-            <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mr-1 hidden sm:inline whitespace-nowrap">
-              {t('category.sort_by', 'Sort:')}
-            </span>
-            {sortButtons.map((btn) => (
-              <button
-                key={btn.value}
-                onClick={() => setSortBy(btn.value)}
-                className={`text-xs px-3 py-1.5 rounded-xs transition-colors whitespace-nowrap uppercase tracking-wider font-semibold cursor-pointer ${
-                  sortBy === btn.value
-                    ? 'bg-stone-900 text-white shadow-2xs'
-                    : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
-                }`}
-              >
-                {btn.label}
-              </button>
-            ))}
+          {/* Quick Sort Pills & Live Count */}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+              <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mr-1 hidden sm:inline whitespace-nowrap">
+                {t('category.sort_by', 'Sort:')}
+              </span>
+              {sortButtons.map((btn) => (
+                <button
+                  key={btn.value}
+                  onClick={() => setSortBy(btn.value)}
+                  className={`text-xs px-3 py-1.5 rounded-xs transition-colors whitespace-nowrap uppercase tracking-wider font-semibold cursor-pointer ${
+                    sortBy === btn.value
+                      ? 'bg-stone-900 text-white shadow-2xs'
+                      : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                  }`}
+                >
+                  {btn.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="hidden sm:inline-flex items-center gap-1 text-xs text-stone-500 font-medium px-2.5 py-1 bg-stone-50 rounded-xs border border-stone-200/80">
+              <span>Showing</span>
+              <span className="font-bold text-stone-900 font-mono">
+                {totalCount > 0 ? ((currentPage - 1) * itemsPerPage + 1).toLocaleString() : 0}–{Math.min(currentPage * itemsPerPage, totalCount).toLocaleString()}
+              </span>
+              <span>of</span>
+              <span className="font-bold text-amber-900 font-mono">{totalCount.toLocaleString()}</span>
+              <span>products</span>
+            </div>
           </div>
 
           {/* Right Controls: Filter Trigger & Grid Toggles */}
@@ -559,41 +609,82 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                   ))}
                 </div>
 
-                {/* Pagination Controls - Matching Authentic World Hookah Market */}
-                <div className="mt-10 flex items-center justify-center gap-1.5 text-xs font-semibold">
-                  <button
-                    onClick={() => setCurrentPage(1)}
-                    className="w-8 h-8 rounded-xs border border-amber-800 bg-amber-900 text-white flex items-center justify-center shadow-xs"
-                  >
-                    1
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage(2)}
-                    className="w-8 h-8 rounded-xs border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 flex items-center justify-center transition-colors"
-                  >
-                    2
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage(3)}
-                    className="w-8 h-8 rounded-xs border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 flex items-center justify-center transition-colors"
-                  >
-                    3
-                  </button>
-                  <span className="px-2 text-stone-400">...</span>
-                  <button
-                    onClick={() => setCurrentPage(8)}
-                    className="w-8 h-8 rounded-xs border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 flex items-center justify-center transition-colors"
-                  >
-                    8
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage(p => p + 1)}
-                    className="px-3 h-8 rounded-xs border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 flex items-center justify-center gap-1 transition-colors"
-                  >
-                    <span>Next</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                {/* Dynamic Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-stone-200">
+                    <p className="text-xs text-stone-500 font-medium">
+                      Showing <span className="font-bold text-stone-900 font-mono">{((currentPage - 1) * itemsPerPage + 1).toLocaleString()}</span> to <span className="font-bold text-stone-900 font-mono">{Math.min(currentPage * itemsPerPage, totalCount).toLocaleString()}</span> of <span className="font-bold text-stone-900 font-mono">{totalCount.toLocaleString()}</span> products
+                    </p>
+
+                    <div className="flex items-center gap-1.5 text-xs font-semibold">
+                      <button
+                        onClick={() => {
+                          if (currentPage > 1) {
+                            setCurrentPage(p => p - 1);
+                            window.scrollTo({ top: 350, behavior: 'smooth' });
+                          }
+                        }}
+                        disabled={currentPage === 1}
+                        className={`px-3 h-8.5 rounded-xs border flex items-center justify-center gap-1 transition-colors ${
+                          currentPage === 1
+                            ? 'border-stone-200 bg-stone-100 text-stone-400 cursor-not-allowed'
+                            : 'border-stone-300 bg-white hover:bg-stone-50 text-stone-700 cursor-pointer shadow-2xs'
+                        }`}
+                        title="Previous Page"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                        <span>Prev</span>
+                      </button>
+
+                      {/* Dynamic Page Buttons */}
+                      {getPageNumbers(currentPage, totalPages).map((pNum, idx) => {
+                        if (typeof pNum === 'string') {
+                          return (
+                            <span key={`dots-${idx}`} className="px-1.5 text-stone-400 font-bold select-none">
+                              ...
+                            </span>
+                          );
+                        }
+                        const isCurrent = pNum === currentPage;
+                        return (
+                          <button
+                            key={pNum}
+                            onClick={() => {
+                              setCurrentPage(pNum);
+                              window.scrollTo({ top: 350, behavior: 'smooth' });
+                            }}
+                            className={`min-w-[34px] h-8.5 px-2 rounded-xs font-mono font-bold flex items-center justify-center transition-all cursor-pointer ${
+                              isCurrent
+                                ? 'border border-amber-800 bg-amber-900 text-white shadow-xs'
+                                : 'border border-stone-200 bg-white hover:bg-stone-100 text-stone-700'
+                            }`}
+                          >
+                            {pNum}
+                          </button>
+                        );
+                      })}
+
+                      <button
+                        onClick={() => {
+                          if (currentPage < totalPages) {
+                            setCurrentPage(p => p + 1);
+                            window.scrollTo({ top: 350, behavior: 'smooth' });
+                          }
+                        }}
+                        disabled={currentPage >= totalPages}
+                        className={`px-3 h-8.5 rounded-xs border flex items-center justify-center gap-1 transition-colors ${
+                          currentPage >= totalPages
+                            ? 'border-stone-200 bg-stone-100 text-stone-400 cursor-not-allowed'
+                            : 'border-stone-300 bg-white hover:bg-stone-50 text-stone-700 cursor-pointer shadow-2xs'
+                        }`}
+                        title="Next Page"
+                      >
+                        <span>Next</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

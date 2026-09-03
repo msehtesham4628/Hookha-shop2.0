@@ -181,6 +181,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, s
             }`}
             referrerPolicy="no-referrer"
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=600';
+            }}
           />
           {secondaryImage && (
             <img
@@ -191,6 +195,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, s
               }`}
               referrerPolicy="no-referrer"
               loading="lazy"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=600';
+              }}
             />
           )}
         </div>

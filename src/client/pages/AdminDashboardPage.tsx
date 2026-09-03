@@ -67,6 +67,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   // Admin Data State
   const [analytics, setAnalytics] = useState<any>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [totalProductsCount, setTotalProductsCount] = useState<number>(5590);
   const [orders, setOrders] = useState<Order[]>([]);
   const [customers, setCustomers] = useState<User[]>([]);
   const [wholesaleApps, setWholesaleApps] = useState<any[]>([]);
@@ -105,14 +106,23 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
 
   // Product Form Fields
   const [prodName, setProdName] = useState('');
+  const [prodSku, setProdSku] = useState('');
   const [prodBrand, setProdBrand] = useState('Alpha Hookah');
   const [prodCategory, setProdCategory] = useState('Hookahs');
+  const [prodSubcategory, setProdSubcategory] = useState('');
   const [prodPrice, setProdPrice] = useState('249.00');
   const [prodSalePrice, setProdSalePrice] = useState('');
   const [prodStock, setProdStock] = useState('15');
   const [prodFlavor, setProdFlavor] = useState('');
+  const [prodMaterial, setProdMaterial] = useState('');
+  const [prodShortDesc, setProdShortDesc] = useState('');
   const [prodDesc, setProdDesc] = useState('');
   const [prodImageUrl, setProdImageUrl] = useState('');
+  const [prodIsFeatured, setProdIsFeatured] = useState(false);
+  const [prodIsBestSeller, setProdIsBestSeller] = useState(false);
+  const [prodIsNewArrival, setProdIsNewArrival] = useState(false);
+  const [prodIsActive, setProdIsActive] = useState(true);
+  const [prodRating, setProdRating] = useState('5.0');
 
   // Staff Form Fields
   const [staffEmail, setStaffEmail] = useState('');
@@ -172,7 +182,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         brandsRes
       ] = await Promise.all([
         api.getAnalytics().catch(() => ({ success: false, data: null })),
-        api.getProducts({ limit: 100 }).catch(() => ({ success: false, data: { products: [] } })),
+        api.getProducts({ limit: 500 }).catch(() => ({ success: false, data: { products: [] } })),
         api.getAdminOrders().catch(() => ({ success: false, data: [] })),
         api.getAdminCustomers().catch(() => ({ success: false, data: [] })),
         api.getWholesaleApplications().catch(() => ({ success: false, data: [] })),
@@ -186,9 +196,16 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
 
       if (analyticsRes.success && analyticsRes.data) {
         setAnalytics(analyticsRes.data);
+        if (analyticsRes.data.totalProducts) {
+          setTotalProductsCount(analyticsRes.data.totalProducts);
+        }
       }
       if (productsRes.success && productsRes.data) {
         setProducts(productsRes.data.products || []);
+        const pagination = (productsRes.data as any).pagination;
+        if (pagination?.totalCount) {
+          setTotalProductsCount(pagination.totalCount);
+        }
       }
       if (ordersRes.success && ordersRes.data) {
         setOrders(ordersRes.data || []);
@@ -247,55 +264,106 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const handleOpenCreateProduct = () => {
     setEditingProduct(null);
     setProdName('');
+    setProdSku(`SKU-${Date.now().toString(36).toUpperCase()}`);
     setProdBrand('Alpha Hookah');
     setProdCategory('Hookahs');
+    setProdSubcategory('');
     setProdPrice('249.00');
     setProdSalePrice('');
     setProdStock('15');
     setProdFlavor('');
+    setProdMaterial('V2A Stainless Steel');
+    setProdShortDesc('');
     setProdDesc('Premium Russian engineered hookah with magnetic purge valve and stainless steel core.');
     setProdImageUrl('https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800');
+    setProdIsFeatured(false);
+    setProdIsBestSeller(false);
+    setProdIsNewArrival(true);
+    setProdIsActive(true);
+    setProdRating('5.0');
     setIsProductModalOpen(true);
   };
 
   const handleOpenEditProduct = (prod: Product) => {
     setEditingProduct(prod);
     setProdName(prod.name);
+    setProdSku(prod.sku || '');
     setProdBrand(prod.brand);
     setProdCategory(prod.category);
+    setProdSubcategory(prod.subcategory || '');
     setProdPrice(prod.price.toString());
     setProdSalePrice(prod.salePrice ? prod.salePrice.toString() : '');
     setProdStock(prod.stock.toString());
     setProdFlavor(prod.flavor || '');
+    setProdMaterial(prod.material || '');
+    setProdShortDesc(prod.shortDescription || '');
     setProdDesc(prod.description);
     setProdImageUrl(prod.images[0]?.url || '');
+    setProdIsFeatured(!!prod.isFeatured);
+    setProdIsBestSeller(!!prod.isBestSeller);
+    setProdIsNewArrival(!!prod.isNewArrival);
+    setProdIsActive(prod.isActive !== false);
+    setProdRating(prod.rating ? prod.rating.toString() : '5.0');
     setIsProductModalOpen(true);
+  };
+
+  const handleQuickStockUpdate = async (product: Product, delta: number) => {
+    const newStock = Math.max(0, product.stock + delta);
+    try {
+      const res = await api.updateProduct(product.id, { stock: newStock });
+      if (res.success) {
+        setProducts(prev => prev.map(p => p.id === product.id ? { ...p, stock: newStock } : p));
+        showToast(`${product.name}: stock updated to ${newStock}`, 'success');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Stock update failed', 'error');
+    }
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const primaryUrl = prodImageUrl.trim() || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800';
+      const existingImages = editingProduct?.images || [];
+      let updatedImages = existingImages.map((img, idx) => idx === 0 ? { ...img, url: primaryUrl, thumbnailUrl: primaryUrl, alt: prodName } : img);
+      if (updatedImages.length === 0) {
+        updatedImages = [{ id: `img-${Date.now()}`, url: primaryUrl, thumbnailUrl: primaryUrl, alt: prodName, isPrimary: true, sortOrder: 1 }];
+      }
+
+      const parsedPrice = parseFloat(prodPrice) || 0;
+      const parsedSalePrice = prodSalePrice ? parseFloat(prodSalePrice) : undefined;
+
       const payload: any = {
-        name: prodName,
-        brand: prodBrand,
-        category: prodCategory,
-        price: parseFloat(prodPrice),
-        salePrice: prodSalePrice ? parseFloat(prodSalePrice) : undefined,
-        stock: parseInt(prodStock, 10),
-        flavor: prodFlavor || undefined,
-        description: prodDesc,
-        images: [{ id: `img-${Date.now()}`, url: prodImageUrl || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800', isPrimary: true }]
+        name: prodName.trim(),
+        sku: prodSku.trim() || undefined,
+        brand: prodBrand.trim(),
+        category: prodCategory.trim(),
+        subcategory: prodSubcategory.trim() || undefined,
+        price: parsedPrice,
+        salePrice: parsedSalePrice,
+        isOnSale: !!parsedSalePrice && parsedSalePrice < parsedPrice,
+        stock: parseInt(prodStock, 10) || 0,
+        flavor: prodFlavor.trim() || undefined,
+        material: prodMaterial.trim() || undefined,
+        shortDescription: prodShortDesc.trim() || undefined,
+        description: prodDesc.trim(),
+        images: updatedImages,
+        isFeatured: prodIsFeatured,
+        isBestSeller: prodIsBestSeller,
+        isNewArrival: prodIsNewArrival,
+        isActive: prodIsActive,
+        rating: parseFloat(prodRating) || 5.0
       };
 
       if (editingProduct) {
         const res = await api.updateProduct(editingProduct.id, payload);
         if (res.success) {
-          showToast('Product specifications updated successfully', 'success');
+          showToast(`Product "${prodName}" updated successfully!`, 'success');
         }
       } else {
         const res = await api.createProduct(payload);
         if (res.success) {
-          showToast('New product added to World Hookah Market catalog', 'success');
+          showToast(`New product "${prodName}" added to catalog!`, 'success');
         }
       }
       setIsProductModalOpen(false);
@@ -581,7 +649,16 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
               <Sparkles className="w-3.5 h-3.5" />
               <span>Instant 1-Click Access</span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button
+                type="button"
+                onClick={() => handleAdminLogin(undefined, 'ehtesham4628@gmail.com', 'Admin123!')}
+                disabled={adminLoginLoading}
+                className="bg-amber-950 hover:bg-amber-900 text-amber-100 p-2.5 rounded-xs text-xs font-semibold text-center border border-amber-600 transition-all flex flex-col items-center gap-1 cursor-pointer"
+              >
+                <span className="font-bold">⚡ Owner (Ehtesham)</span>
+                <span className="text-[9px] text-amber-300">Root Super Admin</span>
+              </button>
               <button
                 type="button"
                 onClick={() => handleAdminLogin(undefined, 'admin@worldhookahmarket.com', 'Admin123!')}
@@ -685,10 +762,10 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       <header className="bg-stone-900 text-stone-100 border-b border-stone-800 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-md">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-xs bg-amber-800 flex items-center justify-center font-bold text-amber-100 font-serif text-sm">
-            W
+            F
           </div>
           <div>
-            <h1 className="font-serif text-sm font-bold tracking-wider text-white uppercase">WORLD HOOKAH CONTROL CENTER</h1>
+            <h1 className="font-serif text-sm font-bold tracking-wider text-white uppercase">FUMARE HOOKAH CONTROL CENTER</h1>
             <p className="text-[10px] text-amber-400 uppercase tracking-widest font-semibold">
               Live Storefront Engine • {user?.role || 'SUPER_ADMIN'}
             </p>
@@ -731,7 +808,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           onClick={() => setActiveTab('products')}
           className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'products' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
         >
-          Products ({products.length})
+          Products ({totalProductsCount.toLocaleString()})
         </button>
         <button
           onClick={() => setActiveTab('categories')}
@@ -813,7 +890,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
               <span>Catalog Management</span>
             </div>
             <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'products' ? 'bg-amber-800 text-amber-100' : 'bg-stone-100 text-stone-600'}`}>
-              {products.length}
+              {totalProductsCount.toLocaleString()}
             </span>
           </button>
 
@@ -1019,7 +1096,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="font-serif text-base font-bold text-stone-900">Low Stock Warning Matrix</h3>
                         <button onClick={() => setActiveTab('products')} className="text-xs text-amber-900 font-semibold hover:underline">
-                          View All ({products.length})
+                          View All ({totalProductsCount.toLocaleString()})
                         </button>
                       </div>
                       <div className="space-y-3">
@@ -1074,16 +1151,21 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </div>
                   </div>
 
-                  {/* Search Bar */}
-                  <div className="bg-white border border-stone-200 p-4 rounded-xs flex items-center gap-3 shadow-2xs">
-                    <Search className="w-4 h-4 text-stone-400" />
-                    <input
-                      type="text"
-                      placeholder="Filter catalog by product title, brand (e.g. Alpha, MustHave), or SKU..."
-                      value={adminSearch}
-                      onChange={(e) => setAdminSearch(e.target.value)}
-                      className="w-full text-xs text-stone-800 bg-transparent focus:outline-none"
-                    />
+                  {/* Search Bar & Catalog Stats */}
+                  <div className="bg-white border border-stone-200 p-4 rounded-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
+                    <div className="flex items-center gap-3 flex-1">
+                      <Search className="w-4 h-4 text-stone-400 shrink-0" />
+                      <input
+                        type="text"
+                        placeholder="Filter catalog by product title, brand (e.g. Alpha, MustHave), or SKU..."
+                        value={adminSearch}
+                        onChange={(e) => setAdminSearch(e.target.value)}
+                        className="w-full text-xs text-stone-800 bg-transparent focus:outline-none"
+                      />
+                    </div>
+                    <div className="text-[11px] text-stone-500 font-medium whitespace-nowrap border-t sm:border-t-0 sm:border-l border-stone-200 pt-2 sm:pt-0 sm:pl-3">
+                      Displaying <span className="font-bold text-stone-900 font-mono">{filteredProducts.length.toLocaleString()}</span> of <span className="font-bold text-amber-900 font-mono">{totalProductsCount.toLocaleString()}</span> items
+                    </div>
                   </div>
 
                   {/* Products Table */}
@@ -1104,37 +1186,80 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                         {filteredProducts.map((prod) => (
                           <tr key={prod.id} className="hover:bg-stone-50/70 transition-colors">
                             <td className="py-3 px-4 flex items-center gap-3">
-                              <div className="w-10 h-10 bg-stone-100 border border-stone-200 rounded-xs p-1 shrink-0 flex items-center justify-center">
+                              <div className="w-11 h-11 bg-stone-100 border border-stone-200 rounded-xs p-1 shrink-0 flex items-center justify-center overflow-hidden">
                                 <img src={prod.images[0]?.url} alt={prod.name} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
                               </div>
-                              <div>
+                              <div className="space-y-0.5">
                                 <p className="font-bold text-stone-900">{prod.name}</p>
-                                <p className="text-[10px] text-stone-400 font-mono">{prod.sku}</p>
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <span className="text-[10px] text-stone-400 font-mono">{prod.sku}</span>
+                                  {prod.isBestSeller && (
+                                    <span className="bg-amber-100 text-amber-900 text-[9px] font-bold px-1.5 py-0.2 rounded-xs">Best Seller</span>
+                                  )}
+                                  {prod.isOnSale && (
+                                    <span className="bg-rose-100 text-rose-800 text-[9px] font-bold px-1.5 py-0.2 rounded-xs">Sale</span>
+                                  )}
+                                  {prod.isFeatured && (
+                                    <span className="bg-purple-100 text-purple-900 text-[9px] font-bold px-1.5 py-0.2 rounded-xs">Featured</span>
+                                  )}
+                                </div>
                               </div>
                             </td>
-                            <td className="py-3 px-4 text-stone-700">{prod.category}</td>
-                            <td className="py-3 px-4 font-semibold text-amber-900">{prod.brand}</td>
-                            <td className="py-3 px-4 font-mono font-bold text-stone-900">${prod.price.toFixed(2)}</td>
-                            <td className="py-3 px-4">
-                              <span className={`px-2 py-0.5 rounded-xs font-mono font-bold ${prod.stock <= (prod.lowStockThreshold || 5) ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}`}>
-                                {prod.stock}
-                              </span>
+                            <td className="py-3 px-4 text-stone-700">
+                              <div>{prod.category}</div>
+                              {prod.subcategory && (
+                                <span className="text-[10px] text-stone-400">{prod.subcategory}</span>
+                              )}
                             </td>
-                            <td className="py-3 px-4 text-stone-600">{prod.rating.toFixed(1)} ★ ({prod.reviewCount})</td>
+                            <td className="py-3 px-4 font-semibold text-amber-900">{prod.brand}</td>
+                            <td className="py-3 px-4 font-mono">
+                              {prod.salePrice ? (
+                                <div>
+                                  <span className="font-bold text-rose-700">${prod.salePrice.toFixed(2)}</span>
+                                  <span className="text-[10px] text-stone-400 line-through ml-1.5">${prod.price.toFixed(2)}</span>
+                                </div>
+                              ) : (
+                                <span className="font-bold text-stone-900">${prod.price.toFixed(2)}</span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4">
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleQuickStockUpdate(prod, -1)}
+                                  className="w-5 h-5 flex items-center justify-center bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xs font-mono font-bold cursor-pointer transition-colors"
+                                  title="Decrease stock by 1"
+                                >
+                                  -
+                                </button>
+                                <span className={`px-2 py-0.5 rounded-xs font-mono font-bold text-center min-w-[32px] ${prod.stock <= (prod.lowStockThreshold || 5) ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}`}>
+                                  {prod.stock}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleQuickStockUpdate(prod, 1)}
+                                  className="w-5 h-5 flex items-center justify-center bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xs font-mono font-bold cursor-pointer transition-colors"
+                                  title="Increase stock by 1"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </td>
+                            <td className="py-3 px-4 text-stone-600">{prod.rating ? prod.rating.toFixed(1) : '5.0'} ★ ({prod.reviewCount || 0})</td>
                             <td className="py-3 px-4 text-right space-x-2">
                               <button
                                 onClick={() => handleOpenEditProduct(prod)}
-                                className="p-1 text-stone-600 hover:text-amber-900 transition-colors cursor-pointer"
-                                title="Edit"
+                                className="p-1.5 bg-stone-100 hover:bg-amber-900 hover:text-white text-stone-700 rounded-xs transition-colors cursor-pointer"
+                                title="Edit Product Specifications"
                               >
-                                <Edit2 className="w-4 h-4" />
+                                <Edit2 className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 onClick={() => handleDeleteProduct(prod.id)}
-                                className="p-1 text-stone-400 hover:text-rose-600 transition-colors cursor-pointer"
-                                title="Delete"
+                                className="p-1.5 bg-stone-100 hover:bg-rose-600 hover:text-white text-stone-400 rounded-xs transition-colors cursor-pointer"
+                                title="Decommission Product"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </td>
                           </tr>
@@ -1717,11 +1842,16 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       {/* CREATE / EDIT PRODUCT MODAL */}
       {isProductModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-2xl w-full p-6 space-y-4">
+          <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-stone-100 pb-3">
-              <h3 className="font-serif text-lg font-bold text-stone-900">
-                {editingProduct ? 'Edit Catalog Product' : 'Add New Hookah Product'}
-              </h3>
+              <div>
+                <h3 className="font-serif text-lg font-bold text-stone-900">
+                  {editingProduct ? `Edit Product: ${editingProduct.name}` : 'Add New Hookah Product'}
+                </h3>
+                <p className="text-[11px] text-stone-500">
+                  Update product title, pricing, stock levels, taxonomy, and media assets.
+                </p>
+              </div>
               <button onClick={() => setIsProductModalOpen(false)} className="text-stone-400 hover:text-stone-700 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
@@ -1798,13 +1928,36 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                         <option value="Bases & Glass">Bases & Glass</option>
                         <option value="Charcoal & Heat">Charcoal & Heat</option>
                         <option value="Accessories & HMD">Accessories & HMD</option>
+                        <option value="Vapes & Pod Systems">Vapes & Pod Systems</option>
                       </>
                     )}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-stone-700 mb-1">Price ($) *</label>
+                  <label className="block font-semibold text-stone-700 mb-1">Subcategory / Line</label>
+                  <input
+                    type="text"
+                    value={prodSubcategory}
+                    onChange={(e) => setProdSubcategory(e.target.value)}
+                    placeholder="e.g. Dark Leaf Tobacco, Phunnel Bowls"
+                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">SKU / Item Code</label>
+                  <input
+                    type="text"
+                    value={prodSku}
+                    onChange={(e) => setProdSku(e.target.value)}
+                    placeholder="e.g. ALP-MODX-BLK"
+                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Regular Price ($) *</label>
                   <input
                     type="number"
                     step="0.01"
@@ -1816,13 +1969,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-stone-700 mb-1">Sale Price ($) (Optional)</label>
+                  <label className="block font-semibold text-stone-700 mb-1">Sale / Discount Price ($) (Optional)</label>
                   <input
                     type="number"
                     step="0.01"
                     value={prodSalePrice}
                     onChange={(e) => setProdSalePrice(e.target.value)}
-                    placeholder="Leave empty for regular price"
+                    placeholder="Leave empty if not on sale"
                     className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono"
                   />
                 </div>
@@ -1839,7 +1992,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-stone-700 mb-1">Flavor Notes (If Shisha)</label>
+                  <label className="block font-semibold text-stone-700 mb-1">Flavor Notes (For Shisha / Vapes)</label>
                   <input
                     type="text"
                     value={prodFlavor}
@@ -1849,20 +2002,104 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                   />
                 </div>
 
-                <div className="sm:col-span-2">
-                  <label className="block font-semibold text-stone-700 mb-1">Product Image URL</label>
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Material / Craftsmanship</label>
                   <input
                     type="text"
-                    required
-                    value={prodImageUrl}
-                    onChange={(e) => setProdImageUrl(e.target.value)}
-                    placeholder="https://..."
+                    value={prodMaterial}
+                    onChange={(e) => setProdMaterial(e.target.value)}
+                    placeholder="e.g. AISI 304 Stainless Steel, Stoneware Clay"
+                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Rating (1.0 – 5.0)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="1"
+                    max="5"
+                    value={prodRating}
+                    onChange={(e) => setProdRating(e.target.value)}
                     className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block font-semibold text-stone-700 mb-1">Description & Specifications</label>
+                  <label className="block font-semibold text-stone-700 mb-1">Short Tagline Summary</label>
+                  <input
+                    type="text"
+                    value={prodShortDesc}
+                    onChange={(e) => setProdShortDesc(e.target.value)}
+                    placeholder="Brief 1-line hook for collection cards"
+                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block font-semibold text-stone-700 mb-1">Product Image URL</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      required
+                      value={prodImageUrl}
+                      onChange={(e) => setProdImageUrl(e.target.value)}
+                      placeholder="https://images.unsplash.com/..."
+                      className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono"
+                    />
+                    {prodImageUrl && (
+                      <div className="w-10 h-10 bg-stone-100 border border-stone-300 rounded-xs shrink-0 overflow-hidden flex items-center justify-center">
+                        <img src={prodImageUrl} alt="Preview" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block font-semibold text-stone-700 mb-1">Catalog Status & Merchandising Badges</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-stone-50 p-3 border border-stone-200 rounded-xs">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={prodIsFeatured}
+                        onChange={(e) => setProdIsFeatured(e.target.checked)}
+                        className="rounded-xs text-amber-900 focus:ring-amber-900"
+                      />
+                      <span className="font-semibold text-stone-700">Featured</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={prodIsBestSeller}
+                        onChange={(e) => setProdIsBestSeller(e.target.checked)}
+                        className="rounded-xs text-amber-900 focus:ring-amber-900"
+                      />
+                      <span className="font-semibold text-stone-700">Best Seller</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={prodIsNewArrival}
+                        onChange={(e) => setProdIsNewArrival(e.target.checked)}
+                        className="rounded-xs text-amber-900 focus:ring-amber-900"
+                      />
+                      <span className="font-semibold text-stone-700">New Arrival</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={prodIsActive}
+                        onChange={(e) => setProdIsActive(e.target.checked)}
+                        className="rounded-xs text-amber-900 focus:ring-amber-900"
+                      />
+                      <span className="font-semibold text-stone-700">Active</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block font-semibold text-stone-700 mb-1">Full Description & Specifications</label>
                   <textarea
                     rows={3}
                     required

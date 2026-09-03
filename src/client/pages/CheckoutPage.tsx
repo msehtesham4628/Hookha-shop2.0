@@ -124,7 +124,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
         // Clear local cart
         await loadCart();
-        showToast('Order confirmed! Welcome to Sultan Reserve.', 'success');
+        showToast('Order confirmed! Welcome to Fumare Hookah.', 'success');
         const orderId = res.data.order?.id || res.data.paymentIntentId;
         onNavigate(`/order-success?orderId=${orderId}`);
       }
@@ -477,7 +477,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
             </button>
 
             <div className="text-center text-[11px] text-stone-400">
-              By authorizing this transaction, you accept Sultan Hookah Co.'s terms of service and break-free delivery warranty.
+              By authorizing this transaction, you accept Fumare Hookah's terms of service and break-free delivery warranty.
             </div>
 
           </div>

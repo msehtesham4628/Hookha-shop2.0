@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    service: 'Sultan Hookah Co. API Server',
+    service: 'Fumare Hookah API Server',
     timestamp: new Date().toISOString()
   });
 });

@@ -245,8 +245,8 @@ export const DEFAULT_ROLES: Role[] = [
 ];
 
 export const DEFAULT_SETTINGS: StoreSettings = {
-  storeName: 'World Hookah Market',
-  supportEmail: 'support@worldhookahmarket.com',
+  storeName: 'Fumare Hookah',
+  supportEmail: 'support@fumarehookah.com',
   supportPhone: '+1 (800) 785-8260',
   currency: 'USD',
   currencySymbol: '$',
@@ -258,7 +258,7 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   stripeEnabled: true,
   resendEnabled: true,
   smsProvider: 'twilio',
-  bannerAnnouncement: 'World Hookah Market · Fast Worldwide & US Express Shipping · Official Master Distributor for MustHave, DarkSide, Alpha Hookah, Oblako & Kong',
+  bannerAnnouncement: 'Fumare Hookah · Fast Worldwide & US Express Shipping · Official Master Distributor for MustHave, DarkSide, Alpha Hookah, Oblako & Kong',
   maintenanceMode: false
 };
 
@@ -275,7 +275,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     isActive: true,
     sortOrder: 1,
     seoTitle: 'Buy Hookahs Online | Alpha Hookah, El Bomber, MattPear, Wookah',
-    seoDescription: 'Shop premier European and Russian hookahs with worldwide shipping and fast USA delivery from World Hookah Market.'
+    seoDescription: 'Shop premier European and Russian hookahs with worldwide shipping and fast USA delivery from Fumare Hookah.'
   },
   {
     id: 'cat-tobacco',
@@ -354,7 +354,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     name: 'Vapes',
     slug: 'vapes',
     description: 'High performance pod mods, premium disposable vapes, replacement coils, and nic salt devices from world leading vape manufacturers.',
-    imageUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-800?q=80&w=800&auto=format&fit=crop',
+    imageUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=800&auto=format&fit=crop',
     subcategories: ['GeekVape', 'Vaporesso', 'Lost Mary', 'Elf Bar', 'SMOK', 'VOOPOO', 'OXVA', 'Disposable Vapes', 'Pod Systems', 'Nicotine Salt Liquids'],
     productCount: 10,
     isActive: true,
@@ -700,7 +700,7 @@ export const INITIAL_BRANDS: Brand[] = [
     slug: 'geekvape',
     origin: 'China / Global',
     description: 'IP68 waterproof and shockproof Aegis pod mods and Z-Series sub-ohm flavor tanks.',
-    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=300&auto=format&fit=crop',
     productCount: 6,
     isActive: true
   },
@@ -710,7 +710,7 @@ export const INITIAL_BRANDS: Brand[] = [
     slug: 'vaporesso',
     origin: 'Global',
     description: 'Corex heating tech and AXON chipset pod systems including the best-selling XROS series.',
-    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=300&auto=format&fit=crop',
     productCount: 6,
     isActive: true
   },
@@ -720,7 +720,7 @@ export const INITIAL_BRANDS: Brand[] = [
     slug: 'lost-mary',
     origin: 'Global',
     description: 'Rechargeable dual mesh coil disposables and pod kits with hyper-concentrated fruit flavors.',
-    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=300&auto=format&fit=crop',
     productCount: 5,
     isActive: true
   },
@@ -730,7 +730,7 @@ export const INITIAL_BRANDS: Brand[] = [
     slug: 'elf-bar',
     origin: 'Global',
     description: 'World-famous disposable vape pens and smart power screen devices.',
-    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=300&auto=format&fit=crop',
     productCount: 5,
     isActive: true
   },
@@ -740,7 +740,7 @@ export const INITIAL_BRANDS: Brand[] = [
     slug: 'smok',
     origin: 'Global',
     description: 'Legendary vape hardware pioneers known for Nord and Novo refillable pod kits.',
-    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+    logoUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=300&auto=format&fit=crop',
     productCount: 4,
     isActive: true
   }
@@ -2260,8 +2260,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-gkv-1',
-        url: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-1200?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=300&auto=format&fit=crop',
         alt: 'GeekVape Aegis Legend 3',
         isPrimary: true,
         sortOrder: 1
@@ -2307,8 +2307,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-vap-1',
-        url: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-1200?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=300&auto=format&fit=crop',
         alt: 'Vaporesso XROS 4 Pod Kit',
         isPrimary: true,
         sortOrder: 1
@@ -2355,8 +2355,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-lst-1',
-        url: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-1200?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-300?q=80&w=300&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=300&auto=format&fit=crop',
         alt: 'Lost Mary OS5000',
         isPrimary: true,
         sortOrder: 1
@@ -2532,7 +2532,7 @@ export const INITIAL_COUPONS: Coupon[] = [
   {
     id: 'cpn-welcome15',
     code: 'WELCOME15',
-    description: '15% discount on your initial World Hookah Market order',
+    description: '15% discount on your initial Fumare Hookah order',
     discountType: 'PERCENTAGE',
     discountValue: 15,
     minOrderAmount: 50,

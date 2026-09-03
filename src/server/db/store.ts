@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import bcrypt from 'bcryptjs';
 import {
   User,
@@ -93,7 +95,55 @@ export class DatabaseStore {
     this.roles = [...DEFAULT_ROLES];
     this.categories = [...INITIAL_CATEGORIES];
     this.brands = [...INITIAL_BRANDS];
-    this.products = [...INITIAL_PRODUCTS];
+
+    // Load full authentic product catalog
+    let catalogProducts: Product[] = [];
+    try {
+      const catalogPath = path.join(process.cwd(), 'src/server/db/scrapedProducts.json');
+      if (fs.existsSync(catalogPath)) {
+        const fileData = fs.readFileSync(catalogPath, 'utf8');
+        catalogProducts = JSON.parse(fileData);
+        console.log(`[Store] Loaded ${catalogProducts.length} authentic products from catalog.`);
+      }
+    } catch (e) {
+      console.warn('[Store] Could not load scrapedProducts.json:', e);
+    }
+
+    this.products = catalogProducts.length > 0 ? catalogProducts : [...INITIAL_PRODUCTS];
+
+    // Compute dynamic product counts for categories
+    this.categories.forEach(cat => {
+      cat.productCount = this.products.filter(p =>
+        p.categorySlug === cat.slug || p.category.toLowerCase() === cat.name.toLowerCase()
+      ).length;
+    });
+
+    // Populate and compute brand catalog
+    const brandMap = new Map<string, Brand>();
+    INITIAL_BRANDS.forEach(b => brandMap.set(b.name.toLowerCase(), { ...b, productCount: 0 }));
+
+    this.products.forEach(p => {
+      const bName = p.brand || 'Fumare Hookah';
+      const key = bName.toLowerCase();
+      if (!brandMap.has(key)) {
+        const slug = p.brandSlug || bName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        brandMap.set(key, {
+          id: `brand-${slug}`,
+          name: bName,
+          slug,
+          origin: 'Global Artisan',
+          description: `Certified authentic ${bName} merchandise, flavors, and luxury accessories.`,
+          logoUrl: p.images[0]?.url || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=400',
+          productCount: 0,
+          isActive: true
+        });
+      }
+      const existing = brandMap.get(key)!;
+      existing.productCount = (existing.productCount || 0) + 1;
+    });
+
+    this.brands = Array.from(brandMap.values()).sort((a, b) => b.productCount - a.productCount);
+
     this.coupons = [...INITIAL_COUPONS];
     this.reviews = [...INITIAL_REVIEWS];
     this.settings = { ...DEFAULT_SETTINGS };
@@ -118,9 +168,25 @@ export class DatabaseStore {
 
     this.users = [
       {
+        id: 'usr-ehtesham-root',
+        email: 'ehtesham4628@gmail.com',
+        firstName: 'Ehtesham',
+        lastName: 'Admin',
+        phone: '+1 (800) 785-8260',
+        role: 'SUPER_ADMIN',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: superAdminPasswordHash,
+        createdAt: '2026-01-01T00:00:00Z',
+        updatedAt: '2026-01-01T00:00:00Z'
+      },
+      {
         id: 'usr-super-admin-0',
-        email: 'admin@worldhookahmarket.com',
-        firstName: 'World Hookah',
+        email: 'admin@fumarehookah.com',
+        firstName: 'Fumare Hookah',
         lastName: 'Administrator',
         phone: '+1 (800) 785-8260',
         role: 'SUPER_ADMIN',

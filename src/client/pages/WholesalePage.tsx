@@ -136,7 +136,7 @@ export const WholesalePage: React.FC<WholesalePageProps> = ({ onNavigate }) => {
               </div>
               <h2 className="font-serif text-2xl font-bold text-stone-900">Application Received</h2>
               <p className="text-xs text-stone-600 max-w-md mx-auto leading-relaxed">
-                Thank you for applying to the Sultan Wholesale Network. A B2B account director will verify your EIN / resale permit and activate your commercial portal within 1 business day.
+                Thank you for applying to the Fumare Hookah Wholesale Network. A B2B account director will verify your EIN / resale permit and activate your commercial portal within 1 business day.
               </p>
               <button
                 onClick={() => onNavigate('/')}

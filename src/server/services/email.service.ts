@@ -7,8 +7,8 @@ export interface SendEmailOptions {
 
 export class EmailService {
   private apiKey = process.env.RESEND_API_KEY;
-  private fromEmail = process.env.RESEND_FROM_EMAIL || 'concierge@sultanhookah.com';
-  private fromName = process.env.RESEND_FROM_NAME || 'Sultan Hookah Co.';
+  private fromEmail = process.env.RESEND_FROM_EMAIL || 'concierge@fumarehookah.com';
+  private fromName = process.env.RESEND_FROM_NAME || 'Fumare Hookah';
 
   public async sendEmail(options: SendEmailOptions): Promise<{ success: boolean; messageId?: string }> {
     const formattedFrom = `${this.fromName} <${this.fromEmail}>`;
@@ -51,8 +51,8 @@ export class EmailService {
     const html = `
       <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #fcfcfd; color: #121417;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="font-size: 24px; font-weight: 700; letter-spacing: 2px; color: #121417; text-transform: uppercase;">Sultan Hookah Co.</h1>
-          <p style="color: #71717a; font-size: 13px; letter-spacing: 1px;">HAUTE SHISHA & LUXURY SMOKING ARTIFACTS</p>
+          <h1 style="font-size: 24px; font-weight: 700; letter-spacing: 2px; color: #121417; text-transform: uppercase;">Fumare Hookah</h1>
+          <p style="color: #71717a; font-size: 13px; letter-spacing: 1px;">PREMIER SHISHA & LUXURY SMOKING ARTIFACTS</p>
         </div>
         <div style="background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 8px; padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
           <h2 style="font-size: 18px; font-weight: 600; margin-top: 0;">Your Verification Security Code</h2>
@@ -67,9 +67,9 @@ export class EmailService {
 
     const res = await this.sendEmail({
       to: email,
-      subject: `Your Sultan Hookah Security Passkey: ${otpCode}`,
+      subject: `Your Fumare Hookah Security Passkey: ${otpCode}`,
       html,
-      text: `Your Sultan Hookah verification code is ${otpCode}. It expires in 10 minutes.`
+      text: `Your Fumare Hookah verification code is ${otpCode}. It expires in 10 minutes.`
     });
 
     return res.success;
@@ -79,7 +79,7 @@ export class EmailService {
     const html = `
       <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #fcfcfd; color: #121417;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="font-size: 24px; font-weight: 700; letter-spacing: 2px; color: #121417; text-transform: uppercase;">Sultan Hookah Co.</h1>
+          <h1 style="font-size: 24px; font-weight: 700; letter-spacing: 2px; color: #121417; text-transform: uppercase;">Fumare Hookah</h1>
         </div>
         <div style="background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 8px; padding: 32px;">
           <h2 style="font-size: 18px; font-weight: 600; margin-top: 0; color: #15803d;">Order Confirmed: #${orderData.orderNumber}</h2>
@@ -93,7 +93,7 @@ export class EmailService {
 
     const res = await this.sendEmail({
       to: email,
-      subject: `Order Confirmation #${orderData.orderNumber} | Sultan Hookah Co.`,
+      subject: `Order Confirmation #${orderData.orderNumber} | Fumare Hookah`,
       html,
       text: `Thank you for your order #${orderData.orderNumber}. Total: $${orderData.total.toFixed(2)}.`
     });
@@ -118,7 +118,7 @@ export class EmailService {
 
     const res = await this.sendEmail({
       to: email,
-      subject: 'Reset your Sultan Hookah account password',
+      subject: 'Reset your Fumare Hookah account password',
       html,
       text: `Reset your password by visiting: ${resetUrl}`
     });

@@ -19,17 +19,17 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           {/* Column 1: Contact Info matching Screenshot 6 */}
           <div className="space-y-3">
             <h5 className="text-white font-bold uppercase tracking-wider text-xs">
-              World Hookah Market
+              Fumare Hookah
             </h5>
             <div className="space-y-2 text-stone-400">
               <a
-                href="https://instagram.com/worldhookahmarket"
+                href="https://instagram.com/fumarehookah"
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-2 text-stone-300 hover:text-cyan-400 transition-colors"
               >
                 <Instagram className="w-4 h-4 text-rose-400" />
-                <span>@worldhookahmarket</span>
+                <span>@fumarehookah</span>
               </a>
 
               <a
@@ -41,11 +41,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               </a>
 
               <a
-                href="mailto:cs@worldhookahmarket.com"
+                href="mailto:cs@fumarehookah.com"
                 className="flex items-center gap-2 text-stone-300 hover:text-cyan-400 transition-colors"
               >
                 <Mail className="w-4 h-4 text-cyan-400" />
-                <span>cs@worldhookahmarket.com</span>
+                <span>cs@fumarehookah.com</span>
               </a>
 
               <div className="flex items-start gap-2 text-stone-400 pt-1">
@@ -151,7 +151,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
         {/* Bottom Sub-bar with Kaani Web Credit matching Screenshot 6 */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-400">
-          <p>© {new Date().getFullYear()} World Hookah Market. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Fumare Hookah. All rights reserved.</p>
           <div className="text-stone-400 text-xs">
             <span>kaan! Site created by </span>
             <span className="text-cyan-400 font-semibold">kaani web</span>

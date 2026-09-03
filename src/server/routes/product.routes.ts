@@ -48,7 +48,13 @@ router.get('/', (req, res) => {
 
     // Subcategory filter
     if (subcategory) {
-      result = result.filter(p => p.subcategory?.toLowerCase() === subcategory.toLowerCase());
+      const subLower = subcategory.toLowerCase();
+      result = result.filter(p =>
+        p.subcategory?.toLowerCase() === subLower ||
+        p.subcategory?.toLowerCase().includes(subLower) ||
+        p.tags.some(t => t.toLowerCase().includes(subLower)) ||
+        p.name.toLowerCase().includes(subLower)
+      );
     }
 
     // Brand filter
@@ -142,7 +148,7 @@ router.get('/', (req, res) => {
 
     // Pagination
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.min(200, Math.max(1, parseInt(limit, 10) || 24));
+    const limitNum = Math.min(10000, Math.max(1, parseInt(limit, 10) || 24));
     const totalCount = result.length;
     const totalPages = Math.ceil(totalCount / limitNum);
     const offset = (pageNum - 1) * limitNum;

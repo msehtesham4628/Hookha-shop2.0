@@ -73,7 +73,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
       if (res.success && res.data) {
         localStorage.setItem('sultan_auth_token', res.data.token);
         setUser(res.data.user, []);
-        showToast('Account created! Welcome to Sultan Reserve.', 'success');
+        showToast('Account created! Welcome to Fumare Hookah.', 'success');
         onNavigate('/account');
       }
     } catch (err: any) {
@@ -199,11 +199,11 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
               <ShieldCheck className="w-6 h-6" />
             </div>
             <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-amber-900">
-              Sultan Reserve Access
+              Fumare Hookah Access
             </span>
             <h1 className="font-serif text-2xl font-bold text-stone-900">
               {mode === 'login' && 'Sign In to Your Account'}
-              {mode === 'register' && 'Create Sultan Account'}
+              {mode === 'register' && 'Create Fumare Account'}
               {mode === 'otp-email' && 'Passwordless Email OTP'}
               {mode === 'otp-sms' && 'SMS One-Time Code'}
               {mode === 'forgot' && 'Reset Vault Password'}

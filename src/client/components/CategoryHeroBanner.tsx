@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Category, Brand } from '../../types/index.js';
 import { useTranslation } from '../i18n/LanguageContext.js';
-import { Sparkles, ChevronRight, ChevronLeft, Layers, CheckCircle2 } from 'lucide-react';
+import { Sparkles, ChevronRight, ChevronLeft } from 'lucide-react';
 
 interface CategoryHeroBannerProps {
   category?: Category;
@@ -29,295 +29,233 @@ interface CategoryVisualConfig {
   description: string;
   slides: CategorySlide[];
   accentColor: string;
-  accentGradient: string;
-  stats: { label: string; value: string }[];
 }
 
 const CATEGORY_CONFIGS: Record<string, CategoryVisualConfig> = {
   hookahs: {
     title: 'Hookahs',
-    badge: 'AEROSPACE GRADE AISI 304 • RUSSIAN & EUROPEAN MASTERS',
-    headline: 'Engineered Precision Hookahs',
-    description: 'Precision engineered modern and Russian hookahs crafted from aerospace-grade AISI 304 stainless steel, magnetic purge valves, and artisan crystal glass.',
+    badge: 'AEROSPACE GRADE AISI 304',
+    headline: 'Russian & European Master Hookahs',
+    description: 'Alpha Hookah • El Bomber • Maklaud • Steamulation • WOOKAH • MattPear',
     slides: [
       {
-        image: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Precision Aerospace Stems',
-        subtitle: 'AISI 304 Stainless Steel & 360° Vertical Purge'
+        subtitle: 'AISI 304 Stainless Steel & 360° Vertical Purge Technology'
       },
       {
-        image: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Russian & German Hardware',
-        subtitle: 'Alpha Hookah, El Bomber, MattPear & Maklaud'
+        subtitle: 'Alpha Hookah, El Bomber, MattPear & Maklaud Masterpieces'
       },
       {
-        image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1800&auto=format&fit=crop',
-        tagline: 'Artisan Wood & Crystal Masterpieces',
-        subtitle: 'Heavy Weighted Bases with Magnetic Connectors'
+        image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=2000&auto=format&fit=crop',
+        tagline: 'Artisan Wood & Crystal Stems',
+        subtitle: 'Heavy Weighted Bases with Magnetic Gasket-Free Ports'
       }
     ],
-    accentColor: '#00b5ad',
-    accentGradient: 'from-cyan-950/90 via-stone-950/80 to-stone-950/95',
-    stats: [
-      { label: 'Stem Metallurgy', value: 'AISI 304 Inox' },
-      { label: 'Origin Masters', value: 'Russia & Germany' },
-      { label: 'Purge Tech', value: '360° Vertical' }
-    ]
+    accentColor: '#00b5ad'
   },
   tobacco: {
-    title: 'Tobacco',
-    badge: 'DARK LEAF & BLONDE LEAF • 100+ CERTIFIED BLENDS',
+    title: 'Shisha Tobacco',
+    badge: '100+ FRESH SEALED BLENDS',
     headline: 'Dark & Blonde Leaf Shisha Tobacco',
-    description: 'Dark leaf, blonde leaf, and whole-leaf cigar shisha tobacco blends featuring world-renowned brands like MustHave, DarkSide, BlackBurn, Tangiers, and Bonche.',
+    description: 'MustHave • DarkSide • BlackBurn • Tangiers • Bonche • Chabacco • Spectrum',
     slides: [
       {
-        image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Toasted Burley & Virginia Leaf',
-        subtitle: 'MustHave, DarkSide, BlackBurn & Tangiers Blends'
+        subtitle: 'MustHave, DarkSide, BlackBurn, Tangiers & Bonche Blends'
       },
       {
-        image: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Dense Smoke & Long Session Yield',
-        subtitle: 'Over 100+ Authentic Cured Aromas & Cigar Blends'
+        subtitle: 'Over 100+ Authentic Cured Aromas, Single Notes & Mixed Blends'
       },
       {
-        image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1800&auto=format&fit=crop',
-        tagline: 'Certified Freshness & Origin Sealed',
-        subtitle: 'Mild to Extreme Nicotine Strengths in 25g, 125g & 200g'
+        image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=2000&auto=format&fit=crop',
+        tagline: 'Certified Freshness & Sealed Tins',
+        subtitle: 'Mild, Medium to Extreme Nicotine Strengths in 25g, 125g & 200g'
       }
     ],
-    accentColor: '#0088cc',
-    accentGradient: 'from-blue-950/90 via-stone-950/85 to-stone-950/95',
-    stats: [
-      { label: 'Leaf Varieties', value: 'Burley & Virginia' },
-      { label: 'Nicotine Tiers', value: 'Mild to Extreme' },
-      { label: 'Aroma Freshness', value: 'Sealed & Certified' }
-    ]
+    accentColor: '#0088cc'
   },
   bowls: {
-    title: 'Bowls',
-    badge: 'HANDCRAFTED CLAY & GLAZED CERAMICS • THERMAL RETENTION',
-    headline: 'Handcrafted Artisan Shisha Bowls',
-    description: 'Handcrafted clay, semi-porcelain, and character art bowls designed for high thermal retention, pure flavor, and dense smoke output.',
+    title: 'Shisha Bowls',
+    badge: 'HANDCRAFTED CLAY & GLAZED PHUNNELS',
+    headline: 'Artisan Thermal Retention Bowls',
+    description: 'Oblako • Kong Bowls • Alpaca • Solaris • Target • Cosmo',
     slides: [
       {
-        image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Phunnel & Killer Geometries',
-        subtitle: 'Uniform Thermal Distribution & Zero Flavor Bleed'
+        subtitle: 'Uniform Thermal Distribution & Zero Flavor Bleeding'
       },
       {
-        image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Oblako, Kong & Alpaca Originals',
-        subtitle: 'Artisan Ceramic Glazes & Thermal Terracotta'
+        subtitle: 'Artisan Ceramic Glazes & Thermal Terracotta Construction'
       },
       {
-        image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Engineered for HMD & Foil Packs',
-        subtitle: 'Optimal 15g – 22g Tobacco Capacities'
+        subtitle: 'Optimal 15g – 22g Capacities for Clean Long Sessions'
       }
     ],
-    accentColor: '#f26c60',
-    accentGradient: 'from-rose-950/90 via-stone-950/85 to-stone-950/95',
-    stats: [
-      { label: 'Bowl Geometries', value: 'Phunnel & Killer' },
-      { label: 'Thermal Profile', value: 'Uniform Retention' },
-      { label: 'Capacity Range', value: '12g – 25g' }
-    ]
+    accentColor: '#f26c60'
   },
   bases: {
-    title: 'Bases',
-    badge: 'BOHEMIAN CRYSTAL & CRAFT DROP VASES',
-    headline: 'Bohemian Crystal & Drop Bases',
-    description: 'Russian drop vases, craft glass, and hand-cut Bohemian crystal bases engineered for maximum stability, optimal air chamber volume, and visual elegance.',
+    title: 'Vases & Bases',
+    badge: 'HAND-CUT BOHEMIAN CRYSTAL',
+    headline: 'Crystal Glass & Russian Drop Vases',
+    description: 'Caesar Crystal • Craft Glass • Big Maks • WOOKAH Crystal',
     slides: [
       {
-        image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Hand-Cut Bohemian Crystal',
-        subtitle: 'Caesar Crystal & Craft Glass Russian Drops'
+        subtitle: 'Caesar Crystal & Craft Glass Russian Drop Vases'
       },
       {
-        image: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Weighted Low Center of Gravity',
-        subtitle: 'Universal 45mm Gasket Compatibility'
+        subtitle: 'Universal 45mm Gasket Compatibility & Heavy Wall Glass'
       },
       {
-        image: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Clear, Tinted & Frosted Finishes',
-        subtitle: 'Precision Hand-Blown Heavy Bottom Glass'
+        subtitle: 'Precision Hand-Blown Heavy Bottom Glassware'
       }
     ],
-    accentColor: '#3b82f6',
-    accentGradient: 'from-sky-950/90 via-stone-950/85 to-stone-950/95',
-    stats: [
-      { label: 'Crystal Quality', value: 'Hand-Cut Bohemian' },
-      { label: 'Stability Index', value: 'Heavy Base Weighted' },
-      { label: 'Grommet Fit', value: 'Universal 45mm' }
-    ]
+    accentColor: '#3b82f6'
   },
   coal: {
-    title: 'Coal',
-    badge: '100% NATURAL COCONUT SHELL • ZERO CHEMICAL ODOR',
-    headline: 'Natural Coconut Charcoal & Heat',
-    description: '100% natural coconut charcoal cubes, flats, and circle cuts with low ash, zero sulfur chemicals, and up to 90 minutes burn time.',
+    title: 'Coconut Charcoal',
+    badge: '100% NATURAL COCONUT SHELL',
+    headline: 'High Calorie Natural Coconut Charcoal',
+    description: 'Coco Loco • One Nation • Oasis Charcoal • 26mm & 28mm Cubes',
     slides: [
       {
-        image: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=2000&auto=format&fit=crop',
         tagline: '100% Indonesian Coconut Shell',
         subtitle: 'Coco Loco, One Nation & Oasis Charcoal'
       },
       {
-        image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1800&auto=format&fit=crop',
-        tagline: 'Up to 90 Minutes High Calorie Heat',
-        subtitle: 'Low Ash Output < 2% & Zero Unwanted Odors'
+        image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=2000&auto=format&fit=crop',
+        tagline: 'Up to 90 Minutes High Heat Output',
+        subtitle: 'Low Ash Output < 2% & Zero Unwanted Chemical Odors'
       },
       {
-        image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=2000&auto=format&fit=crop',
         tagline: '26mm & 28mm Cubes Available',
-        subtitle: '1kg Retail Boxes and 20kg Master Lounge Cartons'
+        subtitle: '1kg Retail Packs and 20kg Master Lounge Cartons'
       }
     ],
-    accentColor: '#f97316',
-    accentGradient: 'from-amber-950/90 via-stone-950/85 to-stone-950/95',
-    stats: [
-      { label: 'Burn Duration', value: '80 – 90+ Minutes' },
-      { label: 'Ash Content', value: '< 2.0% Low Ash' },
-      { label: 'Sizes Available', value: '26mm & 28mm Cubes' }
-    ]
+    accentColor: '#f97316'
   },
   accessories: {
-    title: 'Accessories',
-    badge: 'HEAT MANAGEMENT & PRECISION ACCESSORIES',
-    headline: 'HMD, Hoses & Session Essentials',
-    description: 'Heat Management Devices (Kaloud, Na Grani), medical-grade silicone hoses, precision tongs, molasses catchers, and professional cleaning supplies.',
+    title: 'Accessories & HMD',
+    badge: 'HEAT MANAGEMENT & HARDWARE',
+    headline: 'HMD, Hoses, Tongs & Session Gear',
+    description: 'Kaloud Lotus • Na Grani • Blade Hookah • Alpha Tongs • Silicone Hoses',
     slides: [
       {
-        image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Kaloud & Na Grani Heat Management',
-        subtitle: 'Cast Aluminum & Stainless Steel Regulators'
+        subtitle: 'Cast Aluminum & Stainless Steel Thermal Regulators'
       },
       {
-        image: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1800&auto=format&fit=crop',
-        tagline: 'Soft-Touch Medical Grade Silicone Hoses',
-        subtitle: 'Blade Hookah, Alpha Tongs & Stainless Mouthpieces'
+        image: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=2000&auto=format&fit=crop',
+        tagline: 'Soft-Touch Silicone Hoses & Tongs',
+        subtitle: 'Blade Hookah, Alpha Tongs & Stainless Steel Mouthpieces'
       },
       {
-        image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Precision Molasses Catchers & Grommets',
-        subtitle: 'Everything You Need for Pure Flavor Sessions'
+        subtitle: 'Everything You Need for Pure Flavor and Clean Sessions'
       }
     ],
-    accentColor: '#8b5cf6',
-    accentGradient: 'from-purple-950/90 via-stone-950/85 to-stone-950/95',
-    stats: [
-      { label: 'HMD Alloy', value: 'Aircraft Grade Cast' },
-      { label: 'Hose Material', value: 'Medical Soft Silicone' },
-      { label: 'Tongs Precision', value: 'Laser-Cut Steel' }
-    ]
+    accentColor: '#8b5cf6'
   },
   'e-hookah': {
     title: 'E-Hookah',
-    badge: 'SMART ELECTRONIC HEADS & SHISHA VAPORIZERS',
+    badge: 'SMART ELECTRONIC HEADS',
     headline: 'Electronic Hookahs & Smart Heads',
-    description: 'Electronic hookah heads and portable shisha vaporizers for convenient, clean, charcoal-free, and instant modern sessions.',
+    description: 'Ooka • Aspire Proteus • Clean Charcoal-Free Vapor',
     slides: [
       {
-        image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Charcoal-Free Clean Vapor Sessions',
         subtitle: 'Ooka Pods & Aspire Proteus Electronic Heads'
       },
       {
-        image: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-800?q=80&w=1800&auto=format&fit=crop',
-        tagline: 'Instant Heat-Up & Long Battery Life',
-        subtitle: 'Smart Temperature Regulation & Pure Pod Flavors'
+        image: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=2000&auto=format&fit=crop',
+        tagline: 'Instant Heat-Up & Smart Temperature Regulation',
+        subtitle: 'Long Battery Life & Pure Pod Flavors'
       }
     ],
-    accentColor: '#06b6d4',
-    accentGradient: 'from-teal-950/90 via-stone-950/85 to-stone-950/95',
-    stats: [
-      { label: 'Vapor Tech', value: 'Dual Ceramic Mesh' },
-      { label: 'Battery Life', value: 'All-Day Fast USB-C' },
-      { label: 'Heat Mechanism', value: '100% Charcoal-Free' }
-    ]
+    accentColor: '#06b6d4'
   },
   vapes: {
-    title: 'Vapes',
-    badge: 'POD SYSTEMS & RECHARGEABLE VAPES',
+    title: 'Vapes & Pods',
+    badge: 'POD SYSTEMS & DISPOSABLES',
     headline: 'Pod Mods, Disposables & Coils',
-    description: 'High performance pod mods, premium disposable vapes, replacement coils, and nic salt devices from world leading vape manufacturers.',
+    description: 'GeekVape • Vaporesso • Lost Mary • Elf Bar • SMOK',
     slides: [
       {
-        image: 'https://images.unsplash.com/photo-1528701800487-ba01 settings-800?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=2000&auto=format&fit=crop',
         tagline: 'GeekVape, Vaporesso & Lost Mary',
         subtitle: 'Leak-Proof Mesh Coils & Smart Auto-Wattage'
       },
       {
-        image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=2000&auto=format&fit=crop',
         tagline: 'High Capacity Rechargeable Disposables',
         subtitle: 'Pure Taste Technology & Smooth Draw Resistance'
       }
     ],
-    accentColor: '#ec4899',
-    accentGradient: 'from-fuchsia-950/90 via-stone-950/85 to-stone-950/95',
-    stats: [
-      { label: 'Coil Technology', value: 'Leak-Proof Mesh' },
-      { label: 'Power Output', value: 'Smart Auto-Wattage' },
-      { label: 'Flavor Profile', value: 'Pure Sub-Ohm & MTL' }
-    ]
+    accentColor: '#ec4899'
   },
   'wholesale-supplies': {
     title: 'Wholesale Supplies',
-    badge: 'COMMERCIAL B2B & LOUNGE DIRECT PRICING',
+    badge: 'COMMERCIAL B2B DIRECT PRICING',
     headline: 'Wholesale Lounge Supplies & Bulk Packs',
-    description: 'Commercial 1kg shisha tins, 20kg master charcoal cartons, and bulk lounge accessory packs at authorized distributor wholesale pricing.',
+    description: '1kg Shisha Tins • 20kg Master Coal Cartons • Lounge Hygiene Packs',
     slides: [
       {
-        image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Commercial 1kg Tins & 20kg Master Cases',
         subtitle: 'Tiered 15% – 35% Wholesale Discounts with Fast Dispatch'
       },
       {
-        image: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1800&auto=format&fit=crop',
-        tagline: 'Direct Lounge Supply & Hygiene Packs',
+        image: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=2000&auto=format&fit=crop',
+        tagline: 'Direct Lounge Supply & Hygiene Essentials',
         subtitle: 'Disposable Mouthpieces, Master Charcoal & Hoses'
       }
     ],
-    accentColor: '#d97706',
-    accentGradient: 'from-amber-950/90 via-stone-950/85 to-stone-950/95',
-    stats: [
-      { label: 'Bulk Units', value: '1kg Tins & 20kg Cases' },
-      { label: 'Wholesale Discount', value: 'Tiered 15% – 35% Off' },
-      { label: 'Account Approval', value: 'Instant Tax ID Auth' }
-    ]
+    accentColor: '#d97706'
   },
   all: {
     title: 'All Products',
     badge: 'HAUTE SHISHA CATALOG • VERIFIED MASTER DROPS',
     headline: 'All Masterpieces & Shisha Tobacco',
-    description: 'Browse premier Russian and European aerospace-grade hookahs, toasted dark leaf shisha tobacco, artisanal clay bowls, Bohemian crystal bases, and coconut coals.',
+    description: 'Russian & European Aerospace Hookahs • Dark Leaf Tobacco • Artisan Bowls • Crystal Bases',
     slides: [
       {
-        image: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Authentic Russian & European Catalog',
         subtitle: 'Direct from Authorized Brand Manufacturers'
       },
       {
-        image: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Dark Leaf, Stems, Bowls & Accessories',
         subtitle: 'Premium Curated Shisha Gear with Same-Day Dispatch'
       },
       {
-        image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Worldwide Shipping & Verified Quality',
         subtitle: 'Guaranteed Authentic Origin & Secure Delivery'
       }
     ],
-    accentColor: '#b45309',
-    accentGradient: 'from-stone-950/95 via-stone-900/90 to-stone-950/95',
-    stats: [
-      { label: 'Catalog Selection', value: '100% Authentic' },
-      { label: 'Shipping Speed', value: 'Same Day Dispatch' },
-      { label: 'Global Network', value: 'Worldwide Delivery' }
-    ]
+    accentColor: '#00b5ad'
   }
 };
 
@@ -378,182 +316,143 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
   const activeSlide = slides[currentSlideIndex] || slides[0];
 
   return (
-    <div
-      className="relative mb-6 rounded-2xl overflow-hidden shadow-xl border border-stone-800/80 bg-stone-950 text-white select-none"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-    >
-      {/* Background Image Slides with Smooth Fade Transitions */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden">
-        {slides.map((slide, idx) => (
-          <div
-            key={idx}
-            className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
-              idx === currentSlideIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'
-            }`}
-          >
-            <img
-              src={slide.image}
-              alt={`${displayTitle} - Slide ${idx + 1}`}
-              className="w-full h-full object-cover object-center filter brightness-60 contrast-110"
-              referrerPolicy="no-referrer"
-              loading={idx === 0 ? 'eager' : 'lazy'}
-            />
-          </div>
-        ))}
-
-        {/* Dark Vignette & Gradient Overlays */}
-        <div className={`absolute inset-0 bg-gradient-to-r ${config.accentGradient} opacity-85`} />
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/60 to-transparent" />
-        <div
-          className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-20 pointer-events-none"
-          style={{ backgroundColor: config.accentColor }}
-        />
-      </div>
-
-      {/* Hero Content Area */}
-      <div className="relative z-10 p-5 sm:p-7 lg:p-9 flex flex-col justify-between min-h-[280px] sm:min-h-[320px]">
-        {/* Top Header: Breadcrumb & Realtime Counter */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/10">
-          {/* Breadcrumb Path */}
-          <div className="flex items-center gap-1.5 text-xs text-stone-300 font-medium">
-            <button
-              onClick={() => onNavigate('/')}
-              className="hover:text-white transition-colors cursor-pointer"
+    <div className="relative mb-6">
+      {/* Sleek Hero Slide Carousel (Matching Homepage Banner Style, No Card Look) */}
+      <div
+        className="relative w-full h-[250px] sm:h-[300px] md:h-[360px] rounded-xl overflow-hidden bg-stone-950 text-white select-none shadow-md group"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        {/* Full-Bleed Slides with Smooth Fade and Subtle Motion */}
+        {slides.map((slide, idx) => {
+          const isActive = idx === currentSlideIndex;
+          return (
+            <div
+              key={idx}
+              className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
+                isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+              }`}
             >
-              Home
-            </button>
-            <ChevronRight className="w-3 h-3 text-stone-500 flex-shrink-0" />
-            <button
-              onClick={onResetCategory}
-              className={`hover:text-white transition-colors cursor-pointer ${!categorySlug && !brandSlug ? 'text-white font-bold' : ''}`}
-            >
-              {t('nav.all_products', 'Catalog')}
-            </button>
-            {category && (
-              <>
-                <ChevronRight className="w-3 h-3 text-stone-500 flex-shrink-0" />
-                <span className="text-white font-bold">{category.name}</span>
-              </>
-            )}
-            {brand && (
-              <>
-                <ChevronRight className="w-3 h-3 text-stone-500 flex-shrink-0" />
-                <span className="text-cyan-400 font-bold">{brand.name}</span>
-              </>
-            )}
-          </div>
-
-          {/* Real-time Product Counter & Slide Counter */}
-          <div className="flex items-center gap-2">
-            {slides.length > 1 && (
-              <span className="text-[11px] font-mono text-stone-300 bg-black/40 px-2 py-0.5 rounded-full border border-white/10">
-                {currentSlideIndex + 1} / {slides.length}
-              </span>
-            )}
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/10 backdrop-blur-md border border-white/15 text-stone-100 shadow-sm">
-              <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: config.accentColor }} />
-              <span>{t('category.showing_items', `${productCount} Products`, { count: productCount })}</span>
-            </span>
-          </div>
-        </div>
-
-        {/* Middle Body: Badge, Main Title, Slide Highlights */}
-        <div className="my-4 max-w-3xl">
-          {/* Section Eyebrow Badge */}
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider bg-white/10 border border-white/20 text-stone-200 mb-2.5 backdrop-blur-sm">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>{config.badge}</span>
-          </div>
-
-          {/* Big Category Headline */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white mb-1.5 leading-tight drop-shadow-md">
-            {displayTitle}
-          </h1>
-
-          {/* Slide Tagline */}
-          <div className="flex items-center gap-2 text-sm sm:text-base font-semibold text-cyan-300 mb-1 drop-shadow-xs">
-            <span>{activeSlide?.tagline || config.headline}</span>
-          </div>
-
-          {/* Slide Subtitle / Description */}
-          <p className="text-xs sm:text-sm text-stone-300/90 leading-relaxed max-w-2xl drop-shadow-sm font-normal">
-            {activeSlide?.subtitle || config.description}
-          </p>
-
-          {/* Category Specs / Highlight Badges */}
-          <div className="mt-4 flex flex-wrap items-center gap-2 sm:gap-2.5">
-            {config.stats.map((stat, idx) => (
-              <div
-                key={idx}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/40 backdrop-blur-md border border-white/10 shadow-xs text-[11px]"
-              >
-                <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
-                <span className="text-stone-400 font-medium">{stat.label}:</span>
-                <span className="text-white font-bold">{stat.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom Bar: Subcategory Filter Pills + Slide Dot Indicators & Arrows */}
-        <div className="pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          {/* Subcategories Filter Strip */}
-          {subcategories && subcategories.length > 0 ? (
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none flex-1">
-              <span className="text-[10px] uppercase font-bold text-stone-400 whitespace-nowrap flex items-center gap-1 mr-1">
-                <Layers className="w-3 h-3" />
-                <span>Filters:</span>
-              </span>
-
-              {/* All Items Button */}
-              <button
-                onClick={() => onSelectSubcategory('')}
-                className={`text-xs px-3 py-1 rounded-md font-bold transition-all duration-200 whitespace-nowrap cursor-pointer ${
-                  selectedSubcategory === ''
-                    ? 'bg-white text-stone-950 shadow-sm'
-                    : 'bg-white/10 hover:bg-white/20 text-stone-200 border border-white/15'
+              <img
+                src={slide.image}
+                alt={`${displayTitle} - Slide ${idx + 1}`}
+                className={`w-full h-full object-cover object-center transition-transform duration-7000 ease-out filter brightness-70 contrast-105 ${
+                  isActive ? 'scale-105' : 'scale-100'
                 }`}
-              >
-                All {displayTitle}
-              </button>
+                referrerPolicy="no-referrer"
+                loading={idx === 0 ? 'eager' : 'lazy'}
+              />
 
-              {/* Subcategory Pills */}
-              {subcategories.map((sub) => {
-                const isSelected = selectedSubcategory === sub;
-                return (
-                  <button
-                    key={sub}
-                    onClick={() => onSelectSubcategory(isSelected ? '' : sub)}
-                    className={`text-xs px-3 py-1 rounded-md font-medium transition-all duration-200 whitespace-nowrap cursor-pointer ${
-                      isSelected
-                        ? 'bg-white text-stone-950 font-bold shadow-sm'
-                        : 'bg-white/10 hover:bg-white/20 text-stone-200 border border-white/15'
-                    }`}
-                  >
-                    {sub}
-                  </button>
-                );
-              })}
+              {/* Natural Dark Gradient Scrims */}
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/40 to-black/20" />
+              <div className="absolute inset-0 bg-gradient-to-r from-stone-950/90 via-stone-950/40 to-transparent" />
             </div>
-          ) : (
-            <div />
-          )}
+          );
+        })}
 
-          {/* Slide Navigation Controls (2-3 Slides) */}
-          {slides.length > 1 && (
-            <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
-              {/* Prev Slide Button */}
+        {/* Minimal Hero Content Overlay */}
+        <div className="absolute inset-0 p-5 sm:p-7 md:p-9 flex flex-col justify-between z-20">
+          {/* Breadcrumb Path & Counter */}
+          <div className="flex items-center justify-between gap-3 text-xs text-stone-300 font-medium">
+            <div className="flex items-center gap-1.5 flex-wrap">
               <button
-                onClick={prevSlide}
-                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-md flex items-center justify-center text-white transition-colors cursor-pointer border border-white/20 shadow-xs"
-                title="Previous Slide"
+                onClick={() => onNavigate('/')}
+                className="hover:text-white transition-colors cursor-pointer"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
+                Home
               </button>
+              <ChevronRight className="w-3 h-3 text-stone-500 flex-shrink-0" />
+              <button
+                onClick={onResetCategory}
+                className={`hover:text-white transition-colors cursor-pointer ${!categorySlug && !brandSlug ? 'text-white font-bold' : ''}`}
+              >
+                {t('nav.all_products', 'Catalog')}
+              </button>
+              {category && (
+                <>
+                  <ChevronRight className="w-3 h-3 text-stone-500 flex-shrink-0" />
+                  <span className="text-white font-bold">{category.name}</span>
+                </>
+              )}
+              {brand && (
+                <>
+                  <ChevronRight className="w-3 h-3 text-stone-500 flex-shrink-0" />
+                  <span className="text-cyan-400 font-bold">{brand.name}</span>
+                </>
+              )}
+            </div>
 
-              {/* Slide Indicator Dots */}
-              <div className="flex items-center gap-1.5 px-2">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-black/50 backdrop-blur-md border border-white/15 text-stone-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                <span>{(productCount || 0).toLocaleString()} Products</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Hero Titles & Slide Subtitle */}
+          <div className="max-w-2xl">
+            {/* Subtle Eyebrow Badge */}
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-black/60 backdrop-blur-md border border-white/20 text-stone-200 mb-2 shadow-xs">
+              <Sparkles className="w-3 h-3 text-amber-400" />
+              <span>{config.badge}</span>
+            </div>
+
+            {/* Clean, High-Contrast Category Headline */}
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white drop-shadow-md leading-tight mb-1.5">
+              {displayTitle}
+            </h1>
+
+            {/* Active Slide Tagline */}
+            <p className="text-xs sm:text-sm font-semibold text-cyan-300 mb-1 drop-shadow-xs">
+              {activeSlide?.tagline || config.headline}
+            </p>
+
+            {/* Active Slide Subtitle */}
+            <p className="text-xs sm:text-sm text-stone-300 leading-relaxed font-normal line-clamp-2 drop-shadow-xs max-w-xl">
+              {activeSlide?.subtitle || config.description}
+            </p>
+          </div>
+
+          {/* Bottom Controls: Navigation Arrows & Slide Dots */}
+          <div className="flex items-center justify-between">
+            {/* Subcategory Quick Links if available */}
+            {subcategories && subcategories.length > 0 ? (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none max-w-[80%]">
+                <button
+                  onClick={() => onSelectSubcategory('')}
+                  className={`text-[11px] sm:text-xs px-2.5 py-0.5 rounded-full font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                    selectedSubcategory === ''
+                      ? 'bg-white text-stone-950 shadow-xs'
+                      : 'bg-black/40 hover:bg-black/60 text-stone-300 border border-white/10'
+                  }`}
+                >
+                  All
+                </button>
+                {subcategories.slice(0, 4).map((sub) => {
+                  const isSelected = selectedSubcategory === sub;
+                  return (
+                    <button
+                      key={sub}
+                      onClick={() => onSelectSubcategory(isSelected ? '' : sub)}
+                      className={`text-[11px] sm:text-xs px-2.5 py-0.5 rounded-full font-medium transition-all whitespace-nowrap cursor-pointer ${
+                        isSelected
+                          ? 'bg-white text-stone-950 font-bold shadow-xs'
+                          : 'bg-black/40 hover:bg-black/60 text-stone-300 border border-white/10'
+                      }`}
+                    >
+                      {sub}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div />
+            )}
+
+            {/* Slide Dots Indicator */}
+            {slides.length > 1 && (
+              <div className="flex items-center gap-1.5">
                 {slides.map((_, idx) => (
                   <button
                     key={idx}
@@ -567,18 +466,29 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
                   />
                 ))}
               </div>
-
-              {/* Next Slide Button */}
-              <button
-                onClick={nextSlide}
-                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-md flex items-center justify-center text-white transition-colors cursor-pointer border border-white/20 shadow-xs"
-                title="Next Slide"
-              >
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
+
+        {/* Floating Left/Right Navigation Arrow Buttons (Appears on Hover) */}
+        {slides.length > 1 && (
+          <>
+            <button
+              onClick={prevSlide}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all opacity-80 hover:opacity-100 cursor-pointer shadow-md"
+              title="Previous slide"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all opacity-80 hover:opacity-100 cursor-pointer shadow-md"
+              title="Next slide"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

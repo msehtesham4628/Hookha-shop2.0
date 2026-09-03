@@ -204,7 +204,7 @@ router.post('/products', requirePermission('products.create'), (req: Authenticat
     isOnSale: !!body.salePrice && parseFloat(body.salePrice) < parseFloat(body.price),
     isActive: body.isActive !== undefined ? !!body.isActive : true,
     ageRestricted: body.ageRestricted !== undefined ? !!body.ageRestricted : true,
-    seoTitle: body.seoTitle || `${body.name} | Sultan Hookah Co.`,
+    seoTitle: body.seoTitle || `${body.name} | Fumare Hookah`,
     seoDescription: body.seoDescription || body.shortDescription,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()

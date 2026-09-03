@@ -78,11 +78,11 @@ const CATEGORY_GUIDES: Record<string, { title: string; subtitle: string; section
     ]
   },
   default: {
-    title: 'WORLD HOOKAH MARKET — PREMIER AUTHENTIC MASTER DISTRIBUTOR',
+    title: 'FUMARE HOOKAH — PREMIER AUTHENTIC MASTER DISTRIBUTOR',
     subtitle: 'Official USA and International source for authentic shisha lifestyle goods',
     sections: [
       {
-        title: 'Why choose World Hookah Market?',
+        title: 'Why choose Fumare Hookah?',
         content: [
           'We work directly with official manufacturing houses in Russia, Germany, Poland, and the United States. Every item carries guaranteed authenticity seals and serial numbers.',
           'We offer express same-day fulfillment, free shipping over $99 in the contiguous US, and professional B2B wholesale pricing for verified lounges and retailers.'

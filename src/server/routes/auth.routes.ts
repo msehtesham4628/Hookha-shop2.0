@@ -72,8 +72,8 @@ router.post('/register', authRateLimiter, async (req, res) => {
     // Send welcome email in background
     emailService.sendEmail({
       to: normalizedEmail,
-      subject: 'Welcome to Sultan Hookah Co. — Haute Shisha & Smoking Artifacts',
-      html: `<div style="font-family:sans-serif;padding:30px;"><h2>Welcome to Sultan Hookah, ${firstName}!</h2><p>Your account is ready. Discover our curated collection of luxury hookahs, handmade bowls, and rare dark leaf tobaccos.</p></div>`
+      subject: 'Welcome to Fumare Hookah — Premier Hookahs & Shisha',
+      html: `<div style="font-family:sans-serif;padding:30px;"><h2>Welcome to Fumare Hookah, ${firstName}!</h2><p>Your account is ready. Discover our curated collection of luxury hookahs, handmade bowls, and rare dark leaf tobaccos.</p></div>`
     }).catch(console.error);
 
     res.cookie('auth_token', accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 7 * 24 * 3600 * 1000 });
@@ -402,6 +402,7 @@ router.post('/google', async (req, res) => {
   }
 
   const normalizedEmail = email.toLowerCase().trim();
+  const isBootstrappedAdmin = normalizedEmail === 'ehtesham4628@gmail.com' || normalizedEmail.endsWith('@worldhookahmarket.com');
   let user = db.users.find(u => u.email.toLowerCase() === normalizedEmail);
 
   if (!user) {
@@ -415,7 +416,7 @@ router.post('/google', async (req, res) => {
       firstName,
       lastName,
       avatarUrl,
-      role: 'CUSTOMER',
+      role: isBootstrappedAdmin ? 'SUPER_ADMIN' : 'CUSTOMER',
       status: 'ACTIVE',
       isEmailVerified: true,
       isPhoneVerified: false,
@@ -426,6 +427,9 @@ router.post('/google', async (req, res) => {
     };
     db.users.push(user);
   } else {
+    if (isBootstrappedAdmin && user.role !== 'SUPER_ADMIN') {
+      user.role = 'SUPER_ADMIN';
+    }
     user.isEmailVerified = true;
     user.lastLoginAt = new Date().toISOString();
     if (avatarUrl && !user.avatarUrl) user.avatarUrl = avatarUrl;

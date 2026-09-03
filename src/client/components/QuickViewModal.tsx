@@ -55,6 +55,10 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ onNavigate }) =>
               alt={quickViewProduct.name}
               className="max-h-full max-w-full object-contain"
               referrerPolicy="no-referrer"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800';
+              }}
             />
           </div>
 

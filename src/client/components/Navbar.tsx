@@ -189,11 +189,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
           >
             <div className="flex items-center gap-1.5">
               <span className="font-serif text-xl sm:text-2xl font-bold tracking-[0.15em] text-stone-900 group-hover:text-amber-900 transition-colors uppercase">
-                WORLD HOOKAH
+                FUMARE HOOKAH
               </span>
             </div>
             <span className="text-[9px] uppercase tracking-[0.35em] text-amber-800/90 font-sans font-bold -mt-1">
-              MARKET • EST. 2018
+              EST. 2018
             </span>
           </div>
 
