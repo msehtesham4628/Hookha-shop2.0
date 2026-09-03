@@ -40003,9 +40003,9 @@
     "currency": "USD",
     "brand": "Alpha Hookah",
     "brandSlug": "alpha-hookah",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Tongs & Forks",
     "images": [
       {
         "id": "img-499-0",
@@ -40037,8 +40037,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Alpha Hookah",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Accessories",
+      "Tongs & Forks"
     ],
     "specifications": [
       {
@@ -109843,9 +109843,9 @@
     "currency": "USD",
     "brand": "DarkSide",
     "brandSlug": "darkside",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Tongs & Forks",
     "images": [
       {
         "id": "img-1363-0",
@@ -109885,8 +109885,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "DarkSide",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Accessories",
+      "Tongs & Forks"
     ],
     "specifications": [
       {
@@ -114134,9 +114134,9 @@
     "currency": "USD",
     "brand": "DarkSide",
     "brandSlug": "darkside",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-1418-0",
@@ -114176,8 +114176,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "DarkSide",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -114219,9 +114219,9 @@
     "currency": "USD",
     "brand": "DarkSide",
     "brandSlug": "darkside",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-1419-0",
@@ -114261,8 +114261,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "DarkSide",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -114304,9 +114304,9 @@
     "currency": "USD",
     "brand": "DarkSide",
     "brandSlug": "darkside",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-1420-0",
@@ -114346,8 +114346,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "DarkSide",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -114389,9 +114389,9 @@
     "currency": "USD",
     "brand": "DarkSide",
     "brandSlug": "darkside",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-1421-0",
@@ -114423,8 +114423,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "DarkSide",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -114466,9 +114466,9 @@
     "currency": "USD",
     "brand": "DarkSide",
     "brandSlug": "darkside",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-1422-0",
@@ -114500,8 +114500,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "DarkSide",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -137896,9 +137896,9 @@
     "currency": "USD",
     "brand": "Don",
     "brandSlug": "don",
-    "category": "Bowls",
-    "categorySlug": "bowls",
-    "subcategory": "Phunnel Bowls",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-1713-0",
@@ -137938,8 +137938,8 @@
     "material": "High-fire Russian Ceramic Clay",
     "tags": [
       "Don",
-      "Bowls",
-      "Phunnel Bowls"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -138066,9 +138066,9 @@
     "currency": "USD",
     "brand": "Oblako",
     "brandSlug": "oblako",
-    "category": "Bowls",
-    "categorySlug": "bowls",
-    "subcategory": "Phunnel Bowls",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-1715-0",
@@ -138108,8 +138108,8 @@
     "material": "High-fire Russian Ceramic Clay",
     "tags": [
       "Oblako",
-      "Bowls",
-      "Phunnel Bowls"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -158899,9 +158899,9 @@
     "currency": "USD",
     "brand": "World Hookah Market",
     "brandSlug": "world-hookah-market",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Maintenance & Cleaning",
     "images": [
       {
         "id": "img-1964-0",
@@ -158932,9 +158932,8 @@
     "lowStockThreshold": 5,
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
-      "World Hookah Market",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Enso",
+      "Accessories"
     ],
     "specifications": [
       {
@@ -158976,9 +158975,9 @@
     "currency": "USD",
     "brand": "World Hookah Market",
     "brandSlug": "world-hookah-market",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Maintenance & Cleaning",
     "images": [
       {
         "id": "img-1965-0",
@@ -159009,9 +159008,8 @@
     "lowStockThreshold": 5,
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
-      "World Hookah Market",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Enso",
+      "Accessories"
     ],
     "specifications": [
       {
@@ -185500,9 +185498,9 @@
     "currency": "USD",
     "brand": "Geometry",
     "brandSlug": "geometry",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Tongs & Forks",
     "images": [
       {
         "id": "img-2289-0",
@@ -185542,8 +185540,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Geometry",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Accessories",
+      "Tongs & Forks"
     ],
     "specifications": [
       {
@@ -185585,9 +185583,9 @@
     "currency": "USD",
     "brand": "Geometry",
     "brandSlug": "geometry",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Tongs & Forks",
     "images": [
       {
         "id": "img-2290-0",
@@ -185627,8 +185625,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Geometry",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Accessories",
+      "Tongs & Forks"
     ],
     "specifications": [
       {
@@ -185670,9 +185668,9 @@
     "currency": "USD",
     "brand": "Geometry",
     "brandSlug": "geometry",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Tongs & Forks",
     "images": [
       {
         "id": "img-2291-0",
@@ -185712,8 +185710,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Geometry",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Accessories",
+      "Tongs & Forks"
     ],
     "specifications": [
       {
@@ -185755,9 +185753,9 @@
     "currency": "USD",
     "brand": "Geometry",
     "brandSlug": "geometry",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Tongs & Forks",
     "images": [
       {
         "id": "img-2292-0",
@@ -185797,8 +185795,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Geometry",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Accessories",
+      "Tongs & Forks"
     ],
     "specifications": [
       {
@@ -185840,9 +185838,9 @@
     "currency": "USD",
     "brand": "Geometry",
     "brandSlug": "geometry",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Tongs & Forks",
     "images": [
       {
         "id": "img-2293-0",
@@ -185882,8 +185880,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Geometry",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Accessories",
+      "Tongs & Forks"
     ],
     "specifications": [
       {
@@ -185925,9 +185923,9 @@
     "currency": "USD",
     "brand": "Geometry",
     "brandSlug": "geometry",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Tongs & Forks",
     "images": [
       {
         "id": "img-2294-0",
@@ -185967,8 +185965,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Geometry",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Accessories",
+      "Tongs & Forks"
     ],
     "specifications": [
       {
@@ -186010,9 +186008,9 @@
     "currency": "USD",
     "brand": "Geometry",
     "brandSlug": "geometry",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Tongs & Forks",
     "images": [
       {
         "id": "img-2295-0",
@@ -186052,8 +186050,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Geometry",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Accessories",
+      "Tongs & Forks"
     ],
     "specifications": [
       {
@@ -186096,9 +186094,9 @@
     "currency": "USD",
     "brand": "Geometry",
     "brandSlug": "geometry",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Tongs & Forks",
     "images": [
       {
         "id": "img-2296-0",
@@ -186138,8 +186136,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Geometry",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Accessories",
+      "Tongs & Forks"
     ],
     "specifications": [
       {
@@ -186182,9 +186180,9 @@
     "currency": "USD",
     "brand": "Geometry",
     "brandSlug": "geometry",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Tongs & Forks",
     "images": [
       {
         "id": "img-2297-0",
@@ -186224,8 +186222,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Geometry",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Accessories",
+      "Tongs & Forks"
     ],
     "specifications": [
       {
@@ -192815,9 +192813,9 @@
     "currency": "USD",
     "brand": "Hoob",
     "brandSlug": "hoob",
-    "category": "Accessories",
-    "categorySlug": "accessories",
-    "subcategory": "Heat Management (HMD)",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2378-0",
@@ -192857,8 +192855,9 @@
     "material": "AISI 304 Stainless Steel & Silicone",
     "tags": [
       "Hoob",
-      "Accessories",
-      "Heat Management (HMD)"
+      "Hookahs",
+      "Russian Hookahs",
+      "Limited Edition"
     ],
     "specifications": [
       {
@@ -192867,15 +192866,19 @@
       },
       {
         "label": "Category",
-        "value": "Accessories"
+        "value": "Hookahs"
       },
       {
-        "label": "Material / Craft",
-        "value": "AISI 304 Stainless Steel & Silicone"
+        "label": "Material",
+        "value": "AISI 304 Stainless Steel & Duralumin"
       },
       {
-        "label": "Authenticity",
-        "value": "100% Genuine Certified"
+        "label": "Height",
+        "value": "17.8 inches"
+      },
+      {
+        "label": "Includes",
+        "value": "Stem, Tray, Mouthpiece, Diffuser, Hose"
       }
     ],
     "rating": 4.6,
@@ -193045,18 +193048,18 @@
   },
   {
     "id": "prod-hoob-cocktail-kit-for-hoob-cube-base-black",
-    "name": "Hoob Cocktail Kit for Hoob Cube Base Black",
+    "name": "Hoob Cocktail Insert Kit (Accessory) for Hoob Cube Base Black",
     "slug": "hoob-cocktail-kit-for-hoob-cube-base-black",
     "sku": "H-3381",
-    "description": "Cocktail kit for Hoob Cube base Upgrade kit for hookah cocktails in the Hoob Cube water base. Inner glass water base Silicone grommet",
+    "description": "Hookah Base Upgrade Accessory: Inner glass cocktail insert and silicone grommet designed for Hoob Cube base fruit sessions. (Note: This is an accessory kit, not a complete hookah pipe). Cocktail kit for Hoob Cube base Upgrade kit for hookah cocktails in the Hoob Cube water base. Inner glass water base Silicone grommet",
     "shortDescription": "Cocktail kit for Hoob Cube base Upgrade kit for hookah cocktails in the Hoob Cube water base. Inner glass water base Silicone g...",
     "price": 22,
     "currency": "USD",
     "brand": "Hoob",
     "brandSlug": "hoob",
-    "category": "Bases",
-    "categorySlug": "bases",
-    "subcategory": "Russian Drop Bases",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Barware & Hookah Add-ons",
     "images": [
       {
         "id": "img-2381-0",
@@ -193096,21 +193099,26 @@
     "material": "Artisanal Hand-Blown Glass & Crystal",
     "tags": [
       "Hoob",
-      "Bases",
-      "Russian Drop Bases"
+      "Accessories",
+      "Add-ons",
+      "Barware"
     ],
     "specifications": [
+      {
+        "label": "Product Type",
+        "value": "Hookah Base Add-on / Accessory"
+      },
       {
         "label": "Brand",
         "value": "Hoob"
       },
       {
-        "label": "Category",
-        "value": "Bases"
+        "label": "Compatible With",
+        "value": "Hoob Cube Hookah Base"
       },
       {
-        "label": "Material / Craft",
-        "value": "Artisanal Hand-Blown Glass & Crystal"
+        "label": "Material",
+        "value": "Glass Insert & Silicone Seal"
       },
       {
         "label": "Authenticity",
@@ -193130,18 +193138,18 @@
   },
   {
     "id": "prod-hoob-cocktail-kit-for-hoob-cube-base-space-grey",
-    "name": "Hoob Cocktail Kit for Hoob Cube Base Space Grey",
+    "name": "Hoob Cocktail Insert Kit (Accessory) for Hoob Cube Base Space Grey",
     "slug": "hoob-cocktail-kit-for-hoob-cube-base-space-grey",
     "sku": "H-3382",
-    "description": "Cocktail kit for Hoob Cube base Upgrade kit for hookah cocktails in the Hoob Cube water base. Inner glass water base Silicone grommet",
+    "description": "Hookah Base Upgrade Accessory: Inner glass cocktail insert and silicone grommet designed for Hoob Cube base fruit sessions. (Note: This is an accessory kit, not a complete hookah pipe). Cocktail kit for Hoob Cube base Upgrade kit for hookah cocktails in the Hoob Cube water base. Inner glass water base Silicone grommet",
     "shortDescription": "Cocktail kit for Hoob Cube base Upgrade kit for hookah cocktails in the Hoob Cube water base. Inner glass water base Silicone g...",
     "price": 22,
     "currency": "USD",
     "brand": "Hoob",
     "brandSlug": "hoob",
-    "category": "Bases",
-    "categorySlug": "bases",
-    "subcategory": "Russian Drop Bases",
+    "category": "Accessories",
+    "categorySlug": "accessories",
+    "subcategory": "Barware & Hookah Add-ons",
     "images": [
       {
         "id": "img-2382-0",
@@ -193181,21 +193189,26 @@
     "material": "Artisanal Hand-Blown Glass & Crystal",
     "tags": [
       "Hoob",
-      "Bases",
-      "Russian Drop Bases"
+      "Accessories",
+      "Add-ons",
+      "Barware"
     ],
     "specifications": [
+      {
+        "label": "Product Type",
+        "value": "Hookah Base Add-on / Accessory"
+      },
       {
         "label": "Brand",
         "value": "Hoob"
       },
       {
-        "label": "Category",
-        "value": "Bases"
+        "label": "Compatible With",
+        "value": "Hoob Cube Hookah Base"
       },
       {
-        "label": "Material / Craft",
-        "value": "Artisanal Hand-Blown Glass & Crystal"
+        "label": "Material",
+        "value": "Glass Insert & Silicone Seal"
       },
       {
         "label": "Authenticity",
@@ -201360,9 +201373,9 @@
     "currency": "USD",
     "brand": "Hooligan",
     "brandSlug": "hooligan",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2485-0",
@@ -201402,8 +201415,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Hooligan",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -202696,9 +202709,9 @@
     "currency": "USD",
     "brand": "Hooligan",
     "brandSlug": "hooligan",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2501-0",
@@ -202738,8 +202751,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Hooligan",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -202781,9 +202794,9 @@
     "currency": "USD",
     "brand": "Hooligan",
     "brandSlug": "hooligan",
-    "category": "Bases",
-    "categorySlug": "bases",
-    "subcategory": "Russian Drop Bases",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2502-0",
@@ -202823,8 +202836,8 @@
     "material": "Artisanal Hand-Blown Glass & Crystal",
     "tags": [
       "Hooligan",
-      "Bases",
-      "Russian Drop Bases"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -202866,9 +202879,9 @@
     "currency": "USD",
     "brand": "Hooligan",
     "brandSlug": "hooligan",
-    "category": "Bases",
-    "categorySlug": "bases",
-    "subcategory": "Russian Drop Bases",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2503-0",
@@ -202908,8 +202921,8 @@
     "material": "Artisanal Hand-Blown Glass & Crystal",
     "tags": [
       "Hooligan",
-      "Bases",
-      "Russian Drop Bases"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -234029,9 +234042,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2881-0",
@@ -234071,8 +234084,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -234115,9 +234128,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2882-0",
@@ -234157,8 +234170,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -234201,9 +234214,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2883-0",
@@ -234235,8 +234248,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -234434,9 +234447,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2886-0",
@@ -234468,8 +234481,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -234512,9 +234525,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2887-0",
@@ -234554,8 +234567,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -234598,9 +234611,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2888-0",
@@ -234640,8 +234653,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -234684,9 +234697,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2889-0",
@@ -234726,8 +234739,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -234770,9 +234783,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2890-0",
@@ -234812,8 +234825,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -234856,9 +234869,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2891-0",
@@ -234898,8 +234911,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -234942,9 +234955,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2892-0",
@@ -234984,8 +234997,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -235190,9 +235203,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2895-0",
@@ -235224,8 +235237,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -235268,9 +235281,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2896-0",
@@ -235310,8 +235323,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -235354,9 +235367,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2897-0",
@@ -235396,8 +235409,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -235609,9 +235622,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2900-0",
@@ -235643,8 +235656,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -235686,9 +235699,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2901-0",
@@ -235720,8 +235733,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -235764,9 +235777,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2902-0",
@@ -235806,8 +235819,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -235850,9 +235863,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2903-0",
@@ -235892,8 +235905,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -235936,9 +235949,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2904-0",
@@ -235978,8 +235991,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -236185,9 +236198,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2907-0",
@@ -236219,8 +236232,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -236263,9 +236276,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2908-0",
@@ -236297,8 +236310,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -236341,9 +236354,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2909-0",
@@ -236383,8 +236396,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -236427,9 +236440,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2910-0",
@@ -236469,8 +236482,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -236589,9 +236602,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2912-0",
@@ -236631,8 +236644,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -236674,9 +236687,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2913-0",
@@ -236716,8 +236729,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -236760,9 +236773,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2914-0",
@@ -236802,8 +236815,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -236846,9 +236859,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2915-0",
@@ -236888,8 +236901,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -236932,9 +236945,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2916-0",
@@ -236974,8 +236987,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -237018,9 +237031,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2917-0",
@@ -237052,8 +237065,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -237181,9 +237194,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2919-0",
@@ -237215,8 +237228,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -237517,9 +237530,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2923-0",
@@ -237559,8 +237572,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -237602,9 +237615,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2924-0",
@@ -237628,8 +237641,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -237672,9 +237685,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2925-0",
@@ -237706,8 +237719,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -237749,9 +237762,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2926-0",
@@ -237791,8 +237804,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -237990,9 +238003,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2929-0",
@@ -238032,8 +238045,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -238076,9 +238089,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2930-0",
@@ -238118,8 +238131,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -238162,9 +238175,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2931-0",
@@ -238204,8 +238217,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -238248,9 +238261,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2932-0",
@@ -238290,8 +238303,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -238334,9 +238347,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2933-0",
@@ -238376,8 +238389,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -238419,9 +238432,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2934-0",
@@ -238445,8 +238458,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -238488,9 +238501,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2935-0",
@@ -238530,8 +238543,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -238573,9 +238586,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2936-0",
@@ -238615,8 +238628,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -238658,9 +238671,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2937-0",
@@ -238700,8 +238713,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -238744,9 +238757,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2938-0",
@@ -238778,8 +238791,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -238821,9 +238834,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2939-0",
@@ -238863,8 +238876,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -238907,9 +238920,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2940-0",
@@ -238941,8 +238954,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -238984,9 +238997,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2941-0",
@@ -239026,8 +239039,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -239070,9 +239083,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2942-0",
@@ -239112,8 +239125,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -239156,9 +239169,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2943-0",
@@ -239198,8 +239211,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -239241,9 +239254,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2944-0",
@@ -239283,8 +239296,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -239326,9 +239339,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2945-0",
@@ -239368,8 +239381,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -239411,9 +239424,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2946-0",
@@ -239453,8 +239466,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -239496,9 +239509,9 @@
     "currency": "USD",
     "brand": "Element",
     "brandSlug": "element",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-2947-0",
@@ -239538,8 +239551,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Element",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -247340,9 +247353,9 @@
     "currency": "USD",
     "brand": "Azure",
     "brandSlug": "azure",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-3041-0",
@@ -247382,8 +247395,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "Azure",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -248065,9 +248078,9 @@
     "currency": "USD",
     "brand": "Don",
     "brandSlug": "don",
-    "category": "Bowls",
-    "categorySlug": "bowls",
-    "subcategory": "Phunnel Bowls",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-3050-0",
@@ -248107,8 +248120,8 @@
     "material": "High-fire Russian Ceramic Clay",
     "tags": [
       "Don",
-      "Bowls",
-      "Phunnel Bowls"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -248490,9 +248503,9 @@
     "currency": "USD",
     "brand": "Moon",
     "brandSlug": "moon",
-    "category": "Bowls",
-    "categorySlug": "bowls",
-    "subcategory": "Phunnel Bowls",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-3055-0",
@@ -248532,8 +248545,8 @@
     "material": "High-fire Russian Ceramic Clay",
     "tags": [
       "Moon",
-      "Bowls",
-      "Phunnel Bowls"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -340961,9 +340974,9 @@
     "currency": "USD",
     "brand": "World Hookah Market",
     "brandSlug": "world-hookah-market",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-4172-0",
@@ -341003,8 +341016,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "World Hookah Market",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -341046,9 +341059,9 @@
     "currency": "USD",
     "brand": "World Hookah Market",
     "brandSlug": "world-hookah-market",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-4173-0",
@@ -341088,8 +341101,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "World Hookah Market",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -341131,9 +341144,9 @@
     "currency": "USD",
     "brand": "World Hookah Market",
     "brandSlug": "world-hookah-market",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-4174-0",
@@ -341173,8 +341186,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "World Hookah Market",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -341216,9 +341229,9 @@
     "currency": "USD",
     "brand": "World Hookah Market",
     "brandSlug": "world-hookah-market",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-4175-0",
@@ -341258,8 +341271,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "World Hookah Market",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -341301,9 +341314,9 @@
     "currency": "USD",
     "brand": "World Hookah Market",
     "brandSlug": "world-hookah-market",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-4176-0",
@@ -341343,8 +341356,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "World Hookah Market",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -341386,9 +341399,9 @@
     "currency": "USD",
     "brand": "World Hookah Market",
     "brandSlug": "world-hookah-market",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-4177-0",
@@ -341428,8 +341441,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "World Hookah Market",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -341471,9 +341484,9 @@
     "currency": "USD",
     "brand": "World Hookah Market",
     "brandSlug": "world-hookah-market",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-4178-0",
@@ -341513,8 +341526,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "World Hookah Market",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -341556,9 +341569,9 @@
     "currency": "USD",
     "brand": "World Hookah Market",
     "brandSlug": "world-hookah-market",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-4179-0",
@@ -341598,8 +341611,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "World Hookah Market",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {
@@ -341641,9 +341654,9 @@
     "currency": "USD",
     "brand": "World Hookah Market",
     "brandSlug": "world-hookah-market",
-    "category": "Tobacco",
-    "categorySlug": "tobacco",
-    "subcategory": "Dark Leaf Tobacco",
+    "category": "Hookahs",
+    "categorySlug": "hookahs",
+    "subcategory": "Russian & European Hookahs",
     "images": [
       {
         "id": "img-4180-0",
@@ -341683,8 +341696,8 @@
     "material": "Burley, Virginia & Cigar Leaf",
     "tags": [
       "World Hookah Market",
-      "Tobacco",
-      "Dark Leaf Tobacco"
+      "Hookahs",
+      "Russian & European Hookahs"
     ],
     "specifications": [
       {

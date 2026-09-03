@@ -236,6 +236,26 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
                 {product.name}
               </h1>
 
+              {/* Category context & Hookah link if not a full hookah pipe */}
+              {product.categorySlug !== 'hookahs' && (
+                <div className="mt-3 p-3 bg-amber-50/70 border border-amber-200/80 rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="text-xs text-amber-950 flex items-center gap-2">
+                    <span className="font-bold uppercase tracking-wider text-[10px] bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-xs">
+                      {product.category}
+                    </span>
+                    <span>
+                      This product is a <strong>{product.category.toLowerCase().replace(/s$/, '')} component</strong> (not a complete hookah pipe).
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => onNavigate('/shop?category=hookahs')}
+                    className="text-xs font-semibold text-amber-900 hover:text-amber-700 underline shrink-0 cursor-pointer self-start sm:self-auto"
+                  >
+                    Browse Complete Hookahs &rarr;
+                  </button>
+                </div>
+              )}
+
               {/* Rating & Review counter */}
               <div className="flex items-center gap-3 mt-2">
                 <div className="flex text-amber-500">
