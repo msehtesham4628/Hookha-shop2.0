@@ -47,6 +47,7 @@ export interface User {
   orderCount: number;
   isWholesaleCustomer?: boolean;
   wholesaleCompany?: string;
+  address?: string;
   lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;

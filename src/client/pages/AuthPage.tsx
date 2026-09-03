@@ -6,40 +6,135 @@ import {
   Mail,
   Lock,
   Phone,
-  ArrowRight,
-  Sparkles,
-  KeyRound,
+  User as UserIcon,
+  MapPin,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  KeyRound,
+  Send,
+  Sparkles,
+  ChevronDown
 } from 'lucide-react';
 
 interface AuthPageProps {
-  initialMode?: 'login' | 'register' | 'otp-email' | 'otp-sms' | 'forgot';
+  initialMode?: 'login' | 'register' | 'forgot';
   onNavigate: (path: string) => void;
 }
 
+const COUNTRY_CODES = [
+  { code: '+1', country: 'United States / Canada', flag: '🇺🇸' },
+  { code: '+971', country: 'United Arab Emirates', flag: '🇦🇪' },
+  { code: '+966', country: 'Saudi Arabia', flag: '🇸🇦' },
+  { code: '+44', country: 'United Kingdom', flag: '🇬🇧' },
+  { code: '+49', country: 'Germany', flag: '🇩🇪' },
+  { code: '+33', country: 'France', flag: '🇫🇷' },
+  { code: '+7', country: 'Russia', flag: '🇷🇺' },
+  { code: '+91', country: 'India', flag: '🇮🇳' },
+  { code: '+90', country: 'Turkey', flag: '🇹🇷' },
+  { code: '+974', country: 'Qatar', flag: '🇶🇦' },
+  { code: '+965', country: 'Kuwait', flag: '🇰🇼' },
+  { code: '+973', country: 'Bahrain', flag: '🇧🇭' },
+  { code: '+968', country: 'Oman', flag: '🇴🇲' },
+  { code: '+20', country: 'Egypt', flag: '🇪🇬' },
+  { code: '+61', country: 'Australia', flag: '🇦🇺' },
+  { code: '+34', country: 'Spain', flag: '🇪🇸' },
+  { code: '+39', country: 'Italy', flag: '🇮🇹' },
+  { code: '+81', country: 'Japan', flag: '🇯🇵' },
+  { code: '+55', country: 'Brazil', flag: '🇧🇷' },
+  { code: '+52', country: 'Mexico', flag: '🇲🇽' },
+  { code: '+92', country: 'Pakistan', flag: '🇵🇰' },
+];
+
 export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNavigate }) => {
   const { setUser, showToast } = useStore();
-  const [mode, setMode] = useState<'login' | 'register' | 'otp-email' | 'otp-sms' | 'forgot'>(initialMode);
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>(
+    initialMode === 'register' ? 'register' : initialMode === 'forgot' ? 'forgot' : 'login'
+  );
 
-  // Form Fields
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [otpCode, setOtpCode] = useState('');
+  // Common Feedback State
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [devOtpHint, setDevOtpHint] = useState<string | null>(null);
 
-  // 1. Standard Email + Password Login
+  // 1. LOGIN FIELDS
+  // "User" & "Password"
+  const [loginUser, setLoginUser] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+
+  // 2. NEW USER / REGISTER FIELDS
+  // "First name second name"
+  const [regFirstName, setRegFirstName] = useState('');
+  const [regSecondName, setRegSecondName] = useState('');
+  // "Email / mobile" selector
+  const [regContactType, setRegContactType] = useState<'email' | 'mobile'>('email');
+  const [regEmail, setRegEmail] = useState('');
+  const [regCountryCode, setRegCountryCode] = useState('+1');
+  const [regMobile, setRegMobile] = useState('');
+  // "Request otp" & verification
+  const [regOtpRequested, setRegOtpRequested] = useState(false);
+  const [regOtpCode, setRegOtpCode] = useState('');
+  const [regOtpVerified, setRegOtpVerified] = useState(false);
+  const [regOtpLoading, setRegOtpLoading] = useState(false);
+  // "Adress"
+  const [regAddress, setRegAddress] = useState('');
+  // "Create password" & "Re enter password"
+  const [regPassword, setRegPassword] = useState('');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('');
+  const [showRegPassword, setShowRegPassword] = useState(false);
+
+  // 3. FORGET PASSWORD FIELDS
+  // "Email / mobile"
+  const [forgotContactType, setForgotContactType] = useState<'email' | 'mobile'>('email');
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotCountryCode, setForgotCountryCode] = useState('+1');
+  const [forgotMobile, setForgotMobile] = useState('');
+  // "Request otp" & OTP code
+  const [forgotOtpRequested, setForgotOtpRequested] = useState(false);
+  const [forgotOtpCode, setForgotOtpCode] = useState('');
+  const [forgotOtpLoading, setForgotOtpLoading] = useState(false);
+  // "Set new password" & "Re enter new password"
+  const [forgotNewPassword, setForgotNewPassword] = useState('');
+  const [forgotConfirmPassword, setForgotConfirmPassword] = useState('');
+  const [showForgotNewPassword, setShowForgotNewPassword] = useState(false);
+
+  // Switch helper
+  const switchMode = (newMode: 'login' | 'register' | 'forgot') => {
+    setMode(newMode);
+    setErrorMsg('');
+    setSuccessMsg('');
+    setDevOtpHint(null);
+  };
+
+  // ----------------------------------------------------
+  // ACTION 1: LOGIN (User + Password)
+  // ----------------------------------------------------
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+    setSuccessMsg('');
+
+    if (!loginUser.trim()) {
+      setErrorMsg('Please enter your User (Email or Mobile).');
+      return;
+    }
+    if (!loginPassword) {
+      setErrorMsg('Please enter your password.');
+      return;
+    }
+
     try {
       setLoading(true);
-      const res = await api.loginWithPassword(email, password);
+      const res = await api.login({
+        user: loginUser.trim(),
+        email: loginUser.includes('@') ? loginUser.trim() : undefined,
+        password: loginPassword
+      });
+
       if (res.success && res.data) {
         localStorage.setItem('sultan_auth_token', res.data.token);
         setUser(res.data.user, (res.data as any).permissions || []);
@@ -51,117 +146,245 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
         }
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Login failed. Please check your credentials.');
+      setErrorMsg(err.message || 'Login failed. Please verify your credentials.');
     } finally {
       setLoading(false);
     }
   };
 
-  // 2. Customer Registration
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg('');
-    try {
-      setLoading(true);
-      const res = await api.register({
-        email,
-        password,
-        firstName,
-        lastName,
-        phone: phone || undefined
-      });
-      if (res.success && res.data) {
-        localStorage.setItem('sultan_auth_token', res.data.token);
-        setUser(res.data.user, []);
-        showToast('Account created! Welcome to Fumare Hookah.', 'success');
-        onNavigate('/account');
-      }
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Registration failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 3. Request Email OTP
-  const handleSendEmailOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // ----------------------------------------------------
+  // ACTION 2: REGISTER - REQUEST OTP
+  // ----------------------------------------------------
+  const handleRegRequestOtp = async () => {
     setErrorMsg('');
     setSuccessMsg('');
+    setDevOtpHint(null);
+
+    const identifier = regContactType === 'email'
+      ? regEmail.trim()
+      : `${regCountryCode}${regMobile.trim()}`;
+
+    if (regContactType === 'email') {
+      if (!regEmail || !regEmail.includes('@')) {
+        setErrorMsg('Please provide a valid email address first.');
+        return;
+      }
+    } else {
+      if (!regMobile || regMobile.length < 5) {
+        setErrorMsg('Please provide a valid mobile number.');
+        return;
+      }
+    }
+
     try {
-      setLoading(true);
-      const res = await api.sendEmailOtp(email);
+      setRegOtpLoading(true);
+      const res = await api.sendOTP(identifier, regContactType === 'email' ? 'EMAIL' : 'SMS');
       if (res.success) {
-        setSuccessMsg(res.message || 'One-time passcode sent to your email.');
-        showToast('OTP Code sent to email (Simulation Sandbox)', 'info');
+        setRegOtpRequested(true);
+        setSuccessMsg(res.message || `OTP sent to ${identifier}`);
+        if (res.devOtp) {
+          setDevOtpHint(res.devOtp);
+        }
+        showToast('Verification code dispatched!', 'info');
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Failed to send Email OTP.');
+      setErrorMsg(err.message || 'Failed to request OTP. Please try again.');
     } finally {
-      setLoading(false);
+      setRegOtpLoading(false);
     }
   };
 
-  // 4. Verify Email OTP
-  const handleVerifyEmailOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // REGISTER - VERIFY OTP (Optional inline verification)
+  const handleRegVerifyOtp = async () => {
     setErrorMsg('');
+    const identifier = regContactType === 'email'
+      ? regEmail.trim()
+      : `${regCountryCode}${regMobile.trim()}`;
+
+    if (!regOtpCode.trim()) {
+      setErrorMsg('Please enter the 6-digit OTP code.');
+      return;
+    }
+
     try {
-      setLoading(true);
-      const res = await api.verifyEmailOtp(email, otpCode);
-      if (res.success && res.data) {
-        localStorage.setItem('sultan_auth_token', res.data.token);
-        setUser(res.data.user, []);
-        showToast('Verified successfully via Email OTP!', 'success');
-        onNavigate('/account');
+      setRegOtpLoading(true);
+      const res = await api.verifyOTP(identifier, regOtpCode.trim());
+      if (res.success) {
+        setRegOtpVerified(true);
+        setSuccessMsg('Phone / Email verified successfully!');
+        showToast('OTP verified!', 'success');
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'Invalid or expired OTP code.');
     } finally {
-      setLoading(false);
+      setRegOtpLoading(false);
     }
   };
 
-  // 5. Request SMS OTP
-  const handleSendSmsOtp = async (e: React.FormEvent) => {
+  // ----------------------------------------------------
+  // ACTION 3: REGISTER - CREATE ACCOUNT
+  // ----------------------------------------------------
+  const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
-    try {
-      setLoading(true);
-      const res = await api.sendSmsOtp(phone);
-      if (res.success) {
-        setSuccessMsg(res.message || 'One-time passcode sent to your phone.');
-        showToast('SMS OTP Code sent (Simulation Sandbox)', 'info');
-      }
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Failed to send SMS OTP.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  // 6. Verify SMS OTP
-  const handleVerifySmsOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg('');
+    if (!regFirstName.trim()) {
+      setErrorMsg('First name is required.');
+      return;
+    }
+    if (!regSecondName.trim()) {
+      setErrorMsg('Second name (Last name) is required.');
+      return;
+    }
+
+    const emailVal = regContactType === 'email' ? regEmail.trim() : undefined;
+    const phoneVal = regContactType === 'mobile' ? `${regCountryCode}${regMobile.trim()}` : undefined;
+
+    if (regContactType === 'email' && (!emailVal || !emailVal.includes('@'))) {
+      setErrorMsg('Please enter a valid email address.');
+      return;
+    }
+    if (regContactType === 'mobile' && (!regMobile || regMobile.length < 5)) {
+      setErrorMsg('Please enter a valid mobile number.');
+      return;
+    }
+
+    if (!regAddress.trim()) {
+      setErrorMsg('Please provide your address.');
+      return;
+    }
+
+    if (!regPassword || regPassword.length < 6) {
+      setErrorMsg('Password must be at least 6 characters.');
+      return;
+    }
+
+    if (regPassword !== regConfirmPassword) {
+      setErrorMsg('Passwords do not match. Please check "Re enter password".');
+      return;
+    }
+
     try {
       setLoading(true);
-      const res = await api.verifySmsOtp(phone, otpCode);
+      const res = await api.register({
+        firstName: regFirstName.trim(),
+        lastName: regSecondName.trim(),
+        email: emailVal,
+        phone: phoneVal,
+        address: regAddress.trim(),
+        password: regPassword,
+        otpCode: regOtpCode.trim() || undefined
+      });
+
       if (res.success && res.data) {
         localStorage.setItem('sultan_auth_token', res.data.token);
         setUser(res.data.user, []);
-        showToast('Verified successfully via SMS OTP!', 'success');
+        showToast('Account created successfully! Welcome to Fumare Hookah.', 'success');
         onNavigate('/account');
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Invalid SMS OTP code.');
+      setErrorMsg(err.message || 'Registration failed. Please check your information.');
     } finally {
       setLoading(false);
     }
   };
 
-  // 7. Google Firebase Fast Auth
+  // ----------------------------------------------------
+  // ACTION 4: FORGET PASSWORD - REQUEST OTP
+  // ----------------------------------------------------
+  const handleForgotRequestOtp = async () => {
+    setErrorMsg('');
+    setSuccessMsg('');
+    setDevOtpHint(null);
+
+    const identifier = forgotContactType === 'email'
+      ? forgotEmail.trim()
+      : `${forgotCountryCode}${forgotMobile.trim()}`;
+
+    if (forgotContactType === 'email') {
+      if (!forgotEmail || !forgotEmail.includes('@')) {
+        setErrorMsg('Please enter a valid registered email.');
+        return;
+      }
+    } else {
+      if (!forgotMobile || forgotMobile.length < 5) {
+        setErrorMsg('Please enter a valid mobile number.');
+        return;
+      }
+    }
+
+    try {
+      setForgotOtpLoading(true);
+      const res = await api.sendOTP(identifier, forgotContactType === 'email' ? 'EMAIL' : 'SMS');
+      if (res.success) {
+        setForgotOtpRequested(true);
+        setSuccessMsg(res.message || `OTP sent to ${identifier}`);
+        if (res.devOtp) {
+          setDevOtpHint(res.devOtp);
+        }
+        showToast('Password reset code dispatched!', 'info');
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Could not send reset OTP. Please verify details.');
+    } finally {
+      setForgotOtpLoading(false);
+    }
+  };
+
+  // ----------------------------------------------------
+  // ACTION 5: FORGET PASSWORD - RESET ("Rest")
+  // ----------------------------------------------------
+  const handleForgotResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+    setSuccessMsg('');
+
+    const identifier = forgotContactType === 'email'
+      ? forgotEmail.trim()
+      : `${forgotCountryCode}${forgotMobile.trim()}`;
+
+    if (!identifier) {
+      setErrorMsg('Please enter your email or mobile number.');
+      return;
+    }
+    if (!forgotOtpCode.trim()) {
+      setErrorMsg('Please enter the OTP code you received.');
+      return;
+    }
+    if (!forgotNewPassword || forgotNewPassword.length < 6) {
+      setErrorMsg('New password must be at least 6 characters.');
+      return;
+    }
+    if (forgotNewPassword !== forgotConfirmPassword) {
+      setErrorMsg('Passwords do not match. Please verify "Re enter new password".');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await api.resetPasswordOTP({
+        identifier,
+        code: forgotOtpCode.trim(),
+        newPassword: forgotNewPassword
+      });
+
+      if (res.success) {
+        showToast('Password updated! You can now log in.', 'success');
+        setSuccessMsg('Your password has been successfully reset. Please log in with your new password.');
+        setTimeout(() => {
+          switchMode('login');
+          setLoginUser(identifier);
+        }, 1500);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Password reset failed. Please check the OTP code.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Google 1-Click fast auth fallback
   const handleGoogleAuth = async () => {
     setErrorMsg('');
     try {
@@ -174,337 +397,684 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
         onNavigate('/account');
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Google sign-in was cancelled or failed.');
+      setErrorMsg(err.message || 'Google sign-in was cancelled or unavailable.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full bg-stone-50/50 py-12 min-h-screen flex items-center justify-center">
-      <div className="max-w-md w-full mx-auto px-4">
+    <div className="w-full bg-[#f8f7f5] py-12 min-h-[calc(100vh-140px)] flex items-center justify-center px-4">
+      <div className="max-w-md w-full mx-auto">
         
-        {/* Card */}
-        <div className="bg-white border border-stone-200 rounded-sm shadow-xl p-6 sm:p-8 space-y-6">
+        {/* Main Card */}
+        <div className="bg-white border border-stone-200 rounded-sm shadow-md p-6 sm:p-8 space-y-6">
           
           {/* Header */}
-          <div className="text-center space-y-1">
-            <div className="w-12 h-12 bg-amber-50 border border-amber-200 text-amber-900 rounded-full flex items-center justify-center mx-auto mb-2">
-              <ShieldCheck className="w-6 h-6" />
+          <div className="text-center space-y-1.5">
+            <div className="w-12 h-12 bg-amber-50 border border-amber-200/80 text-amber-900 rounded-full flex items-center justify-center mx-auto mb-2 shadow-2xs">
+              <ShieldCheck className="w-6 h-6 text-amber-800" />
             </div>
-            <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-amber-900">
-              Fumare Hookah Access
-            </span>
-            <h1 className="font-serif text-2xl font-bold text-stone-900">
-              {mode === 'login' && 'Sign In to Your Account'}
-              {mode === 'register' && 'Create Fumare Account'}
-              {mode === 'otp-email' && 'Passwordless Email OTP'}
-              {mode === 'otp-sms' && 'SMS One-Time Code'}
-              {mode === 'forgot' && 'Reset Vault Password'}
+            <div className="text-[11px] uppercase font-bold tracking-[0.25em] text-amber-900/80">
+              Fumare Hookah
+            </div>
+            <h1 className="font-serif text-2xl font-bold text-stone-900 tracking-tight">
+              {mode === 'login' && 'Login'}
+              {mode === 'register' && 'Register'}
+              {mode === 'forgot' && 'Forget Password'}
             </h1>
+            <p className="text-xs text-stone-500">
+              {mode === 'login' && 'Enter your credentials to access your account'}
+              {mode === 'register' && 'Create your new customer account'}
+              {mode === 'forgot' && 'Reset your password via Email or Mobile OTP'}
+            </p>
           </div>
 
-          {/* Mode Switch Tabs */}
-          <div className="flex border-b border-stone-200 text-xs">
-            <button
-              onClick={() => { setMode('login'); setErrorMsg(''); setSuccessMsg(''); }}
-              className={`flex-1 py-2 font-semibold border-b-2 text-center ${mode === 'login' ? 'border-amber-900 text-amber-900' : 'border-transparent text-stone-500 hover:text-stone-900'}`}
-            >
-              Password
-            </button>
-            <button
-              onClick={() => { setMode('otp-email'); setErrorMsg(''); setSuccessMsg(''); }}
-              className={`flex-1 py-2 font-semibold border-b-2 text-center ${mode === 'otp-email' ? 'border-amber-900 text-amber-900' : 'border-transparent text-stone-500 hover:text-stone-900'}`}
-            >
-              Email OTP
-            </button>
-            <button
-              onClick={() => { setMode('otp-sms'); setErrorMsg(''); setSuccessMsg(''); }}
-              className={`flex-1 py-2 font-semibold border-b-2 text-center ${mode === 'otp-sms' ? 'border-amber-900 text-amber-900' : 'border-transparent text-stone-500 hover:text-stone-900'}`}
-            >
-              SMS OTP
-            </button>
-            <button
-              onClick={() => { setMode('register'); setErrorMsg(''); setSuccessMsg(''); }}
-              className={`flex-1 py-2 font-semibold border-b-2 text-center ${mode === 'register' ? 'border-amber-900 text-amber-900' : 'border-transparent text-stone-500 hover:text-stone-900'}`}
-            >
-              Register
-            </button>
-          </div>
-
-          {/* Status Banners */}
+          {/* Feedback Banners */}
           {errorMsg && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xs flex items-center gap-2 text-rose-900 text-xs">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-              <span>{errorMsg}</span>
+            <div id="auth-error-banner" className="p-3 bg-rose-50 border border-rose-200 rounded-xs flex items-start gap-2.5 text-rose-900 text-xs">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <span className="leading-relaxed">{errorMsg}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xs flex items-center gap-2 text-emerald-900 text-xs">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>{successMsg}</span>
+            <div id="auth-success-banner" className="p-3 bg-emerald-50 border border-emerald-200 rounded-xs flex items-start gap-2.5 text-emerald-900 text-xs">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <span className="leading-relaxed">{successMsg}</span>
             </div>
           )}
 
-          {/* Form 1: Password Login */}
+          {/* Sandbox Development OTP Notice Banner */}
+          {devOtpHint && (
+            <div className="p-3 bg-amber-50/80 border border-amber-300 rounded-xs flex items-center justify-between text-amber-950 text-xs">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-700 shrink-0" />
+                <span>Sandbox Security Code: <strong>{devOtpHint}</strong></span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (mode === 'register') setRegOtpCode(devOtpHint);
+                  if (mode === 'forgot') setForgotOtpCode(devOtpHint);
+                  showToast('Code applied to field', 'info');
+                }}
+                className="text-[11px] font-bold text-amber-900 underline hover:text-amber-700 ml-2"
+              >
+                Auto-fill
+              </button>
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* VIEW 1: LOGIN (User, Password, Login, New user / Forget password) */}
+          {/* ============================================================ */}
           {mode === 'login' && (
             <form onSubmit={handleLogin} className="space-y-4">
+              {/* Field: User */}
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">Email Address</label>
+                <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                  User <span className="text-stone-400 font-normal">(Email / Mobile number)</span>
+                </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
+                  <UserIcon className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
                   <input
-                    type="email"
+                    id="login-user-input"
+                    type="text"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@sultanhookah.com"
-                    className="w-full bg-stone-50 border border-stone-300 text-xs pl-9 pr-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800"
+                    value={loginUser}
+                    onChange={(e) => setLoginUser(e.target.value)}
+                    placeholder="Enter email or mobile number"
+                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs pl-9 pr-3 py-2.5 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
                   />
                 </div>
               </div>
 
+              {/* Field: Password */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-semibold text-stone-700">Password</label>
-                  <button
-                    type="button"
-                    onClick={() => setMode('forgot')}
-                    className="text-[11px] text-amber-800 hover:underline"
-                  >
-                    Forgot?
-                  </button>
-                </div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                  Password
+                </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
                   <input
-                    type="password"
+                    id="login-password-input"
+                    type={showLoginPassword ? 'text' : 'password'}
                     required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••••••"
-                    className="w-full bg-stone-50 border border-stone-300 text-xs pl-9 pr-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs pl-9 pr-10 py-2.5 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowLoginPassword(!showLoginPassword)}
+                    className="absolute right-3 top-2.5 text-stone-400 hover:text-stone-600 focus:outline-none"
+                    aria-label="Toggle password visibility"
+                  >
+                    {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
+              {/* Login Button */}
               <button
-                id="auth-submit-login-btn"
+                id="login-submit-btn"
                 type="submit"
                 disabled={loading}
-                className="w-full bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold uppercase tracking-wider py-3 rounded-xs transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50"
+                className="w-full bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold uppercase tracking-wider py-3 rounded-xs transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 mt-1 cursor-pointer"
               >
-                {loading ? 'Authenticating...' : 'Sign In'}
+                {loading ? 'Logging in...' : 'Login'}
               </button>
+
+              {/* Navigation Links: New user / Forget password */}
+              <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-600">
+                <button
+                  id="nav-to-register-btn"
+                  type="button"
+                  onClick={() => switchMode('register')}
+                  className="font-medium text-amber-900 hover:text-amber-700 hover:underline transition-colors cursor-pointer"
+                >
+                  New user? Register
+                </button>
+                <button
+                  id="nav-to-forgot-btn"
+                  type="button"
+                  onClick={() => switchMode('forgot')}
+                  className="text-stone-500 hover:text-amber-900 hover:underline transition-colors cursor-pointer"
+                >
+                  Forget password?
+                </button>
+              </div>
             </form>
           )}
 
-          {/* Form 2: Email OTP */}
-          {mode === 'otp-email' && (
-            <div className="space-y-4">
-              <form onSubmit={handleSendEmailOtp} className="space-y-2">
-                <label className="block text-xs font-semibold text-stone-700">VIP Email</label>
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="vip@sultanhookah.com"
-                    className="flex-1 bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800"
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading || !email}
-                    className="bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold px-3 py-2.5 rounded-xs transition-colors"
-                  >
-                    Send OTP
-                  </button>
-                </div>
-              </form>
-
-              <form onSubmit={handleVerifyEmailOtp} className="space-y-3 pt-3 border-t border-stone-100">
-                <label className="block text-xs font-semibold text-stone-700">6-Digit Email Code</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Enter 6-digit code"
-                  value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-300 text-center font-mono tracking-widest text-base font-bold px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800"
-                />
-                <button
-                  id="verify-email-otp-btn"
-                  type="submit"
-                  disabled={loading || !otpCode}
-                  className="w-full bg-amber-800 hover:bg-amber-900 text-white text-xs font-semibold uppercase tracking-wider py-3 rounded-xs transition-colors"
-                >
-                  {loading ? 'Verifying...' : 'Verify Code & Enter'}
-                </button>
-              </form>
-            </div>
-          )}
-
-          {/* Form 3: SMS OTP */}
-          {mode === 'otp-sms' && (
-            <div className="space-y-4">
-              <form onSubmit={handleSendSmsOtp} className="space-y-2">
-                <label className="block text-xs font-semibold text-stone-700">Mobile Phone Number</label>
-                <div className="flex gap-2">
-                  <input
-                    type="tel"
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+1 (555) 785-8260"
-                    className="flex-1 bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800"
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading || !phone}
-                    className="bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold px-3 py-2.5 rounded-xs transition-colors"
-                  >
-                    Send SMS
-                  </button>
-                </div>
-              </form>
-
-              <form onSubmit={handleVerifySmsOtp} className="space-y-3 pt-3 border-t border-stone-100">
-                <label className="block text-xs font-semibold text-stone-700">SMS Verification Code</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Enter SMS code"
-                  value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-300 text-center font-mono tracking-widest text-base font-bold px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800"
-                />
-                <button
-                  id="verify-sms-otp-btn"
-                  type="submit"
-                  disabled={loading || !otpCode}
-                  className="w-full bg-amber-800 hover:bg-amber-900 text-white text-xs font-semibold uppercase tracking-wider py-3 rounded-xs transition-colors"
-                >
-                  {loading ? 'Verifying...' : 'Verify SMS & Sign In'}
-                </button>
-              </form>
-            </div>
-          )}
-
-          {/* Form 4: Register */}
+          {/* ============================================================ */}
+          {/* VIEW 2: REGISTER (New user) */}
+          {/* First name, second name, Email / mobile (with country code if mobile), */}
+          {/* Request otp, Adress, Create password, Re enter password, Create account */}
+          {/* ============================================================ */}
           {mode === 'register' && (
-            <form onSubmit={handleRegister} className="space-y-3">
+            <form onSubmit={handleCreateAccount} className="space-y-4">
+              
+              {/* First name second name */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">First Name *</label>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">First name *</label>
                   <input
+                    id="register-firstname-input"
                     type="text"
                     required
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2 rounded-xs focus:outline-none focus:border-amber-800"
+                    value={regFirstName}
+                    onChange={(e) => setRegFirstName(e.target.value)}
+                    placeholder="First name"
+                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">Last Name *</label>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">Second name *</label>
                   <input
+                    id="register-secondname-input"
                     type="text"
                     required
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2 rounded-xs focus:outline-none focus:border-amber-800"
+                    value={regSecondName}
+                    onChange={(e) => setRegSecondName(e.target.value)}
+                    placeholder="Second name"
+                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
                   />
                 </div>
               </div>
 
+              {/* Email / mobile selector */}
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">Email Address *</label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your.email@domain.com"
-                  className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2 rounded-xs focus:outline-none focus:border-amber-800"
-                />
+                <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                  Email / mobile *
+                </label>
+                <div className="grid grid-cols-2 gap-1 p-1 bg-stone-100 rounded-xs text-xs font-medium mb-2.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRegContactType('email');
+                      setRegOtpRequested(false);
+                      setRegOtpVerified(false);
+                    }}
+                    className={`py-1.5 rounded-xs text-center transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+                      regContactType === 'email'
+                        ? 'bg-white text-stone-900 font-semibold shadow-2xs'
+                        : 'text-stone-500 hover:text-stone-800'
+                    }`}
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    <span>Email</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRegContactType('mobile');
+                      setRegOtpRequested(false);
+                      setRegOtpVerified(false);
+                    }}
+                    className={`py-1.5 rounded-xs text-center transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+                      regContactType === 'mobile'
+                        ? 'bg-white text-stone-900 font-semibold shadow-2xs'
+                        : 'text-stone-500 hover:text-stone-800'
+                    }`}
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>Mobile</span>
+                  </button>
+                </div>
+
+                {/* If they use EMAIL */}
+                {regContactType === 'email' && (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Mail className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
+                        <input
+                          id="register-email-input"
+                          type="email"
+                          required
+                          value={regEmail}
+                          onChange={(e) => setRegEmail(e.target.value)}
+                          placeholder="name@example.com"
+                          className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs pl-9 pr-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800"
+                        />
+                      </div>
+                      <button
+                        id="register-request-otp-email-btn"
+                        type="button"
+                        onClick={handleRegRequestOtp}
+                        disabled={regOtpLoading || !regEmail}
+                        className="bg-amber-900 hover:bg-amber-800 text-white text-xs font-medium px-3 py-2 rounded-xs transition-colors shrink-0 disabled:opacity-50 cursor-pointer"
+                      >
+                        {regOtpLoading ? 'Sending...' : 'Request otp'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* If they use MOBILE: Country code + Mobile number */}
+                {regContactType === 'mobile' && (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      {/* Country Code Dropdown */}
+                      <div className="relative w-36 shrink-0">
+                        <select
+                          id="register-country-code-select"
+                          value={regCountryCode}
+                          onChange={(e) => setRegCountryCode(e.target.value)}
+                          aria-label="Country code"
+                          className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-2.5 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 appearance-none font-mono"
+                        >
+                          {COUNTRY_CODES.map((item) => (
+                            <option key={`${item.country}-${item.code}`} value={item.code}>
+                              {item.flag} {item.code} ({item.country.split('/')[0].trim()})
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="w-3.5 h-3.5 text-stone-400 absolute right-2.5 top-2.5 pointer-events-none" />
+                      </div>
+
+                      {/* Mobile Number Input */}
+                      <input
+                        id="register-mobile-input"
+                        type="tel"
+                        required
+                        value={regMobile}
+                        onChange={(e) => setRegMobile(e.target.value)}
+                        placeholder="555 123 4567"
+                        className="flex-1 bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800"
+                      />
+
+                      {/* Request OTP Button */}
+                      <button
+                        id="register-request-otp-mobile-btn"
+                        type="button"
+                        onClick={handleRegRequestOtp}
+                        disabled={regOtpLoading || !regMobile}
+                        className="bg-amber-900 hover:bg-amber-800 text-white text-xs font-medium px-3 py-2 rounded-xs transition-colors shrink-0 disabled:opacity-50 cursor-pointer"
+                      >
+                        {regOtpLoading ? 'Sending...' : 'Request otp'}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
+              {/* OTP Field (Shown after requesting or for code entry) */}
+              {(regOtpRequested || regOtpCode) && (
+                <div className="p-3 bg-stone-50 border border-stone-200 rounded-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-semibold text-stone-700">
+                      Enter OTP Code *
+                    </label>
+                    {regOtpVerified && (
+                      <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Verified
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      id="register-otp-input"
+                      type="text"
+                      maxLength={6}
+                      value={regOtpCode}
+                      onChange={(e) => setRegOtpCode(e.target.value)}
+                      placeholder="6-digit code"
+                      className="flex-1 bg-white border border-stone-300 text-center font-mono tracking-widest text-sm font-bold py-1.5 px-3 rounded-xs focus:outline-none focus:border-amber-800"
+                    />
+                    {!regOtpVerified && (
+                      <button
+                        type="button"
+                        onClick={handleRegVerifyOtp}
+                        disabled={regOtpLoading || !regOtpCode}
+                        className="bg-stone-800 hover:bg-stone-900 text-white text-xs px-3 py-1.5 rounded-xs transition-colors disabled:opacity-50 cursor-pointer"
+                      >
+                        Verify
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Adress */}
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">Password *</label>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 6 characters"
-                  className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2 rounded-xs focus:outline-none focus:border-amber-800"
-                />
+                <label className="block text-xs font-semibold text-stone-700 mb-1">
+                  Adress * <span className="text-stone-400 font-normal">(Delivery / Street, City, ZIP)</span>
+                </label>
+                <div className="relative">
+                  <MapPin className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
+                  <input
+                    id="register-address-input"
+                    type="text"
+                    required
+                    value={regAddress}
+                    onChange={(e) => setRegAddress(e.target.value)}
+                    placeholder="123 Luxury Way, Suite 400, Miami FL 33101"
+                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs pl-9 pr-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
+                  />
+                </div>
               </div>
 
+              {/* Create password */}
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">Phone (For SMS Delivery Updates)</label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+1 (555) 000-0000"
-                  className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2 rounded-xs focus:outline-none focus:border-amber-800"
-                />
+                <label className="block text-xs font-semibold text-stone-700 mb-1">
+                  Create password * <span className="text-stone-400 font-normal">(min. 6 characters)</span>
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
+                  <input
+                    id="register-password-input"
+                    type={showRegPassword ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    value={regPassword}
+                    onChange={(e) => setRegPassword(e.target.value)}
+                    placeholder="Create a strong password"
+                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs pl-9 pr-10 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowRegPassword(!showRegPassword)}
+                    className="absolute right-3 top-2 text-stone-400 hover:text-stone-600 focus:outline-none"
+                  >
+                    {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
+              {/* Re enter password */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-stone-700">
+                    Re enter password *
+                  </label>
+                  {regConfirmPassword && (
+                    <span className={`text-[10px] font-semibold ${
+                      regPassword === regConfirmPassword ? 'text-emerald-700' : 'text-rose-600'
+                    }`}>
+                      {regPassword === regConfirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
+                    </span>
+                  )}
+                </div>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
+                  <input
+                    id="register-confirm-password-input"
+                    type={showRegPassword ? 'text' : 'password'}
+                    required
+                    value={regConfirmPassword}
+                    onChange={(e) => setRegConfirmPassword(e.target.value)}
+                    placeholder="Re enter your password"
+                    className={`w-full bg-stone-50 border text-stone-900 text-xs pl-9 pr-3 py-2 rounded-xs focus:bg-white focus:outline-none transition-colors ${
+                      regConfirmPassword && regPassword !== regConfirmPassword
+                        ? 'border-rose-400 focus:border-rose-600'
+                        : 'border-stone-300 focus:border-amber-800'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* Create account Button */}
               <button
-                id="register-submit-btn"
+                id="register-create-account-btn"
                 type="submit"
                 disabled={loading}
-                className="w-full bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold uppercase tracking-wider py-3 rounded-xs transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 mt-2"
+                className="w-full bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold uppercase tracking-wider py-3 rounded-xs transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 mt-2 cursor-pointer"
               >
-                {loading ? 'Creating...' : 'Create Account'}
+                {loading ? 'Creating account...' : 'Create account'}
               </button>
+
+              {/* Bottom Navigation */}
+              <div className="text-center pt-2 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => switchMode('login')}
+                  className="text-xs text-stone-600 hover:text-amber-900 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Already have an account? <strong>Login</strong></span>
+                </button>
+              </div>
+
             </form>
           )}
 
-          {/* Form 5: Forgot Password */}
+          {/* ============================================================ */}
+          {/* VIEW 3: FORGET PASSWORD */}
+          {/* Email / mobile (with country code if mobile), Request otp, */}
+          {/* Set new password, Re enter new password, Rest (Reset Password) */}
+          {/* ============================================================ */}
           {mode === 'forgot' && (
-            <div className="space-y-4">
-              <p className="text-xs text-stone-600">Enter your registered email and we will send you password reset authorization instructions.</p>
-              <form onSubmit={async (e) => {
-                e.preventDefault();
-                setLoading(true);
-                await api.forgotPassword(email);
-                setLoading(false);
-                setSuccessMsg('Reset code generated and dispatched to your email.');
-              }} className="space-y-3">
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email..."
-                  className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs"
-                />
+            <form onSubmit={handleForgotResetPassword} className="space-y-4">
+              
+              {/* Email / mobile selector */}
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                  Mail / mobile number *
+                </label>
+                <div className="grid grid-cols-2 gap-1 p-1 bg-stone-100 rounded-xs text-xs font-medium mb-2.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForgotContactType('email');
+                      setForgotOtpRequested(false);
+                    }}
+                    className={`py-1.5 rounded-xs text-center transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+                      forgotContactType === 'email'
+                        ? 'bg-white text-stone-900 font-semibold shadow-2xs'
+                        : 'text-stone-500 hover:text-stone-800'
+                    }`}
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    <span>Email</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForgotContactType('mobile');
+                      setForgotOtpRequested(false);
+                    }}
+                    className={`py-1.5 rounded-xs text-center transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+                      forgotContactType === 'mobile'
+                        ? 'bg-white text-stone-900 font-semibold shadow-2xs'
+                        : 'text-stone-500 hover:text-stone-800'
+                    }`}
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>Mobile</span>
+                  </button>
+                </div>
+
+                {/* If EMAIL */}
+                {forgotContactType === 'email' && (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Mail className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
+                        <input
+                          id="forgot-email-input"
+                          type="email"
+                          required
+                          value={forgotEmail}
+                          onChange={(e) => setForgotEmail(e.target.value)}
+                          placeholder="Enter registered email"
+                          className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs pl-9 pr-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800"
+                        />
+                      </div>
+                      <button
+                        id="forgot-request-otp-email-btn"
+                        type="button"
+                        onClick={handleForgotRequestOtp}
+                        disabled={forgotOtpLoading || !forgotEmail}
+                        className="bg-amber-900 hover:bg-amber-800 text-white text-xs font-medium px-3 py-2 rounded-xs transition-colors shrink-0 disabled:opacity-50 cursor-pointer"
+                      >
+                        {forgotOtpLoading ? 'Sending...' : 'Request otp'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* If MOBILE: Country code + Mobile number */}
+                {forgotContactType === 'mobile' && (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <div className="relative w-36 shrink-0">
+                        <select
+                          id="forgot-country-code-select"
+                          value={forgotCountryCode}
+                          onChange={(e) => setForgotCountryCode(e.target.value)}
+                          aria-label="Country code"
+                          className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-2.5 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 appearance-none font-mono"
+                        >
+                          {COUNTRY_CODES.map((item) => (
+                            <option key={`forgot-${item.country}-${item.code}`} value={item.code}>
+                              {item.flag} {item.code} ({item.country.split('/')[0].trim()})
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="w-3.5 h-3.5 text-stone-400 absolute right-2.5 top-2.5 pointer-events-none" />
+                      </div>
+                      <input
+                        id="forgot-mobile-input"
+                        type="tel"
+                        required
+                        value={forgotMobile}
+                        onChange={(e) => setForgotMobile(e.target.value)}
+                        placeholder="555 123 4567"
+                        className="flex-1 bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800"
+                      />
+                      <button
+                        id="forgot-request-otp-mobile-btn"
+                        type="button"
+                        onClick={handleForgotRequestOtp}
+                        disabled={forgotOtpLoading || !forgotMobile}
+                        className="bg-amber-900 hover:bg-amber-800 text-white text-xs font-medium px-3 py-2 rounded-xs transition-colors shrink-0 disabled:opacity-50 cursor-pointer"
+                      >
+                        {forgotOtpLoading ? 'Sending...' : 'Request otp'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* OTP Input */}
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1">
+                  Enter OTP Code *
+                </label>
+                <div className="relative">
+                  <KeyRound className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
+                  <input
+                    id="forgot-otp-input"
+                    type="text"
+                    required
+                    maxLength={6}
+                    value={forgotOtpCode}
+                    onChange={(e) => setForgotOtpCode(e.target.value)}
+                    placeholder="Enter 6-digit OTP received"
+                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 font-mono text-xs pl-9 pr-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 tracking-wider"
+                  />
+                </div>
+              </div>
+
+              {/* Set new password */}
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1">
+                  Set new password *
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
+                  <input
+                    id="forgot-new-password-input"
+                    type={showForgotNewPassword ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    value={forgotNewPassword}
+                    onChange={(e) => setForgotNewPassword(e.target.value)}
+                    placeholder="Enter new password (min. 6 chars)"
+                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs pl-9 pr-10 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotNewPassword(!showForgotNewPassword)}
+                    className="absolute right-3 top-2 text-stone-400 hover:text-stone-600 focus:outline-none"
+                  >
+                    {showForgotNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Re enter new password */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-stone-700">
+                    Re enter new password *
+                  </label>
+                  {forgotConfirmPassword && (
+                    <span className={`text-[10px] font-semibold ${
+                      forgotNewPassword === forgotConfirmPassword ? 'text-emerald-700' : 'text-rose-600'
+                    }`}>
+                      {forgotNewPassword === forgotConfirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
+                    </span>
+                  )}
+                </div>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
+                  <input
+                    id="forgot-confirm-password-input"
+                    type={showForgotNewPassword ? 'text' : 'password'}
+                    required
+                    value={forgotConfirmPassword}
+                    onChange={(e) => setForgotConfirmPassword(e.target.value)}
+                    placeholder="Re enter your new password"
+                    className={`w-full bg-stone-50 border text-stone-900 text-xs pl-9 pr-3 py-2 rounded-xs focus:bg-white focus:outline-none transition-colors ${
+                      forgotConfirmPassword && forgotNewPassword !== forgotConfirmPassword
+                        ? 'border-rose-400 focus:border-rose-600'
+                        : 'border-stone-300 focus:border-amber-800'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* Reset Button ("Rest") */}
+              <button
+                id="forgot-reset-submit-btn"
+                type="submit"
+                disabled={loading}
+                className="w-full bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold uppercase tracking-wider py-3 rounded-xs transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 mt-2 cursor-pointer"
+              >
+                {loading ? 'Resetting password...' : 'Reset'}
+              </button>
+
+              {/* Back to Login */}
+              <div className="text-center pt-2 border-t border-stone-100">
                 <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-stone-900 text-white text-xs font-semibold py-2.5 rounded-xs"
+                  type="button"
+                  onClick={() => switchMode('login')}
+                  className="text-xs text-stone-600 hover:text-amber-900 transition-colors inline-flex items-center gap-1 cursor-pointer"
                 >
-                  Send Reset Link
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Remember your password? <strong>Login</strong></span>
                 </button>
-              </form>
-            </div>
+              </div>
+
+            </form>
           )}
 
-          {/* Google 1-Click Login Divider */}
+          {/* Google 1-Click Instant Connect (Kept neat for convenience) */}
           <div className="relative border-t border-stone-200 pt-4">
             <span className="absolute left-1/2 -top-2.5 -translate-x-1/2 bg-white px-2 text-[10px] uppercase font-bold text-stone-400">
-              Or Instant Connect
+              Or Fast Access
             </span>
 
             <button
-              id="google-login-btn"
+              id="google-fast-login-btn"
               type="button"
               onClick={handleGoogleAuth}
-              className="w-full bg-white hover:bg-stone-50 border border-stone-300 text-stone-800 text-xs font-semibold py-2.5 px-4 rounded-xs transition-colors flex items-center justify-center gap-2.5 shadow-2xs"
+              className="w-full bg-white hover:bg-stone-50 border border-stone-300 text-stone-800 text-xs font-medium py-2 px-4 rounded-xs transition-colors flex items-center justify-center gap-2.5 shadow-2xs cursor-pointer"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />

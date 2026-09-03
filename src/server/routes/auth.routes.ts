@@ -12,15 +12,18 @@ const router = Router();
 
 // Validation schemas
 const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+  password: z.string().min(6),
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  phone: z.string().optional()
+  address: z.string().optional(),
+  otpCode: z.string().optional()
 });
 
 const loginSchema = z.object({
-  email: z.string().email(),
+  user: z.string().min(1).optional(),
+  email: z.string().min(1).optional(),
   password: z.string().min(1)
 });
 
@@ -35,15 +38,50 @@ router.post('/register', authRateLimiter, async (req, res) => {
       });
     }
 
-    const { email, password, firstName, lastName, phone } = parse.data;
-    const normalizedEmail = email.toLowerCase().trim();
+    const { email, phone, password, firstName, lastName, address, otpCode } = parse.data;
 
-    const existingUser = db.users.find(u => u.email.toLowerCase() === normalizedEmail);
-    if (existingUser) {
-      return res.status(409).json({
+    if (!email && !phone) {
+      return res.status(400).json({
         success: false,
-        error: { code: 'EMAIL_ALREADY_EXISTS', message: 'An account with this email address already exists.' }
+        error: { code: 'IDENTIFIER_REQUIRED', message: 'Either Email or Mobile phone is required for registration.' }
       });
+    }
+
+    const normalizedEmail = email ? email.toLowerCase().trim() : `phone_${(phone || '').replace(/\D/g, '')}@fumarehookah.user`;
+    const cleanPhone = phone?.trim();
+
+    // Check if email already exists
+    if (email) {
+      const existingUser = db.users.find(u => u.email.toLowerCase() === normalizedEmail);
+      if (existingUser) {
+        return res.status(409).json({
+          success: false,
+          error: { code: 'EMAIL_ALREADY_EXISTS', message: 'An account with this email address already exists. Please login instead.' }
+        });
+      }
+    }
+
+    // Check if phone already exists
+    if (cleanPhone) {
+      const existingPhone = db.users.find(u => u.phone && u.phone.replace(/\D/g, '') === cleanPhone.replace(/\D/g, ''));
+      if (existingPhone) {
+        return res.status(409).json({
+          success: false,
+          error: { code: 'PHONE_ALREADY_EXISTS', message: 'An account with this mobile number already exists. Please login instead.' }
+        });
+      }
+    }
+
+    // If OTP was provided, verify it
+    if (otpCode) {
+      const identifier = cleanPhone || normalizedEmail;
+      const verifyResult = await authService.verifyOTP(identifier, otpCode);
+      if (!verifyResult.valid) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_OTP', message: verifyResult.reason || 'Invalid or expired OTP code' }
+        });
+      }
     }
 
     const passwordHash = await authService.hashPassword(password);
@@ -52,11 +90,12 @@ router.post('/register', authRateLimiter, async (req, res) => {
       email: normalizedEmail,
       firstName,
       lastName,
-      phone,
+      phone: cleanPhone,
+      address,
       role: 'CUSTOMER',
       status: 'ACTIVE',
-      isEmailVerified: false,
-      isPhoneVerified: false,
+      isEmailVerified: !!email && !!otpCode,
+      isPhoneVerified: !!cleanPhone && !!otpCode,
       totalSpent: 0,
       orderCount: 0,
       passwordHash,
@@ -70,12 +109,14 @@ router.post('/register', authRateLimiter, async (req, res) => {
     const accessToken = authService.generateAccessToken(newUser);
     const refreshToken = authService.generateRefreshToken(newUser);
 
-    // Send welcome email in background
-    emailService.sendEmail({
-      to: normalizedEmail,
-      subject: 'Welcome to Fumare Hookah — Premier Hookahs & Shisha',
-      html: `<div style="font-family:sans-serif;padding:30px;"><h2>Welcome to Fumare Hookah, ${firstName}!</h2><p>Your account is ready. Discover our curated collection of luxury hookahs, handmade bowls, and rare dark leaf tobaccos.</p></div>`
-    }).catch(console.error);
+    // Send welcome email if email available
+    if (email) {
+      emailService.sendEmail({
+        to: normalizedEmail,
+        subject: 'Welcome to Fumare Hookah — Premier Hookahs & Shisha',
+        html: `<div style="font-family:sans-serif;padding:30px;"><h2>Welcome to Fumare Hookah, ${firstName}!</h2><p>Your account is ready. Discover our curated collection of luxury hookahs, handmade bowls, and rare dark leaf tobaccos.</p></div>`
+      }).catch(console.error);
+    }
 
     res.cookie('auth_token', accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 7 * 24 * 3600 * 1000 });
 
@@ -105,18 +146,35 @@ router.post('/login', authRateLimiter, async (req, res) => {
     if (!parse.success) {
       return res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'Email and password are required' }
+        error: { code: 'VALIDATION_ERROR', message: 'User identifier and password are required' }
       });
     }
 
-    const { email, password } = parse.data;
-    const normalizedEmail = email.toLowerCase().trim();
+    const { user: userIdentifier, email, password } = parse.data;
+    const identifier = (userIdentifier || email || '').trim();
 
-    const user = db.users.find(u => u.email.toLowerCase() === normalizedEmail);
+    if (!identifier) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: 'User or Email is required' }
+      });
+    }
+
+    const idLower = identifier.toLowerCase();
+    const idDigits = identifier.replace(/\D/g, '');
+
+    // Find user by Email, Phone (exact or digits), or User ID
+    const user = db.users.find(u => {
+      if (u.email && u.email.toLowerCase() === idLower) return true;
+      if (u.phone && (u.phone === identifier || (idDigits.length >= 7 && u.phone.replace(/\D/g, '') === idDigits))) return true;
+      if (u.id === identifier) return true;
+      return false;
+    });
+
     if (!user || !user.passwordHash) {
       return res.status(401).json({
         success: false,
-        error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' }
+        error: { code: 'INVALID_CREDENTIALS', message: 'Invalid username/email or password' }
       });
     }
 
@@ -131,7 +189,7 @@ router.post('/login', authRateLimiter, async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' }
+        error: { code: 'INVALID_CREDENTIALS', message: 'Invalid username/email or password' }
       });
     }
 
@@ -447,6 +505,115 @@ router.post('/google', async (req, res) => {
     success: true,
     message: 'Signed in via Google',
     data: { user: safeUser, token, refreshToken }
+  });
+});
+
+// POST /api/auth/send-otp (Unified for Email or Mobile)
+router.post('/send-otp', otpRateLimiter, async (req, res) => {
+  const { identifier, type } = req.body;
+  if (!identifier || typeof identifier !== 'string' || identifier.trim().length === 0) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'INVALID_REQUEST', message: 'Email or Mobile Number is required' }
+    });
+  }
+
+  const raw = identifier.trim();
+  const isEmail = type === 'EMAIL' || raw.includes('@');
+  const cleanIdentifier = isEmail ? raw.toLowerCase() : raw;
+
+  const otpCode = await authService.createAndStoreOTP(cleanIdentifier, isEmail ? 'EMAIL' : 'SMS');
+
+  if (isEmail) {
+    await emailService.sendOTP(cleanIdentifier, otpCode);
+  } else {
+    await smsService.sendOTP(cleanIdentifier, otpCode);
+  }
+
+  return res.json({
+    success: true,
+    message: isEmail 
+      ? `Verification passkey sent to ${cleanIdentifier}`
+      : `SMS security code sent to ${cleanIdentifier}`,
+    devOtp: process.env.NODE_ENV !== 'production' ? otpCode : undefined
+  });
+});
+
+// POST /api/auth/verify-otp
+router.post('/verify-otp', async (req, res) => {
+  const { identifier, code } = req.body;
+  if (!identifier || !code) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'INVALID_REQUEST', message: 'Identifier and OTP code are required' }
+    });
+  }
+
+  const raw = identifier.trim();
+  const isEmail = raw.includes('@');
+  const cleanIdentifier = isEmail ? raw.toLowerCase() : raw;
+
+  const verifyResult = await authService.verifyOTP(cleanIdentifier, code.trim());
+  if (!verifyResult.valid) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'INVALID_OTP', message: verifyResult.reason || 'Invalid or expired OTP code' }
+    });
+  }
+
+  return res.json({
+    success: true,
+    message: 'OTP verified successfully'
+  });
+});
+
+// POST /api/auth/reset-password-otp
+router.post('/reset-password-otp', async (req, res) => {
+  const { identifier, code, newPassword } = req.body;
+  if (!identifier || !code || !newPassword || newPassword.length < 6) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'VALIDATION_ERROR', message: 'Identifier, valid OTP code, and new password (min 6 characters) are required.' }
+    });
+  }
+
+  const raw = identifier.trim();
+  const isEmail = raw.includes('@');
+  const cleanIdentifier = isEmail ? raw.toLowerCase() : raw;
+  const digits = cleanIdentifier.replace(/\D/g, '');
+
+  const verifyResult = await authService.verifyOTP(cleanIdentifier, code.trim());
+  if (!verifyResult.valid) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'INVALID_OTP', message: verifyResult.reason || 'Invalid or expired OTP code' }
+    });
+  }
+
+  // Find user by email or mobile phone
+  const user = db.users.find(u => {
+    if (isEmail && u.email && u.email.toLowerCase() === cleanIdentifier) return true;
+    if (!isEmail && u.phone) {
+      if (u.phone === cleanIdentifier) return true;
+      if (digits.length >= 7 && u.phone.replace(/\D/g, '') === digits) return true;
+    }
+    return false;
+  });
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      error: { code: 'USER_NOT_FOUND', message: 'No registered account found matching this email or mobile number.' }
+    });
+  }
+
+  user.passwordHash = await authService.hashPassword(newPassword);
+  user.updatedAt = new Date().toISOString();
+  db.persist('users', user);
+
+  return res.json({
+    success: true,
+    message: 'Password reset successfully. You can now sign in with your new password.'
   });
 });
 

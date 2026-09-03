@@ -73,17 +73,38 @@ class ApiClient {
   }
 
   // --- Auth Endpoints ---
-  public async register(payload: { email: string; password: string; firstName: string; lastName: string; phone?: string }) {
+  public async register(payload: { email?: string; password: string; firstName: string; lastName: string; phone?: string; address?: string; otpCode?: string }) {
     return this.request<{ success: boolean; data: { user: User; token: string } }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(payload)
     });
   }
 
-  public async login(credentials: { email: string; password: string }) {
+  public async login(credentials: { user?: string; email?: string; password: string }) {
     return this.request<{ success: boolean; data: { user: User; token: string } }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials)
+    });
+  }
+
+  public async sendOTP(identifier: string, type?: 'EMAIL' | 'SMS') {
+    return this.request<{ success: boolean; message: string; devOtp?: string }>('/auth/send-otp', {
+      method: 'POST',
+      body: JSON.stringify({ identifier, type })
+    });
+  }
+
+  public async verifyOTP(identifier: string, code: string) {
+    return this.request<{ success: boolean; message: string }>('/auth/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ identifier, code })
+    });
+  }
+
+  public async resetPasswordOTP(payload: { identifier: string; code: string; newPassword: string }) {
+    return this.request<{ success: boolean; message: string }>('/auth/reset-password-otp', {
+      method: 'POST',
+      body: JSON.stringify(payload)
     });
   }
 

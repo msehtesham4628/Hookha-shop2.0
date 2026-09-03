@@ -22,7 +22,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[Sultan Hookah Co.] Full-Stack Server active on http://0.0.0.0:${PORT}`);
+    console.log(`[Fumare Hookah] Full-Stack Server active on http://0.0.0.0:${PORT}`);
   });
 }
 

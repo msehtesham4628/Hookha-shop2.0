@@ -120,8 +120,11 @@ export default function App() {
     if (pathOnly === '/auth/register') {
       return <AuthPage initialMode="register" onNavigate={navigate} />;
     }
+    if (pathOnly === '/auth/forgot') {
+      return <AuthPage initialMode="forgot" onNavigate={navigate} />;
+    }
     if (pathOnly === '/auth/otp') {
-      return <AuthPage initialMode="otp-email" onNavigate={navigate} />;
+      return <AuthPage initialMode="login" onNavigate={navigate} />;
     }
 
     // 9. Brand & Concierge Info
