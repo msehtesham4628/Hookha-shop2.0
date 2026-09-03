@@ -407,7 +407,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                               const itemTotal = item.subtotal ?? (item as any).totalPrice ?? (itemPrice * item.quantity);
                               const flavor = item.flavor || (item as any).selectedFlavor;
                               const color = item.color || (item as any).selectedColor;
-                              const img = item.productImage || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=200';
+                              const img = item.productImage || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=200';
 
                               return (
                                 <div key={i} className="pt-3 first:pt-0 flex items-center justify-between text-xs gap-3">

@@ -40,7 +40,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
           <div className="aspect-4/3 bg-stone-100 rounded-xs overflow-hidden border border-stone-200">
             <img
-              src="https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800"
+              src="https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=800"
               alt="Craftsmanship"
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"

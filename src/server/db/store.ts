@@ -111,6 +111,33 @@ export class DatabaseStore {
 
     this.products = catalogProducts.length > 0 ? catalogProducts : [...INITIAL_PRODUCTS];
 
+    // Sanitize image URLs (strip broken -916x916 WordPress thumbnails and deduplicate)
+    this.products.forEach(p => {
+      if (p.images && p.images.length > 0) {
+        const seen = new Set<string>();
+        const cleanImgs = [];
+        for (const img of p.images) {
+          const cleanUrl = (img.url || '').replace(/-916x916(?=\.(?:jpg|jpeg|png|webp))/i, '');
+          if (cleanUrl && !seen.has(cleanUrl)) {
+            seen.add(cleanUrl);
+            cleanImgs.push({
+              ...img,
+              url: cleanUrl,
+              thumbnailUrl: (img.thumbnailUrl || cleanUrl).replace(/-916x916(?=\.(?:jpg|jpeg|png|webp))/i, '')
+            });
+          }
+        }
+        if (cleanImgs.length > 0) {
+          cleanImgs[0].isPrimary = true;
+          for (let i = 1; i < cleanImgs.length; i++) {
+            cleanImgs[i].isPrimary = false;
+            cleanImgs[i].sortOrder = i + 1;
+          }
+          p.images = cleanImgs;
+        }
+      }
+    });
+
     // Compute dynamic product counts for categories
     this.categories.forEach(cat => {
       cat.productCount = this.products.filter(p =>
@@ -133,7 +160,7 @@ export class DatabaseStore {
           slug,
           origin: 'Global Artisan',
           description: `Certified authentic ${bName} merchandise, flavors, and luxury accessories.`,
-          logoUrl: p.images[0]?.url || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=400',
+          logoUrl: p.images[0]?.url || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400',
           productCount: 0,
           isActive: true
         });
@@ -150,7 +177,7 @@ export class DatabaseStore {
 
     // Initialize media library with high res assets
     this.mediaLibrary = [
-      { id: 'med-1', url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop', alt: 'Luxury Shisha Stainless Steel Studio Photo', category: 'Products', size: '1.4 MB', createdAt: new Date().toISOString() },
+      { id: 'med-1', url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop', alt: 'Luxury Shisha Stainless Steel Studio Photo', category: 'Products', size: '1.4 MB', createdAt: new Date().toISOString() },
       { id: 'med-2', url: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200&auto=format&fit=crop', alt: 'Bohemian Cut Crystal Shisha Base', category: 'Bases', size: '1.8 MB', createdAt: new Date().toISOString() },
       { id: 'med-3', url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop', alt: 'Artisan Dark Leaf Shisha Tobacco Leaf', category: 'Tobacco', size: '2.1 MB', createdAt: new Date().toISOString() },
       { id: 'med-4', url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop', alt: 'Stoneware Handthrown Hookah Bowl Phunnel', category: 'Bowls', size: '1.1 MB', createdAt: new Date().toISOString() },
@@ -344,7 +371,7 @@ export class DatabaseStore {
             productId: 'prod-wookah-oak-crystal',
             productName: 'Wookah Masterpiece Oak with Olives Crystal Base',
             productSku: 'WKH-OAK-01',
-            productImage: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=400&auto=format&fit=crop',
+            productImage: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400&auto=format&fit=crop',
             price: 449.00,
             quantity: 1,
             subtotal: 449.00

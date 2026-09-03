@@ -162,7 +162,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onNavigate }) => {
                   >
                     <div className="w-12 h-12 bg-stone-100 rounded-xs overflow-hidden shrink-0 flex items-center justify-center p-1 border border-stone-200">
                       <img
-                        src={product.images[0]?.url || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=100'}
+                        src={product.images[0]?.url || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=100'}
                         alt={product.name}
                         className="w-full h-full object-contain"
                         referrerPolicy="no-referrer"

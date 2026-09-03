@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useStore } from '../store/useStore.js';
 import { X, Star, ShoppingBag, Heart, ShieldCheck, Check, ArrowRight } from 'lucide-react';
+import { sanitizeImageUrl, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/imageFallback.js';
 
 interface QuickViewModalProps {
   onNavigate: (path: string) => void;
@@ -13,11 +14,24 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ onNavigate }) =>
   const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+
+  const activeImages = useMemo(() => {
+    if (!quickViewProduct?.images || quickViewProduct.images.length === 0) return [];
+    const cleaned = quickViewProduct.images.map(img => ({
+      ...img,
+      url: sanitizeImageUrl(img.url),
+      thumbnailUrl: sanitizeImageUrl(img.thumbnailUrl || img.url)
+    }));
+    const valid = cleaned.filter(img => !failedImages[img.url]);
+    return valid.length > 0 ? valid : cleaned;
+  }, [quickViewProduct?.images, failedImages]);
 
   if (!quickViewProduct) return null;
 
   const isSaved = wishlistIds.includes(quickViewProduct.id);
-  const currentImage = quickViewProduct.images[selectedImageIdx]?.url || quickViewProduct.images[0]?.url || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800';
+  const safeIdx = selectedImageIdx >= activeImages.length ? 0 : selectedImageIdx;
+  const currentImage = activeImages[safeIdx]?.url || DEFAULT_PRODUCT_PLACEHOLDER;
 
   const handleAddToCart = async () => {
     setIsAdding(true);
@@ -53,27 +67,36 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ onNavigate }) =>
             <img
               src={currentImage}
               alt={quickViewProduct.name}
-              className="max-h-full max-w-full object-contain"
+              className="max-h-full max-w-full object-contain transition-all duration-300"
               referrerPolicy="no-referrer"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800';
+              onError={() => {
+                if (currentImage !== DEFAULT_PRODUCT_PLACEHOLDER) {
+                  setFailedImages(prev => ({ ...prev, [currentImage]: true }));
+                }
               }}
             />
           </div>
 
           {/* Thumbnails */}
-          {quickViewProduct.images.length > 1 && (
+          {activeImages.length > 1 && (
             <div className="flex gap-2 mt-4 overflow-x-auto max-w-full pb-1">
-              {quickViewProduct.images.map((img, idx) => (
+              {activeImages.map((img, idx) => (
                 <button
-                  key={img.id || idx}
+                  key={img.id || img.url || idx}
                   onClick={() => setSelectedImageIdx(idx)}
-                  className={`w-12 h-12 rounded-xs border p-1 shrink-0 bg-white transition-all ${
-                    selectedImageIdx === idx ? 'border-amber-800 ring-1 ring-amber-800' : 'border-stone-200 opacity-70'
+                  className={`w-12 h-12 rounded-xs border p-1 shrink-0 bg-white transition-all cursor-pointer ${
+                    safeIdx === idx ? 'border-amber-800 ring-1 ring-amber-800' : 'border-stone-200 opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <img src={img.url} alt="thumbnail" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                  <img
+                    src={img.thumbnailUrl || img.url}
+                    alt="thumbnail"
+                    className="w-full h-full object-contain"
+                    referrerPolicy="no-referrer"
+                    onError={() => {
+                      setFailedImages(prev => ({ ...prev, [img.url]: true }));
+                    }}
+                  />
                 </button>
               ))}
             </div>
@@ -157,14 +180,20 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ onNavigate }) =>
                 </button>
               </div>
 
+              {/* Add to Cart Logo Button */}
               <button
                 id="quick-view-add-cart-btn"
                 disabled={quickViewProduct.stock <= 0 || isAdding}
                 onClick={handleAddToCart}
-                className="flex-1 bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold py-2.5 px-4 rounded-xs transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50"
+                title={quickViewProduct.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
+                aria-label="Add to Cart"
+                className="w-12 h-10 bg-stone-900 hover:bg-amber-900 text-white rounded-xs transition-all duration-200 flex items-center justify-center shadow-xs disabled:opacity-50 cursor-pointer active:scale-95 group relative"
               >
-                {isAdding ? <Check className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
-                <span>{quickViewProduct.stock <= 0 ? 'Out of Stock' : 'Add to Bag'}</span>
+                {isAdding ? (
+                  <Check className="w-4 h-4 text-emerald-400 animate-in zoom-in" />
+                ) : (
+                  <ShoppingBag className="w-4 h-4 transition-transform group-hover:scale-110" />
+                )}
               </button>
 
               <button

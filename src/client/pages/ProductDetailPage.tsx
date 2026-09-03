@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '../services/api.js';
 import { useStore } from '../store/useStore.js';
 import { ProductCard } from '../components/ProductCard.js';
 import { Product, Review } from '../../types/index.js';
+import { sanitizeImageUrl, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/imageFallback.js';
 import {
   Star,
   ShoppingBag,
@@ -45,6 +46,19 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
   const [reviewComment, setReviewComment] = useState('');
   const [reviewerName, setReviewerName] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+
+  // Sanitize and filter broken/failed images
+  const activeImages = useMemo(() => {
+    if (!product?.images || product.images.length === 0) return [];
+    const cleaned = product.images.map(img => ({
+      ...img,
+      url: sanitizeImageUrl(img.url),
+      thumbnailUrl: sanitizeImageUrl(img.thumbnailUrl || img.url)
+    }));
+    const valid = cleaned.filter(img => !failedImages[img.url]);
+    return valid.length > 0 ? valid : cleaned;
+  }, [product?.images, failedImages]);
 
   useEffect(() => {
     const loadProductData = async () => {
@@ -94,7 +108,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
   }
 
   const isSaved = wishlistIds.includes(product.id);
-  const currentImage = product.images[selectedImageIdx]?.url || product.images[0]?.url || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800';
+  const safeIdx = selectedImageIdx >= activeImages.length ? 0 : selectedImageIdx;
+  const currentImage = activeImages[safeIdx]?.url || DEFAULT_PRODUCT_PLACEHOLDER;
   const isOutOfStock = product.stock <= 0;
 
   const handleAddToCart = async () => {
@@ -167,11 +182,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
               <img
                 src={currentImage}
                 alt={product.name}
-                className="max-h-full max-w-full object-contain"
+                className="max-h-full max-w-full object-contain transition-all duration-300"
                 referrerPolicy="no-referrer"
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800';
+                onError={() => {
+                  if (currentImage !== DEFAULT_PRODUCT_PLACEHOLDER) {
+                    setFailedImages(prev => ({ ...prev, [currentImage]: true }));
+                  }
                 }}
               />
 
@@ -183,17 +199,25 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
             </div>
 
             {/* Thumbnail Selectors */}
-            {product.images.length > 1 && (
+            {activeImages.length > 1 && (
               <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
-                {product.images.map((img, idx) => (
+                {activeImages.map((img, idx) => (
                   <button
-                    key={img.id || idx}
+                    key={img.id || img.url || idx}
                     onClick={() => setSelectedImageIdx(idx)}
-                    className={`w-16 h-16 rounded-xs border p-1.5 shrink-0 bg-white transition-all ${
-                      selectedImageIdx === idx ? 'border-amber-900 ring-2 ring-amber-800' : 'border-stone-200 opacity-70 hover:opacity-100'
+                    className={`w-16 h-16 rounded-xs border p-1.5 shrink-0 bg-white transition-all cursor-pointer ${
+                      safeIdx === idx ? 'border-amber-900 ring-2 ring-amber-800' : 'border-stone-200 opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={img.url} alt="thumbnail" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                    <img
+                      src={img.thumbnailUrl || img.url}
+                      alt={`Thumbnail angle ${idx + 1}`}
+                      className="w-full h-full object-contain"
+                      referrerPolicy="no-referrer"
+                      onError={() => {
+                        setFailedImages(prev => ({ ...prev, [img.url]: true }));
+                      }}
+                    />
                   </button>
                 ))}
               </div>
@@ -283,13 +307,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
               </div>
             </div>
 
-            {/* Action Form: Quantity + Add To Bag + Wishlist */}
+            {/* Action Form: Quantity + Add To Bag (Cart Logo) + Wishlist */}
             <div className="pt-6 border-t border-stone-200 space-y-4">
-              <div className="flex gap-3">
-                <div className="flex items-center border border-stone-300 rounded-xs bg-stone-50">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center border border-stone-300 rounded-xs bg-stone-50 h-12">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-3.5 py-3 text-stone-600 hover:text-stone-900"
+                    className="px-3.5 h-full text-stone-600 hover:text-stone-900 transition-colors cursor-pointer"
+                    aria-label="Decrease quantity"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
@@ -297,27 +322,36 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
                   <button
                     onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
                     disabled={quantity >= product.stock}
-                    className="px-3.5 py-3 text-stone-600 hover:text-stone-900 disabled:opacity-40"
+                    className="px-3.5 h-full text-stone-600 hover:text-stone-900 disabled:opacity-40 transition-colors cursor-pointer"
+                    aria-label="Increase quantity"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
 
+                {/* Add to Cart Button (Just Cart Logo) */}
                 <button
                   id="pdp-add-to-bag-btn"
                   disabled={isOutOfStock || isAdding}
                   onClick={handleAddToCart}
-                  className="flex-1 bg-stone-900 hover:bg-amber-900 text-white text-xs uppercase font-bold tracking-widest py-3.5 px-6 rounded-xs transition-all duration-200 flex items-center justify-center gap-2 shadow-xs disabled:opacity-50"
+                  title={isOutOfStock ? 'Sold Out' : 'Add to Cart'}
+                  aria-label="Add to Cart"
+                  className="h-12 w-14 sm:w-16 bg-stone-900 hover:bg-amber-900 text-white rounded-xs transition-all duration-200 flex items-center justify-center shadow-xs disabled:opacity-50 cursor-pointer active:scale-95 group relative"
                 >
-                  {isAdding ? <Check className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
-                  <span>{isOutOfStock ? 'Sold Out' : 'Add to Shopping Bag'}</span>
+                  {isAdding ? (
+                    <Check className="w-5 h-5 text-emerald-400 animate-in zoom-in" />
+                  ) : (
+                    <ShoppingBag className="w-5 h-5 transition-transform group-hover:scale-110" />
+                  )}
                 </button>
 
+                {/* Wishlist Button */}
                 <button
                   id="pdp-wishlist-btn"
                   onClick={() => toggleWishlist(product.id)}
-                  className="p-3.5 border border-stone-300 rounded-xs hover:border-amber-800 text-stone-700 hover:text-amber-800 transition-colors"
+                  className="h-12 w-12 border border-stone-300 rounded-xs hover:border-amber-800 text-stone-700 hover:text-amber-800 transition-colors flex items-center justify-center cursor-pointer"
                   title={isSaved ? 'Remove from wishlist' : 'Save to wishlist'}
+                  aria-label={isSaved ? 'Remove from wishlist' : 'Save to wishlist'}
                 >
                   <Heart className={`w-5 h-5 ${isSaved ? 'fill-amber-800 text-amber-800' : ''}`} />
                 </button>
@@ -350,7 +384,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
                 {/* Main Item */}
                 <div className="flex items-center gap-3">
                   <div className="w-16 h-16 bg-stone-50 border border-stone-200 rounded-xs p-1">
-                    <img src={currentImage} alt={product.name} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                    <img
+                      src={currentImage}
+                      alt={product.name}
+                      className="w-full h-full object-contain"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = DEFAULT_PRODUCT_PLACEHOLDER;
+                      }}
+                    />
                   </div>
                   <div>
                     <p className="text-xs font-bold text-stone-900 truncate max-w-[140px]">{product.name}</p>
@@ -363,7 +406,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
                     <Plus className="w-4 h-4 text-stone-400" />
                     <div className="flex items-center gap-3">
                       <div className="w-16 h-16 bg-stone-50 border border-stone-200 rounded-xs p-1">
-                        <img src={bundleItem.images[0]?.url} alt={bundleItem.name} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                        <img
+                          src={sanitizeImageUrl(bundleItem.images[0]?.url)}
+                          alt={bundleItem.name}
+                          className="w-full h-full object-contain"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = DEFAULT_PRODUCT_PLACEHOLDER;
+                          }}
+                        />
                       </div>
                       <div>
                         <p className="text-xs font-bold text-stone-900 truncate max-w-[140px]">{bundleItem.name}</p>

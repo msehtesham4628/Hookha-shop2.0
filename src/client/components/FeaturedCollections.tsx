@@ -104,7 +104,7 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ onNavi
       slug: hookahsCategory?.slug || 'hookahs',
       categorySlug: hookahsCategory?.slug || 'hookahs',
       description: 'Alpha Hookah, Maklaud, El Bomber, and Wookah with patented vertical purges and magnetic connectors.',
-      imageUrl: hookahsCategory?.imageUrl || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
+      imageUrl: hookahsCategory?.imageUrl || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
       itemCount: hookahsCategory?.productCount || 24,
       highlightBadge: 'Award Winning',
       tags: ['AISI 304 Steel', 'Vertical Purge', 'Magnetic Port', 'Diffuser'],

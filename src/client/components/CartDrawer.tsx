@@ -116,7 +116,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onNavigate }) => {
                   {/* Item Image */}
                   <div className="w-20 h-20 bg-stone-50 rounded-xs border border-stone-200 overflow-hidden shrink-0 flex items-center justify-center p-2">
                     <img
-                      src={item.product.images[0]?.url || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=200'}
+                      src={item.product.images[0]?.url || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=200'}
                       alt={item.product.name}
                       className="w-full h-full object-contain"
                       referrerPolicy="no-referrer"

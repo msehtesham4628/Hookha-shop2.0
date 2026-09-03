@@ -275,7 +275,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     setProdMaterial('V2A Stainless Steel');
     setProdShortDesc('');
     setProdDesc('Premium Russian engineered hookah with magnetic purge valve and stainless steel core.');
-    setProdImageUrl('https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800');
+    setProdImageUrl('https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=800');
     setProdIsFeatured(false);
     setProdIsBestSeller(false);
     setProdIsNewArrival(true);
@@ -323,7 +323,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const primaryUrl = prodImageUrl.trim() || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800';
+      const primaryUrl = prodImageUrl.trim() || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=800';
       const existingImages = editingProduct?.images || [];
       let updatedImages = existingImages.map((img, idx) => idx === 0 ? { ...img, url: primaryUrl, thumbnailUrl: primaryUrl, alt: prodName } : img);
       if (updatedImages.length === 0) {
@@ -391,7 +391,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     setEditingCategory(null);
     setCatName('');
     setCatDesc('');
-    setCatImageUrl('https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800');
+    setCatImageUrl('https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=800');
     setCatBannerUrl('https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200');
     setCatSubcategoriesStr('');
     setIsCategoryModalOpen(true);
@@ -422,7 +422,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       const payload: Partial<Category> = {
         name: catName.trim(),
         description: catDesc.trim(),
-        imageUrl: catImageUrl.trim() || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800',
+        imageUrl: catImageUrl.trim() || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=800',
         bannerUrl: catBannerUrl.trim() || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200',
         subcategories
       };
@@ -464,7 +464,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     setBrandName('');
     setBrandOrigin('Russia');
     setBrandDesc('Premium hookah and shisha craftsmanship.');
-    setBrandLogoUrl('https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=400');
+    setBrandLogoUrl('https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400');
     setIsBrandModalOpen(true);
   };
 
@@ -488,7 +488,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         name: brandName.trim(),
         origin: brandOrigin.trim() || 'Global',
         description: brandDesc.trim(),
-        logoUrl: brandLogoUrl.trim() || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=400'
+        logoUrl: brandLogoUrl.trim() || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400'
       };
 
       if (editingBrand) {
@@ -1315,7 +1315,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                             <div>
                               <div className="h-32 bg-stone-100 relative overflow-hidden border-b border-stone-100">
                                 <img
-                                  src={cat.imageUrl || cat.bannerUrl || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800'}
+                                  src={cat.imageUrl || cat.bannerUrl || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=800'}
                                   alt={cat.name}
                                   className="w-full h-full object-cover"
                                   referrerPolicy="no-referrer"

@@ -390,7 +390,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
                 const flavor = item.flavor || (item as any).selectedFlavor;
                 const color = item.color || (item as any).selectedColor;
                 const sku = item.productSku || `SKU-${order.orderNumber}-${idx + 1}`;
-                const img = item.productImage || 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=200';
+                const img = item.productImage || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=200';
 
                 return (
                   <div key={idx} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-stone-50/60 transition-colors">

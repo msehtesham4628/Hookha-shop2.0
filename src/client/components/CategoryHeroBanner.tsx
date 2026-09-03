@@ -39,7 +39,7 @@ const CATEGORY_CONFIGS: Record<string, CategoryVisualConfig> = {
     description: 'Alpha Hookah • El Bomber • Maklaud • Steamulation • WOOKAH • MattPear',
     slides: [
       {
-        image: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=2000&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Precision Aerospace Stems',
         subtitle: 'AISI 304 Stainless Steel & 360° Vertical Purge Technology'
       },
@@ -116,7 +116,7 @@ const CATEGORY_CONFIGS: Record<string, CategoryVisualConfig> = {
         subtitle: 'Caesar Crystal & Craft Glass Russian Drop Vases'
       },
       {
-        image: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=2000&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Weighted Low Center of Gravity',
         subtitle: 'Universal 45mm Gasket Compatibility & Heavy Wall Glass'
       },
@@ -164,7 +164,7 @@ const CATEGORY_CONFIGS: Record<string, CategoryVisualConfig> = {
         subtitle: 'Cast Aluminum & Stainless Steel Thermal Regulators'
       },
       {
-        image: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=2000&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Soft-Touch Silicone Hoses & Tongs',
         subtitle: 'Blade Hookah, Alpha Tongs & Stainless Steel Mouthpieces'
       },
@@ -245,7 +245,7 @@ const CATEGORY_CONFIGS: Record<string, CategoryVisualConfig> = {
         subtitle: 'Direct from Authorized Brand Manufacturers'
       },
       {
-        image: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=2000&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=2000&auto=format&fit=crop',
         tagline: 'Dark Leaf, Stems, Bowls & Accessories',
         subtitle: 'Premium Curated Shisha Gear with Same-Day Dispatch'
       },

@@ -3,6 +3,7 @@ import { Product } from '../../types/index.js';
 import { useStore } from '../store/useStore.js';
 import { useTranslation } from '../i18n/LanguageContext.js';
 import { Heart, Eye, ShoppingBag, Minus, Plus, Check, Flame, Star, Sparkles, ShieldCheck } from 'lucide-react';
+import { sanitizeImageUrl, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/imageFallback.js';
 
 interface ProductCardProps {
   product: Product;
@@ -19,8 +20,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, s
   const [isHovered, setIsHovered] = useState(false);
 
   const isSaved = wishlistIds.includes(product.id);
-  const primaryImage = product.images.find(img => img.isPrimary) || product.images[0] || { url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=600' };
-  const secondaryImage = product.images.length > 1 ? (product.images.find(img => !img.isPrimary) || product.images[1]) : null;
+  const primaryRaw = product.images.find(img => img.isPrimary) || product.images[0];
+  const primaryImage = primaryRaw ? { ...primaryRaw, url: sanitizeImageUrl(primaryRaw.url) } : { url: DEFAULT_PRODUCT_PLACEHOLDER };
+  const secondaryRaw = product.images.length > 1 ? (product.images.find(img => !img.isPrimary) || product.images[1]) : null;
+  const secondaryImage = secondaryRaw ? { ...secondaryRaw, url: sanitizeImageUrl(secondaryRaw.url) } : null;
 
   const isOutOfStock = product.stock <= 0;
   const isLowStock = product.stock > 0 && product.stock <= 5;
@@ -183,7 +186,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, s
             loading="lazy"
             onError={(e) => {
               e.currentTarget.onerror = null;
-              e.currentTarget.src = 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=600';
+              e.currentTarget.src = DEFAULT_PRODUCT_PLACEHOLDER;
             }}
           />
           {secondaryImage && (
@@ -197,7 +200,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, s
               loading="lazy"
               onError={(e) => {
                 e.currentTarget.onerror = null;
-                e.currentTarget.src = 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=600';
+                e.currentTarget.src = DEFAULT_PRODUCT_PLACEHOLDER;
               }}
             />
           )}
@@ -318,31 +321,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, s
             </button>
           </div>
 
-          {/* Add to Basket Button */}
+          {/* Add to Basket Button (Just Cart Logo) */}
           <button
             id={`add-to-cart-btn-${product.id}`}
             onClick={handleAddToCart}
             disabled={isOutOfStock || isAdding}
-            className={`flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-bold uppercase tracking-wider py-2 px-3 rounded-lg shadow-xs transition-all duration-200 cursor-pointer ${
+            title={isOutOfStock ? t('common.out_of_stock', 'Out of Stock') : t('common.add_to_cart', 'Add to Cart')}
+            aria-label={t('common.add_to_cart', 'Add to Cart')}
+            className={`w-9 h-8 sm:w-10 sm:h-8 shrink-0 flex items-center justify-center rounded-lg shadow-xs transition-all duration-200 cursor-pointer ${
               isOutOfStock
                 ? 'bg-stone-100 text-stone-400 cursor-not-allowed border border-stone-200'
                 : justAdded
-                ? 'bg-emerald-600 text-white shadow-emerald-600/20'
-                : 'bg-stone-900 hover:bg-cyan-600 text-white shadow-stone-900/10 active:scale-95'
+                ? 'bg-emerald-600 text-white shadow-emerald-600/20 scale-105'
+                : 'bg-stone-900 hover:bg-amber-900 text-white shadow-stone-900/10 active:scale-95'
             }`}
           >
-            {isOutOfStock ? (
-              <span>{t('common.out_of_stock', 'Out of Stock')}</span>
-            ) : justAdded ? (
-              <>
-                <Check className="w-3.5 h-3.5" />
-                <span>{t('common.added', 'Added')}</span>
-              </>
+            {justAdded ? (
+              <Check className="w-4 h-4 text-white animate-in zoom-in" />
             ) : (
-              <>
-                <ShoppingBag className="w-3.5 h-3.5" />
-                <span>{t('common.add_to_cart', 'Add to Cart')}</span>
-              </>
+              <ShoppingBag className="w-4 h-4" />
             )}
           </button>
         </div>

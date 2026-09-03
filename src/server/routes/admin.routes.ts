@@ -186,7 +186,7 @@ router.post('/products', requirePermission('products.create'), (req: Authenticat
     categorySlug: (body.category || 'accessories').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
     subcategory: body.subcategory,
     images: body.images && body.images.length > 0 ? body.images : [
-      { id: `img-${Date.now()}`, url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800&auto=format&fit=crop', alt: body.name, isPrimary: true, sortOrder: 1 }
+      { id: `img-${Date.now()}`, url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=800&auto=format&fit=crop', alt: body.name, isPrimary: true, sortOrder: 1 }
     ],
     stock: parseInt(body.stock, 10) || 0,
     lowStockThreshold: parseInt(body.lowStockThreshold, 10) || 5,

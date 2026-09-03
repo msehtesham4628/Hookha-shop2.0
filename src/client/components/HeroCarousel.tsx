@@ -19,7 +19,7 @@ const HERO_SLIDES: HeroSlide[] = [
     title: 'Russian & European Master Hookahs',
     subtitle: 'Alpha Hookah • El Bomber • Maklaud • Steamulation • WOOKAH',
     targetLink: '/shop?category=hookahs',
-    imageUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=2000&auto=format&fit=crop',
+    imageUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=2000&auto=format&fit=crop',
     accentColor: '#00b5ad',
     brandLogos: ['Alpha', 'Maklaud', 'El Bomber']
   },

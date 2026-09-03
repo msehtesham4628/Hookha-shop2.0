@@ -268,8 +268,8 @@ export const INITIAL_CATEGORIES: Category[] = [
     name: 'Hookahs',
     slug: 'hookahs',
     description: 'Precision engineered modern and Russian hookahs crafted from aerospace-grade AISI 304 stainless steel, polyacetal, and artisanal crystal.',
-    imageUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=800&auto=format&fit=crop',
-    bannerUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1600&auto=format&fit=crop',
+    imageUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=800&auto=format&fit=crop',
+    bannerUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1600&auto=format&fit=crop',
     subcategories: ['Alpha Hookah', 'El Bomber', 'MattPear', 'Maklaud Hookah', 'WOOKAH', 'Japona Hookah', 'Steamulation', 'Modern Hookahs', 'Russian Hookahs', 'Stainless Steel'],
     productCount: 18,
     isActive: true,
@@ -380,7 +380,7 @@ export const INITIAL_BRANDS: Brand[] = [
     slug: 'alpha-hookah',
     origin: 'Saint Petersburg, Russia',
     description: 'Award-winning manufacturer of the legendary Model X, Beat, and Artist hookahs featuring vertical blow-off purge technology and magnetic connectors.',
-    logoUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
     productCount: 8,
     isActive: true
   },
@@ -390,7 +390,7 @@ export const INITIAL_BRANDS: Brand[] = [
     slug: 'el-bomber',
     origin: 'Russia',
     description: 'Futuristic and cyberpunk-inspired hookahs featuring Katana samurai blades, motorcycle exhaust manifolds, and precision AISI 304 engineering.',
-    logoUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
     productCount: 5,
     isActive: true
   },
@@ -400,7 +400,7 @@ export const INITIAL_BRANDS: Brand[] = [
     slug: 'mattpear',
     origin: 'Russia',
     description: 'Pioneers of medical-grade AISI 304 stainless steel hookahs with patented magnetic hose valves and whisper-quiet adjustable diffusers.',
-    logoUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
     productCount: 4,
     isActive: true
   },
@@ -410,7 +410,7 @@ export const INITIAL_BRANDS: Brand[] = [
     slug: 'maklaud-hookah',
     origin: 'Russia',
     description: 'Artisan sculptural masterpieces uniting functional high-grade stainless steel with hand-cast bronze and brass dragon sculptures.',
-    logoUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
     productCount: 4,
     isActive: true
   },
@@ -580,7 +580,7 @@ export const INITIAL_BRANDS: Brand[] = [
     slug: 'japona-hookah',
     origin: 'Saint Petersburg, Russia',
     description: 'Exquisite Japanese-inspired wooden and ceramic hookahs and hand-corded bowls.',
-    logoUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
     productCount: 5,
     isActive: true
   },
@@ -590,7 +590,7 @@ export const INITIAL_BRANDS: Brand[] = [
     slug: 'steamulation-hookah',
     origin: 'Germany / Switzerland',
     description: 'Swiss precision engineering featuring patented SteamClick 360 rotation and Air-Flow Control systems.',
-    logoUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+    logoUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
     productCount: 4,
     isActive: true
   },
@@ -904,8 +904,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-mkl-drt-1',
-        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
         alt: 'Maklaud Dart 23 Project Hookah',
         isPrimary: true,
         sortOrder: 1
@@ -951,8 +951,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-mkl-moon-1',
-        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
         alt: 'Maklaud The Shine of Moon by Di-lun Hookah',
         isPrimary: true,
         sortOrder: 1
@@ -997,8 +997,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-alp-smr-1',
-        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
         alt: 'Alpha Hookah Smart Exzo Tribal Black',
         isPrimary: true,
         sortOrder: 1
@@ -1043,8 +1043,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-alp-cyb-1',
-        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
         alt: 'Alpha Hookah Model X Cyber Sunset',
         isPrimary: true,
         sortOrder: 1
@@ -1089,8 +1089,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-alp-x-1',
-        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
         alt: 'Alpha Hookah Model X Black Matte',
         isPrimary: true,
         sortOrder: 1
@@ -1147,8 +1147,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-alp-beat-1',
-        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
         alt: 'Alpha Hookah Beat White Silver',
         isPrimary: true,
         sortOrder: 1
@@ -1196,8 +1196,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-elb-ktn-1',
-        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
         alt: 'El Bomber Katana Hookah Samurai Edition',
         isPrimary: true,
         sortOrder: 1
@@ -1244,8 +1244,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-mtp-1',
-        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
         alt: 'MattPear Simple M Ball Hookah',
         isPrimary: true,
         sortOrder: 1
@@ -1293,8 +1293,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-mkl-1',
-        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
         alt: 'Maklaud Warta Sculptural Brass Hookah',
         isPrimary: true,
         sortOrder: 1
@@ -1342,8 +1342,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-wkh-1',
-        url: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1200&auto=format&fit=crop',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=300&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop',
         alt: 'Wookah Masterpiece Oak Shisha',
         isPrimary: true,
         sortOrder: 1
