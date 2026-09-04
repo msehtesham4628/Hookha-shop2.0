@@ -31,6 +31,14 @@ export interface Role {
   updatedAt: string;
 }
 
+export interface UserAddressDetails {
+  houseNo?: string;
+  areaRoad?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -48,6 +56,7 @@ export interface User {
   isWholesaleCustomer?: boolean;
   wholesaleCompany?: string;
   address?: string;
+  addressDetails?: UserAddressDetails;
   lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;

@@ -114,7 +114,7 @@ export const DEFAULT_ROLES: Role[] = [
     code: 'ADMIN',
     description: 'Executive management across store operations, inventory, customers, and analytics.',
     isSystem: true,
-    permissions: allPermissionKeys.filter(k => !k.startsWith('roles.') && k !== 'staff.delete'),
+    permissions: allPermissionKeys.filter(k => (k === 'roles.view' || !k.startsWith('roles.')) && k !== 'staff.delete'),
     userCount: 1,
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-01-01T00:00:00Z'

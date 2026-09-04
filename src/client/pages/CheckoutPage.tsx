@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore.js';
 import { api } from '../services/api.js';
 import { createCloudOrder } from '../services/firebase.js';
@@ -27,12 +27,30 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   const [firstName, setFirstName] = useState(user?.firstName || '');
   const [lastName, setLastName] = useState(user?.lastName || '');
   const [phone, setPhone] = useState(user?.phone || '');
-  const [street, setStreet] = useState('');
-  const [apartment, setApartment] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('CA');
-  const [postalCode, setPostalCode] = useState('');
+  const [houseNo, setHouseNo] = useState(user?.addressDetails?.houseNo || '');
+  const [areaRoad, setAreaRoad] = useState(user?.addressDetails?.areaRoad || '');
+  const [city, setCity] = useState(user?.addressDetails?.city || '');
+  const [state, setState] = useState(user?.addressDetails?.state || 'CA');
+  const [pincode, setPincode] = useState(user?.addressDetails?.pincode || '');
   const [country, setCountry] = useState('United States');
+
+  // Sync address if user loads later
+  useEffect(() => {
+    if (user?.addressDetails) {
+      if (!houseNo) setHouseNo(user.addressDetails.houseNo || '');
+      if (!areaRoad) setAreaRoad(user.addressDetails.areaRoad || '');
+      if (!city) setCity(user.addressDetails.city || '');
+      if (!state) setState(user.addressDetails.state || 'CA');
+      if (!pincode) setPincode(user.addressDetails.pincode || '');
+    } else if (user?.address && !houseNo && !areaRoad) {
+      const parts = user.address.split(',').map(s => s.trim());
+      if (parts.length >= 1) setHouseNo(parts[0] || '');
+      if (parts.length >= 2) setAreaRoad(parts[1] || '');
+      if (parts.length >= 3) setCity(parts[2] || '');
+      if (parts.length >= 4) setState(parts[3] || 'CA');
+      if (parts.length >= 5) setPincode(parts[4].replace(/^PIN:\s*/i, '') || '');
+    }
+  }, [user]);
 
   // Shipping Method
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
@@ -90,8 +108,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       return;
     }
 
-    if (!email || !firstName || !lastName || !street || !city || !postalCode) {
-      setErrorMsg('Please complete all mandatory address fields.');
+    if (!email || !firstName || !lastName || !houseNo || !areaRoad || !city || !state || !pincode) {
+      setErrorMsg('Please complete all 5 mandatory address fields.');
       showToast('Missing required address details', 'error');
       return;
     }
@@ -103,10 +121,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         customerName: `${firstName} ${lastName}`,
         customerPhone: phone || undefined,
         shippingAddress: {
-          street,
+          street: [houseNo, areaRoad].filter(Boolean).join(', '),
           city,
           state,
-          postalCode,
+          postalCode: pincode,
           country
         },
         paymentMethod,
@@ -230,24 +248,27 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">Street Address *</label>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">House / flat /office no *</label>
                   <input
+                    id="checkout-house-no"
                     type="text"
                     required
-                    placeholder="e.g. 9465 Wilshire Blvd"
-                    value={street}
-                    onChange={(e) => setStreet(e.target.value)}
+                    placeholder="e.g. Flat 402, Building 3 / Office 12B"
+                    value={houseNo}
+                    onChange={(e) => setHouseNo(e.target.value)}
                     className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">Apartment, Suite, Unit (Optional)</label>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">Area/road name/colony *</label>
                   <input
+                    id="checkout-area-road"
                     type="text"
-                    placeholder="Suite 800"
-                    value={apartment}
-                    onChange={(e) => setApartment(e.target.value)}
+                    required
+                    placeholder="e.g. MG Road, Indiranagar / Palm Jumeirah"
+                    value={areaRoad}
+                    onChange={(e) => setAreaRoad(e.target.value)}
                     className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800"
                   />
                 </div>
@@ -255,9 +276,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                 <div>
                   <label className="block text-xs font-semibold text-stone-700 mb-1">City *</label>
                   <input
+                    id="checkout-city"
                     type="text"
                     required
-                    placeholder="Beverly Hills"
+                    placeholder="e.g. Mumbai, Beverly Hills"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800"
@@ -265,11 +287,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">State / Province *</label>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">State *</label>
                   <input
+                    id="checkout-state"
                     type="text"
                     required
-                    placeholder="CA"
+                    placeholder="e.g. Maharashtra, CA"
                     value={state}
                     onChange={(e) => setState(e.target.value)}
                     className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800"
@@ -277,25 +300,28 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">ZIP / Postal Code *</label>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">Pincode *</label>
                   <input
+                    id="checkout-pincode"
                     type="text"
                     required
-                    placeholder="90212"
-                    value={postalCode}
-                    onChange={(e) => setPostalCode(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800"
+                    placeholder="e.g. 400001 or 90212"
+                    value={pincode}
+                    onChange={(e) => setPincode(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800 font-mono"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-stone-700 mb-1">Country</label>
                   <select
+                    id="checkout-country"
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
                     className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800"
                   >
                     <option value="United States">United States</option>
+                    <option value="India">India</option>
                     <option value="Canada">Canada</option>
                     <option value="United Kingdom">United Kingdom</option>
                     <option value="Germany">Germany</option>

@@ -19,6 +19,18 @@
         "orderCount": { "type": "number", "description": "Number of placed orders" },
         "isWholesaleCustomer": { "type": "boolean", "description": "B2B wholesale tier" },
         "wholesaleCompany": { "type": "string", "description": "Wholesale company business name" },
+        "address": { "type": "string", "description": "Delivery address" },
+        "addressDetails": {
+          "type": "object",
+          "description": "Structured address components",
+          "properties": {
+            "houseNo": { "type": "string" },
+            "areaRoad": { "type": "string" },
+            "city": { "type": "string" },
+            "state": { "type": "string" },
+            "pincode": { "type": "string" }
+          }
+        },
         "createdAt": { "type": "string", "description": "ISO timestamp created" },
         "updatedAt": { "type": "string", "description": "ISO timestamp modified" }
       },

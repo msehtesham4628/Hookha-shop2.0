@@ -100,12 +100,32 @@ export const useStore = create<AppState>((set, get) => {
           }
 
           const profile = await getUserProfile(fbUser.uid);
+          const isBootstrappedAdmin = fbUser.email === 'ehtesham4628@gmail.com' || (fbUser.email?.toLowerCase().endsWith('@worldhookahmarket.com') ?? false);
           if (profile) {
-            const isBootstrappedAdmin = fbUser.email === 'ehtesham4628@gmail.com' || (fbUser.email?.endsWith('@worldhookahmarket.com') ?? false);
             if (isBootstrappedAdmin && profile.role !== 'SUPER_ADMIN') {
               profile.role = 'SUPER_ADMIN';
             }
             get().setUser(profile, profile.role !== 'CUSTOMER' ? ['*'] : []);
+            get().loadWishlist();
+            return;
+          } else {
+            // Immediate fallback user creation if profile doc doesn't exist yet
+            const fallbackUser: User = {
+              id: fbUser.uid,
+              email: fbUser.email || '',
+              firstName: (fbUser.displayName || 'VIP').split(' ')[0],
+              lastName: (fbUser.displayName || '').split(' ').slice(1).join(' ') || 'User',
+              role: isBootstrappedAdmin ? 'SUPER_ADMIN' : 'CUSTOMER',
+              status: 'ACTIVE',
+              isEmailVerified: fbUser.emailVerified,
+              isPhoneVerified: false,
+              totalSpent: 0,
+              orderCount: 0,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              avatarUrl: fbUser.photoURL || undefined
+            };
+            get().setUser(fallbackUser, isBootstrappedAdmin ? ['*'] : []);
             get().loadWishlist();
             return;
           }
@@ -136,12 +156,16 @@ export const useStore = create<AppState>((set, get) => {
     settings: null,
 
     setUser: (user, permissions = []) => {
-      const isAdmin = !!user && (user.role !== 'CUSTOMER' || user.email === 'ehtesham4628@gmail.com');
+      const isPrivileged = !!user && (
+        user.role !== 'CUSTOMER' || 
+        user.email === 'ehtesham4628@gmail.com' || 
+        (user.email?.toLowerCase().endsWith('@worldhookahmarket.com') ?? false)
+      );
       set({
         user,
         userPermissions: permissions,
         isAuthenticated: !!user,
-        isAdmin,
+        isAdmin: isPrivileged,
         isAuthLoading: false
       });
     },
@@ -151,7 +175,27 @@ export const useStore = create<AppState>((set, get) => {
       if (auth.currentUser) {
         try {
           const profile = await getUserProfile(auth.currentUser.uid);
+          const isBootstrappedAdmin = auth.currentUser.email === 'ehtesham4628@gmail.com' || (auth.currentUser.email?.toLowerCase().endsWith('@worldhookahmarket.com') ?? false);
+          
           if (profile) {
+            if (isBootstrappedAdmin && profile.role !== 'SUPER_ADMIN') {
+              profile.role = 'SUPER_ADMIN';
+            }
+
+            // Ensure valid backend session JWT is stored
+            try {
+              const apiRes = await api.googleLogin({
+                email: auth.currentUser.email || '',
+                name: auth.currentUser.displayName || `${profile.firstName} ${profile.lastName}`,
+                avatarUrl: auth.currentUser.photoURL || profile.avatarUrl
+              });
+              if (apiRes.success && apiRes.data?.token) {
+                localStorage.setItem('sultan_auth_token', apiRes.data.token);
+              }
+            } catch (syncErr) {
+              console.warn('Backend session sync note:', syncErr);
+            }
+
             get().setUser(profile, profile.role !== 'CUSTOMER' ? ['*'] : []);
             get().loadWishlist();
             return;

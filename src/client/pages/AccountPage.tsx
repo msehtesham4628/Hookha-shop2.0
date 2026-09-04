@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore.js';
 import { api } from '../services/api.js';
-import { getUserOrders } from '../services/firebase.js';
+import { getUserOrders, updateUserProfile } from '../services/firebase.js';
 import { Order, Product } from '../../types/index.js';
 import { ProductCard } from '../components/ProductCard.js';
 import { OrderDetailsModal } from '../components/OrderDetailsModal.js';
@@ -31,7 +31,7 @@ interface AccountPageProps {
 }
 
 export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders', onNavigate }) => {
-  const { user, isAuthenticated, logout, wishlistIds, showToast } = useStore();
+  const { user, isAuthenticated, logout, wishlistIds, showToast, setUser } = useStore();
   const [activeTab, setActiveTab] = useState(initialTab);
   const [orders, setOrders] = useState<Order[]>([]);
   const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
@@ -41,12 +41,85 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('ALL');
 
-  // Address edit state
+  // Address edit state (5 distinct address fields)
   const [addressSaved, setAddressSaved] = useState(false);
-  const [street, setStreet] = useState('9465 Wilshire Blvd, Suite 800');
-  const [city, setCity] = useState('Beverly Hills');
-  const [state, setState] = useState('CA');
-  const [zip, setZip] = useState('90212');
+  const [savingAddress, setSavingAddress] = useState(false);
+  const [houseNo, setHouseNo] = useState(user?.addressDetails?.houseNo || '');
+  const [areaRoad, setAreaRoad] = useState(user?.addressDetails?.areaRoad || '');
+  const [city, setCity] = useState(user?.addressDetails?.city || '');
+  const [state, setState] = useState(user?.addressDetails?.state || '');
+  const [pincode, setPincode] = useState(user?.addressDetails?.pincode || '');
+
+  // Populate address when user data updates
+  useEffect(() => {
+    if (user?.addressDetails) {
+      setHouseNo(user.addressDetails.houseNo || '');
+      setAreaRoad(user.addressDetails.areaRoad || '');
+      setCity(user.addressDetails.city || '');
+      setState(user.addressDetails.state || '');
+      setPincode(user.addressDetails.pincode || '');
+    } else if (user?.address) {
+      const parts = user.address.split(',').map(s => s.trim());
+      if (parts.length >= 1) setHouseNo(parts[0] || '');
+      if (parts.length >= 2) setAreaRoad(parts[1] || '');
+      if (parts.length >= 3) setCity(parts[2] || '');
+      if (parts.length >= 4) setState(parts[3] || '');
+      if (parts.length >= 5) setPincode(parts[4].replace(/^PIN:\s*/i, '') || '');
+    }
+  }, [user]);
+
+  const handleSaveAddress = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!houseNo.trim() || !areaRoad.trim() || !city.trim() || !state.trim() || !pincode.trim()) {
+      showToast('Please fill in all 5 address fields.', 'error');
+      return;
+    }
+
+    try {
+      setSavingAddress(true);
+      const addressDetails = {
+        houseNo: houseNo.trim(),
+        areaRoad: areaRoad.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        pincode: pincode.trim()
+      };
+      const formattedAddress = [
+        houseNo.trim(),
+        areaRoad.trim(),
+        city.trim(),
+        state.trim(),
+        `PIN: ${pincode.trim()}`
+      ].filter(Boolean).join(', ');
+
+      await api.updateAddress({
+        address: formattedAddress,
+        addressDetails
+      });
+
+      if (user?.id) {
+        await updateUserProfile(user.id, {
+          address: formattedAddress,
+          addressDetails
+        }).catch(() => {});
+      }
+
+      if (user) {
+        setUser({
+          ...user,
+          address: formattedAddress,
+          addressDetails
+        });
+      }
+
+      setAddressSaved(true);
+      showToast('Delivery address saved successfully', 'success');
+    } catch (err: any) {
+      showToast(err.message || 'Failed to save address', 'error');
+    } finally {
+      setSavingAddress(false);
+    }
+  };
 
   // Helper to generate carrier tracking links
   const getCarrierTrackingUrl = (trk?: string, car?: string) => {
@@ -526,46 +599,107 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
             {/* 3. ADDRESSES TAB */}
             {activeTab === 'addresses' && (
               <div className="bg-white border border-stone-200 rounded-xs p-6 shadow-xs space-y-6">
-                <h2 className="font-serif text-lg font-bold text-stone-900 border-b border-stone-100 pb-3">
-                  Saved Primary Address
-                </h2>
+                <div>
+                  <h2 className="font-serif text-lg font-bold text-stone-900 border-b border-stone-100 pb-3">
+                    Saved Primary Address
+                  </h2>
+                  <p className="text-xs text-stone-500 mt-2">
+                    Manage your delivery address details for rapid order checkout.
+                  </p>
+                </div>
 
-                <form onSubmit={(e) => { e.preventDefault(); setAddressSaved(true); showToast('Address saved', 'success'); }} className="space-y-4 max-w-md">
+                <form onSubmit={handleSaveAddress} className="space-y-4 max-w-lg">
+                  {/* 1. House / flat /office no */}
                   <div>
-                    <label className="block text-xs font-semibold text-stone-700 mb-1">Street Address</label>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      House / flat /office no *
+                    </label>
                     <input
+                      id="account-address-house-no"
                       type="text"
-                      value={street}
-                      onChange={(e) => setStreet(e.target.value)}
-                      className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2 rounded-xs"
+                      required
+                      value={houseNo}
+                      onChange={(e) => setHouseNo(e.target.value)}
+                      placeholder="e.g. Flat 402, Building 3 / Office 12B"
+                      className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+
+                  {/* 2. Area/road name/colony */}
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      Area/road name/colony *
+                    </label>
+                    <input
+                      id="account-address-area-road"
+                      type="text"
+                      required
+                      value={areaRoad}
+                      onChange={(e) => setAreaRoad(e.target.value)}
+                      placeholder="e.g. MG Road, Indiranagar / Palm Jumeirah"
+                      className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
+                    />
+                  </div>
+
+                  {/* 3. City & 4. State */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-stone-700 mb-1">City</label>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">
+                        City *
+                      </label>
                       <input
+                        id="account-address-city"
                         type="text"
+                        required
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2 rounded-xs"
+                        placeholder="e.g. Mumbai, Dubai, New York"
+                        className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
                       />
                     </div>
+
                     <div>
-                      <label className="block text-xs font-semibold text-stone-700 mb-1">State / Zip</label>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">
+                        State *
+                      </label>
                       <input
+                        id="account-address-state"
                         type="text"
-                        value={`${state} ${zip}`}
-                        onChange={(e) => { setState('CA'); setZip('90212'); }}
-                        className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2 rounded-xs"
+                        required
+                        value={state}
+                        onChange={(e) => setState(e.target.value)}
+                        placeholder="e.g. Maharashtra, California"
+                        className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
                       />
                     </div>
                   </div>
-                  <button
-                    type="submit"
-                    className="bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold px-4 py-2 rounded-xs"
-                  >
-                    Save Address
-                  </button>
+
+                  {/* 5. Pincode */}
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      Pincode *
+                    </label>
+                    <input
+                      id="account-address-pincode"
+                      type="text"
+                      required
+                      value={pincode}
+                      onChange={(e) => setPincode(e.target.value)}
+                      placeholder="e.g. 400001 or 560038"
+                      className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors font-mono"
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      id="account-address-save-btn"
+                      type="submit"
+                      disabled={savingAddress}
+                      className="bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold px-5 py-2.5 rounded-xs transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      {savingAddress ? 'Saving Address...' : 'Save Address'}
+                    </button>
+                  </div>
                 </form>
               </div>
             )}

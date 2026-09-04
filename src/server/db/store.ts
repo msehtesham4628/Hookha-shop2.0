@@ -86,7 +86,182 @@ export class DatabaseStore {
   private isInitialized = false;
 
   constructor() {
+    this.seedDefaultUsers();
     this.init();
+  }
+
+  public seedDefaultUsers() {
+    if (this.users && this.users.length > 0) return;
+
+    const superAdminPasswordHash = bcrypt.hashSync('Admin123!', 10);
+    const sultanAdminHash = bcrypt.hashSync('Sultan@Admin2026!', 10);
+    const staffPasswordHash = bcrypt.hashSync('Staff123!', 10);
+    const sultanManagerHash = bcrypt.hashSync('Sultan@Manager2026!', 10);
+    const customerPasswordHash = bcrypt.hashSync('Customer123!', 10);
+    const sultanVipHash = bcrypt.hashSync('Sultan@Vip2026!', 10);
+
+    this.users = [
+      {
+        id: 'usr-ehtesham-root',
+        email: 'ehtesham4628@gmail.com',
+        firstName: 'Ehtesham',
+        lastName: 'Admin',
+        phone: '+1 (800) 785-8260',
+        role: 'SUPER_ADMIN',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: superAdminPasswordHash,
+        createdAt: '2026-01-01T00:00:00Z',
+        updatedAt: '2026-01-01T00:00:00Z'
+      },
+      {
+        id: 'usr-super-admin-0',
+        email: 'admin@fumarehookah.com',
+        firstName: 'Fumare Hookah',
+        lastName: 'Administrator',
+        phone: '+1 (800) 785-8260',
+        role: 'SUPER_ADMIN',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: superAdminPasswordHash,
+        createdAt: '2026-01-01T00:00:00Z',
+        updatedAt: '2026-01-01T00:00:00Z'
+      },
+      {
+        id: 'usr-super-admin-whm',
+        email: 'admin@worldhookahmarket.com',
+        firstName: 'Market',
+        lastName: 'Administrator',
+        phone: '+1 (800) 785-8260',
+        role: 'SUPER_ADMIN',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: superAdminPasswordHash,
+        createdAt: '2026-01-01T00:00:00Z',
+        updatedAt: '2026-01-01T00:00:00Z'
+      },
+      {
+        id: 'usr-super-admin-1',
+        email: 'admin@sultan.com',
+        firstName: 'Farhan',
+        lastName: 'Al-Mansoor',
+        phone: '+1 (800) 785-8260',
+        role: 'SUPER_ADMIN',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: superAdminPasswordHash,
+        createdAt: '2026-01-01T00:00:00Z',
+        updatedAt: '2026-01-01T00:00:00Z'
+      },
+      {
+        id: 'usr-super-admin-2',
+        email: 'admin@sultanhookah.com',
+        firstName: 'Farhan',
+        lastName: 'Al-Mansoor',
+        phone: '+1 (800) 785-8260',
+        role: 'SUPER_ADMIN',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: sultanAdminHash,
+        createdAt: '2026-01-01T00:00:00Z',
+        updatedAt: '2026-01-01T00:00:00Z'
+      },
+      {
+        id: 'usr-product-manager-1',
+        email: 'pm@sultan.com',
+        firstName: 'Dmitri',
+        lastName: 'Volkov',
+        phone: '+1 (555) 492-8821',
+        role: 'PRODUCT_MANAGER',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: false,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: staffPasswordHash,
+        createdAt: '2026-01-02T00:00:00Z',
+        updatedAt: '2026-01-02T00:00:00Z'
+      },
+      {
+        id: 'usr-manager-2',
+        email: 'manager@sultanhookah.com',
+        firstName: 'Dmitri',
+        lastName: 'Volkov',
+        phone: '+1 (555) 492-8821',
+        role: 'STORE_MANAGER',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: false,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: sultanManagerHash,
+        createdAt: '2026-01-02T00:00:00Z',
+        updatedAt: '2026-01-02T00:00:00Z'
+      },
+      {
+        id: 'usr-support-1',
+        email: 'support@sultan.com',
+        firstName: 'Sarah',
+        lastName: 'Jenkins',
+        phone: '+1 (555) 381-9922',
+        role: 'CUSTOMER_SUPPORT',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: false,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: staffPasswordHash,
+        createdAt: '2026-01-03T00:00:00Z',
+        updatedAt: '2026-01-03T00:00:00Z'
+      },
+      {
+        id: 'usr-customer-1',
+        email: 'customer@example.com',
+        firstName: 'Julian',
+        lastName: 'Vance',
+        phone: '+1 (555) 219-4402',
+        role: 'CUSTOMER',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 733.95,
+        orderCount: 2,
+        passwordHash: customerPasswordHash,
+        createdAt: '2026-01-10T00:00:00Z',
+        updatedAt: '2026-01-10T00:00:00Z'
+      },
+      {
+        id: 'usr-vip-2',
+        email: 'vip@sultanhookah.com',
+        firstName: 'Julian',
+        lastName: 'Vance',
+        phone: '+1 (555) 219-4402',
+        role: 'CUSTOMER',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 1250.00,
+        orderCount: 4,
+        passwordHash: sultanVipHash,
+        createdAt: '2026-01-10T00:00:00Z',
+        updatedAt: '2026-01-10T00:00:00Z'
+      }
+    ];
   }
 
   public async init() {
@@ -237,160 +412,8 @@ export class DatabaseStore {
       { id: 'med-6', url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop', alt: 'Silver Heat Management Device', category: 'Accessories', size: '980 KB', createdAt: new Date().toISOString() }
     ];
 
-    // Seed default administrative users and demo customer
-    const superAdminPasswordHash = await bcrypt.hash('Admin123!', 10);
-    const sultanAdminHash = await bcrypt.hash('Sultan@Admin2026!', 10);
-    const staffPasswordHash = await bcrypt.hash('Staff123!', 10);
-    const sultanManagerHash = await bcrypt.hash('Sultan@Manager2026!', 10);
-    const customerPasswordHash = await bcrypt.hash('Customer123!', 10);
-    const sultanVipHash = await bcrypt.hash('Sultan@Vip2026!', 10);
-
-    this.users = [
-      {
-        id: 'usr-ehtesham-root',
-        email: 'ehtesham4628@gmail.com',
-        firstName: 'Ehtesham',
-        lastName: 'Admin',
-        phone: '+1 (800) 785-8260',
-        role: 'SUPER_ADMIN',
-        status: 'ACTIVE',
-        isEmailVerified: true,
-        isPhoneVerified: true,
-        totalSpent: 0,
-        orderCount: 0,
-        passwordHash: superAdminPasswordHash,
-        createdAt: '2026-01-01T00:00:00Z',
-        updatedAt: '2026-01-01T00:00:00Z'
-      },
-      {
-        id: 'usr-super-admin-0',
-        email: 'admin@fumarehookah.com',
-        firstName: 'Fumare Hookah',
-        lastName: 'Administrator',
-        phone: '+1 (800) 785-8260',
-        role: 'SUPER_ADMIN',
-        status: 'ACTIVE',
-        isEmailVerified: true,
-        isPhoneVerified: true,
-        totalSpent: 0,
-        orderCount: 0,
-        passwordHash: superAdminPasswordHash,
-        createdAt: '2026-01-01T00:00:00Z',
-        updatedAt: '2026-01-01T00:00:00Z'
-      },
-      {
-        id: 'usr-super-admin-1',
-        email: 'admin@sultan.com',
-        firstName: 'Farhan',
-        lastName: 'Al-Mansoor',
-        phone: '+1 (800) 785-8260',
-        role: 'SUPER_ADMIN',
-        status: 'ACTIVE',
-        isEmailVerified: true,
-        isPhoneVerified: true,
-        totalSpent: 0,
-        orderCount: 0,
-        passwordHash: superAdminPasswordHash,
-        createdAt: '2026-01-01T00:00:00Z',
-        updatedAt: '2026-01-01T00:00:00Z'
-      },
-      {
-        id: 'usr-super-admin-2',
-        email: 'admin@sultanhookah.com',
-        firstName: 'Farhan',
-        lastName: 'Al-Mansoor',
-        phone: '+1 (800) 785-8260',
-        role: 'SUPER_ADMIN',
-        status: 'ACTIVE',
-        isEmailVerified: true,
-        isPhoneVerified: true,
-        totalSpent: 0,
-        orderCount: 0,
-        passwordHash: sultanAdminHash,
-        createdAt: '2026-01-01T00:00:00Z',
-        updatedAt: '2026-01-01T00:00:00Z'
-      },
-      {
-        id: 'usr-product-manager-1',
-        email: 'pm@sultan.com',
-        firstName: 'Dmitri',
-        lastName: 'Volkov',
-        phone: '+1 (555) 492-8821',
-        role: 'PRODUCT_MANAGER',
-        status: 'ACTIVE',
-        isEmailVerified: true,
-        isPhoneVerified: false,
-        totalSpent: 0,
-        orderCount: 0,
-        passwordHash: staffPasswordHash,
-        createdAt: '2026-01-02T00:00:00Z',
-        updatedAt: '2026-01-02T00:00:00Z'
-      },
-      {
-        id: 'usr-manager-2',
-        email: 'manager@sultanhookah.com',
-        firstName: 'Dmitri',
-        lastName: 'Volkov',
-        phone: '+1 (555) 492-8821',
-        role: 'STORE_MANAGER',
-        status: 'ACTIVE',
-        isEmailVerified: true,
-        isPhoneVerified: false,
-        totalSpent: 0,
-        orderCount: 0,
-        passwordHash: sultanManagerHash,
-        createdAt: '2026-01-02T00:00:00Z',
-        updatedAt: '2026-01-02T00:00:00Z'
-      },
-      {
-        id: 'usr-support-1',
-        email: 'support@sultan.com',
-        firstName: 'Sarah',
-        lastName: 'Jenkins',
-        phone: '+1 (555) 381-9922',
-        role: 'CUSTOMER_SUPPORT',
-        status: 'ACTIVE',
-        isEmailVerified: true,
-        isPhoneVerified: false,
-        totalSpent: 0,
-        orderCount: 0,
-        passwordHash: staffPasswordHash,
-        createdAt: '2026-01-03T00:00:00Z',
-        updatedAt: '2026-01-03T00:00:00Z'
-      },
-      {
-        id: 'usr-customer-1',
-        email: 'customer@example.com',
-        firstName: 'Julian',
-        lastName: 'Vance',
-        phone: '+1 (555) 219-4402',
-        role: 'CUSTOMER',
-        status: 'ACTIVE',
-        isEmailVerified: true,
-        isPhoneVerified: true,
-        totalSpent: 733.95,
-        orderCount: 2,
-        passwordHash: customerPasswordHash,
-        createdAt: '2026-01-10T00:00:00Z',
-        updatedAt: '2026-01-10T00:00:00Z'
-      },
-      {
-        id: 'usr-vip-2',
-        email: 'vip@sultanhookah.com',
-        firstName: 'Julian',
-        lastName: 'Vance',
-        phone: '+1 (555) 219-4402',
-        role: 'CUSTOMER',
-        status: 'ACTIVE',
-        isEmailVerified: true,
-        isPhoneVerified: true,
-        totalSpent: 1250.00,
-        orderCount: 4,
-        passwordHash: sultanVipHash,
-        createdAt: '2026-01-10T00:00:00Z',
-        updatedAt: '2026-01-10T00:00:00Z'
-      }
-    ];
+    // Seed default administrative users and demo customer if not already seeded
+    this.seedDefaultUsers();
 
     // Seed addresses for demo customer
     this.addresses = [

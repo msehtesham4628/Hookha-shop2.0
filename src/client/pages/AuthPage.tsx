@@ -80,8 +80,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
   const [regOtpCode, setRegOtpCode] = useState('');
   const [regOtpVerified, setRegOtpVerified] = useState(false);
   const [regOtpLoading, setRegOtpLoading] = useState(false);
-  // "Adress"
-  const [regAddress, setRegAddress] = useState('');
+  // 5 Address Fields: House / flat /office no, Area/road name/colony, City, State, Pincode
+  const [regHouseNo, setRegHouseNo] = useState('');
+  const [regAreaRoad, setRegAreaRoad] = useState('');
+  const [regCity, setRegCity] = useState('');
+  const [regState, setRegState] = useState('');
+  const [regPincode, setRegPincode] = useState('');
   // "Create password" & "Re enter password"
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
@@ -250,8 +254,28 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
       return;
     }
 
-    if (!regAddress.trim()) {
-      setErrorMsg('Please provide your address.');
+    if (!regHouseNo.trim()) {
+      setErrorMsg('Please enter your House / flat /office no.');
+      return;
+    }
+
+    if (!regAreaRoad.trim()) {
+      setErrorMsg('Please enter your Area/road name/colony.');
+      return;
+    }
+
+    if (!regCity.trim()) {
+      setErrorMsg('Please enter your City.');
+      return;
+    }
+
+    if (!regState.trim()) {
+      setErrorMsg('Please enter your State.');
+      return;
+    }
+
+    if (!regPincode.trim()) {
+      setErrorMsg('Please enter your Pincode.');
       return;
     }
 
@@ -265,6 +289,22 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
       return;
     }
 
+    const fullFormattedAddress = [
+      regHouseNo.trim(),
+      regAreaRoad.trim(),
+      regCity.trim(),
+      regState.trim(),
+      regPincode.trim() ? `PIN: ${regPincode.trim()}` : ''
+    ].filter(Boolean).join(', ');
+
+    const addressDetails = {
+      houseNo: regHouseNo.trim(),
+      areaRoad: regAreaRoad.trim(),
+      city: regCity.trim(),
+      state: regState.trim(),
+      pincode: regPincode.trim()
+    };
+
     try {
       setLoading(true);
       const res = await api.register({
@@ -272,7 +312,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
         lastName: regSecondName.trim(),
         email: emailVal,
         phone: phoneVal,
-        address: regAddress.trim(),
+        address: fullFormattedAddress,
+        addressDetails,
         password: regPassword,
         otpCode: regOtpCode.trim() || undefined
       });
@@ -428,6 +469,34 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
               {mode === 'register' && 'Create your new customer account'}
               {mode === 'forgot' && 'Reset your password via Email or Mobile OTP'}
             </p>
+
+            {/* Top Navigation Tabs */}
+            <div className="grid grid-cols-2 p-1 bg-stone-100 rounded-xs text-xs font-semibold mt-4">
+              <button
+                id="auth-tab-login"
+                type="button"
+                onClick={() => switchMode('login')}
+                className={`py-2 text-center rounded-xs transition-colors cursor-pointer ${
+                  mode === 'login'
+                    ? 'bg-white text-stone-900 shadow-2xs font-bold'
+                    : 'text-stone-500 hover:text-stone-900'
+                }`}
+              >
+                Login
+              </button>
+              <button
+                id="auth-tab-register"
+                type="button"
+                onClick={() => switchMode('register')}
+                className={`py-2 text-center rounded-xs transition-colors cursor-pointer ${
+                  mode === 'register'
+                    ? 'bg-white text-stone-900 shadow-2xs font-bold'
+                    : 'text-stone-500 hover:text-stone-900'
+                }`}
+              >
+                Register / New User
+              </button>
+            </div>
           </div>
 
           {/* Feedback Banners */}
@@ -545,6 +614,51 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
                 >
                   Forget password?
                 </button>
+              </div>
+
+              {/* Quick Fill Demo Credentials */}
+              <div className="mt-4 pt-3 border-t border-stone-200/80 bg-stone-50/80 -mx-6 -mb-6 p-4 rounded-b-sm">
+                <p className="text-[11px] font-medium text-stone-600 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <KeyRound className="w-3.5 h-3.5 text-amber-800" />
+                  Quick Fill Test Accounts
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    id="quick-fill-admin-btn"
+                    onClick={() => {
+                      setLoginUser('admin@worldhookahmarket.com');
+                      setLoginPassword('Admin123!');
+                      setErrorMsg('');
+                    }}
+                    className="text-left p-2 rounded-xs border border-stone-200 bg-white hover:border-amber-700 hover:bg-amber-50/40 transition-colors text-xs cursor-pointer"
+                  >
+                    <div className="font-semibold text-stone-800 flex items-center justify-between text-xs">
+                      <span>Administrator</span>
+                      <span className="text-[10px] text-amber-800 font-mono bg-amber-100/60 px-1 py-0.5 rounded">fill</span>
+                    </div>
+                    <div className="text-[10px] text-stone-500 truncate mt-0.5">admin@worldhookahmarket.com</div>
+                    <div className="text-[10px] text-stone-400 font-mono">Admin123!</div>
+                  </button>
+
+                  <button
+                    type="button"
+                    id="quick-fill-customer-btn"
+                    onClick={() => {
+                      setLoginUser('customer@example.com');
+                      setLoginPassword('Customer123!');
+                      setErrorMsg('');
+                    }}
+                    className="text-left p-2 rounded-xs border border-stone-200 bg-white hover:border-amber-700 hover:bg-amber-50/40 transition-colors text-xs cursor-pointer"
+                  >
+                    <div className="font-semibold text-stone-800 flex items-center justify-between text-xs">
+                      <span>Customer VIP</span>
+                      <span className="text-[10px] text-amber-800 font-mono bg-amber-100/60 px-1 py-0.5 rounded">fill</span>
+                    </div>
+                    <div className="text-[10px] text-stone-500 truncate mt-0.5">customer@example.com</div>
+                    <div className="text-[10px] text-stone-400 font-mono">Customer123!</div>
+                  </button>
+                </div>
               </div>
             </form>
           )}
@@ -739,21 +853,91 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
                 </div>
               )}
 
-              {/* Adress */}
-              <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">
-                  Adress * <span className="text-stone-400 font-normal">(Delivery / Street, City, ZIP)</span>
-                </label>
-                <div className="relative">
-                  <MapPin className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
+              {/* Address Fields: House/flat/office, Area/road/colony, City, State, Pincode */}
+              <div className="pt-2 border-t border-stone-200/80 space-y-3">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-stone-800 uppercase tracking-wider">
+                  <MapPin className="w-3.5 h-3.5 text-amber-800" />
+                  <span>Address Details</span>
+                </div>
+
+                {/* 1. House / flat /office no */}
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    House / flat /office no *
+                  </label>
                   <input
-                    id="register-address-input"
+                    id="register-house-no-input"
                     type="text"
                     required
-                    value={regAddress}
-                    onChange={(e) => setRegAddress(e.target.value)}
-                    placeholder="123 Luxury Way, Suite 400, Miami FL 33101"
-                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs pl-9 pr-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
+                    value={regHouseNo}
+                    onChange={(e) => setRegHouseNo(e.target.value)}
+                    placeholder="e.g. Flat 402, Building 3 / Office 12B"
+                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
+                  />
+                </div>
+
+                {/* 2. Area/road name/colony */}
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    Area/road name/colony *
+                  </label>
+                  <input
+                    id="register-area-road-input"
+                    type="text"
+                    required
+                    value={regAreaRoad}
+                    onChange={(e) => setRegAreaRoad(e.target.value)}
+                    placeholder="e.g. MG Road, Indiranagar / Palm Jumeirah"
+                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
+                  />
+                </div>
+
+                {/* 3. City & 4. State */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      City *
+                    </label>
+                    <input
+                      id="register-city-input"
+                      type="text"
+                      required
+                      value={regCity}
+                      onChange={(e) => setRegCity(e.target.value)}
+                      placeholder="e.g. Mumbai, Dubai, New York"
+                      className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      State *
+                    </label>
+                    <input
+                      id="register-state-input"
+                      type="text"
+                      required
+                      value={regState}
+                      onChange={(e) => setRegState(e.target.value)}
+                      placeholder="e.g. Maharashtra, California"
+                      className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                {/* 5. Pincode */}
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    Pincode *
+                  </label>
+                  <input
+                    id="register-pincode-input"
+                    type="text"
+                    required
+                    value={regPincode}
+                    onChange={(e) => setRegPincode(e.target.value)}
+                    placeholder="e.g. 400001 or 560038"
+                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs px-3 py-2 rounded-xs focus:bg-white focus:outline-none focus:border-amber-800 transition-colors font-mono"
                   />
                 </div>
               </div>

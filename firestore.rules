@@ -55,7 +55,9 @@ service cloud.firestore {
              (!('phone' in data) || (data.phone is string && data.phone.size() <= 30)) &&
              (!('avatarUrl' in data) || (data.avatarUrl is string && data.avatarUrl.size() <= 1024)) &&
              (!('isWholesaleCustomer' in data) || data.isWholesaleCustomer is bool) &&
-             (!('wholesaleCompany' in data) || (data.wholesaleCompany is string && data.wholesaleCompany.size() <= 200));
+             (!('wholesaleCompany' in data) || (data.wholesaleCompany is string && data.wholesaleCompany.size() <= 200)) &&
+             (!('address' in data) || (data.address is string && data.address.size() <= 1000)) &&
+             (!('addressDetails' in data) || data.addressDetails is map);
     }
 
     function isValidProduct(data) {
@@ -121,7 +123,7 @@ service cloud.firestore {
       
       // Customer profile updates: cannot alter role or status directly unless admin
       allow update: if isValidId(userId) && (
-        (isOwner(userId) && isValidUser(incoming()) && incoming().role == existing().role && incoming().status == existing().status && incoming().diff(existing()).affectedKeys().hasOnly(['firstName', 'lastName', 'phone', 'avatarUrl', 'wholesaleCompany', 'updatedAt'])) ||
+        (isOwner(userId) && isValidUser(incoming()) && incoming().role == existing().role && incoming().status == existing().status && incoming().diff(existing()).affectedKeys().hasOnly(['firstName', 'lastName', 'phone', 'avatarUrl', 'wholesaleCompany', 'address', 'addressDetails', 'updatedAt'])) ||
         isAdmin()
       );
       

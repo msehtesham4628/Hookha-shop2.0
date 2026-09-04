@@ -56,26 +56,83 @@ class ApiClient {
 
     try {
       const response = await fetch(url, { ...options, headers });
-      const data = await response.json();
+      const contentType = response.headers.get('content-type') || '';
+
+      let data: any;
+      if (contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = {
+            success: false,
+            error: {
+              code: response.ok ? 'INVALID_FORMAT' : 'HTTP_ERROR',
+              message: response.ok
+                ? 'Server returned non-JSON response format.'
+                : `Request failed with HTTP status ${response.status} (${response.statusText || 'Error'})`
+            }
+          };
+        }
+      }
 
       if (!response.ok) {
-        if (response.status === 401) {
+        // Only clear stored auth token if the session token itself is invalid or expired
+        if (response.status === 401 && data?.error?.code === 'INVALID_TOKEN') {
           localStorage.removeItem('sultan_auth_token');
         }
-        throw new Error(data.error?.message || `Request failed with status ${response.status}`);
+        throw new Error(data?.error?.message || `Request failed with status ${response.status}`);
       }
 
       return data;
     } catch (err: any) {
-      console.error(`[API Error] ${options.method || 'GET'} ${endpoint}:`, err);
+      // Don't format expected user-level authentication responses as system-level [API Error] crashes
+      if (endpoint.startsWith('/auth/login') || endpoint.startsWith('/auth/admin-login') || endpoint.startsWith('/auth/otp')) {
+        console.warn(`[Auth Notice] ${options.method || 'GET'} ${endpoint}:`, err.message);
+      } else {
+        console.error(`[API Error] ${options.method || 'GET'} ${endpoint}:`, err);
+      }
       throw err;
     }
   }
 
   // --- Auth Endpoints ---
-  public async register(payload: { email?: string; password: string; firstName: string; lastName: string; phone?: string; address?: string; otpCode?: string }) {
+  public async register(payload: {
+    email?: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    address?: string;
+    addressDetails?: {
+      houseNo?: string;
+      areaRoad?: string;
+      city?: string;
+      state?: string;
+      pincode?: string;
+    };
+    otpCode?: string;
+  }) {
     return this.request<{ success: boolean; data: { user: User; token: string } }>('/auth/register', {
       method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  public async updateAddress(payload: {
+    address?: string;
+    addressDetails?: {
+      houseNo?: string;
+      areaRoad?: string;
+      city?: string;
+      state?: string;
+      pincode?: string;
+    };
+  }) {
+    return this.request<{ success: boolean; data: { user: User } }>('/auth/address', {
+      method: 'PUT',
       body: JSON.stringify(payload)
     });
   }
@@ -385,6 +442,22 @@ class ApiClient {
 
   public async getAdminCustomers() {
     return this.request<{ success: boolean; data: User[] }>('/admin/customers');
+  }
+
+  public async downloadCustomersExcel(): Promise<Blob> {
+    const res = await fetch(`${API_BASE}/admin/export/customers/excel`, {
+      headers: this.getHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to export customer data');
+    return res.blob();
+  }
+
+  public async downloadInventoryExcel(): Promise<Blob> {
+    const res = await fetch(`${API_BASE}/admin/export/inventory/excel`, {
+      headers: this.getHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to export inventory data');
+    return res.blob();
   }
 
   public async toggleSuspendCustomer(id: string) {

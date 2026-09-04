@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
+import * as XLSX from 'xlsx';
 import { db } from '../db/store.js';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth.middleware.js';
 import { requirePermission, requireRole } from '../middleware/rbac.middleware.js';
@@ -1275,6 +1276,164 @@ router.post('/mongodb/reconnect', async (req: AuthenticatedRequest, res) => {
     return res.json({ success: connected, data: mongoService.getStatus() });
   } catch (err: any) {
     return res.status(500).json({ success: false, error: { code: 'RECONNECT_ERROR', message: err.message } });
+  }
+});
+
+// ==========================================
+// 10. EXCEL EXPORTS (CUSTOMERS & INVENTORY)
+// ==========================================
+
+// GET /api/admin/export/customers/excel
+router.get('/export/customers/excel', requirePermission('customers.view'), (req: AuthenticatedRequest, res) => {
+  try {
+    const customers = db.users.filter(u => u.role === 'CUSTOMER');
+    const rows = customers.map((c, index) => ({
+      '#': index + 1,
+      'Customer ID': c.id,
+      'First Name': c.firstName || '',
+      'Last Name': c.lastName || '',
+      'Full Name': `${c.firstName || ''} ${c.lastName || ''}`.trim(),
+      'Email Address': c.email || '',
+      'Phone Number': c.phone || '',
+      'Role': c.role || 'CUSTOMER',
+      'Account Status': c.status || 'ACTIVE',
+      'House / Flat / Office No': c.addressDetails?.houseNo || '',
+      'Area / Road / Colony': c.addressDetails?.areaRoad || '',
+      'City': c.addressDetails?.city || '',
+      'State': c.addressDetails?.state || '',
+      'Pincode': c.addressDetails?.pincode || '',
+      'Full Delivery Address': c.address || '',
+      '21+ Age Verified': 'Yes',
+      'Email Verified': c.isEmailVerified ? 'Yes' : 'No',
+      'Phone Verified': c.isPhoneVerified ? 'Yes' : 'No',
+      'Total Orders': c.orderCount || 0,
+      'Total Spent ($)': Number((c.totalSpent || 0).toFixed(2)),
+      'Wholesale Customer': c.isWholesaleCustomer ? 'Yes' : 'No',
+      'Wholesale Company': c.wholesaleCompany || '',
+      'Registration Date': c.createdAt ? new Date(c.createdAt).toISOString().replace('T', ' ').substring(0, 16) : '',
+      'Last Login': c.lastLoginAt ? new Date(c.lastLoginAt).toISOString().replace('T', ' ').substring(0, 16) : ''
+    }));
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+
+    // Auto column widths
+    const colKeys = rows.length > 0 ? Object.keys(rows[0]) : [];
+    ws['!cols'] = colKeys.map(key => {
+      let maxLen = key.length;
+      for (const r of rows) {
+        const val = (r as any)[key];
+        const str = val !== null && val !== undefined ? String(val) : '';
+        if (str.length > maxLen) maxLen = str.length;
+      }
+      return { wch: Math.min(Math.max(maxLen + 3, 10), 60) };
+    });
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Customers');
+    const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+
+    const exportDate = new Date().toISOString().split('T')[0];
+    const filename = `fumare_customers_${exportDate}.xlsx`;
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    return res.send(buffer);
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: { code: 'EXPORT_FAILED', message: err.message } });
+  }
+});
+
+// GET /api/admin/export/inventory/excel
+router.get('/export/inventory/excel', requirePermission('inventory.view'), (req: AuthenticatedRequest, res) => {
+  try {
+    const products = db.products;
+
+    const inventoryRows = products.map((p, index) => {
+      let stockStatus = 'In Stock';
+      if (p.stock === 0) stockStatus = 'Out of Stock';
+      else if (p.stock <= (p.lowStockThreshold || 5)) stockStatus = 'Low Stock';
+
+      const price = Number(p.price || 0);
+      const totalValue = Number((price * (p.stock || 0)).toFixed(2));
+
+      return {
+        '#': index + 1,
+        'Product ID': p.id,
+        'SKU': p.sku || '',
+        'Product Name': p.name || '',
+        'Category': p.category || '',
+        'Subcategory': p.subcategory || '',
+        'Brand': p.brand || '',
+        'Stock Quantity': p.stock || 0,
+        'Low Stock Alert Level': p.lowStockThreshold || 5,
+        'Stock Status': stockStatus,
+        'Retail Price ($)': price,
+        'Sale Price ($)': p.salePrice !== undefined && p.salePrice !== null ? Number(p.salePrice) : '',
+        'Total Stock Value ($)': totalValue,
+        'Flavor / Aroma': p.flavor || '',
+        'Material': p.material || '',
+        'Color / Finish': p.color || '',
+        'Weight (g)': p.weight || '',
+        '21+ Age Restricted': p.ageRestricted ? 'Yes' : 'No',
+        'Active In Store': p.isActive !== false ? 'Yes' : 'No',
+        'Best Seller': p.isBestSeller ? 'Yes' : 'No',
+        'On Sale': p.isOnSale ? 'Yes' : 'No',
+        'Featured': p.isFeatured ? 'Yes' : 'No',
+        'Customer Rating': p.rating ? Number(p.rating.toFixed(1)) : 5.0,
+        'Reviews Count': p.reviewCount || 0,
+        'Primary Image URL': p.images?.[0]?.url || '',
+        'Date Created': p.createdAt ? new Date(p.createdAt).toISOString().replace('T', ' ').substring(0, 16) : '',
+        'Last Updated': p.updatedAt ? new Date(p.updatedAt).toISOString().replace('T', ' ').substring(0, 16) : ''
+      };
+    });
+
+    // Summary calculations
+    const totalItems = products.length;
+    const totalUnits = products.reduce((acc, p) => acc + (p.stock || 0), 0);
+    const totalValuation = products.reduce((acc, p) => acc + ((p.price || 0) * (p.stock || 0)), 0);
+    const outOfStockCount = products.filter((p) => p.stock === 0).length;
+    const lowStockCount = products.filter((p) => p.stock > 0 && p.stock <= (p.lowStockThreshold || 5)).length;
+    const inStockCount = products.filter((p) => p.stock > (p.lowStockThreshold || 5)).length;
+
+    const summaryRows = [
+      { 'Metric': 'Total Catalog SKUs', 'Value': totalItems },
+      { 'Metric': 'Total Physical Units in Stock', 'Value': totalUnits },
+      { 'Metric': 'Total Inventory Valuation ($)', 'Value': `$${totalValuation.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+      { 'Metric': 'Optimal Stocked Items', 'Value': inStockCount },
+      { 'Metric': 'Low Stock Alert Items', 'Value': lowStockCount },
+      { 'Metric': 'Out of Stock Items', 'Value': outOfStockCount },
+      { 'Metric': 'Report Generated At', 'Value': new Date().toLocaleString() }
+    ];
+
+    const wb = XLSX.utils.book_new();
+
+    const wsInventory = XLSX.utils.json_to_sheet(inventoryRows);
+    const colKeys = inventoryRows.length > 0 ? Object.keys(inventoryRows[0]) : [];
+    wsInventory['!cols'] = colKeys.map(key => {
+      let maxLen = key.length;
+      for (const r of inventoryRows) {
+        const val = (r as any)[key];
+        const str = val !== null && val !== undefined ? String(val) : '';
+        if (str.length > maxLen) maxLen = str.length;
+      }
+      return { wch: Math.min(Math.max(maxLen + 3, 10), 60) };
+    });
+    XLSX.utils.book_append_sheet(wb, wsInventory, 'Inventory Stock');
+
+    const wsSummary = XLSX.utils.json_to_sheet(summaryRows);
+    wsSummary['!cols'] = [{ wch: 35 }, { wch: 30 }];
+    XLSX.utils.book_append_sheet(wb, wsSummary, 'Inventory Overview');
+
+    const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+
+    const exportDate = new Date().toISOString().split('T')[0];
+    const filename = `fumare_inventory_${exportDate}.xlsx`;
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    return res.send(buffer);
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: { code: 'EXPORT_FAILED', message: err.message } });
   }
 });
 

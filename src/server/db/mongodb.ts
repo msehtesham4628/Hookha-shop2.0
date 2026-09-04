@@ -299,7 +299,33 @@ class MongoDatabaseService {
           this.getDocuments<any>('settings', { id: 'store_settings' })
         ]);
 
-        if (mongoUsers.length > 0) store.users = mongoUsers;
+        if (mongoUsers.length > 0) {
+          const userMap = new Map<string, User & { passwordHash?: string }>();
+          for (const u of store.users) {
+            userMap.set(u.email.toLowerCase(), u);
+          }
+          for (const u of mongoUsers) {
+            userMap.set(u.email.toLowerCase(), u);
+          }
+          // Ensure essential administrative and demo accounts are always preserved with valid credentials and active status
+          for (const u of store.users) {
+            const isPrivileged = u.email === 'admin@worldhookahmarket.com' || u.email === 'ehtesham4628@gmail.com' || u.email === 'customer@example.com' || u.role === 'SUPER_ADMIN';
+            if (isPrivileged) {
+              const existing = userMap.get(u.email.toLowerCase());
+              if (!existing) {
+                userMap.set(u.email.toLowerCase(), u);
+              } else {
+                // Keep known valid passwordHash and active status
+                existing.status = 'ACTIVE';
+                existing.role = u.role;
+                if (u.passwordHash) {
+                  existing.passwordHash = u.passwordHash;
+                }
+              }
+            }
+          }
+          store.users = Array.from(userMap.values());
+        }
         if (mongoOrders.length > 0) store.orders = mongoOrders;
         if (mongoCategories.length > 0) store.categories = mongoCategories;
         if (mongoBrands.length > 0) store.brands = mongoBrands;
