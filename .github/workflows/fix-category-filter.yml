@@ -1,0 +1,42 @@
+name: Fix category filter aliases
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: ${{ !contains(github.event.head_commit.message, '[category-filter-fixed]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Normalize category aliases
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('src/server/routes/product.routes.ts')
+          s = p.read_text()
+          old = """      const catLower = category.toLowerCase().trim();\n      result = result.filter(p =>\n        p.categorySlug === catLower ||\n        p.category.toLowerCase() === catLower ||\n        p.categorySlug.replace(/-/g, ' ') === catLower.replace(/-/g, ' ') ||\n        p.category.toLowerCase().replace(/\\s+/g, '-') === catLower\n      );"""
+          new = """      const catLower = category.toLowerCase().trim();\n      const categoryAliases: Record<string, string[]> = {\n        'e-hookah': ['e-hookah', 'e hookah', 'e-hookah & electronic', 'e hookah electronic', 'electronic hookah', 'electronic hookah heads'],\n        'vapes': ['vapes', 'vape', 'vapes & pod systems', 'vape & pod systems', 'pod systems', 'disposable vapes']\n      };\n      const aliases = categoryAliases[catLower] || [catLower];\n      result = result.filter(p => {\n        const pSlug = (p.categorySlug || '').toLowerCase().trim();\n        const pCategory = (p.category || '').toLowerCase().trim();\n        const pSlugSpaced = pSlug.replace(/-/g, ' ');\n        const pCategorySlug = pCategory.replace(/\\s+/g, '-');\n        return aliases.some(alias => {\n          const a = alias.toLowerCase().trim();\n          return pSlug === a || pCategory === a || pSlugSpaced === a.replace(/-/g, ' ') || pCategorySlug === a.replace(/\\s+/g, '-');\n        });\n      });"""
+          if old not in s:
+              raise SystemExit('Expected category filter block not found')
+          s = s.replace(old, new, 1)
+          marker = '// [category-filter-fixed]'
+          if marker not in s:
+              s = s.replace("import { Router } from 'express';", "import { Router } from 'express';\n\n// [category-filter-fixed]", 1)
+          p.write_text(s)
+          PY
+
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/server/routes/product.routes.ts
+          git diff --cached --quiet || git commit -m "fix: normalize e-hookah and vape category aliases [category-filter-fixed]"
+          git push
