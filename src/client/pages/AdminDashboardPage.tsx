@@ -30,6 +30,7 @@ import {
   Truck,
   DollarSign,
   AlertTriangle,
+  AlertCircle,
   RotateCcw,
   ArrowRight,
   Eye,
@@ -56,10 +57,28 @@ import {
   UserX,
   Key,
   CheckSquare,
-  Square
+  Square,
+  ChevronLeft,
+  ChevronRight,
+  Filter
 } from 'lucide-react';
 import { BulkProductUpdateModal } from '../components/BulkProductUpdateModal.js';
 import { exportCustomersToExcel, exportInventoryToExcel } from '../utils/excelExport.js';
+
+function getCatalogPageNumbers(current: number, total: number): (number | string)[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  const pages: (number | string)[] = [];
+  if (current <= 4) {
+    pages.push(1, 2, 3, 4, 5, '...', total);
+  } else if (current >= total - 3) {
+    pages.push(1, '...', total - 4, total - 3, total - 2, total - 1, total);
+  } else {
+    pages.push(1, '...', current - 1, current, current + 1, '...', total);
+  }
+  return pages;
+}
 
 interface AdminDashboardProps {
   onNavigate: (path: string) => void;
@@ -157,6 +176,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [staffPassword, setStaffPassword] = useState('');
   const [staffFirstName, setStaffFirstName] = useState('');
   const [staffLastName, setStaffLastName] = useState('');
+  const [staffPhone, setStaffPhone] = useState('');
   const [staffRole, setStaffRole] = useState('PRODUCT_SPECIALIST');
 
   // Staff Management State
@@ -169,6 +189,18 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [editStaffRole, setEditStaffRole] = useState('PRODUCT_SPECIALIST');
   const [editStaffStatus, setEditStaffStatus] = useState<'ACTIVE' | 'SUSPENDED'>('ACTIVE');
   const [editStaffPassword, setEditStaffPassword] = useState('');
+  const [staffToDelete, setStaffToDelete] = useState<User | null>(null);
+
+  // Catalog Pagination & Filtering State
+  const [catalogPage, setCatalogPage] = useState<number>(1);
+  const [catalogLimit, setCatalogLimit] = useState<number>(50);
+  const [catalogCategory, setCatalogCategory] = useState<string>('');
+  const [catalogBrand, setCatalogBrand] = useState<string>('');
+  const [catalogStockFilter, setCatalogStockFilter] = useState<string>('all');
+  const [catalogSortBy, setCatalogSortBy] = useState<string>('newest');
+  const [catalogTotalPages, setCatalogTotalPages] = useState<number>(1);
+  const [catalogLoading, setCatalogLoading] = useState<boolean>(false);
+  const [jumpPageInput, setJumpPageInput] = useState<string>('');
 
   // Bulk Product Selection & Actions State
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
@@ -323,7 +355,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         staffRes
       ] = await Promise.all([
         api.getAnalytics().catch(() => ({ success: false, data: null })),
-        api.getProducts({ limit: 500 }).catch(() => ({ success: false, data: { products: [] } })),
+        api.getProducts({ page: 1, limit: catalogLimit, sort: catalogSortBy }).catch(() => ({ success: false, data: { products: [] } })),
         api.getAdminOrders().catch(() => ({ success: false, data: [] })),
         api.getAdminCustomers().catch(() => ({ success: false, data: [] })),
         api.getWholesaleApplications().catch(() => ({ success: false, data: [] })),
@@ -345,8 +377,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       if (productsRes.success && productsRes.data) {
         setProducts(productsRes.data.products || []);
         const pagination = (productsRes.data as any).pagination;
-        if (pagination?.totalCount) {
-          setTotalProductsCount(pagination.totalCount);
+        if (pagination) {
+          setTotalProductsCount(pagination.totalCount || 0);
+          setCatalogTotalPages(pagination.totalPages || 1);
+          setCatalogPage(pagination.page || 1);
+        } else {
+          setTotalProductsCount(productsRes.data.products?.length || 0);
+          setCatalogTotalPages(1);
         }
       }
       if (ordersRes.success && ordersRes.data) {
@@ -523,6 +560,45 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
+  const fetchAdminCatalog = async (
+    page: number = catalogPage,
+    limit: number = catalogLimit,
+    search: string = adminSearch,
+    category: string = catalogCategory,
+    brand: string = catalogBrand,
+    stockStatus: string = catalogStockFilter,
+    sort: string = catalogSortBy
+  ) => {
+    try {
+      setCatalogLoading(true);
+      const params: Record<string, any> = {
+        page,
+        limit: limit === -1 ? 10000 : limit,
+        q: search ? search.trim() : undefined,
+        category: category || undefined,
+        brand: brand || undefined,
+        stockStatus: stockStatus !== 'all' ? stockStatus : undefined,
+        sort
+      };
+      const res = await api.getProducts(params);
+      if (res.success && res.data) {
+        setProducts(res.data.products || []);
+        if (res.data.pagination) {
+          setTotalProductsCount(res.data.pagination.totalCount);
+          setCatalogTotalPages(res.data.pagination.totalPages);
+          setCatalogPage(res.data.pagination.page);
+        } else {
+          setTotalProductsCount(res.data.products?.length || 0);
+          setCatalogTotalPages(1);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch admin catalog products:', err);
+    } finally {
+      setCatalogLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!isAdmin) return;
 
@@ -548,9 +624,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         }).catch(() => {});
       } else if (event.type === 'INVENTORY_UPDATED' || event.type === 'PRODUCT_UPDATED') {
         // Refresh catalog inventory table
-        api.getProducts({ limit: 500 }).then(pRes => {
-          if (pRes.success && pRes.data) setProducts(pRes.data.products || []);
-        }).catch(() => {});
+        fetchAdminCatalog();
       }
     });
 
@@ -607,6 +681,23 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       window.removeEventListener('focus', handleVisibility);
     };
   }, [isAdmin]);
+
+  // Fetch products whenever catalog pagination or filters change
+  useEffect(() => {
+    if (activeTab === 'products') {
+      fetchAdminCatalog(catalogPage, catalogLimit, adminSearch, catalogCategory, catalogBrand, catalogStockFilter, catalogSortBy);
+    }
+  }, [catalogPage, catalogLimit, catalogCategory, catalogBrand, catalogStockFilter, catalogSortBy, activeTab]);
+
+  // Debounced search for catalog filter
+  useEffect(() => {
+    if (activeTab !== 'products') return;
+    const timer = setTimeout(() => {
+      setCatalogPage(1);
+      fetchAdminCatalog(1, catalogLimit, adminSearch, catalogCategory, catalogBrand, catalogStockFilter, catalogSortBy);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [adminSearch]);
 
   // Derived stats with safe fallbacks
   const statsRevenue = analytics?.totalRevenue ?? analytics?.stats?.totalRevenue ?? orders.reduce((acc, o) => acc + (o.grandTotal || o.total || 0), 0);
@@ -941,19 +1032,22 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     e.preventDefault();
     try {
       const res = await api.createStaffAccount({
-        email: staffEmail,
-        password: staffPassword,
-        firstName: staffFirstName,
-        lastName: staffLastName,
+        email: staffEmail.trim(),
+        password: staffPassword.trim(),
+        firstName: staffFirstName.trim(),
+        lastName: staffLastName.trim(),
+        phone: staffPhone.trim() || undefined,
         role: staffRole
       });
       if (res.success) {
-        showToast('Staff credentials generated & active!', 'success');
+        showToast(`Staff member "${staffEmail}" provisioned with role ${staffRole}`, 'success');
         setIsStaffModalOpen(false);
         setStaffEmail('');
         setStaffPassword('');
         setStaffFirstName('');
         setStaffLastName('');
+        setStaffPhone('');
+        setStaffRole('PRODUCT_SPECIALIST');
         loadAllAdminData();
       }
     } catch (err: any) {
@@ -998,14 +1092,25 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
-  const handleDeleteStaff = async (id: string, email: string) => {
-    if (!window.confirm(`Are you sure you want to revoke access and delete staff account "${email}"? This action cannot be undone.`)) {
-      return;
-    }
+  const handleQuickChangeStaffRole = async (staffId: string, staffEmail: string, newRole: string) => {
     try {
-      const res = await api.deleteAdminStaff(id);
+      const res = await api.updateAdminStaff(staffId, { role: newRole });
       if (res.success) {
-        showToast(`Staff account "${email}" removed`, 'success');
+        showToast(`Updated role for ${staffEmail} to ${newRole}`, 'success');
+        loadAllAdminData();
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to update staff role', 'error');
+    }
+  };
+
+  const handleConfirmDeleteStaff = async () => {
+    if (!staffToDelete) return;
+    try {
+      const res = await api.deleteAdminStaff(staffToDelete.id);
+      if (res.success) {
+        showToast(`Staff account "${staffToDelete.email}" removed successfully`, 'success');
+        setStaffToDelete(null);
         loadAllAdminData();
       }
     } catch (err: any) {
@@ -1164,15 +1269,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     return true;
   });
 
-  const filteredProducts = products.filter(p => {
-    if (!adminSearch) return true;
-    const q = adminSearch.toLowerCase();
-    return (
-      (p.name || '').toLowerCase().includes(q) ||
-      (p.brand || '').toLowerCase().includes(q) ||
-      (p.sku || '').toLowerCase().includes(q)
-    );
-  });
+  // Server-side paginated products for catalog view
+  const filteredProducts = products;
 
   if (isAuthLoading) {
     return (
@@ -1752,31 +1850,166 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </div>
                   </div>
 
-                  {/* Search Bar & Catalog Stats */}
-                  <div className="bg-white border border-stone-200 p-4 rounded-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
-                    <div className="flex items-center gap-3 flex-1">
-                      <Search className="w-4 h-4 text-stone-400 shrink-0" />
-                      <input
-                        type="text"
-                        placeholder="Filter catalog by product title, brand (e.g. Alpha, MustHave), or SKU..."
-                        value={adminSearch}
-                        onChange={(e) => setAdminSearch(e.target.value)}
-                        className="w-full text-xs text-stone-800 bg-transparent focus:outline-none"
-                      />
-                    </div>
-                    <div className="flex items-center gap-2 border-t sm:border-t-0 sm:border-l border-stone-200 pt-2 sm:pt-0 sm:pl-3">
-                      <div className="text-[11px] text-stone-500 font-medium whitespace-nowrap">
-                        Displaying <span className="font-bold text-stone-900 font-mono">{filteredProducts.length.toLocaleString()}</span> of <span className="font-bold text-amber-900 font-mono">{totalProductsCount.toLocaleString()}</span> items
+                  {/* Search Bar & Catalog Filters */}
+                  <div className="bg-white border border-stone-200 p-4 rounded-xs flex flex-col gap-3 shadow-2xs">
+                    {/* Row 1: Search bar & Counter & Export */}
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 flex-1 bg-stone-50 border border-stone-200 px-3 py-2 rounded-xs">
+                        <Search className="w-4 h-4 text-stone-400 shrink-0" />
+                        <input
+                          type="text"
+                          placeholder="Search products by title, SKU, brand, or specifications..."
+                          value={adminSearch}
+                          onChange={(e) => setAdminSearch(e.target.value)}
+                          className="w-full text-xs text-stone-800 bg-transparent focus:outline-none"
+                        />
+                        {adminSearch && (
+                          <button
+                            type="button"
+                            onClick={() => setAdminSearch('')}
+                            className="text-stone-400 hover:text-stone-600 text-xs font-semibold cursor-pointer"
+                          >
+                            Clear
+                          </button>
+                        )}
                       </div>
-                      {adminSearch && filteredProducts.length > 0 && (
-                        <button
-                          onClick={() => handleDownloadInventoryExcel(true)}
-                          disabled={exportingInventory}
-                          className="text-[11px] text-emerald-800 hover:text-emerald-900 font-semibold underline flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                          title="Export only currently filtered search results to Excel"
+                      <div className="flex items-center gap-2 border-t sm:border-t-0 sm:border-l border-stone-200 pt-2 sm:pt-0 sm:pl-3">
+                        <div className="text-[11px] text-stone-500 font-medium whitespace-nowrap">
+                          Displaying <span className="font-bold text-stone-900 font-mono">{filteredProducts.length.toLocaleString()}</span> of <span className="font-bold text-amber-900 font-mono">{totalProductsCount.toLocaleString()}</span> items
+                          {catalogTotalPages > 1 && (
+                            <span className="ml-1 text-stone-500 font-mono">(Page {catalogPage} of {catalogTotalPages})</span>
+                          )}
+                        </div>
+                        {catalogLoading && (
+                          <RefreshCw className="w-3.5 h-3.5 text-amber-900 animate-spin" />
+                        )}
+                        {adminSearch && filteredProducts.length > 0 && (
+                          <button
+                            onClick={() => handleDownloadInventoryExcel(true)}
+                            disabled={exportingInventory}
+                            className="text-[11px] text-emerald-800 hover:text-emerald-900 font-semibold underline flex items-center gap-1 cursor-pointer whitespace-nowrap ml-2"
+                            title="Export only currently filtered search results to Excel"
+                          >
+                            <Download className="w-3 h-3" />
+                            <span>Export Page ({filteredProducts.length})</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Row 2: Deep Filtering & Sorting Dropdowns */}
+                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-stone-100 text-xs">
+                      {/* Filter by Category */}
+                      <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-2.5 py-1.5 rounded-xs">
+                        <span className="text-[11px] text-stone-500 font-medium">Category:</span>
+                        <select
+                          value={catalogCategory}
+                          onChange={(e) => {
+                            setCatalogCategory(e.target.value);
+                            setCatalogPage(1);
+                          }}
+                          className="bg-transparent text-xs text-stone-800 font-medium focus:outline-none cursor-pointer"
                         >
-                          <Download className="w-3 h-3" />
-                          <span>Export Filtered ({filteredProducts.length})</span>
+                          <option value="">All Categories</option>
+                          {categories.map(c => (
+                            <option key={c.id} value={c.name}>{c.name}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Filter by Brand */}
+                      <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-2.5 py-1.5 rounded-xs">
+                        <span className="text-[11px] text-stone-500 font-medium">Brand:</span>
+                        <select
+                          value={catalogBrand}
+                          onChange={(e) => {
+                            setCatalogBrand(e.target.value);
+                            setCatalogPage(1);
+                          }}
+                          className="bg-transparent text-xs text-stone-800 font-medium focus:outline-none cursor-pointer"
+                        >
+                          <option value="">All Brands</option>
+                          {brands.map(b => (
+                            <option key={b.id} value={b.name}>{b.name}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Filter by Stock Status */}
+                      <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-2.5 py-1.5 rounded-xs">
+                        <span className="text-[11px] text-stone-500 font-medium">Stock:</span>
+                        <select
+                          value={catalogStockFilter}
+                          onChange={(e) => {
+                            setCatalogStockFilter(e.target.value);
+                            setCatalogPage(1);
+                          }}
+                          className="bg-transparent text-xs text-stone-800 font-medium focus:outline-none cursor-pointer"
+                        >
+                          <option value="all">All Inventory</option>
+                          <option value="in">In Stock (&gt;5)</option>
+                          <option value="low">Low Stock (≤5)</option>
+                          <option value="out">Out of Stock (0)</option>
+                        </select>
+                      </div>
+
+                      {/* Sort Order */}
+                      <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-2.5 py-1.5 rounded-xs">
+                        <span className="text-[11px] text-stone-500 font-medium">Sort:</span>
+                        <select
+                          value={catalogSortBy}
+                          onChange={(e) => {
+                            setCatalogSortBy(e.target.value);
+                            setCatalogPage(1);
+                          }}
+                          className="bg-transparent text-xs text-stone-800 font-medium focus:outline-none cursor-pointer"
+                        >
+                          <option value="newest">Newest First</option>
+                          <option value="price-asc">Price: Low to High</option>
+                          <option value="price-desc">Price: High to Low</option>
+                          <option value="stock-low-high">Stock: Low to High</option>
+                          <option value="stock-high-low">Stock: High to Low</option>
+                          <option value="name-asc">Name: A to Z</option>
+                          <option value="name-desc">Name: Z to A</option>
+                        </select>
+                      </div>
+
+                      {/* Items per page */}
+                      <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-2.5 py-1.5 rounded-xs ml-auto">
+                        <span className="text-[11px] text-stone-500 font-medium">Per Page:</span>
+                        <select
+                          value={catalogLimit}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value, 10);
+                            setCatalogLimit(val);
+                            setCatalogPage(1);
+                          }}
+                          className="bg-transparent text-xs text-stone-800 font-medium focus:outline-none cursor-pointer font-mono"
+                        >
+                          <option value={25}>25</option>
+                          <option value={50}>50</option>
+                          <option value={100}>100</option>
+                          <option value={250}>250</option>
+                          <option value={500}>500</option>
+                          <option value={-1}>All ({totalProductsCount})</option>
+                        </select>
+                      </div>
+
+                      {/* Reset Filters */}
+                      {(adminSearch || catalogCategory || catalogBrand || catalogStockFilter !== 'all' || catalogSortBy !== 'newest') && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAdminSearch('');
+                            setCatalogCategory('');
+                            setCatalogBrand('');
+                            setCatalogStockFilter('all');
+                            setCatalogSortBy('newest');
+                            setCatalogPage(1);
+                          }}
+                          className="text-[11px] text-stone-600 hover:text-rose-700 font-semibold px-2 py-1.5 border border-stone-200 rounded-xs hover:bg-stone-50 transition-colors cursor-pointer"
+                        >
+                          Reset Filters
                         </button>
                       )}
                     </div>
@@ -1951,8 +2184,157 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                           </tr>
                         );
                       })}
+                      {filteredProducts.length === 0 && (
+                        <tr>
+                          <td colSpan={8} className="py-12 text-center text-stone-500">
+                            <Package className="w-8 h-8 text-stone-300 mx-auto mb-2" />
+                            <p className="font-semibold text-stone-700">No products found matching the criteria.</p>
+                            <p className="text-xs text-stone-400 mt-0.5">Try adjusting your search terms or clearing current filter selections.</p>
+                            {(adminSearch || catalogCategory || catalogBrand || catalogStockFilter !== 'all') && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setAdminSearch('');
+                                  setCatalogCategory('');
+                                  setCatalogBrand('');
+                                  setCatalogStockFilter('all');
+                                  setCatalogSortBy('newest');
+                                  setCatalogPage(1);
+                                }}
+                                className="mt-3 text-xs bg-stone-100 hover:bg-stone-200 text-stone-800 font-semibold px-3 py-1.5 rounded-xs transition-colors cursor-pointer"
+                              >
+                                Reset All Filters
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      )}
                       </tbody>
                     </table>
+                  </div>
+
+                  {/* Catalog Pagination Controls */}
+                  <div className="bg-white border border-stone-200 px-4 py-3 rounded-xs flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
+                    {/* Left: Range and loading */}
+                    <div className="text-xs text-stone-600 flex items-center gap-2">
+                      <span>
+                        Showing <strong className="text-stone-900 font-mono">{totalProductsCount === 0 ? 0 : (catalogPage - 1) * (catalogLimit === -1 ? totalProductsCount : catalogLimit) + 1}</strong>
+                        {' '}–{' '}
+                        <strong className="text-stone-900 font-mono">{catalogLimit === -1 ? totalProductsCount : Math.min(catalogPage * catalogLimit, totalProductsCount)}</strong>
+                        {' '}of{' '}
+                        <strong className="text-amber-900 font-mono">{totalProductsCount.toLocaleString()}</strong> items
+                      </span>
+                      {catalogLoading && (
+                        <span className="flex items-center gap-1 text-[11px] text-amber-900 bg-amber-50 px-2 py-0.5 rounded font-medium">
+                          <RefreshCw className="w-3 h-3 animate-spin" /> Loading...
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Center: Pagination controls */}
+                    {catalogLimit !== -1 && catalogTotalPages > 1 && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          disabled={catalogPage <= 1 || catalogLoading}
+                          onClick={() => setCatalogPage(prev => Math.max(1, prev - 1))}
+                          className="px-2.5 py-1.5 border border-stone-300 rounded-xs text-xs font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 transition-colors cursor-pointer"
+                          title="Previous Page"
+                        >
+                          <ChevronLeft className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">Prev</span>
+                        </button>
+
+                        {/* Page number buttons */}
+                        <div className="flex items-center gap-1">
+                          {getCatalogPageNumbers(catalogPage, catalogTotalPages).map((p, idx) => (
+                            p === '...' ? (
+                              <span key={`ellipsis-${idx}`} className="px-1 text-stone-400 text-xs select-none">...</span>
+                            ) : (
+                              <button
+                                key={`page-${p}`}
+                                type="button"
+                                disabled={catalogLoading}
+                                onClick={() => setCatalogPage(Number(p))}
+                                className={`min-w-[28px] h-7 px-1 flex items-center justify-center rounded-xs text-xs font-mono transition-colors cursor-pointer ${
+                                  catalogPage === p
+                                    ? 'bg-amber-900 text-white font-bold shadow-xs'
+                                    : 'text-stone-700 hover:bg-stone-100 border border-stone-200'
+                                }`}
+                              >
+                                {p}
+                              </button>
+                            )
+                          ))}
+                        </div>
+
+                        <button
+                          type="button"
+                          disabled={catalogPage >= catalogTotalPages || catalogLoading}
+                          onClick={() => setCatalogPage(prev => Math.min(catalogTotalPages, prev + 1))}
+                          className="px-2.5 py-1.5 border border-stone-300 rounded-xs text-xs font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 transition-colors cursor-pointer"
+                          title="Next Page"
+                        >
+                          <span className="hidden sm:inline">Next</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Right: Quick jump and page size */}
+                    <div className="flex items-center gap-3">
+                      {catalogLimit !== -1 && catalogTotalPages > 1 && (
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            const target = parseInt(jumpPageInput, 10);
+                            if (target >= 1 && target <= catalogTotalPages) {
+                              setCatalogPage(target);
+                              setJumpPageInput('');
+                            }
+                          }}
+                          className="flex items-center gap-1 text-xs"
+                        >
+                          <span className="text-stone-500 text-[11px] whitespace-nowrap">Go to:</span>
+                          <input
+                            type="number"
+                            min={1}
+                            max={catalogTotalPages}
+                            value={jumpPageInput}
+                            onChange={(e) => setJumpPageInput(e.target.value)}
+                            placeholder={`1-${catalogTotalPages}`}
+                            className="w-14 border border-stone-300 rounded-xs px-1.5 py-1 text-xs text-center font-mono focus:outline-none focus:border-amber-900"
+                          />
+                          <button
+                            type="submit"
+                            disabled={!jumpPageInput}
+                            className="px-2 py-1 bg-stone-100 hover:bg-stone-200 border border-stone-300 text-stone-700 rounded-xs text-xs font-semibold cursor-pointer disabled:opacity-40"
+                          >
+                            Go
+                          </button>
+                        </form>
+                      )}
+
+                      <div className="flex items-center gap-1 text-xs">
+                        <span className="text-stone-500 text-[11px] whitespace-nowrap">Per page:</span>
+                        <select
+                          value={catalogLimit}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value, 10);
+                            setCatalogLimit(val);
+                            setCatalogPage(1);
+                          }}
+                          className="border border-stone-300 rounded-xs px-1.5 py-1 text-xs bg-white font-mono cursor-pointer"
+                        >
+                          <option value={25}>25</option>
+                          <option value={50}>50</option>
+                          <option value={100}>100</option>
+                          <option value={250}>250</option>
+                          <option value={500}>500</option>
+                          <option value={-1}>All ({totalProductsCount})</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -2506,15 +2888,33 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                                 </div>
                               </td>
                               <td className="py-3 px-4">
-                                <span className={`px-2 py-0.5 rounded-xs font-mono text-[10px] font-bold ${
-                                  member.role === 'SUPER_ADMIN'
-                                    ? 'bg-purple-100 text-purple-900 border border-purple-200'
-                                    : member.role === 'STORE_MANAGER'
-                                    ? 'bg-amber-100 text-amber-900 border border-amber-200'
-                                    : 'bg-stone-100 text-stone-800'
-                                }`}>
-                                  {member.role}
-                                </span>
+                                <div className="flex items-center gap-1.5">
+                                  <select
+                                    value={member.role}
+                                    disabled={member.id === 'usr-ehtesham-root' || (member.role === 'SUPER_ADMIN' && user?.role !== 'SUPER_ADMIN')}
+                                    onChange={(e) => handleQuickChangeStaffRole(member.id, member.email, e.target.value)}
+                                    className={`px-2 py-1 rounded-xs font-mono text-[10px] font-bold border focus:outline-none cursor-pointer ${
+                                      member.role === 'SUPER_ADMIN'
+                                        ? 'bg-purple-100 text-purple-900 border-purple-300'
+                                        : member.role === 'ADMIN'
+                                        ? 'bg-blue-100 text-blue-900 border-blue-300'
+                                        : member.role === 'STORE_MANAGER'
+                                        ? 'bg-amber-100 text-amber-900 border-amber-300'
+                                        : member.role === 'PRODUCT_MANAGER'
+                                        ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                                        : 'bg-stone-100 text-stone-800 border-stone-200'
+                                    }`}
+                                    title="Quick change staff operational role"
+                                  >
+                                    <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+                                    <option value="ADMIN">ADMIN</option>
+                                    <option value="STORE_MANAGER">STORE_MANAGER</option>
+                                    <option value="PRODUCT_MANAGER">PRODUCT_MANAGER</option>
+                                    <option value="PRODUCT_SPECIALIST">PRODUCT_SPECIALIST</option>
+                                    <option value="ORDER_FULFILLMENT">ORDER_FULFILLMENT</option>
+                                    <option value="SUPPORT_AGENT">SUPPORT_AGENT</option>
+                                  </select>
+                                </div>
                               </td>
                               <td className="py-3 px-4 text-stone-600 font-mono">
                                 {member.phone || <span className="text-stone-400 italic">Not set</span>}
@@ -2544,9 +2944,9 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                                 >
                                   <Edit2 className="w-3.5 h-3.5" />
                                 </button>
-                                {member.role !== 'SUPER_ADMIN' && member.id !== user?.id && (
+                                {member.id !== 'usr-ehtesham-root' && member.id !== user?.id && (
                                   <button
-                                    onClick={() => handleDeleteStaff(member.id, member.email)}
+                                    onClick={() => setStaffToDelete(member)}
                                     className="p-1.5 bg-stone-100 hover:bg-rose-600 hover:text-white text-stone-400 rounded-xs transition-colors cursor-pointer"
                                     title="Revoke Credentials and Delete"
                                   >
@@ -3142,36 +3542,47 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 />
               </div>
 
-              <input
-                type="email"
-                required
-                placeholder="Staff Email"
-                value={staffEmail}
-                onChange={(e) => setStaffEmail(e.target.value)}
-                className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <input
+                  type="email"
+                  required
+                  placeholder="Staff Email"
+                  value={staffEmail}
+                  onChange={(e) => setStaffEmail(e.target.value)}
+                  className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                />
+                <input
+                  type="text"
+                  placeholder="Phone (Optional)"
+                  value={staffPhone}
+                  onChange={(e) => setStaffPhone(e.target.value)}
+                  className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono"
+                />
+              </div>
 
               <input
                 type="password"
                 required
-                placeholder="Initial Password"
+                placeholder="Initial Password (min 6 characters)"
                 value={staffPassword}
                 onChange={(e) => setStaffPassword(e.target.value)}
                 className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
               />
 
               <div>
-                <label className="block font-semibold text-stone-700 mb-1">Assigned Role</label>
+                <label className="block font-semibold text-stone-700 mb-1">Assigned Operational Role</label>
                 <select
                   value={staffRole}
                   onChange={(e) => setStaffRole(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                  className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono"
                 >
-                  <option value="PRODUCT_SPECIALIST">PRODUCT_SPECIALIST</option>
-                  <option value="ORDER_FULFILLMENT">ORDER_FULFILLMENT</option>
-                  <option value="SUPPORT_AGENT">SUPPORT_AGENT</option>
-                  <option value="STORE_MANAGER">STORE_MANAGER</option>
-                  <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+                  <option value="SUPER_ADMIN">SUPER_ADMIN (Full Administrative Control)</option>
+                  <option value="ADMIN">ADMIN (Catalog, Orders, Inventory, Reports)</option>
+                  <option value="STORE_MANAGER">STORE_MANAGER (Daily Store Operations & Inventory)</option>
+                  <option value="PRODUCT_MANAGER">PRODUCT_MANAGER (Catalog & Brand Management)</option>
+                  <option value="PRODUCT_SPECIALIST">PRODUCT_SPECIALIST (Product Updates & Specs)</option>
+                  <option value="ORDER_FULFILLMENT">ORDER_FULFILLMENT (Dispatch, Tracking & Logistics)</option>
+                  <option value="SUPPORT_AGENT">SUPPORT_AGENT (Customer Service & Inquiry Desk)</option>
                 </select>
               </div>
 
@@ -3255,11 +3666,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     onChange={(e) => setEditStaffRole(e.target.value)}
                     className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono"
                   >
+                    <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="STORE_MANAGER">STORE_MANAGER</option>
+                    <option value="PRODUCT_MANAGER">PRODUCT_MANAGER</option>
                     <option value="PRODUCT_SPECIALIST">PRODUCT_SPECIALIST</option>
                     <option value="ORDER_FULFILLMENT">ORDER_FULFILLMENT</option>
                     <option value="SUPPORT_AGENT">SUPPORT_AGENT</option>
-                    <option value="STORE_MANAGER">STORE_MANAGER</option>
-                    <option value="SUPER_ADMIN">SUPER_ADMIN</option>
                   </select>
                 </div>
 
@@ -3305,6 +3718,56 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* CONFIRM DELETE STAFF MODAL */}
+      {staffToDelete && (
+        <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-rose-200 rounded-sm shadow-2xl max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center gap-3 text-rose-600 border-b border-stone-100 pb-3">
+              <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center shrink-0">
+                <AlertCircle className="w-5 h-5 text-rose-600" />
+              </div>
+              <div>
+                <h3 className="font-serif text-base font-bold text-stone-900">Revoke Staff Account</h3>
+                <p className="text-xs text-stone-500">Confirm permanent revocation of access</p>
+              </div>
+            </div>
+
+            <div className="bg-stone-50 border border-stone-200 rounded-xs p-3 space-y-1.5 text-xs">
+              <p className="text-stone-700">
+                Are you sure you want to remove the staff account for{' '}
+                <strong className="text-stone-900">{staffToDelete.firstName} {staffToDelete.lastName}</strong>?
+              </p>
+              <div className="font-mono text-[11px] text-stone-600 bg-white p-2 rounded border border-stone-200 space-y-0.5">
+                <div>Email: <span className="font-bold text-stone-800">{staffToDelete.email}</span></div>
+                <div>Role: <span className="font-bold text-purple-900">{staffToDelete.role}</span></div>
+                {staffToDelete.phone && <div>Phone: <span className="font-bold text-stone-800">{staffToDelete.phone}</span></div>}
+              </div>
+              <p className="text-rose-600 text-[11px] font-medium pt-1">
+                ⚠️ This will immediately revoke their dashboard access and sessions. This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setStaffToDelete(null)}
+                className="bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold px-4 py-2 rounded-xs cursor-pointer transition-colors text-xs"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteStaff}
+                className="bg-rose-600 hover:bg-rose-700 text-white font-semibold px-4 py-2 rounded-xs cursor-pointer transition-colors text-xs flex items-center gap-1.5 shadow-xs"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Revoke & Delete Staff</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

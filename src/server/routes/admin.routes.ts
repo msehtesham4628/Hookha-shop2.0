@@ -1186,8 +1186,8 @@ router.delete('/staff/:id', requirePermission('staff.update'), async (req: Authe
   }
 
   const targetStaff = db.users[targetStaffIndex];
-  if (targetStaff.role === 'SUPER_ADMIN') {
-    return res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Cannot delete Super Admin accounts.' } });
+  if (targetStaff.role === 'SUPER_ADMIN' && (currentUser.role !== 'SUPER_ADMIN' || targetStaff.id === 'usr-ehtesham-root')) {
+    return res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Root Super Admin account cannot be deleted.' } });
   }
 
   if (targetStaff.id === currentUser.id) {

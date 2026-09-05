@@ -20,6 +20,7 @@ router.get('/', (req, res) => {
       featured,
       newArrival,
       bestSeller,
+      stockStatus,
       sort = 'popularity',
       page = '1',
       limit = '16',
@@ -131,8 +132,12 @@ router.get('/', (req, res) => {
       result = result.filter(p => p.color?.toLowerCase().includes(color.toLowerCase()));
     }
 
-    // Stock
-    if (inStock === 'true') {
+    // Stock & Stock Status
+    if (stockStatus === 'low') {
+      result = result.filter(p => p.stock <= (p.lowStockThreshold || 5) && p.stock > 0);
+    } else if (stockStatus === 'out') {
+      result = result.filter(p => p.stock === 0);
+    } else if (stockStatus === 'in' || inStock === 'true') {
       result = result.filter(p => p.stock > 0);
     }
 
@@ -162,6 +167,18 @@ router.get('/', (req, res) => {
       case 'price-high-low':
       case 'price_desc':
         result.sort((a, b) => (b.salePrice || b.price) - (a.salePrice || a.price));
+        break;
+      case 'stock-low-high':
+        result.sort((a, b) => a.stock - b.stock);
+        break;
+      case 'stock-high-low':
+        result.sort((a, b) => b.stock - a.stock);
+        break;
+      case 'name-asc':
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name-desc':
+        result.sort((a, b) => b.name.localeCompare(a.name));
         break;
       case 'newest':
         result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
