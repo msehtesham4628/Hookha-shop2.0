@@ -539,6 +539,96 @@ export class DatabaseStore {
         ],
         createdAt: '2026-02-26T10:15:00Z',
         updatedAt: '2026-02-26T11:00:00Z'
+      },
+      {
+        id: 'ord-1003',
+        orderNumber: 'SLT-2026-1003',
+        userId: 'usr-customer-1',
+        customerName: 'Julian Vance',
+        customerEmail: 'customer@example.com',
+        customerPhone: '+1 (555) 219-4402',
+        items: [
+          {
+            productId: 'prod-steamulation-pro-x-iii',
+            productName: 'Steamulation Pro X III Platinum Metallic Shisha',
+            productSku: 'STM-PRO-X3',
+            productImage: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400&auto=format&fit=crop',
+            price: 529.00,
+            quantity: 1,
+            subtotal: 529.00
+          },
+          {
+            productId: 'prod-darkside-core-cola',
+            productName: 'Darkside Core Supernova & Falling Star (200g)',
+            productSku: 'DKS-CORE-COLA',
+            productImage: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400&auto=format&fit=crop',
+            price: 26.50,
+            quantity: 2,
+            subtotal: 53.00
+          }
+        ],
+        shippingAddress: this.addresses[0],
+        billingAddress: this.addresses[0],
+        subtotal: 582.00,
+        discount: 0,
+        shippingFee: 0,
+        tax: 49.47,
+        total: 631.47,
+        paymentMethod: 'STRIPE',
+        paymentStatus: 'PAID',
+        paymentIntentId: 'pi_test_983719283719',
+        orderStatus: 'SHIPPED',
+        trackingNumber: '9400111899223397612345',
+        carrier: 'FedEx Priority Overnight',
+        timeline: [
+          { status: 'PLACED', timestamp: '2026-03-01T09:20:00Z', note: 'Priority expedited order confirmed', actor: 'Julian Vance' },
+          { status: 'PAYMENT_CONFIRMED', timestamp: '2026-03-01T09:21:00Z', note: 'Payment verified via Stripe', actor: 'System' },
+          { status: 'PROCESSING', timestamp: '2026-03-01T10:30:00Z', note: 'Packed with luxury impact-resistant casing', actor: 'Warehouse Tech' },
+          { status: 'SHIPPED', timestamp: '2026-03-02T14:15:00Z', note: 'Picked up by FedEx Express courier. In transit to regional hub.', actor: 'FedEx Memphis Hub' }
+        ],
+        createdAt: '2026-03-01T09:20:00Z',
+        updatedAt: '2026-03-02T14:15:00Z'
+      },
+      {
+        id: 'ord-1004',
+        orderNumber: 'SLT-2026-1004',
+        userId: 'usr-customer-1',
+        customerName: 'Julian Vance',
+        customerEmail: 'customer@example.com',
+        customerPhone: '+1 (555) 219-4402',
+        items: [
+          {
+            productId: 'prod-wookah-classic-walnut',
+            productName: 'Wookah Classic Walnut Hookah Body & Crystal Vase',
+            productSku: 'WKH-WLN-02',
+            productImage: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400&auto=format&fit=crop',
+            price: 395.00,
+            quantity: 1,
+            subtotal: 395.00
+          }
+        ],
+        shippingAddress: this.addresses[0],
+        billingAddress: this.addresses[0],
+        subtotal: 395.00,
+        discount: 25.00,
+        shippingFee: 0,
+        tax: 31.45,
+        total: 401.45,
+        paymentMethod: 'STRIPE',
+        paymentStatus: 'PAID',
+        paymentIntentId: 'pi_test_102938475612',
+        orderStatus: 'OUT_FOR_DELIVERY',
+        trackingNumber: 'DHL9823410948',
+        carrier: 'DHL Express Worldwide Air',
+        timeline: [
+          { status: 'PLACED', timestamp: '2026-03-02T08:00:00Z', note: 'Order placed by client', actor: 'Julian Vance' },
+          { status: 'PAYMENT_CONFIRMED', timestamp: '2026-03-02T08:01:00Z', note: 'Payment processed', actor: 'System' },
+          { status: 'PROCESSING', timestamp: '2026-03-02T09:30:00Z', note: 'Quality check completed', actor: 'Dmitri Volkov' },
+          { status: 'SHIPPED', timestamp: '2026-03-03T11:00:00Z', note: 'Departed sorting facility in Cincinnati', actor: 'DHL Air Logistics' },
+          { status: 'OUT_FOR_DELIVERY', timestamp: '2026-03-04T07:45:00Z', note: 'With courier for final delivery today before 5:00 PM. Signature required.', actor: 'DHL Courier' }
+        ],
+        createdAt: '2026-03-02T08:00:00Z',
+        updatedAt: '2026-03-04T07:45:00Z'
       }
     ];
 

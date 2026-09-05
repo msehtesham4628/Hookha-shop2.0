@@ -202,8 +202,10 @@ export interface OrderItem {
   price: number;
   quantity: number;
   flavor?: string;
+  selectedFlavor?: string;
   color?: string;
   subtotal: number;
+  totalPrice?: number;
 }
 
 export interface Order {

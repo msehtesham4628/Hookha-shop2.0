@@ -51,7 +51,12 @@ import {
   Database,
   UploadCloud,
   FileSpreadsheet,
-  Download
+  Download,
+  UserCheck,
+  UserX,
+  Key,
+  CheckSquare,
+  Square
 } from 'lucide-react';
 import { BulkProductUpdateModal } from '../components/BulkProductUpdateModal.js';
 import { exportCustomersToExcel, exportInventoryToExcel } from '../utils/excelExport.js';
@@ -65,8 +70,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [activeTab, setActiveTab] = useState<'analytics' | 'products' | 'categories' | 'brands' | 'orders' | 'customers' | 'wholesale' | 'rbac' | 'audit' | 'settings'>('analytics');
 
   // Admin Login State for Gateway
-  const [adminLoginEmail, setAdminLoginEmail] = useState('admin@worldhookahmarket.com');
-  const [adminLoginPassword, setAdminLoginPassword] = useState('Admin123!');
+  const [adminLoginEmail, setAdminLoginEmail] = useState('');
+  const [adminLoginPassword, setAdminLoginPassword] = useState('');
   const [adminLoginLoading, setAdminLoginLoading] = useState(false);
   const [adminLoginError, setAdminLoginError] = useState('');
 
@@ -153,6 +158,29 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [staffFirstName, setStaffFirstName] = useState('');
   const [staffLastName, setStaffLastName] = useState('');
   const [staffRole, setStaffRole] = useState('PRODUCT_SPECIALIST');
+
+  // Staff Management State
+  const [staffMembers, setStaffMembers] = useState<User[]>([]);
+  const [isEditStaffModalOpen, setIsEditStaffModalOpen] = useState(false);
+  const [editingStaff, setEditingStaff] = useState<User | null>(null);
+  const [editStaffFirstName, setEditStaffFirstName] = useState('');
+  const [editStaffLastName, setEditStaffLastName] = useState('');
+  const [editStaffPhone, setEditStaffPhone] = useState('');
+  const [editStaffRole, setEditStaffRole] = useState('PRODUCT_SPECIALIST');
+  const [editStaffStatus, setEditStaffStatus] = useState<'ACTIVE' | 'SUSPENDED'>('ACTIVE');
+  const [editStaffPassword, setEditStaffPassword] = useState('');
+
+  // Bulk Product Selection & Actions State
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
+  const [bulkPriceAction, setBulkPriceAction] = useState<'none' | 'set' | 'increase_percent' | 'decrease_percent' | 'increase_fixed' | 'decrease_fixed'>('none');
+  const [bulkPriceValue, setBulkPriceValue] = useState('');
+  const [bulkStockAction, setBulkStockAction] = useState<'none' | 'set' | 'increase' | 'decrease'>('none');
+  const [bulkStockValue, setBulkStockValue] = useState('');
+  const [bulkCategoryAction, setBulkCategoryAction] = useState('');
+  const [bulkBrandAction, setBulkBrandAction] = useState('');
+  const [bulkBadgeAction, setBulkBadgeAction] = useState<'none' | 'set_sale' | 'remove_sale' | 'set_bestseller' | 'remove_bestseller' | 'set_featured' | 'remove_featured'>('none');
+  const [isApplyingBulk, setIsApplyingBulk] = useState(false);
 
   // Search & Filter within Admin Tables
   const [adminSearch, setAdminSearch] = useState('');
@@ -275,20 +303,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       }
     }
 
-    // Auto-authenticate with administrative credentials if still needed
-    if (!token) {
-      try {
-        const autoRes = await api.loginWithPassword('admin@worldhookahmarket.com', 'Admin123!');
-        if (autoRes.success && autoRes.data?.token) {
-          token = autoRes.data.token;
-          localStorage.setItem('sultan_auth_token', token);
-          setUser(autoRes.data.user, ['*']);
-        }
-      } catch {
-        // Handled silently
-      }
-    }
-
+    // If no valid session token exists, require manual authentication
     if (!token) return;
 
     try {
@@ -304,7 +319,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         auditRes,
         settingsRes,
         catsRes,
-        brandsRes
+        brandsRes,
+        staffRes
       ] = await Promise.all([
         api.getAnalytics().catch(() => ({ success: false, data: null })),
         api.getProducts({ limit: 500 }).catch(() => ({ success: false, data: { products: [] } })),
@@ -316,7 +332,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         api.getAdminAuditLogs().catch(() => ({ success: false, data: [] })),
         api.getSettings().catch(() => ({ success: false, data: null })),
         api.getCategories().catch(() => ({ success: false, data: [] })),
-        api.getBrands().catch(() => ({ success: false, data: [] }))
+        api.getBrands().catch(() => ({ success: false, data: [] })),
+        api.getAdminStaff().catch(() => ({ success: false, data: [] }))
       ]);
 
       if (analyticsRes.success && analyticsRes.data) {
@@ -362,6 +379,9 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       }
       if (brandsRes.success && brandsRes.data) {
         setBrands(brandsRes.data || []);
+      }
+      if (staffRes.success && staffRes.data) {
+        setStaffMembers(staffRes.data || []);
       }
 
       // Fetch MongoDB connection & collection metrics
@@ -916,7 +936,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
-  // Create Staff
+  // Staff Management Handlers
   const handleCreateStaff = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -938,6 +958,196 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       }
     } catch (err: any) {
       showToast(err.message || 'Failed to create staff account', 'error');
+    }
+  };
+
+  const handleOpenEditStaff = (staff: User) => {
+    setEditingStaff(staff);
+    setEditStaffFirstName(staff.firstName || '');
+    setEditStaffLastName(staff.lastName || '');
+    setEditStaffPhone(staff.phone || '');
+    setEditStaffRole(staff.role || 'PRODUCT_SPECIALIST');
+    setEditStaffStatus((staff.status as any) || 'ACTIVE');
+    setEditStaffPassword('');
+    setIsEditStaffModalOpen(true);
+  };
+
+  const handleUpdateStaff = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingStaff) return;
+    try {
+      const payload: any = {
+        firstName: editStaffFirstName.trim(),
+        lastName: editStaffLastName.trim(),
+        phone: editStaffPhone.trim() || undefined,
+        role: editStaffRole,
+        status: editStaffStatus
+      };
+      if (editStaffPassword.trim()) {
+        payload.password = editStaffPassword.trim();
+      }
+      const res = await api.updateAdminStaff(editingStaff.id, payload);
+      if (res.success) {
+        showToast(`Staff member "${editingStaff.email}" updated successfully`, 'success');
+        setIsEditStaffModalOpen(false);
+        setEditingStaff(null);
+        loadAllAdminData();
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to update staff profile', 'error');
+    }
+  };
+
+  const handleDeleteStaff = async (id: string, email: string) => {
+    if (!window.confirm(`Are you sure you want to revoke access and delete staff account "${email}"? This action cannot be undone.`)) {
+      return;
+    }
+    try {
+      const res = await api.deleteAdminStaff(id);
+      if (res.success) {
+        showToast(`Staff account "${email}" removed`, 'success');
+        loadAllAdminData();
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to remove staff account', 'error');
+    }
+  };
+
+  const handleToggleStaffStatus = async (staff: User) => {
+    try {
+      const nextStatus = staff.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
+      const res = await api.updateAdminStaff(staff.id, { status: nextStatus });
+      if (res.success) {
+        showToast(`Staff member status changed to ${nextStatus}`, 'success');
+        loadAllAdminData();
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to update staff status', 'error');
+    }
+  };
+
+  // Bulk Product Selection Helpers
+  const handleToggleSelectProduct = (id: string) => {
+    setSelectedProductIds(prev =>
+      prev.includes(id) ? prev.filter(pId => pId !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAllVisibleProducts = () => {
+    if (selectedProductIds.length === filteredProducts.length && filteredProducts.length > 0) {
+      setSelectedProductIds([]);
+    } else {
+      setSelectedProductIds(filteredProducts.map(p => p.id));
+    }
+  };
+
+  // Bulk Stock Delta (+10, -5, etc.)
+  const handleBulkQuickStock = async (delta: number) => {
+    if (selectedProductIds.length === 0) return;
+    try {
+      let count = 0;
+      for (const id of selectedProductIds) {
+        const prod = products.find(p => p.id === id);
+        if (prod) {
+          const newStock = Math.max(0, prod.stock + delta);
+          await api.updateAdminProduct(id, { stock: newStock });
+          count++;
+        }
+      }
+      showToast(`Adjusted inventory for ${count} selected products (${delta > 0 ? `+${delta}` : delta})`, 'success');
+      loadAllAdminData();
+    } catch (err: any) {
+      showToast(err.message || 'Error updating stock levels', 'error');
+    }
+  };
+
+  // Bulk Delete
+  const handleBulkDelete = async () => {
+    if (selectedProductIds.length === 0) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedProductIds.length} selected products?`)) {
+      return;
+    }
+    try {
+      let count = 0;
+      for (const id of selectedProductIds) {
+        await api.deleteAdminProduct(id);
+        count++;
+      }
+      showToast(`Removed ${count} products from catalog`, 'success');
+      setSelectedProductIds([]);
+      loadAllAdminData();
+    } catch (err: any) {
+      showToast(err.message || 'Error deleting selected products', 'error');
+    }
+  };
+
+  // Bulk Edit Modal Submission
+  const handleApplyBulkEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedProductIds.length === 0) return;
+    setIsApplyingBulk(true);
+    try {
+      let count = 0;
+      for (const id of selectedProductIds) {
+        const prod = products.find(p => p.id === id);
+        if (!prod) continue;
+        const updatePayload: any = {};
+
+        // Price action
+        if (bulkPriceAction === 'set' && bulkPriceValue) {
+          updatePayload.price = Math.max(0, parseFloat(bulkPriceValue) || 0);
+        } else if (bulkPriceAction === 'increase_percent' && bulkPriceValue) {
+          const pct = parseFloat(bulkPriceValue) || 0;
+          updatePayload.price = Math.round(prod.price * (1 + pct / 100) * 100) / 100;
+        } else if (bulkPriceAction === 'decrease_percent' && bulkPriceValue) {
+          const pct = parseFloat(bulkPriceValue) || 0;
+          updatePayload.price = Math.max(0, Math.round(prod.price * (1 - pct / 100) * 100) / 100);
+        } else if (bulkPriceAction === 'increase_fixed' && bulkPriceValue) {
+          const amt = parseFloat(bulkPriceValue) || 0;
+          updatePayload.price = Math.round((prod.price + amt) * 100) / 100;
+        } else if (bulkPriceAction === 'decrease_fixed' && bulkPriceValue) {
+          const amt = parseFloat(bulkPriceValue) || 0;
+          updatePayload.price = Math.max(0, Math.round((prod.price - amt) * 100) / 100);
+        }
+
+        // Stock action
+        if (bulkStockAction === 'set' && bulkStockValue) {
+          updatePayload.stock = Math.max(0, parseInt(bulkStockValue) || 0);
+        } else if (bulkStockAction === 'increase' && bulkStockValue) {
+          updatePayload.stock = Math.max(0, prod.stock + (parseInt(bulkStockValue) || 0));
+        } else if (bulkStockAction === 'decrease' && bulkStockValue) {
+          updatePayload.stock = Math.max(0, prod.stock - (parseInt(bulkStockValue) || 0));
+        }
+
+        // Category & Brand
+        if (bulkCategoryAction) {
+          updatePayload.category = bulkCategoryAction;
+        }
+        if (bulkBrandAction) {
+          updatePayload.brand = bulkBrandAction;
+        }
+
+        // Badges
+        if (bulkBadgeAction === 'set_sale') updatePayload.isOnSale = true;
+        if (bulkBadgeAction === 'remove_sale') updatePayload.isOnSale = false;
+        if (bulkBadgeAction === 'set_bestseller') updatePayload.isBestSeller = true;
+        if (bulkBadgeAction === 'remove_bestseller') updatePayload.isBestSeller = false;
+        if (bulkBadgeAction === 'set_featured') updatePayload.isFeatured = true;
+        if (bulkBadgeAction === 'remove_featured') updatePayload.isFeatured = false;
+
+        if (Object.keys(updatePayload).length > 0) {
+          await api.updateAdminProduct(id, updatePayload);
+          count++;
+        }
+      }
+      showToast(`Bulk updated ${count} products successfully!`, 'success');
+      setIsBulkEditModalOpen(false);
+      setSelectedProductIds([]);
+      loadAllAdminData();
+    } catch (err: any) {
+      showToast(err.message || 'Failed to apply bulk updates', 'error');
+    } finally {
+      setIsApplyingBulk(false);
     }
   };
 
@@ -1014,7 +1224,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 type="email"
                 value={adminLoginEmail}
                 onChange={(e) => setAdminLoginEmail(e.target.value)}
-                placeholder="admin@worldhookahmarket.com"
+                placeholder="staff@fumarehookah.com"
                 required
                 className="w-full bg-stone-950 border border-stone-700 rounded-xs px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
               />
@@ -1572,11 +1782,73 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </div>
                   </div>
 
+                  {/* Bulk Selection Actions Bar */}
+                  {selectedProductIds.length > 0 && (
+                    <div className="bg-stone-900 text-white px-4 py-3 rounded-xs flex flex-wrap items-center justify-between gap-3 shadow-md animate-in fade-in">
+                      <div className="flex items-center gap-3">
+                        <span className="bg-amber-500 text-stone-950 text-xs font-bold px-2 py-0.5 rounded font-mono">
+                          {selectedProductIds.length} Selected
+                        </span>
+                        <span className="text-xs text-stone-300">Apply batch updates across chosen items</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsBulkEditModalOpen(true)}
+                          className="bg-amber-700 hover:bg-amber-600 text-white text-xs font-semibold px-3 py-1.5 rounded-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                          <span>Bulk Edit Specifications</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleBulkQuickStock(10)}
+                          className="bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-medium px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
+                          title="Increase stock by 10 for all selected items"
+                        >
+                          +10 Stock
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleBulkQuickStock(-5)}
+                          className="bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-medium px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
+                          title="Decrease stock by 5 for all selected items"
+                        >
+                          -5 Stock
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleBulkDelete}
+                          className="bg-rose-900/80 hover:bg-rose-800 text-rose-200 text-xs font-medium px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer flex items-center gap-1"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedProductIds([])}
+                          className="text-xs text-stone-400 hover:text-white px-2 py-1.5 transition-colors cursor-pointer"
+                        >
+                          Deselect All
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Products Table */}
                   <div className="bg-white border border-stone-200 rounded-xs overflow-x-auto shadow-xs">
-                    <table className="w-full text-left text-xs min-w-[700px]">
+                    <table className="w-full text-left text-xs min-w-[750px]">
                       <thead className="bg-stone-50 border-b border-stone-200 text-stone-600 uppercase font-semibold text-[10px] tracking-wider">
                         <tr>
+                          <th className="py-3 px-3 w-10 text-center">
+                            <input
+                              type="checkbox"
+                              checked={filteredProducts.length > 0 && selectedProductIds.length === filteredProducts.length}
+                              onChange={handleSelectAllVisibleProducts}
+                              className="rounded-xs border-stone-300 text-amber-900 focus:ring-amber-900 cursor-pointer"
+                              title="Select / Deselect all visible items"
+                            />
+                          </th>
                           <th className="py-3 px-4">Product Details</th>
                           <th className="py-3 px-4">Category</th>
                           <th className="py-3 px-4">Brand</th>
@@ -1587,8 +1859,18 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-stone-100">
-                        {filteredProducts.map((prod) => (
-                          <tr key={prod.id} className="hover:bg-stone-50/70 transition-colors">
+                        {filteredProducts.map((prod) => {
+                          const isSelected = selectedProductIds.includes(prod.id);
+                          return (
+                          <tr key={prod.id} className={`transition-colors ${isSelected ? 'bg-amber-50/50' : 'hover:bg-stone-50/70'}`}>
+                            <td className="py-3 px-3 text-center">
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => handleToggleSelectProduct(prod.id)}
+                                className="rounded-xs border-stone-300 text-amber-900 focus:ring-amber-900 cursor-pointer"
+                              />
+                            </td>
                             <td className="py-3 px-4 flex items-center gap-3">
                               <div className="w-11 h-11 bg-stone-100 border border-stone-200 rounded-xs p-1 shrink-0 flex items-center justify-center overflow-hidden">
                                 <img src={prod.images[0]?.url} alt={prod.name} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
@@ -1667,7 +1949,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                               </button>
                             </td>
                           </tr>
-                        ))}
+                        );
+                      })}
                       </tbody>
                     </table>
                   </div>
@@ -2160,42 +2443,151 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
 
               {/* TAB 6: RBAC & STAFF */}
               {activeTab === 'rbac' && (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
+                <div className="space-y-8">
+                  {/* Staff Users Management Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <h2 className="font-serif text-2xl font-bold text-stone-900">Roles & Staff Security (RBAC)</h2>
-                      <p className="text-xs text-stone-500">Inspect system roles, authorization scopes, and provision staff access.</p>
+                      <h2 className="font-serif text-2xl font-bold text-stone-900">Staff User Details & Management</h2>
+                      <p className="text-xs text-stone-500">Manage administrator accounts, assign operational roles, reset credentials, and control portal security.</p>
                     </div>
                     <button
                       onClick={() => setIsStaffModalOpen(true)}
-                      className="bg-amber-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
+                      className="bg-amber-900 hover:bg-amber-800 text-white text-xs font-semibold px-4 py-2.5 rounded-xs flex items-center gap-1.5 shadow-xs cursor-pointer transition-colors"
                     >
                       <Plus className="w-4 h-4" />
-                      <span>Provision Staff</span>
+                      <span>Provision New Staff</span>
                     </button>
                   </div>
 
-                  {/* Roles Matrix */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {roles.map((r) => (
-                      <div key={r.id} className="bg-white border border-stone-200 p-5 rounded-xs shadow-xs space-y-3">
-                        <div className="flex items-center justify-between border-b border-stone-100 pb-2">
-                          <h3 className="font-serif text-sm font-bold text-stone-900">{r.name}</h3>
-                          <span className="text-[10px] font-mono text-amber-900 font-bold bg-amber-50 px-2 py-0.5 rounded-xs">{r.id}</span>
-                        </div>
-                        <p className="text-xs text-stone-600">{r.description}</p>
-                        <div>
-                          <span className="text-[10px] uppercase font-bold text-stone-500 tracking-wider block mb-1.5">Authorized Permissions:</span>
-                          <div className="flex flex-wrap gap-1">
-                            {r.permissions.map((p) => (
-                              <span key={p} className="text-[10px] bg-stone-100 text-stone-700 px-2 py-0.5 rounded-xs font-mono">
-                                {p}
-                              </span>
-                            ))}
+                  {/* Staff Accounts Table */}
+                  <div className="bg-white border border-stone-200 rounded-xs overflow-x-auto shadow-xs">
+                    <div className="px-5 py-3 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
+                      <h3 className="font-serif text-sm font-bold text-stone-900 flex items-center gap-2">
+                        <Users className="w-4 h-4 text-amber-900" />
+                        <span>Active Staff Personnel ({staffMembers.length})</span>
+                      </h3>
+                      <span className="text-[11px] text-stone-500 font-mono">
+                        Session: {user?.email} ({user?.role})
+                      </span>
+                    </div>
+                    <table className="w-full text-left text-xs min-w-[700px]">
+                      <thead className="bg-stone-50 border-b border-stone-200 text-stone-600 uppercase font-semibold text-[10px] tracking-wider">
+                        <tr>
+                          <th className="py-3 px-4">Staff Member</th>
+                          <th className="py-3 px-4">Role / Permissions</th>
+                          <th className="py-3 px-4">Phone Contact</th>
+                          <th className="py-3 px-4">Account Status</th>
+                          <th className="py-3 px-4">Created</th>
+                          <th className="py-3 px-4 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-stone-100">
+                        {staffMembers.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="py-8 text-center text-stone-500">
+                              No staff accounts found. Click "Provision New Staff" above to add an administrator or store manager.
+                            </td>
+                          </tr>
+                        ) : (
+                          staffMembers.map((member) => (
+                            <tr key={member.id} className="hover:bg-stone-50/70 transition-colors">
+                              <td className="py-3 px-4 flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-amber-900 text-amber-100 flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                                  {member.firstName ? member.firstName[0] : member.email[0]}
+                                </div>
+                                <div>
+                                  <div className="font-bold text-stone-900 flex items-center gap-1.5">
+                                    <span>{member.firstName} {member.lastName}</span>
+                                    {member.id === user?.id && (
+                                      <span className="text-[9px] bg-amber-100 text-amber-900 font-bold px-1.5 py-0.2 rounded font-mono">You</span>
+                                    )}
+                                  </div>
+                                  <span className="text-[11px] text-stone-500 font-mono">{member.email}</span>
+                                </div>
+                              </td>
+                              <td className="py-3 px-4">
+                                <span className={`px-2 py-0.5 rounded-xs font-mono text-[10px] font-bold ${
+                                  member.role === 'SUPER_ADMIN'
+                                    ? 'bg-purple-100 text-purple-900 border border-purple-200'
+                                    : member.role === 'STORE_MANAGER'
+                                    ? 'bg-amber-100 text-amber-900 border border-amber-200'
+                                    : 'bg-stone-100 text-stone-800'
+                                }`}>
+                                  {member.role}
+                                </span>
+                              </td>
+                              <td className="py-3 px-4 text-stone-600 font-mono">
+                                {member.phone || <span className="text-stone-400 italic">Not set</span>}
+                              </td>
+                              <td className="py-3 px-4">
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleStaffStatus(member)}
+                                  className={`px-2 py-0.5 rounded-xs text-[10px] font-bold cursor-pointer transition-colors ${
+                                    member.status === 'ACTIVE'
+                                      ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                                      : 'bg-rose-100 text-rose-800 hover:bg-rose-200'
+                                  }`}
+                                  title="Click to toggle status between Active and Suspended"
+                                >
+                                  {member.status === 'ACTIVE' ? '● Active' : '✕ Suspended'}
+                                </button>
+                              </td>
+                              <td className="py-3 px-4 text-stone-400 font-mono text-[11px]">
+                                {new Date(member.createdAt).toLocaleDateString()}
+                              </td>
+                              <td className="py-3 px-4 text-right space-x-1.5">
+                                <button
+                                  onClick={() => handleOpenEditStaff(member)}
+                                  className="p-1.5 bg-stone-100 hover:bg-amber-900 hover:text-white text-stone-700 rounded-xs transition-colors cursor-pointer"
+                                  title="Edit Staff Details & Security"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </button>
+                                {member.role !== 'SUPER_ADMIN' && member.id !== user?.id && (
+                                  <button
+                                    onClick={() => handleDeleteStaff(member.id, member.email)}
+                                    className="p-1.5 bg-stone-100 hover:bg-rose-600 hover:text-white text-stone-400 rounded-xs transition-colors cursor-pointer"
+                                    title="Revoke Credentials and Delete"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* System Roles Matrix */}
+                  <div className="space-y-3">
+                    <div className="border-b border-stone-200 pb-2">
+                      <h3 className="font-serif text-lg font-bold text-stone-900">Roles & Permission Scopes Matrix</h3>
+                      <p className="text-xs text-stone-500">Fine-grained access rights mapped to operational staff positions.</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {roles.map((r) => (
+                        <div key={r.id} className="bg-white border border-stone-200 p-5 rounded-xs shadow-xs space-y-3">
+                          <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+                            <h3 className="font-serif text-sm font-bold text-stone-900">{r.name}</h3>
+                            <span className="text-[10px] font-mono text-amber-900 font-bold bg-amber-50 px-2 py-0.5 rounded-xs">{r.id}</span>
+                          </div>
+                          <p className="text-xs text-stone-600">{r.description}</p>
+                          <div>
+                            <span className="text-[10px] uppercase font-bold text-stone-500 tracking-wider block mb-1.5">Authorized Permissions:</span>
+                            <div className="flex flex-wrap gap-1">
+                              {r.permissions.map((p) => (
+                                <span key={p} className="text-[10px] bg-stone-100 text-stone-700 px-2 py-0.5 rounded-xs font-mono">
+                                  {p}
+                                </span>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -2335,7 +2727,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
                         <div className="bg-white p-2.5 rounded border border-stone-200">
                           <span className="text-[10px] text-stone-500 block uppercase">Database</span>
-                          <span className="font-bold text-stone-900">{mongoStatus?.dbName || 'sultan_hookah'}</span>
+                          <span className="font-bold text-stone-900">{mongoStatus?.dbName || 'fumare_hookah'}</span>
                         </div>
                         <div className="bg-white p-2.5 rounded border border-stone-200">
                           <span className="text-[10px] text-stone-500 block uppercase">Catalog Items</span>
@@ -2796,6 +3188,284 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                   className="bg-amber-900 text-white font-semibold px-5 py-2 rounded-xs cursor-pointer"
                 >
                   Generate Credentials
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT STAFF MODAL */}
+      {isEditStaffModalOpen && editingStaff && (
+        <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+              <div>
+                <h3 className="font-serif text-base font-bold text-stone-900">Edit Staff Profile</h3>
+                <p className="text-xs text-stone-500">{editingStaff.email}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditStaffModalOpen(false)}
+                className="text-stone-400 hover:text-stone-600 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <form onSubmit={handleUpdateStaff} className="space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">First Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={editStaffFirstName}
+                    onChange={(e) => setEditStaffFirstName(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Last Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={editStaffLastName}
+                    onChange={(e) => setEditStaffLastName(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Phone Number (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="+1 (555) 000-0000"
+                  value={editStaffPhone}
+                  onChange={(e) => setEditStaffPhone(e.target.value)}
+                  className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Assigned Role</label>
+                  <select
+                    value={editStaffRole}
+                    onChange={(e) => setEditStaffRole(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono"
+                  >
+                    <option value="PRODUCT_SPECIALIST">PRODUCT_SPECIALIST</option>
+                    <option value="ORDER_FULFILLMENT">ORDER_FULFILLMENT</option>
+                    <option value="SUPPORT_AGENT">SUPPORT_AGENT</option>
+                    <option value="STORE_MANAGER">STORE_MANAGER</option>
+                    <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Account Status</label>
+                  <select
+                    value={editStaffStatus}
+                    onChange={(e) => setEditStaffStatus(e.target.value as any)}
+                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono"
+                  >
+                    <option value="ACTIVE">ACTIVE</option>
+                    <option value="SUSPENDED">SUSPENDED</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">
+                  Reset Password (Leave blank to keep unchanged)
+                </label>
+                <input
+                  type="password"
+                  placeholder="Enter new password to reset"
+                  value={editStaffPassword}
+                  onChange={(e) => setEditStaffPassword(e.target.value)}
+                  className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => setIsEditStaffModalOpen(false)}
+                  className="bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold px-4 py-2 rounded-xs cursor-pointer transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-amber-900 hover:bg-amber-800 text-white font-semibold px-5 py-2 rounded-xs cursor-pointer transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* BULK EDIT PRODUCT SPECIFICATIONS MODAL */}
+      {isBulkEditModalOpen && (
+        <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-lg w-full p-6 space-y-4 my-8">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+              <div>
+                <h3 className="font-serif text-base font-bold text-stone-900 flex items-center gap-2">
+                  <Edit2 className="w-4 h-4 text-amber-900" />
+                  <span>Bulk Edit Catalog Items</span>
+                </h3>
+                <p className="text-xs text-stone-500">
+                  Applying batch updates to <span className="font-bold text-amber-900">{selectedProductIds.length} selected products</span>. Leave fields on "No Change" if you do not wish to update them.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsBulkEditModalOpen(false)}
+                className="text-stone-400 hover:text-stone-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleApplyBulkEdit} className="space-y-4 text-xs">
+              {/* Price Action */}
+              <div className="bg-stone-50 p-3 rounded-xs border border-stone-200 space-y-2">
+                <label className="block font-bold text-stone-800 uppercase tracking-wider text-[10px]">
+                  Price Adjustment
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <select
+                    value={bulkPriceAction}
+                    onChange={(e) => setBulkPriceAction(e.target.value as any)}
+                    className="bg-white border border-stone-300 p-2 rounded-xs"
+                  >
+                    <option value="none">No Change to Price</option>
+                    <option value="set">Set Exact Price ($)</option>
+                    <option value="increase_percent">Increase Price by % (+)</option>
+                    <option value="decrease_percent">Decrease Price by % (-)</option>
+                    <option value="increase_fixed">Increase Price by Fixed $ (+)</option>
+                    <option value="decrease_fixed">Decrease Price by Fixed $ (-)</option>
+                  </select>
+                  {bulkPriceAction !== 'none' && (
+                    <input
+                      type="number"
+                      step="any"
+                      min="0"
+                      required
+                      placeholder={bulkPriceAction.includes('percent') ? 'Percentage (e.g. 15)' : 'Amount (e.g. 29.99)'}
+                      value={bulkPriceValue}
+                      onChange={(e) => setBulkPriceValue(e.target.value)}
+                      className="bg-white border border-stone-300 p-2 rounded-xs font-mono"
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Stock Inventory Action */}
+              <div className="bg-stone-50 p-3 rounded-xs border border-stone-200 space-y-2">
+                <label className="block font-bold text-stone-800 uppercase tracking-wider text-[10px]">
+                  Inventory Stock Level
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <select
+                    value={bulkStockAction}
+                    onChange={(e) => setBulkStockAction(e.target.value as any)}
+                    className="bg-white border border-stone-300 p-2 rounded-xs"
+                  >
+                    <option value="none">No Change to Stock</option>
+                    <option value="set">Set Exact Stock Count</option>
+                    <option value="increase">Increase Stock by (+)</option>
+                    <option value="decrease">Decrease Stock by (-)</option>
+                  </select>
+                  {bulkStockAction !== 'none' && (
+                    <input
+                      type="number"
+                      min="0"
+                      required
+                      placeholder="Units count (e.g. 25)"
+                      value={bulkStockValue}
+                      onChange={(e) => setBulkStockValue(e.target.value)}
+                      className="bg-white border border-stone-300 p-2 rounded-xs font-mono"
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Category & Brand Reassignment */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Assign Category</label>
+                  <select
+                    value={bulkCategoryAction}
+                    onChange={(e) => setBulkCategoryAction(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                  >
+                    <option value="">No Change</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.name}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Assign Brand</label>
+                  <select
+                    value={bulkBrandAction}
+                    onChange={(e) => setBulkBrandAction(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                  >
+                    <option value="">No Change</option>
+                    {brands.map((b) => (
+                      <option key={b.id} value={b.name}>{b.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Badges / Visibility */}
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Promotional Badges</label>
+                <select
+                  value={bulkBadgeAction}
+                  onChange={(e) => setBulkBadgeAction(e.target.value as any)}
+                  className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                >
+                  <option value="none">No Change</option>
+                  <option value="set_sale">Mark as "On Sale"</option>
+                  <option value="remove_sale">Remove "On Sale" status</option>
+                  <option value="set_bestseller">Mark as "Best Seller"</option>
+                  <option value="remove_bestseller">Remove "Best Seller" status</option>
+                  <option value="set_featured">Mark as "Featured"</option>
+                  <option value="remove_featured">Remove "Featured" status</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => setIsBulkEditModalOpen(false)}
+                  disabled={isApplyingBulk}
+                  className="bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold px-4 py-2 rounded-xs cursor-pointer transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isApplyingBulk}
+                  className="bg-amber-900 hover:bg-amber-800 text-white font-semibold px-5 py-2 rounded-xs cursor-pointer transition-colors flex items-center gap-2"
+                >
+                  {isApplyingBulk ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Updating Catalog...</span>
+                    </>
+                  ) : (
+                    <span>Apply to {selectedProductIds.length} Items</span>
+                  )}
                 </button>
               </div>
             </form>

@@ -31,7 +31,7 @@ class MongoDatabaseService {
   private db: Db | null = null;
   private isConnecting = false;
   private isConnected = false;
-  private dbName = 'sultan_hookah';
+  private dbName = 'fumare_hookah';
   private lastSyncAt: string | null = null;
   private lastError: string | null = null;
   private cachedCounts: Record<string, number> = {};
@@ -82,7 +82,7 @@ class MongoDatabaseService {
       // Determine database name from URI or fallback
       const urlParsed = new URL(mongoUri.trim().replace(/^mongodb(\+srv)?:\/\//, 'http://'));
       const pathDb = urlParsed.pathname.replace(/^\//, '').split('?')[0];
-      this.dbName = pathDb && pathDb.length > 0 ? pathDb : 'sultan_hookah';
+      this.dbName = pathDb && pathDb.length > 0 ? pathDb : 'fumare_hookah';
 
       this.db = this.client.db(this.dbName);
       this.isConnected = true;
@@ -326,12 +326,60 @@ class MongoDatabaseService {
           }
           store.users = Array.from(userMap.values());
         }
-        if (mongoOrders.length > 0) store.orders = mongoOrders;
-        if (mongoCategories.length > 0) store.categories = mongoCategories;
-        if (mongoBrands.length > 0) store.brands = mongoBrands;
-        if (mongoReviews.length > 0) store.reviews = mongoReviews;
-        if (mongoCoupons.length > 0) store.coupons = mongoCoupons;
-        if (mongoWholesale.length > 0) store.wholesaleApplications = mongoWholesale;
+        if (mongoOrders.length > 0) {
+          const orderMap = new Map<string, Order>();
+          // Preserve all in-memory / seed orders first
+          for (const o of store.orders) {
+            orderMap.set(o.id, o);
+            if (o.orderNumber) orderMap.set(o.orderNumber.toUpperCase(), o);
+          }
+          // Merge in orders from MongoDB, updating existing records or adding user orders
+          for (const o of mongoOrders) {
+            orderMap.set(o.id, o);
+            if (o.orderNumber) orderMap.set(o.orderNumber.toUpperCase(), o);
+          }
+          // Deduplicate by ID
+          const uniqueOrders = new Map<string, Order>();
+          for (const o of orderMap.values()) {
+            uniqueOrders.set(o.id, o);
+          }
+          store.orders = Array.from(uniqueOrders.values());
+
+          // Persist the combined set back to MongoDB so MongoDB contains all valid seed & customer orders
+          this.saveManyDocuments('orders', store.orders).catch(err => {
+            console.error('[MongoDB] Auto-sync combined orders err:', err);
+          });
+        }
+        if (mongoCategories.length > 0) {
+          const catMap = new Map<string, Category>();
+          for (const c of store.categories) catMap.set(c.id, c);
+          for (const c of mongoCategories) catMap.set(c.id, c);
+          store.categories = Array.from(catMap.values());
+        }
+        if (mongoBrands.length > 0) {
+          const brandMap = new Map<string, Brand>();
+          for (const b of store.brands) brandMap.set(b.id, b);
+          for (const b of mongoBrands) brandMap.set(b.id, b);
+          store.brands = Array.from(brandMap.values());
+        }
+        if (mongoReviews.length > 0) {
+          const revMap = new Map<string, Review>();
+          for (const r of store.reviews) revMap.set(r.id, r);
+          for (const r of mongoReviews) revMap.set(r.id, r);
+          store.reviews = Array.from(revMap.values());
+        }
+        if (mongoCoupons.length > 0) {
+          const coupMap = new Map<string, Coupon>();
+          for (const c of store.coupons) coupMap.set(c.code.toUpperCase(), c);
+          for (const c of mongoCoupons) coupMap.set(c.code.toUpperCase(), c);
+          store.coupons = Array.from(coupMap.values());
+        }
+        if (mongoWholesale.length > 0) {
+          const wMap = new Map<string, WholesaleApplication>();
+          for (const w of store.wholesaleApplications) wMap.set(w.id, w);
+          for (const w of mongoWholesale) wMap.set(w.id, w);
+          store.wholesaleApplications = Array.from(wMap.values());
+        }
         if (mongoSettings.length > 0) store.settings = mongoSettings[0];
 
         loaded = true;

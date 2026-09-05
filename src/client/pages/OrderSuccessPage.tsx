@@ -10,8 +10,12 @@ import {
   Calendar,
   MapPin,
   ArrowRight,
-  Printer
+  Printer,
+  Mail,
+  Download
 } from 'lucide-react';
+import { EmailPdfModal } from '../components/EmailPdfModal.js';
+import { downloadOrderInvoicePDF } from '../utils/pdfGenerator.js';
 
 interface OrderSuccessPageProps {
   orderId?: string;
@@ -21,6 +25,16 @@ interface OrderSuccessPageProps {
 export const OrderSuccessPage: React.FC<OrderSuccessPageProps> = ({ orderId, onNavigate }) => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEmailPdfOpen, setIsEmailPdfOpen] = useState(false);
+
+  const handleDownloadPdf = () => {
+    if (!order) return;
+    try {
+      downloadOrderInvoicePDF(order);
+    } catch (e) {
+      console.error('Failed to download invoice PDF:', e);
+    }
+  };
 
   useEffect(() => {
     // Fire festive luxury confetti on mount
@@ -135,13 +149,35 @@ export const OrderSuccessPage: React.FC<OrderSuccessPageProps> = ({ orderId, onN
                 <h4 className="font-serif text-sm font-bold text-stone-900">Ordered Items</h4>
                 <p className="text-xs text-stone-500">{order.items.length} items total</p>
               </div>
-              <button
-                onClick={() => window.print()}
-                className="text-xs text-stone-600 hover:text-stone-900 flex items-center gap-1.5 border border-stone-300 px-3 py-1.5 rounded-xs"
-              >
-                <Printer className="w-3.5 h-3.5" />
-                <span>Print Dossier</span>
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  id="order-success-email-pdf-btn"
+                  type="button"
+                  onClick={() => setIsEmailPdfOpen(true)}
+                  className="text-xs bg-amber-900 hover:bg-amber-800 text-white font-semibold flex items-center gap-1.5 px-3 py-1.5 rounded-xs transition-colors cursor-pointer shadow-2xs"
+                >
+                  <Mail className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Email PDF</span>
+                </button>
+
+                <button
+                  id="order-success-download-pdf-btn"
+                  type="button"
+                  onClick={handleDownloadPdf}
+                  className="text-xs text-stone-700 hover:text-stone-900 flex items-center gap-1.5 border border-stone-300 px-3 py-1.5 rounded-xs hover:bg-stone-50 transition-colors cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5 text-stone-500" />
+                  <span>Download PDF</span>
+                </button>
+
+                <button
+                  onClick={() => window.print()}
+                  className="text-xs text-stone-600 hover:text-stone-900 flex items-center gap-1.5 border border-stone-300 px-3 py-1.5 rounded-xs hover:bg-stone-50 transition-colors cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print</span>
+                </button>
+              </div>
             </div>
 
             <div className="space-y-3">
@@ -191,15 +227,44 @@ export const OrderSuccessPage: React.FC<OrderSuccessPageProps> = ({ orderId, onN
           </div>
         )}
 
-        {/* Back to Home CTA */}
-        <div className="mt-8 text-center">
+        {/* CTAs */}
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          {order && (
+            <>
+              <button
+                onClick={() => onNavigate(`/track-order?orderId=${encodeURIComponent(order.orderNumber)}`)}
+                className="w-full sm:w-auto bg-amber-900 hover:bg-amber-800 text-white text-xs font-semibold uppercase tracking-wider px-6 py-3.5 rounded-xs transition-colors shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Truck className="w-4 h-4" />
+                <span>Track Real-Time Status</span>
+              </button>
+
+              <button
+                onClick={() => setIsEmailPdfOpen(true)}
+                className="w-full sm:w-auto bg-white border border-stone-300 hover:border-stone-400 text-stone-800 text-xs font-semibold uppercase tracking-wider px-6 py-3.5 rounded-xs transition-colors shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Mail className="w-4 h-4 text-amber-800" />
+                <span>Email PDF Receipt</span>
+              </button>
+            </>
+          )}
           <button
             onClick={() => onNavigate('/')}
-            className="bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold uppercase tracking-wider px-8 py-3.5 rounded-xs transition-colors shadow-xs"
+            className="w-full sm:w-auto bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold uppercase tracking-wider px-8 py-3.5 rounded-xs transition-colors shadow-xs cursor-pointer"
           >
             Return to Storefront
           </button>
         </div>
+
+        {/* Email PDF Modal */}
+        {order && (
+          <EmailPdfModal
+            isOpen={isEmailPdfOpen}
+            onClose={() => setIsEmailPdfOpen(false)}
+            order={order}
+            initialEmail={order.customerEmail}
+          />
+        )}
 
       </div>
     </div>

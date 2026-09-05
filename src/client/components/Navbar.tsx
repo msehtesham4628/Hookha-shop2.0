@@ -15,7 +15,8 @@ import {
   Package,
   Settings,
   Sparkles,
-  Globe
+  Globe,
+  Truck
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -167,8 +168,17 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
             </span>
           </div>
 
-          {/* Topbar Language Selector */}
-          <div className="flex-shrink-0 flex items-center gap-2">
+          {/* Topbar Language Selector & Quick Track Order */}
+          <div className="flex-shrink-0 flex items-center gap-3">
+            <button
+              onClick={() => onNavigate('/track-order')}
+              className="text-stone-300 hover:text-amber-300 text-[10px] hidden sm:flex items-center gap-1 transition-colors cursor-pointer"
+              title="Track your shipment in real time"
+            >
+              <Truck className="w-3.5 h-3.5 text-amber-400" />
+              <span>{t('nav.track_order', 'Track Order')}</span>
+            </button>
+            <div className="h-3 w-px bg-stone-700 hidden sm:block"></div>
             <LanguageSelector variant="topbar" />
           </div>
         </div>
@@ -291,6 +301,14 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
                         <span>{t('nav.my_account', 'My Account & Orders')}</span>
                       </button>
 
+                      <button
+                        onClick={() => { setUserDropdownOpen(false); onNavigate('/track-order'); }}
+                        className="w-full text-left px-4 py-2 text-xs text-stone-700 hover:bg-stone-50 hover:text-amber-900 flex items-center gap-2 cursor-pointer"
+                      >
+                        <Truck className="w-3.5 h-3.5 text-amber-800" />
+                        <span>{t('nav.track_order', 'Track Order')}</span>
+                      </button>
+
                       {isAdmin && (
                         <button
                           onClick={() => { setUserDropdownOpen(false); onNavigate('/admin'); }}
@@ -327,6 +345,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
                         className="w-full bg-white hover:bg-stone-50 text-stone-800 border border-stone-300 text-xs font-semibold py-2 px-3 rounded-xs transition-colors text-center block cursor-pointer"
                       >
                         {t('nav.create_account', 'Create Account')}
+                      </button>
+
+                      <div className="border-t border-stone-100 my-2"></div>
+                      <button
+                        onClick={() => { setUserDropdownOpen(false); onNavigate('/track-order'); }}
+                        className="w-full text-stone-700 hover:text-amber-900 text-xs font-semibold py-1.5 px-3 rounded-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer bg-stone-50 hover:bg-stone-100 border border-stone-200"
+                      >
+                        <Truck className="w-3.5 h-3.5 text-amber-800" />
+                        <span>{t('nav.track_order', 'Track an Order')}</span>
                       </button>
                     </div>
                   )}
@@ -506,6 +533,16 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
                     </li>
                   );
                 })}
+
+                <li className="border-b border-stone-100 pb-2.5 pt-1">
+                  <button
+                    onClick={() => { onNavigate('/track-order'); setMobileMenuOpen(false); }}
+                    className="text-left uppercase tracking-wider text-xs font-semibold text-amber-900 hover:text-amber-700 cursor-pointer flex items-center gap-2"
+                  >
+                    <Truck className="w-4 h-4 text-amber-800" />
+                    <span>{t('nav.track_order', 'Track Order')}</span>
+                  </button>
+                </li>
               </ul>
 
               {/* Language Selector in Mobile Drawer */}

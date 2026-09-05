@@ -106,6 +106,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </button>
               </li>
               <li>
+                <button onClick={() => onNavigate('/track-order')} className="hover:text-cyan-400 transition-colors cursor-pointer text-amber-300/90 font-medium">
+                  {t('nav.track_order', 'Track My Order')}
+                </button>
+              </li>
+              <li>
                 <button onClick={() => onNavigate('/account')} className="hover:text-cyan-400 transition-colors cursor-pointer">
                   {t('nav.my_account', 'My Account & Orders')}
                 </button>

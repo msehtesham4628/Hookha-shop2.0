@@ -332,6 +332,39 @@ class ApiClient {
     return this.request<{ success: boolean; data: { order: Order } }>(`/orders/${orderId}`);
   }
 
+  public async trackOrder(query: string, email?: string) {
+    const qs = email ? `?email=${encodeURIComponent(email)}` : '';
+    return this.request<{
+      success: boolean;
+      data: {
+        order: Order;
+        trackingInfo: {
+          carrier: string;
+          trackingNumber: string;
+          trackingUrl: string;
+          status: string;
+          statusBadge: string;
+          progressPercent: number;
+          estimatedDelivery: string;
+          isDelivered: boolean;
+          isOutForDelivery: boolean;
+          isInTransit: boolean;
+        };
+      };
+    }>(`/orders/track/${encodeURIComponent(query.trim())}${qs}`);
+  }
+
+  public async emailOrderPdf(orderId: string, email: string, pdfBase64?: string, customNote?: string) {
+    return this.request<{
+      success: boolean;
+      message: string;
+      recipient?: string;
+    }>(`/orders/${encodeURIComponent(orderId)}/email-pdf`, {
+      method: 'POST',
+      body: JSON.stringify({ email, pdfBase64, customNote })
+    });
+  }
+
   // --- Reviews, Wholesale, Contact, Newsletter ---
   public async submitReview(productId: string, review: { rating: number; title: string; comment: string; userName?: string; userEmail?: string }) {
     return this.request<{ success: boolean; message: string; data: Review }>(`/products/${productId}/reviews`, {
@@ -581,6 +614,12 @@ class ApiClient {
     return this.request<{ success: boolean; data: User }>(`/admin/staff/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload)
+    });
+  }
+
+  public async deleteAdminStaff(id: string) {
+    return this.request<{ success: boolean; message: string }>(`/admin/staff/${id}`, {
+      method: 'DELETE'
     });
   }
 

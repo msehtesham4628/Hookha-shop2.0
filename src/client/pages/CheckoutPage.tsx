@@ -12,12 +12,17 @@ import {
   Tag,
   ArrowRight,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  Banknote,
+  Landmark,
+  Zap
 } from 'lucide-react';
 
 interface CheckoutPageProps {
   onNavigate: (path: string) => void;
 }
+
+type PaymentMethodType = 'STRIPE_CREDIT_CARD' | 'CASH_ON_DELIVERY' | 'BANK_TRANSFER' | 'TEST_INSTANT';
 
 export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   const { user, cart, applyCoupon, loadCart, showToast } = useStore();
@@ -57,7 +62,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   const [ageConfirmed, setAgeConfirmed] = useState(false);
 
   // Payment Form
-  const [paymentMethod, setPaymentMethod] = useState<'STRIPE_CREDIT_CARD' | 'TEST_INSTANT'>('STRIPE_CREDIT_CARD');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('STRIPE_CREDIT_CARD');
   const [cardNumber, setCardNumber] = useState('');
   const [cardExp, setCardExp] = useState('');
   const [cardCvc, setCardCvc] = useState('');
@@ -116,22 +121,44 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
     try {
       setIsSubmitting(true);
+      const streetAddress = [houseNo, areaRoad].filter(Boolean).join(', ');
       const res = await api.createOrder({
-        customerEmail: email,
-        customerName: `${firstName} ${lastName}`,
+        customerEmail: email.trim().toLowerCase(),
+        customerName: `${firstName} ${lastName}`.trim(),
         customerPhone: phone || undefined,
         shippingAddress: {
-          street: [houseNo, areaRoad].filter(Boolean).join(', '),
+          fullName: `${firstName} ${lastName}`.trim(),
+          addressLine1: streetAddress,
           city,
           state,
           postalCode: pincode,
-          country
+          country,
+          phone: phone || ''
+        },
+        billingAddress: {
+          fullName: `${firstName} ${lastName}`.trim(),
+          addressLine1: streetAddress,
+          city,
+          state,
+          postalCode: pincode,
+          country,
+          phone: phone || ''
         },
         paymentMethod,
+        ageConfirmed: true,
         couponCode: cart.couponCode
       });
 
       if (res.success && res.data) {
+        // If it's a card payment in sandbox or mock, auto-confirm to mark as PAID
+        if (paymentMethod === 'STRIPE_CREDIT_CARD' && res.data.order?.id && res.data.paymentIntentId) {
+          try {
+            await api.confirmSimulatedPayment(res.data.order.id, res.data.paymentIntentId);
+          } catch {
+            // Handled gracefully
+          }
+        }
+
         // Broadcast new order event so Admin Dashboard and other views reflect immediately
         if (res.data.order) {
           broadcastSync('ORDER_PLACED', { order: res.data.order });
@@ -338,57 +365,177 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                   <span className="w-5 h-5 rounded-full bg-stone-900 text-white text-[10px] flex items-center justify-center font-sans">3</span>
                   <span>Payment Method</span>
                 </h2>
+                {paymentMethod === 'STRIPE_CREDIT_CARD' && (
+                  <button
+                    type="button"
+                    onClick={handleFillSandboxCard}
+                    className="text-[11px] text-amber-900 bg-amber-50 hover:bg-amber-100 px-2.5 py-1 rounded-xs font-semibold border border-amber-200"
+                  >
+                    ⚡ Fill Stripe Test Sandbox
+                  </button>
+                )}
+              </div>
+
+              {/* Payment Method Selector Tabs */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <button
                   type="button"
-                  onClick={handleFillSandboxCard}
-                  className="text-[11px] text-amber-900 bg-amber-50 hover:bg-amber-100 px-2.5 py-1 rounded-xs font-semibold border border-amber-200"
+                  onClick={() => setPaymentMethod('STRIPE_CREDIT_CARD')}
+                  className={`p-3 text-left border rounded-xs transition-all flex items-start gap-3 cursor-pointer ${
+                    paymentMethod === 'STRIPE_CREDIT_CARD'
+                      ? 'border-amber-800 bg-amber-50/40 text-stone-900 ring-1 ring-amber-800/20'
+                      : 'border-stone-200 hover:border-stone-300 bg-white text-stone-600'
+                  }`}
                 >
-                  ⚡ Fill Stripe Test Sandbox
+                  <CreditCard className={`w-5 h-5 mt-0.5 shrink-0 ${paymentMethod === 'STRIPE_CREDIT_CARD' ? 'text-amber-800' : 'text-stone-400'}`} />
+                  <div>
+                    <div className="text-xs font-bold text-stone-900 flex items-center gap-1.5">
+                      <span>Stripe Credit / Debit Card</span>
+                      <span className="text-[10px] px-1.5 py-0.2 bg-emerald-100 text-emerald-800 rounded font-medium">Instant</span>
+                    </div>
+                    <p className="text-[11px] text-stone-500 mt-0.5">Visa, Mastercard, American Express, Discover</p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('CASH_ON_DELIVERY')}
+                  className={`p-3 text-left border rounded-xs transition-all flex items-start gap-3 cursor-pointer ${
+                    paymentMethod === 'CASH_ON_DELIVERY'
+                      ? 'border-amber-800 bg-amber-50/40 text-stone-900 ring-1 ring-amber-800/20'
+                      : 'border-stone-200 hover:border-stone-300 bg-white text-stone-600'
+                  }`}
+                >
+                  <Banknote className={`w-5 h-5 mt-0.5 shrink-0 ${paymentMethod === 'CASH_ON_DELIVERY' ? 'text-amber-800' : 'text-stone-400'}`} />
+                  <div>
+                    <div className="text-xs font-bold text-stone-900 flex items-center gap-1.5">
+                      <span>Cash on Delivery (COD)</span>
+                      <span className="text-[10px] px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded font-medium">Courier</span>
+                    </div>
+                    <p className="text-[11px] text-stone-500 mt-0.5">Pay in cash when your parcel is delivered</p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('BANK_TRANSFER')}
+                  className={`p-3 text-left border rounded-xs transition-all flex items-start gap-3 cursor-pointer ${
+                    paymentMethod === 'BANK_TRANSFER'
+                      ? 'border-amber-800 bg-amber-50/40 text-stone-900 ring-1 ring-amber-800/20'
+                      : 'border-stone-200 hover:border-stone-300 bg-white text-stone-600'
+                  }`}
+                >
+                  <Landmark className={`w-5 h-5 mt-0.5 shrink-0 ${paymentMethod === 'BANK_TRANSFER' ? 'text-amber-800' : 'text-stone-400'}`} />
+                  <div>
+                    <div className="text-xs font-bold text-stone-900 flex items-center gap-1.5">
+                      <span>Direct Bank Wire / ACH</span>
+                      <span className="text-[10px] px-1.5 py-0.2 bg-stone-100 text-stone-700 rounded font-medium">B2B</span>
+                    </div>
+                    <p className="text-[11px] text-stone-500 mt-0.5">Wire transfer instructions sent upon checkout</p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('TEST_INSTANT')}
+                  className={`p-3 text-left border rounded-xs transition-all flex items-start gap-3 cursor-pointer ${
+                    paymentMethod === 'TEST_INSTANT'
+                      ? 'border-amber-800 bg-amber-50/40 text-stone-900 ring-1 ring-amber-800/20'
+                      : 'border-stone-200 hover:border-stone-300 bg-white text-stone-600'
+                  }`}
+                >
+                  <Zap className={`w-5 h-5 mt-0.5 shrink-0 ${paymentMethod === 'TEST_INSTANT' ? 'text-amber-800' : 'text-stone-400'}`} />
+                  <div>
+                    <div className="text-xs font-bold text-stone-900 flex items-center gap-1.5">
+                      <span>Instant Sandbox Test</span>
+                      <span className="text-[10px] px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded font-medium">1-Click</span>
+                    </div>
+                    <p className="text-[11px] text-stone-500 mt-0.5">No card required; simulates instant clearance</p>
+                  </div>
                 </button>
               </div>
 
-              {/* Card Inputs */}
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">Card Number</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      required
-                      placeholder="4242 4242 4242 4242"
-                      value={cardNumber}
-                      onChange={(e) => setCardNumber(e.target.value)}
-                      className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800 font-mono"
-                    />
-                    <CreditCard className="w-4 h-4 text-stone-400 absolute right-3 top-3" />
+              {/* Conditional Payment Method Content */}
+              {paymentMethod === 'STRIPE_CREDIT_CARD' && (
+                <div className="space-y-3 pt-2">
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">Card Number</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required
+                        placeholder="4242 4242 4242 4242"
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(e.target.value)}
+                        className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800 font-mono"
+                      />
+                      <CreditCard className="w-4 h-4 text-stone-400 absolute right-3 top-3" />
+                    </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-stone-700 mb-1">Expiration</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="MM/YY"
-                      value={cardExp}
-                      onChange={(e) => setCardExp(e.target.value)}
-                      className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800 font-mono"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-stone-700 mb-1">Security Code (CVC)</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="CVC"
-                      value={cardCvc}
-                      onChange={(e) => setCardCvc(e.target.value)}
-                      className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800 font-mono"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">Expiration</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="MM/YY"
+                        value={cardExp}
+                        onChange={(e) => setCardExp(e.target.value)}
+                        className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800 font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">Security Code (CVC)</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="CVC"
+                        value={cardCvc}
+                        onChange={(e) => setCardCvc(e.target.value)}
+                        className="w-full bg-stone-50 border border-stone-300 text-xs px-3 py-2.5 rounded-xs focus:outline-none focus:border-amber-800 font-mono"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {paymentMethod === 'CASH_ON_DELIVERY' && (
+                <div className="p-4 bg-stone-50 border border-stone-200 rounded-xs text-xs space-y-1.5">
+                  <div className="font-semibold text-stone-900 flex items-center gap-1.5">
+                    <Banknote className="w-4 h-4 text-emerald-700" />
+                    Cash on Delivery Terms
+                  </div>
+                  <p className="text-stone-600 leading-relaxed">
+                    Please prepare the exact order total of <strong>${(cart.grandTotal || 0).toFixed(2)}</strong> in cash. 
+                    The authorized carrier will collect payment upon verified parcel handover and age ID check.
+                  </p>
+                </div>
+              )}
+
+              {paymentMethod === 'BANK_TRANSFER' && (
+                <div className="p-4 bg-stone-50 border border-stone-200 rounded-xs text-xs space-y-1.5">
+                  <div className="font-semibold text-stone-900 flex items-center gap-1.5">
+                    <Landmark className="w-4 h-4 text-stone-700" />
+                    Direct Bank Wire & B2B Settlement
+                  </div>
+                  <p className="text-stone-600 leading-relaxed">
+                    Upon clicking place order, our account routing number and swift invoice instructions will be dispatched to <strong>{email || 'your email'}</strong>. Your items will be reserved immediately.
+                  </p>
+                </div>
+              )}
+
+              {paymentMethod === 'TEST_INSTANT' && (
+                <div className="p-4 bg-blue-50/70 border border-blue-200 rounded-xs text-xs space-y-1.5">
+                  <div className="font-semibold text-blue-950 flex items-center gap-1.5">
+                    <Zap className="w-4 h-4 text-blue-600" />
+                    Instant Developer Sandbox Mode
+                  </div>
+                  <p className="text-blue-900 leading-relaxed">
+                    Instantly verifies payment approval and generates your order confirmation receipt without communicating with third-party banking processors.
+                  </p>
+                </div>
+              )}
 
               {/* Mandatory 21+ Age Certification Checkbox */}
               <div className="pt-4 border-t border-stone-100">

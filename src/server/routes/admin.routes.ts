@@ -1175,6 +1175,38 @@ router.put('/staff/:id', requirePermission('staff.update'), async (req: Authenti
   return res.json({ success: true, message: 'Staff profile updated', data: safe });
 });
 
+// DELETE /api/admin/staff/:id
+router.delete('/staff/:id', requirePermission('staff.update'), async (req: AuthenticatedRequest, res) => {
+  const currentUser = req.user!;
+  const { id } = req.params;
+
+  const targetStaffIndex = db.users.findIndex(u => u.id === id);
+  if (targetStaffIndex === -1) {
+    return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Staff member not found' } });
+  }
+
+  const targetStaff = db.users[targetStaffIndex];
+  if (targetStaff.role === 'SUPER_ADMIN') {
+    return res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Cannot delete Super Admin accounts.' } });
+  }
+
+  if (targetStaff.id === currentUser.id) {
+    return res.status(400).json({ success: false, error: { code: 'SELF_DELETE', message: 'You cannot delete your own staff account.' } });
+  }
+
+  db.users.splice(targetStaffIndex, 1);
+
+  db.logAudit(
+    { id: currentUser.id, name: `${currentUser.firstName} ${currentUser.lastName}`, role: currentUser.role, ip: req.ip },
+    'ADMIN_DELETED_STAFF',
+    'STAFF',
+    id,
+    { email: targetStaff.email, role: targetStaff.role }
+  );
+
+  return res.json({ success: true, message: 'Staff member removed successfully' });
+});
+
 // ==========================================
 // 11. AUDIT LOGS & SYSTEM SETTINGS
 // ==========================================

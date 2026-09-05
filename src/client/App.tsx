@@ -22,6 +22,7 @@ import { AuthPage } from './pages/AuthPage.js';
 import { AboutPage } from './pages/AboutPage.js';
 import { ContactPage } from './pages/ContactPage.js';
 import { AdminDashboardPage } from './pages/AdminDashboardPage.js';
+import { OrderTrackingPage } from './pages/OrderTrackingPage.js';
 
 export default function App() {
   const { loadCurrentUser, loadCart, loadWishlist, loadSettings } = useStore();
@@ -100,6 +101,22 @@ export default function App() {
     if (pathOnly === '/order-success') {
       const orderId = queryParams.get('orderId') || undefined;
       return <OrderSuccessPage orderId={orderId} onNavigate={navigate} />;
+    }
+
+    // 5b. Order Tracking & Real-Time Shipping Page
+    if (
+      pathOnly === '/track-order' ||
+      pathOnly === '/order-tracking' ||
+      pathOnly === '/track' ||
+      pathOnly.startsWith('/track/')
+    ) {
+      const orderId =
+        queryParams.get('orderId') ||
+        queryParams.get('id') ||
+        queryParams.get('query') ||
+        (pathOnly.startsWith('/track/') ? pathOnly.replace('/track/', '') : undefined);
+
+      return <OrderTrackingPage initialOrderId={orderId} onNavigate={navigate} />;
     }
 
     // 6. Customer Account Dashboard

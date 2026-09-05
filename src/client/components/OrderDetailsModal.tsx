@@ -20,8 +20,11 @@ import {
   Phone,
   Mail,
   ShoppingBag,
-  ArrowRight
+  ArrowRight,
+  Download
 } from 'lucide-react';
+import { EmailPdfModal } from './EmailPdfModal.js';
+import { downloadOrderInvoicePDF } from '../utils/pdfGenerator.js';
 
 interface OrderDetailsModalProps {
   order: Order | null;
@@ -33,6 +36,18 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
   const { addToCart, showToast } = useStore();
   const [copiedTracking, setCopiedTracking] = useState(false);
   const [reordering, setReordering] = useState(false);
+  const [isEmailPdfOpen, setIsEmailPdfOpen] = useState(false);
+
+  const handleDownloadPdf = () => {
+    if (!order) return;
+    try {
+      downloadOrderInvoicePDF(order);
+      showToast('Downloading official invoice PDF...', 'success');
+    } catch (err) {
+      console.error('Failed to generate PDF:', err);
+      showToast('Failed to generate invoice PDF', 'error');
+    }
+  };
 
   if (!order) return null;
 
@@ -213,6 +228,28 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              id="order-details-email-pdf-btn"
+              type="button"
+              onClick={() => setIsEmailPdfOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-900 hover:bg-amber-800 text-white text-xs font-semibold rounded-xs transition-colors cursor-pointer shadow-2xs"
+              title="Email official PDF invoice"
+            >
+              <Mail className="w-3.5 h-3.5 text-amber-300" />
+              <span>Email PDF</span>
+            </button>
+
+            <button
+              id="order-details-download-pdf-btn"
+              type="button"
+              onClick={handleDownloadPdf}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-medium rounded-xs transition-colors cursor-pointer"
+              title="Download invoice PDF"
+            >
+              <Download className="w-3.5 h-3.5 text-stone-400" />
+              <span>PDF</span>
+            </button>
+
             <button
               onClick={() => window.print()}
               className="p-2 text-stone-400 hover:text-white hover:bg-stone-800 rounded-xs transition-colors cursor-pointer"
@@ -624,6 +661,17 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
             </button>
           </div>
         </div>
+
+        {/* Email Invoice PDF Modal */}
+        {order && (
+          <EmailPdfModal
+            isOpen={isEmailPdfOpen}
+            onClose={() => setIsEmailPdfOpen(false)}
+            order={order}
+            initialEmail={order.customerEmail}
+            onSuccess={(msg) => showToast(msg, 'success')}
+          />
+        )}
 
       </div>
     </div>

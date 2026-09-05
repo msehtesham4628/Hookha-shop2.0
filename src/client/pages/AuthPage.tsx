@@ -615,51 +615,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onNav
                   Forget password?
                 </button>
               </div>
-
-              {/* Quick Fill Demo Credentials */}
-              <div className="mt-4 pt-3 border-t border-stone-200/80 bg-stone-50/80 -mx-6 -mb-6 p-4 rounded-b-sm">
-                <p className="text-[11px] font-medium text-stone-600 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                  <KeyRound className="w-3.5 h-3.5 text-amber-800" />
-                  Quick Fill Test Accounts
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    id="quick-fill-admin-btn"
-                    onClick={() => {
-                      setLoginUser('admin@worldhookahmarket.com');
-                      setLoginPassword('Admin123!');
-                      setErrorMsg('');
-                    }}
-                    className="text-left p-2 rounded-xs border border-stone-200 bg-white hover:border-amber-700 hover:bg-amber-50/40 transition-colors text-xs cursor-pointer"
-                  >
-                    <div className="font-semibold text-stone-800 flex items-center justify-between text-xs">
-                      <span>Administrator</span>
-                      <span className="text-[10px] text-amber-800 font-mono bg-amber-100/60 px-1 py-0.5 rounded">fill</span>
-                    </div>
-                    <div className="text-[10px] text-stone-500 truncate mt-0.5">admin@worldhookahmarket.com</div>
-                    <div className="text-[10px] text-stone-400 font-mono">Admin123!</div>
-                  </button>
-
-                  <button
-                    type="button"
-                    id="quick-fill-customer-btn"
-                    onClick={() => {
-                      setLoginUser('customer@example.com');
-                      setLoginPassword('Customer123!');
-                      setErrorMsg('');
-                    }}
-                    className="text-left p-2 rounded-xs border border-stone-200 bg-white hover:border-amber-700 hover:bg-amber-50/40 transition-colors text-xs cursor-pointer"
-                  >
-                    <div className="font-semibold text-stone-800 flex items-center justify-between text-xs">
-                      <span>Customer VIP</span>
-                      <span className="text-[10px] text-amber-800 font-mono bg-amber-100/60 px-1 py-0.5 rounded">fill</span>
-                    </div>
-                    <div className="text-[10px] text-stone-500 truncate mt-0.5">customer@example.com</div>
-                    <div className="text-[10px] text-stone-400 font-mono">Customer123!</div>
-                  </button>
-                </div>
-              </div>
             </form>
           )}
 

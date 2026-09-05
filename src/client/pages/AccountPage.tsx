@@ -540,6 +540,14 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
 
                             <div className="flex items-center gap-2">
                               <button
+                                onClick={() => onNavigate(`/track-order?orderId=${encodeURIComponent(order.orderNumber)}`)}
+                                className="bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs px-3 py-1.5 rounded-xs transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                              >
+                                <Truck className="w-3.5 h-3.5 text-amber-400" />
+                                <span>Track Live</span>
+                              </button>
+
+                              <button
                                 onClick={() => setSelectedOrder(order)}
                                 className="bg-amber-900 hover:bg-amber-950 text-white font-semibold text-xs px-3.5 py-1.5 rounded-xs transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
                               >
@@ -551,7 +559,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                                 onClick={() => onNavigate(`/order-success?orderId=${order.id}`)}
                                 className="bg-white hover:bg-stone-100 text-stone-700 font-semibold text-xs px-3 py-1.5 rounded-xs border border-stone-300 transition-colors flex items-center gap-1 cursor-pointer"
                               >
-                                <span>Live Dossier</span>
+                                <span>Dossier</span>
                                 <ChevronRight className="w-3.5 h-3.5" />
                               </button>
                             </div>
