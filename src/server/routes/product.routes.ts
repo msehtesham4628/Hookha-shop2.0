@@ -1,4 +1,6 @@
 import { Router } from 'express';
+
+// [category-filter-fixed]
 import { db } from '../db/store.js';
 
 const router = Router();
@@ -45,12 +47,21 @@ router.get('/', (req, res) => {
     // Category filter
     if (category) {
       const catLower = category.toLowerCase().trim();
-      result = result.filter(p =>
-        p.categorySlug === catLower ||
-        p.category.toLowerCase() === catLower ||
-        p.categorySlug.replace(/-/g, ' ') === catLower.replace(/-/g, ' ') ||
-        p.category.toLowerCase().replace(/\s+/g, '-') === catLower
-      );
+      const categoryAliases: Record<string, string[]> = {
+        'e-hookah': ['e-hookah', 'e hookah', 'e-hookah & electronic', 'e hookah electronic', 'electronic hookah', 'electronic hookah heads'],
+        'vapes': ['vapes', 'vape', 'vapes & pod systems', 'vape & pod systems', 'pod systems', 'disposable vapes']
+      };
+      const aliases = categoryAliases[catLower] || [catLower];
+      result = result.filter(p => {
+        const pSlug = (p.categorySlug || '').toLowerCase().trim();
+        const pCategory = (p.category || '').toLowerCase().trim();
+        const pSlugSpaced = pSlug.replace(/-/g, ' ');
+        const pCategorySlug = pCategory.replace(/\s+/g, '-');
+        return aliases.some(alias => {
+          const a = alias.toLowerCase().trim();
+          return pSlug === a || pCategory === a || pSlugSpaced === a.replace(/-/g, ' ') || pCategorySlug === a.replace(/\s+/g, '-');
+        });
+      });
     }
 
     // Subcategory filter (supports direct subcategory matches, brand-based subcategories, and cleaned term variations)
