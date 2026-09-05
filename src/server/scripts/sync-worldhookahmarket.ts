@@ -75,6 +75,38 @@ function productJson(html: string): any[] {
 function isProductUrl(url: string) { return /\/product\/[^/?#]+\/?$/i.test(url); }
 function isCategoryUrl(url: string) { return /\/product-category\//i.test(url); }
 
+function classifyCategory(canonical: string) {
+  const parts = canonical.replace(BASE, '').split('/').filter(Boolean);
+  const categoryIndex = parts.indexOf('product-category');
+  if (categoryIndex < 0) return { slug: 'uncategorized', name: 'Uncategorized', path: [] as string[] };
+  const pathParts = parts.slice(categoryIndex + 1).map(slugify);
+  const path = pathParts.filter(Boolean);
+  const first = path[0] || '';
+  const second = path[1] || '';
+
+  // WHM nests E-Hookah below /product-category/hookah/e-hookah/.
+  if (first === 'hookah' && (second === 'e-hookah' || second === 'e-hookah-heads' || second.includes('electronic'))) {
+    return { slug: 'e-hookah', name: 'E-Hookah', path };
+  }
+  // WHM uses the singular /product-category/vape/ path.
+  if (first === 'vape' || first === 'vapes' || first === 'vape-pod' || first === 'vape-pods') {
+    return { slug: 'vapes', name: 'Vapes', path };
+  }
+  if (first === 'hookah') return { slug: 'hookahs', name: 'Hookahs', path };
+  if (first === 'tobacco' || first === 'shisha-tobacco') return { slug: 'tobacco', name: 'Tobacco', path };
+  if (first === 'bowl' || first === 'bowls') return { slug: 'bowls', name: 'Bowls', path };
+  if (first === 'base' || first === 'bases') return { slug: 'bases', name: 'Bases', path };
+  if (first === 'coal' || first === 'charcoal') return { slug: 'coal', name: 'Coal', path };
+  if (first === 'accessory' || first === 'accessories') return { slug: 'accessories', name: 'Accessories', path };
+  return { slug: first || 'uncategorized', name: (first || 'Uncategorized').replace(/-/g, ' '), path };
+}
+
+function normalizeBrand(brand: string) {
+  const value = brand.trim();
+  if (!value || /world\s*hookah\s*market/i.test(value)) return '';
+  return value;
+}
+
 async function main() {
   await fs.mkdir(OUT, { recursive: true });
   const sitemap = await get(`${BASE}/sitemap_index.xml`);
@@ -86,8 +118,6 @@ async function main() {
 
   const productUrls = [...new Set(urls.filter(isProductUrl))];
   const categoryUrls = [...new Set(urls.filter(isCategoryUrl))];
-
-  // Sitemap can omit products. Discover product links from category/home pages too.
   const discoveryPages = [...new Set([BASE, ...categoryUrls.slice(0, 250)])];
   for (const page of discoveryPages) {
     const html = await get(page);
@@ -103,7 +133,8 @@ async function main() {
       const url = uniqueProducts[i];
       const html = await get(url);
       if (!html) continue;
-      const ld = productJson(html).find(x => x['@type'] === 'Product') || productJson(html)[0] || {};
+      const jsonLd = productJson(html);
+      const ld = jsonLd.find(x => x['@type'] === 'Product') || jsonLd[0] || {};
       const name = stripHtml(ld.name || meta(html, 'og:title') || title(html)).replace(/\s*[-|].*$/, '').trim();
       if (!name) continue;
       const brandValue = typeof ld.brand === 'object' ? ld.brand?.name : ld.brand;
@@ -113,24 +144,23 @@ async function main() {
       const rawPrice = Number(offers?.price ?? 0) || price(html);
       const availability = String(offers?.availability || '').toLowerCase();
       const canonical = absolute((/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)/i.exec(html)?.[1] || url));
-      const parts = canonical.replace(BASE, '').split('/').filter(Boolean);
-      const categoryIndex = parts.indexOf('product-category');
-      const categorySlug = categoryIndex >= 0 ? parts[categoryIndex + 1] : 'uncategorized';
-      const brand = String(brandValue || '').trim();
+      const categoryInfo = classifyCategory(canonical);
+      const brand = normalizeBrand(String(brandValue || ''));
       const now = new Date().toISOString();
       products.push({
         id: `whm-${slugify(name)}-${Math.abs(hash(url))}`,
         name,
-        slug: parts[parts.indexOf('product') + 1] || slugify(name),
+        slug: canonical.split('/product/')[1]?.split('/')[0] || slugify(name),
         sku: String(ld.sku || `WHM-${Math.abs(hash(url))}`),
         description: stripHtml(ld.description || meta(html, 'description') || name),
         shortDescription: stripHtml(ld.description || name).slice(0, 240),
         price: rawPrice,
         currency: String(offers?.priceCurrency || 'USD'),
-        brand: brand || 'World Hookah Market',
-        brandSlug: slugify(brand || 'world-hookah-market'),
-        category: categorySlug === 'uncategorized' ? 'Uncategorized' : categorySlug.replace(/-/g, ' '),
-        categorySlug,
+        brand: brand || 'Fumare Hookah',
+        brandSlug: slugify(brand || 'fumare-hookah'),
+        category: categoryInfo.name,
+        categorySlug: categoryInfo.slug,
+        categoryPath: categoryInfo.path,
         images: cleanImages.map((img, index) => ({ id: `img-${index}-${Math.abs(hash(img))}`, url: img, thumbnailUrl: img, alt: name, isPrimary: index === 0, sortOrder: index + 1 })),
         stock: /outofstock|out of stock/i.test(availability) ? 0 : 999,
         lowStockThreshold: 5,
@@ -150,7 +180,6 @@ async function main() {
         createdAt: now,
         updatedAt: now
       });
-      if ((i + 1) % 25 === 0) console.log(`[WHM] ${i + 1}/${uniqueProducts.length}`);
     }
   }
   await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
@@ -168,8 +197,10 @@ async function main() {
   const brandMap = new Map<string, any>();
   for (const p of finalProducts) {
     const key = p.brandSlug;
-    if (!brandMap.has(key)) brandMap.set(key, { id: `brand-${key}`, name: p.brand, slug: key, description: `Products by ${p.brand}.`, logoUrl: p.images[0]?.url, bannerUrl: p.images[0]?.url, productCount: 0, isActive: true });
-    brandMap.get(key).productCount++;
+    if (!brandMap.has(key)) brandMap.set(key, { id: `brand-${key}`, name: p.brand, slug: key, description: `Products by ${p.brand}.`, logoUrl: p.images[0]?.url || '', bannerUrl: p.images[0]?.url || '', productCount: 0, isActive: true });
+    const brand = brandMap.get(key);
+    brand.productCount++;
+    if (!brand.logoUrl && p.images[0]?.url) brand.logoUrl = p.images[0].url;
   }
 
   await fs.writeFile(path.join(OUT, 'scrapedProducts.json'), JSON.stringify(finalProducts, null, 2));
