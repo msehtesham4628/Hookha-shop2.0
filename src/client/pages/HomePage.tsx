@@ -96,6 +96,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         basesRes,
         coalsRes,
         accessoriesRes,
+        ehookahRes,
+        vapeRes,
         newInRes,
         bestRes
       ] = await Promise.all([
@@ -105,6 +107,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         api.getProducts({ category: 'bases', limit: 12 }),
         api.getProducts({ category: 'coal', limit: 12 }),
         api.getProducts({ category: 'accessories', limit: 12 }),
+        api.getProducts({ category: 'e-hookah', limit: 12 }),
+        api.getProducts({ category: 'vapes', limit: 12 }),
         api.getProducts({ newArrival: true, limit: 8 }),
         api.getProducts({ bestSeller: true, limit: 8 })
       ]);
@@ -126,6 +130,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       }
       if (accessoriesRes.success && accessoriesRes.data) {
         setAccessoryProducts(accessoriesRes.data.products);
+      }
+      if (ehookahRes.success && ehookahRes.data) {
+        setEhookahProducts(ehookahRes.data.products);
+      }
+      if (vapeRes.success && vapeRes.data) {
+        setVapeProducts(vapeRes.data.products);
       }
       if (newInRes.success && newInRes.data) {
         setNewInProducts(newInRes.data.products);
