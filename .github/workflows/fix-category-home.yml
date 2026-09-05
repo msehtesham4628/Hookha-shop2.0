@@ -1,0 +1,47 @@
+name: Fix category homepage products
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: ${{ !contains(github.event.head_commit.message, '[category-home-fixed]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch homepage category loading
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('src/client/pages/HomePage.tsx')
+          s = p.read_text()
+          old = """        accessoriesRes,\n        newInRes,\n        bestRes\n      ] = await Promise.all([\n        api.getProducts({ category: 'tobacco', limit: 12 }),\n        api.getProducts({ category: 'hookahs', limit: 12 }),\n        api.getProducts({ category: 'bowls', limit: 12 }),\n        api.getProducts({ category: 'bases', limit: 12 }),\n        api.getProducts({ category: 'coal', limit: 12 }),\n        api.getProducts({ category: 'accessories', limit: 12 }),\n        api.getProducts({ newArrival: true, limit: 8 }),\n        api.getProducts({ bestSeller: true, limit: 8 })\n      ]);"""
+          new = """        accessoriesRes,\n        ehookahRes,\n        vapeRes,\n        newInRes,\n        bestRes\n      ] = await Promise.all([\n        api.getProducts({ category: 'tobacco', limit: 12 }),\n        api.getProducts({ category: 'hookahs', limit: 12 }),\n        api.getProducts({ category: 'bowls', limit: 12 }),\n        api.getProducts({ category: 'bases', limit: 12 }),\n        api.getProducts({ category: 'coal', limit: 12 }),\n        api.getProducts({ category: 'accessories', limit: 12 }),\n        api.getProducts({ category: 'e-hookah', limit: 12 }),\n        api.getProducts({ category: 'vapes', limit: 12 }),\n        api.getProducts({ newArrival: true, limit: 8 }),\n        api.getProducts({ bestSeller: true, limit: 8 })\n      ]);"""
+          if old not in s:
+              raise SystemExit('Expected homepage loading block not found')
+          s = s.replace(old, new, 1)
+          old2 = """      if (accessoriesRes.success && accessoriesRes.data) {\n        setAccessoryProducts(accessoriesRes.data.products);\n      }\n      if (newInRes.success && newInRes.data) {"""
+          new2 = """      if (accessoriesRes.success && accessoriesRes.data) {\n        setAccessoryProducts(accessoriesRes.data.products);\n      }\n      if (ehookahRes.success && ehookahRes.data) {\n        setEhookahProducts(ehookahRes.data.products);\n      }\n      if (vapeRes.success && vapeRes.data) {\n        setVapeProducts(vapeRes.data.products);\n      }\n      if (newInRes.success && newInRes.data) {"""
+          if old2 not in s:
+              raise SystemExit('Expected homepage setter block not found')
+          s = s.replace(old2, new2, 1)
+          marker = '// [category-home-fixed]'
+          if marker not in s:
+              s = s.replace("import React from 'react';", "import React from 'react';\n\n// [category-home-fixed]", 1)
+          p.write_text(s)
+          PY
+
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/client/pages/HomePage.tsx
+          git diff --cached --quiet || git commit -m "fix: load e-hookah and vape products on homepage [category-home-fixed]"
+          git push
