@@ -1,7 +1,13 @@
-name: Sync World Hookah Market Catalog
+name: Full World Hookah Market Catalog Rebuild
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/server/scripts/sync-worldhookahmarket-fresh.ts'
+      - '.github/workflows/sync-worldhookahmarket.yml'
+      - 'package.json'
 
 permissions:
   contents: write
@@ -9,9 +15,12 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -22,13 +31,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Sync WHM catalog
+      - name: Full WHM rebuild
         run: npm run sync:whm
 
-      - name: Commit catalog
+      - name: Validate catalog
+        run: |
+          node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('src/server/db/scrapedProducts.json','utf8')); const c=JSON.parse(fs.readFileSync('src/server/db/scrapedCategories.json','utf8')); const b=JSON.parse(fs.readFileSync('src/server/db/scrapedBrands.json','utf8')); if(!Array.isArray(p)||p.length===0) throw new Error('No products'); if(!Array.isArray(c)||c.length===0) throw new Error('No categories'); if(!Array.isArray(b)||b.length===0) throw new Error('No brands'); console.log({products:p.length,categories:c.length,brands:b.length});"
+
+      - name: Commit rebuilt catalog
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add src/server/db/scrapedProducts.json src/server/db/scrapedCategories.json src/server/db/scrapedBrands.json src/server/db/worldhookahmarket-sync.json
-          git diff --cached --quiet || git commit -m "Sync World Hookah Market catalog"
+          git diff --cached --quiet || git commit -m "Rebuild complete WHM product catalog"
           git push
