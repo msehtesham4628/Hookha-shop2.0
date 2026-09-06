@@ -10,7 +10,6 @@ import { QuickViewModal } from './components/QuickViewModal.js';
 import { CartDrawer } from './components/CartDrawer.js';
 import { ToastContainer } from './components/ToastContainer.js';
 
-// Pages
 import { HomePage } from './pages/HomePage.js';
 import { ShopPage } from './pages/ShopPage.js';
 import { ProductDetailPage } from './pages/ProductDetailPage.js';
@@ -28,7 +27,6 @@ export default function App() {
   const { loadCurrentUser, loadCart, loadWishlist, loadSettings } = useStore();
   const [currentPath, setCurrentPath] = useState<string>(window.location.pathname + window.location.search);
 
-  // Initialize initial store state on app boot
   useEffect(() => {
     loadCurrentUser();
     loadCart();
@@ -36,17 +34,11 @@ export default function App() {
     loadSettings();
 
     const unsubSync = onSync('*', (event) => {
-      if (event.type === 'SETTINGS_UPDATED') {
-        loadSettings();
-      } else if (event.type === 'ORDER_PLACED' || event.type === 'INVENTORY_UPDATED') {
-        loadCart();
-      }
+      if (event.type === 'SETTINGS_UPDATED') loadSettings();
+      else if (event.type === 'ORDER_PLACED' || event.type === 'INVENTORY_UPDATED') loadCart();
     });
 
-    const handlePopState = () => {
-      setCurrentPath(window.location.pathname + window.location.search);
-    };
-
+    const handlePopState = () => setCurrentPath(window.location.pathname + window.location.search);
     window.addEventListener('popstate', handlePopState);
     return () => {
       unsubSync();
@@ -54,24 +46,17 @@ export default function App() {
     };
   }, []);
 
-  // Router navigation helper
   const navigate = (path: string) => {
     window.history.pushState({}, '', path);
     setCurrentPath(path);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Route parser
   const renderRoute = () => {
     const [pathOnly, queryString] = currentPath.split('?');
     const queryParams = new URLSearchParams(queryString || '');
 
-    // 1. Home Page
-    if (pathOnly === '/' || pathOnly === '') {
-      return <HomePage onNavigate={navigate} />;
-    }
-
-    // 2. Shop / Catalog Page
+    if (pathOnly === '/' || pathOnly === '') return <HomePage onNavigate={navigate} />;
     if (pathOnly === '/shop') {
       return (
         <ShopPage
@@ -85,103 +70,41 @@ export default function App() {
         />
       );
     }
-
-    // 3. Product Details Page (/product/:slug)
-    if (pathOnly.startsWith('/product/')) {
-      const slug = pathOnly.replace('/product/', '');
-      return <ProductDetailPage slug={slug} onNavigate={navigate} />;
-    }
-
-    // 4. Checkout Page
-    if (pathOnly === '/checkout') {
-      return <CheckoutPage onNavigate={navigate} />;
-    }
-
-    // 5. Order Success Confirmation
-    if (pathOnly === '/order-success') {
-      const orderId = queryParams.get('orderId') || undefined;
-      return <OrderSuccessPage orderId={orderId} onNavigate={navigate} />;
-    }
-
-    // 5b. Order Tracking & Real-Time Shipping Page
-    if (
-      pathOnly === '/track-order' ||
-      pathOnly === '/order-tracking' ||
-      pathOnly === '/track' ||
-      pathOnly.startsWith('/track/')
-    ) {
-      const orderId =
-        queryParams.get('orderId') ||
-        queryParams.get('id') ||
-        queryParams.get('query') ||
-        (pathOnly.startsWith('/track/') ? pathOnly.replace('/track/', '') : undefined);
-
+    if (pathOnly.startsWith('/product/')) return <ProductDetailPage slug={pathOnly.replace('/product/', '')} onNavigate={navigate} />;
+    if (pathOnly === '/checkout') return <CheckoutPage onNavigate={navigate} />;
+    if (pathOnly === '/order-success') return <OrderSuccessPage orderId={queryParams.get('orderId') || undefined} onNavigate={navigate} />;
+    if (pathOnly === '/track-order' || pathOnly === '/order-tracking' || pathOnly === '/track' || pathOnly.startsWith('/track/')) {
+      const orderId = queryParams.get('orderId') || queryParams.get('id') || queryParams.get('query') || (pathOnly.startsWith('/track/') ? pathOnly.replace('/track/', '') : undefined);
       return <OrderTrackingPage initialOrderId={orderId} onNavigate={navigate} />;
     }
-
-    // 6. Customer Account Dashboard
-    if (pathOnly === '/account') {
-      const tab = queryParams.get('tab') || 'orders';
-      return <AccountPage initialTab={tab} onNavigate={navigate} />;
-    }
-
-    // 7. Wholesale B2B Application
-    if (pathOnly === '/wholesale') {
-      return <WholesalePage onNavigate={navigate} />;
-    }
-
-    // 8. Auth Pages (Login, Register, OTP)
-    if (pathOnly === '/auth/login') {
-      return <AuthPage initialMode="login" onNavigate={navigate} />;
-    }
-    if (pathOnly === '/auth/register') {
-      return <AuthPage initialMode="register" onNavigate={navigate} />;
-    }
-    if (pathOnly === '/auth/forgot') {
-      return <AuthPage initialMode="forgot" onNavigate={navigate} />;
-    }
-    if (pathOnly === '/auth/otp') {
-      return <AuthPage initialMode="login" onNavigate={navigate} />;
-    }
-
-    // 9. Brand & Concierge Info
-    if (pathOnly === '/about') {
-      return <AboutPage onNavigate={navigate} />;
-    }
-    if (pathOnly === '/contact') {
-      return <ContactPage onNavigate={navigate} />;
-    }
-
-    // 10. Admin Suite (Direct /dashboard and /admin routes)
-    if (pathOnly === '/dashboard' || pathOnly === '/admin') {
-      return <AdminDashboardPage onNavigate={navigate} />;
-    }
-
-    // Fallback default: Home
+    if (pathOnly === '/account') return <AccountPage initialTab={queryParams.get('tab') || 'orders'} onNavigate={navigate} />;
+    if (pathOnly === '/wholesale') return <WholesalePage onNavigate={navigate} />;
+    if (pathOnly === '/auth/login') return <AuthPage initialMode="login" onNavigate={navigate} />;
+    if (pathOnly === '/auth/register') return <AuthPage initialMode="register" onNavigate={navigate} />;
+    if (pathOnly === '/auth/forgot') return <AuthPage initialMode="forgot" onNavigate={navigate} />;
+    if (pathOnly === '/auth/otp') return <AuthPage initialMode="login" onNavigate={navigate} />;
+    if (pathOnly === '/about') return <AboutPage onNavigate={navigate} />;
+    if (pathOnly === '/contact') return <ContactPage onNavigate={navigate} />;
+    if (pathOnly === '/dashboard' || pathOnly === '/admin') return <AdminDashboardPage onNavigate={navigate} />;
     return <HomePage onNavigate={navigate} />;
   };
 
   const isAdminRoute = currentPath.startsWith('/dashboard') || currentPath.startsWith('/admin');
+  const isHomeRoute = currentPath === '/' || currentPath === '';
 
   return (
     <LanguageProvider>
       <div className="min-h-screen flex flex-col bg-white text-stone-900 selection:bg-amber-100 selection:text-amber-900">
-        {/* Global Modals & Overlays */}
         <AgeGateModal />
         <SearchModal onNavigate={navigate} />
         <QuickViewModal onNavigate={navigate} />
         <CartDrawer onNavigate={navigate} />
         <ToastContainer />
 
-        {/* Main Navbar (Hidden in Admin suite for immersive focus) */}
-        {!isAdminRoute && <Navbar currentPath={currentPath} onNavigate={navigate} />}
+        {/* Homepage owns its navbar inside the hero so the hero + navigation read as one visual block. */}
+        {!isAdminRoute && !isHomeRoute && <Navbar currentPath={currentPath} onNavigate={navigate} />}
 
-        {/* Page View */}
-        <div className="flex-1">
-          {renderRoute()}
-        </div>
-
-        {/* Footer (Hidden in Admin suite) */}
+        <div className="flex-1">{renderRoute()}</div>
         {!isAdminRoute && <Footer onNavigate={navigate} />}
       </div>
     </LanguageProvider>
