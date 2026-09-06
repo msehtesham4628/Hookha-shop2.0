@@ -306,6 +306,37 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     }
   ];
 
+  const categoryFallbackImages = {
+    tobacco: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=600&auto=format&fit=crop',
+    hookahs: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=600&auto=format&fit=crop',
+    bowls: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=600&auto=format&fit=crop',
+    bases: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=600&auto=format&fit=crop',
+    coal: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=600&auto=format&fit=crop',
+    accessories: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=600&auto=format&fit=crop',
+    ehookah: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=600&auto=format&fit=crop',
+    vapes: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=600&auto=format&fit=crop'
+  } as const;
+
+  const BrandAvatarBadge: React.FC<{ brand: BrandAvatar; category: keyof typeof categoryFallbackImages }> = ({ brand, category }) => {
+    const imageSrc = brand.imageUrl || categoryFallbackImages[category];
+
+    return (
+      <div
+        className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs overflow-hidden ${brand.bgClass} ${brand.textColor} ${brand.borderClass || ''}`}
+      >
+        <img
+          src={imageSrc}
+          alt={brand.name}
+          className="w-full h-full rounded-full object-cover bg-white"
+          loading="lazy"
+          onError={(e) => {
+            e.currentTarget.src = categoryFallbackImages[category];
+          }}
+        />
+      </div>
+    );
+  };
+
   const totalCartCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
   const handleSendFeedback = (e: React.FormEvent) => {
@@ -413,11 +444,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
-                <div
-                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor} ${brand.borderClass || ''}`}
-                >
-                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
-                </div>
+                <BrandAvatarBadge brand={brand} category="tobacco" />
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#0088cc] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
                 </span>
@@ -496,11 +523,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
-                <div
-                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor} ${brand.borderClass || ''}`}
-                >
-                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
-                </div>
+                <BrandAvatarBadge brand={brand} category="hookahs" />
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#00b5ad] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
                 </span>
@@ -579,11 +602,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
-                <div
-                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor} ${brand.borderClass || ''}`}
-                >
-                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
-                </div>
+                <BrandAvatarBadge brand={brand} category="bowls" />
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#f26c60] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
                 </span>
@@ -657,9 +676,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
-                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor}`}>
-                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
-                </div>
+                <BrandAvatarBadge brand={brand} category="bases" />
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#3b82f6] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
                 </span>
@@ -732,9 +749,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
-                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor}`}>
-                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
-                </div>
+                <BrandAvatarBadge brand={brand} category="coal" />
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#f97316] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
                 </span>
@@ -807,9 +822,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
-                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor} ${brand.borderClass || ''}`}>
-                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
-                </div>
+                <BrandAvatarBadge brand={brand} category="accessories" />
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#8b5cf6] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
                 </span>
@@ -882,9 +895,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
-                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor}`}>
-                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
-                </div>
+                <BrandAvatarBadge brand={brand} category="ehookah" />
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#06b6d4] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
                 </span>
@@ -957,9 +968,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
-                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor}`}>
-                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
-                </div>
+                <BrandAvatarBadge brand={brand} category="vapes" />
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#ec4899] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
                 </span>

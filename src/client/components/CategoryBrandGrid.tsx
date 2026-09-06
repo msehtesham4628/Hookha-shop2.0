@@ -108,7 +108,7 @@ export const CategoryBrandGrid: React.FC<CategoryBrandGridProps> = ({
     return true;
   });
 
-  const displayBrands = relevantBrands.length > 0 ? relevantBrands : brands.slice(0, 12);
+  const displayBrands = relevantBrands.length > 0 ? relevantBrands : brands.slice(0, 30);
 
   return (
     <div className="mb-8 bg-white border border-stone-200/90 rounded-xl p-4 sm:p-5 shadow-xs">
@@ -130,7 +130,7 @@ export const CategoryBrandGrid: React.FC<CategoryBrandGridProps> = ({
       </div>
 
       {/* Brand Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {displayBrands.map((brand, bIdx) => {
           const isSelected = selectedBrand === brand.slug;
           const meta = BRAND_METRICS[brand.slug] || { logoIcon: '🏷️', countryCode: brand.origin?.includes('Russia') ? 'RU' : 'US' };
