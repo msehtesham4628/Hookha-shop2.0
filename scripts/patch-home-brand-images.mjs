@@ -74,12 +74,12 @@ function makeArray(items) {
   }).join('\n')}\n  ]`;
 }
 
-home = home.replace(/  const ehookahBrands: BrandAvatar\[\] = \[[\s\S]*?\n  \];/, `  const ehookahBrands: BrandAvatar[] = ${makeArray(eBrands)};`);
-home = home.replace(/  const vapeBrands: BrandAvatar\[\] = \[[\s\S]*?\n  \];/, `  const vapeBrands: BrandAvatar[] = ${makeArray(vBrands)};`);
+home = home.replace(/  const ehookahBrands: BrandAvatar\[\] = \[[^;]*?\];/, `  const ehookahBrands: BrandAvatar[] = ${makeArray(eBrands)};`);
+home = home.replace(/  const vapeBrands: BrandAvatar\[\] = \[[^;]*?\];/, `  const vapeBrands: BrandAvatar[] = ${makeArray(vBrands)};`);
 
 const oldBadge = `<span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>`;
 const newBadge = `{brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}`;
-if (home.includes(oldBadge) && !home.includes('brand.imageUrl ? <img')) {
+if (!home.includes('brand.imageUrl ?') && home.includes(oldBadge)) {
   home = home.replaceAll(oldBadge, newBadge);
 }
 

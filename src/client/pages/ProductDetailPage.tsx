@@ -612,7 +612,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
                       <tbody className="divide-y divide-stone-200">
                         {product.specifications.map((spec, i) => (
                           <tr key={i} className={i % 2 === 0 ? 'bg-stone-50/50' : 'bg-white'}>
-                            <td className="py-2.5 px-4 font-semibold text-stone-800 w-1/3">{spec.name}</td>
+                            <td className="py-2.5 px-4 font-semibold text-stone-800 w-1/3">{spec.label || spec.name}</td>
                             <td className="py-2.5 px-4 text-stone-600">{spec.value}</td>
                           </tr>
                         ))}

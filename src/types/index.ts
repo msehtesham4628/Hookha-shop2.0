@@ -75,6 +75,7 @@ export interface ProductImage {
 
 export interface ProductSpecification {
   label: string;
+  name?: string;
   value: string;
 }
 
@@ -92,6 +93,7 @@ export interface Product {
   brandSlug: string;
   category: string;
   categorySlug: string;
+  categoryId?: string;
   subcategory?: string;
   images: ProductImage[];
   stock: number;
@@ -112,6 +114,9 @@ export interface Product {
   ageRestricted: boolean;
   seoTitle?: string;
   seoDescription?: string;
+  sourceUrl?: string;
+  productUrl?: string;
+  categoryPath?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -174,6 +179,7 @@ export interface Address {
   fullName: string;
   addressLine1: string;
   addressLine2?: string;
+  street?: string;
   city: string;
   state: string;
   postalCode: string;
@@ -220,8 +226,10 @@ export interface Order {
   billingAddress: Address;
   subtotal: number;
   discount: number;
+  discountTotal?: number;
   shippingFee: number;
   tax: number;
+  estimatedTax?: number;
   total: number;
   grandTotal?: number;
   couponCode?: string;
@@ -312,11 +320,14 @@ export interface AuditLog {
   userId: string;
   userName: string;
   userRole: string;
+  userEmail?: string;
   action: string;
   resource: string;
   resourceId?: string;
+  entityType?: string;
   ipAddress?: string;
   details?: Record<string, any>;
+  timestamp?: string;
   createdAt: string;
 }
 

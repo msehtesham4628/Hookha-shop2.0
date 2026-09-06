@@ -113,10 +113,12 @@ if (fs.existsSync(homePagePath) && syncedBrands.length) {
     { name: 'ZColors', slug: 'zcolors', bgClass: 'bg-purple-900', textColor: 'text-purple-100', badgeText: 'ZCOLORS' }
   ];
 
-  home = home.replace(/  const ehookahBrands: BrandAvatar\[\] = \[[\s\S]*?\n  \];/, `  const ehookahBrands: BrandAvatar[] = ${JSON.stringify(makeHomeBrands(ehookah, eDefaults), null, 2).replace(/"([^\"]+)":/g, '$1:').replace(/"([^\"]*)"/g, "'$1'")};`);
-  home = home.replace(/  const vapeBrands: BrandAvatar\[\] = \[[\s\S]*?\n  \];/, `  const vapeBrands: BrandAvatar[] = ${JSON.stringify(makeHomeBrands(vapes, vDefaults), null, 2).replace(/"([^\"]+)":/g, '$1:').replace(/"([^\"]*)"/g, "'$1'")};`);
+  home = home.replace(/  const ehookahBrands: BrandAvatar\[\] = \[[^;]*?\];/, `  const ehookahBrands: BrandAvatar[] = ${JSON.stringify(makeHomeBrands(ehookah, eDefaults), null, 2).replace(/"([^\"]+)":/g, '$1:').replace(/"([^\"]*)"/g, "'$1'")};`);
+  home = home.replace(/  const vapeBrands: BrandAvatar\[\] = \[[^;]*?\];/, `  const vapeBrands: BrandAvatar[] = ${JSON.stringify(makeHomeBrands(vapes, vDefaults), null, 2).replace(/"([^\"]+)":/g, '$1:').replace(/"([^\"]*)"/g, "'$1'")};`);
   home = home.replace(/  badgeText\?: string;\n}/, `  badgeText?: string;\n  imageUrl?: string;\n}`);
-  home = home.replace(/<span className="font-black text-\[11px\] sm:text-xs tracking-tight text-center px-1 leading-none">\s*\{brand\.badgeText\}\s*<\/span>/g, `{brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}`);
+  if (!home.includes('brand.imageUrl ?')) {
+    home = home.replace(/<span className="font-black text-\[11px\] sm:text-xs tracking-tight text-center px-1 leading-none">\s*\{brand\.badgeText\}\s*<\/span>/g, `{brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}`);
+  }
   fs.writeFileSync(homePagePath, home);
   console.log('[WHM] Patched homepage E-Hookah/Vape brands and image rendering.');
 }

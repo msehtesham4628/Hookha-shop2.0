@@ -60,9 +60,13 @@ export const calculateCartTotals = (userId: string, couponCode?: string): Cart =
     }
   }
 
-  const shippingFee = subtotal >= db.settings.freeShippingThreshold || subtotal === 0 ? 0 : db.settings.standardShippingFee;
+  const freeShippingThreshold = db.settings.freeShippingThreshold ?? 100;
+  const standardShippingFee = db.settings.standardShippingFee ?? 10;
+  const taxRatePercent = db.settings.taxRatePercent ?? 8.25;
+
+  const shippingFee = subtotal >= freeShippingThreshold || subtotal === 0 ? 0 : standardShippingFee;
   const taxableAmount = Math.max(0, subtotal - couponDiscount);
-  const estimatedTax = (taxableAmount * db.settings.taxRatePercent) / 100;
+  const estimatedTax = (taxableAmount * taxRatePercent) / 100;
   const grandTotal = taxableAmount + shippingFee + estimatedTax;
 
   return {

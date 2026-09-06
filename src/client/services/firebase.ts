@@ -35,9 +35,9 @@ import { User, Product, Order, Review, WholesaleApplication } from '../../types/
 // Initialize Firebase App
 export const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// Initialize Firestore with specific database ID and experimentalForceLongPolling to eliminate iframe WebChannel stream timeout errors
+// Initialize Firestore with specific database ID and experimentalAutoDetectLongPolling
 export const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true,
+  experimentalAutoDetectLongPolling: true,
 }, firebaseConfig.firestoreDatabaseId || undefined);
 
 // Initialize Firebase Auth
@@ -96,22 +96,16 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 }
 
 /**
- * Connection validator: tests connection on boot safely without throwing
+ * Connection validator: tests connection safely when invoked
  */
 export async function testConnection(): Promise<boolean> {
   try {
     await getDoc(doc(db, 'test', 'connection'));
-    console.log('Firebase Firestore connection verified.');
     return true;
-  } catch (error: any) {
-    // Graceful offline/long-polling fallback notice without unhandled exception
-    console.log('Firebase initialized with persistent long-polling transport.');
+  } catch {
     return true;
   }
 }
-
-// Automatically test connection on module load safely
-testConnection().catch(() => {});
 
 // ==========================================
 // Authentication & Profile Services

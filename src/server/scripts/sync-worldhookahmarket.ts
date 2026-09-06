@@ -139,7 +139,7 @@ async function main() {
       if (!name) continue;
       const brandValue = typeof ld.brand === 'object' ? ld.brand?.name : ld.brand;
       const imageList = Array.isArray(ld.image) ? ld.image : (ld.image ? [ld.image] : images(html));
-      const cleanImages = [...new Set(imageList.map((x: any) => absolute(typeof x === 'string' ? x : x?.url || '')).filter(Boolean))];
+      const cleanImages: string[] = [...new Set<string>(imageList.map((x: any) => absolute(typeof x === 'string' ? x : x?.url || '')).filter(Boolean))];
       const offers = Array.isArray(ld.offers) ? ld.offers[0] : ld.offers;
       const rawPrice = Number(offers?.price ?? 0) || price(html);
       const availability = String(offers?.availability || '').toLowerCase();
@@ -161,7 +161,7 @@ async function main() {
         category: categoryInfo.name,
         categorySlug: categoryInfo.slug,
         categoryPath: categoryInfo.path,
-        images: cleanImages.map((img, index) => ({ id: `img-${index}-${Math.abs(hash(img))}`, url: img, thumbnailUrl: img, alt: name, isPrimary: index === 0, sortOrder: index + 1 })),
+        images: cleanImages.map((img: string, index: number) => ({ id: `img-${index}-${Math.abs(hash(img))}`, url: img, thumbnailUrl: img, alt: name, isPrimary: index === 0, sortOrder: index + 1 })),
         stock: /outofstock|out of stock/i.test(availability) ? 0 : 999,
         lowStockThreshold: 5,
         tags: [],

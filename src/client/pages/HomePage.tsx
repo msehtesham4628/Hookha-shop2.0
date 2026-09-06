@@ -34,6 +34,7 @@ interface BrandAvatar {
   textColor: string;
   borderClass?: string;
   badgeText?: string;
+  imageUrl?: string;
 }
 
 interface BlogPostCard {
@@ -229,59 +230,79 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   ];
 
   const ehookahBrands: BrandAvatar[] = [
-    { name: 'Ooka', slug: 'ooka', bgClass: 'bg-stone-950', textColor: 'text-cyan-400', badgeText: 'OOKA' },
-    { name: 'Aspire Proteus', slug: 'aspire-proteus', bgClass: 'bg-orange-950', textColor: 'text-orange-300', badgeText: 'ASPIRE' }
-  ];
+  {
+    name: 'Enso',
+    slug: 'enso',
+    bgClass: 'bg-stone-950',
+    textColor: 'text-cyan-400',
+    badgeText: 'ENSO',
+    imageUrl: ''
+  },
+  {
+    name: 'HeyBar',
+    slug: 'heybar',
+    bgClass: 'bg-orange-950',
+    textColor: 'text-orange-300',
+    badgeText: 'HEYBAR',
+    imageUrl: ''
+  },
+  {
+    name: 'Kori',
+    slug: 'kori',
+    bgClass: 'bg-emerald-900',
+    textColor: 'text-emerald-100',
+    badgeText: 'KORI',
+    imageUrl: ''
+  },
+  {
+    name: 'XKAH',
+    slug: 'xkah',
+    bgClass: 'bg-slate-900',
+    textColor: 'text-slate-100',
+    badgeText: 'XKAH',
+    imageUrl: ''
+  }
+];
 
   const vapeBrands: BrandAvatar[] = [
-    { name: 'GeekVape', slug: 'geekvape', bgClass: 'bg-amber-600', textColor: 'text-white', badgeText: 'GEEKVAPE' },
-    { name: 'Vaporesso', slug: 'vaporesso', bgClass: 'bg-blue-900', textColor: 'text-blue-100', badgeText: 'VAPORESSO' },
-    { name: 'Lost Mary', slug: 'lost-mary', bgClass: 'bg-rose-900', textColor: 'text-rose-100', badgeText: 'LOST MARY' },
-    { name: 'Elf Bar', slug: 'elf-bar', bgClass: 'bg-purple-900', textColor: 'text-purple-100', badgeText: 'ELF BAR' },
-    { name: 'SMOK', slug: 'smok', bgClass: 'bg-stone-900', textColor: 'text-red-500', badgeText: 'SMOK' }
+    { name: 'Adalya', slug: 'adalya', bgClass: 'bg-rose-900', textColor: 'text-rose-100', badgeText: 'ADALYA' },
+    { name: 'Flamingo', slug: 'flamingo', bgClass: 'bg-pink-700', textColor: 'text-white', badgeText: 'FLAMINGO' },
+    { name: 'Kori Hola', slug: 'kori-hola', bgClass: 'bg-blue-900', textColor: 'text-blue-100', badgeText: 'KORI HOLA' },
+    { name: 'ZColors', slug: 'zcolors', bgClass: 'bg-purple-900', textColor: 'text-purple-100', badgeText: 'ZCOLORS' }
   ];
 
-  // Blog posts matching Screenshot 6
   const blogPosts: BlogPostCard[] = [
     {
       id: 'post-1',
-      title: 'Top 10 flavors of Sapphire Crown shisha tobacco',
-      ghostBg: 'bg-cyan-50 border-cyan-200',
-      ghostEmoji: '👻',
-      tag: 'Flavor Guide',
+      title: 'Heat Management 101: How to Pack the Perfect Dark Leaf Bowl',
+      ghostBg: 'border-stone-200 hover:border-[#0088cc]',
+      ghostEmoji: '💨',
+      tag: 'Guides',
       readTime: '4 min read'
     },
     {
       id: 'post-2',
-      title: 'Best Dark Leaf Hookah Flavors: MustHave vs DarkSide',
-      ghostBg: 'bg-rose-50 border-rose-200',
-      ghostEmoji: '💖',
-      tag: 'Review',
-      readTime: '6 min read'
-    },
-    {
-      id: 'post-3',
-      title: 'Sizes of hookah stems: Mini, Medium, or Standard?',
-      ghostBg: 'bg-amber-50 border-amber-200',
-      ghostEmoji: '🌟',
-      tag: 'Hardware',
+      title: 'Top 5 Russian Hookah Tobacco Flavors You Must Try This Year',
+      ghostBg: 'border-stone-200 hover:border-[#0088cc]',
+      ghostEmoji: '🍂',
+      tag: 'Flavor Spotlight',
       readTime: '5 min read'
     },
     {
-      id: 'post-4',
-      title: 'What do people typically smoke in modern hookah lounges?',
-      ghostBg: 'bg-emerald-50 border-emerald-200',
-      ghostEmoji: '😮',
-      tag: 'Lounge Trends',
+      id: 'post-3',
+      title: 'Coconut Charcoal vs Quick Light: The Science of Clean Smoke',
+      ghostBg: 'border-stone-200 hover:border-[#0088cc]',
+      ghostEmoji: '🔥',
+      tag: 'Essentials',
       readTime: '3 min read'
     },
     {
-      id: 'post-5',
-      title: 'The Ultimate Guide to Phunnel vs Killer Bowls',
-      ghostBg: 'bg-purple-50 border-purple-200',
-      ghostEmoji: '😜',
-      tag: 'Masterclass',
-      readTime: '7 min read'
+      id: 'post-4',
+      title: 'Stainless Steel vs Anodized Aluminum: Choosing Your Next Stem',
+      ghostBg: 'border-stone-200 hover:border-[#0088cc]',
+      ghostEmoji: '🛡️',
+      tag: 'Hardware',
+      readTime: '6 min read'
     }
   ];
 
@@ -395,9 +416,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 <div
                   className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor} ${brand.borderClass || ''}`}
                 >
-                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
-                    {brand.badgeText}
-                  </span>
+                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
                 </div>
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#0088cc] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
@@ -480,9 +499,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 <div
                   className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor} ${brand.borderClass || ''}`}
                 >
-                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
-                    {brand.badgeText}
-                  </span>
+                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
                 </div>
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#00b5ad] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
@@ -565,9 +582,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 <div
                   className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor} ${brand.borderClass || ''}`}
                 >
-                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
-                    {brand.badgeText}
-                  </span>
+                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
                 </div>
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#f26c60] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
@@ -643,9 +658,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
                 <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor}`}>
-                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
-                    {brand.badgeText}
-                  </span>
+                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
                 </div>
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#3b82f6] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
@@ -720,9 +733,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
                 <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor}`}>
-                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
-                    {brand.badgeText}
-                  </span>
+                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
                 </div>
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#f97316] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
@@ -797,9 +808,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
                 <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor} ${brand.borderClass || ''}`}>
-                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
-                    {brand.badgeText}
-                  </span>
+                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
                 </div>
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#8b5cf6] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
@@ -874,9 +883,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
                 <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor}`}>
-                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
-                    {brand.badgeText}
-                  </span>
+                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
                 </div>
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#06b6d4] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}
@@ -951,9 +958,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
                 <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-108 shadow-xs ${brand.bgClass} ${brand.textColor}`}>
-                  <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">
-                    {brand.badgeText}
-                  </span>
+                  {brand.imageUrl ? <img src={brand.imageUrl} alt={brand.name} className="w-full h-full rounded-full object-contain bg-white p-2" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <span className="font-black text-[11px] sm:text-xs tracking-tight text-center px-1 leading-none">{brand.badgeText}</span>}
                 </div>
                 <span className="text-[11px] sm:text-xs font-semibold text-stone-700 group-hover:text-[#ec4899] transition-colors text-center max-w-[90px] line-clamp-2 leading-tight">
                   {brand.name}

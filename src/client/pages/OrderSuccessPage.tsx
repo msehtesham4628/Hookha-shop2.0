@@ -53,7 +53,7 @@ export const OrderSuccessPage: React.FC<OrderSuccessPageProps> = ({ orderId, onN
       try {
         const res = await api.getOrderById(orderId);
         if (res.success && res.data) {
-          setOrder(res.data);
+          setOrder(res.data.order || (res.data as any));
         }
       } catch (err) {
         console.error('Failed to load order:', err);
@@ -188,7 +188,7 @@ export const OrderSuccessPage: React.FC<OrderSuccessPageProps> = ({ orderId, onN
                     <span className="text-stone-400 ml-2">Qty: {item.quantity}</span>
                     {item.selectedFlavor && <span className="text-amber-800 italic block text-[11px]">Flavor: {item.selectedFlavor}</span>}
                   </div>
-                  <span className="font-bold text-stone-900 font-sans">${item.totalPrice.toFixed(2)}</span>
+                  <span className="font-bold text-stone-900 font-sans">${(item.totalPrice ?? (item.price * item.quantity)).toFixed(2)}</span>
                 </div>
               ))}
             </div>
@@ -197,7 +197,7 @@ export const OrderSuccessPage: React.FC<OrderSuccessPageProps> = ({ orderId, onN
               <div>
                 <span className="font-bold text-stone-900 uppercase tracking-wider block mb-1">Destination Address:</span>
                 <p className="text-stone-600 leading-relaxed">
-                  {order.shippingAddress.street}<br />
+                  {order.shippingAddress.addressLine1 || order.shippingAddress.street || 'Address on file'}<br />
                   {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}<br />
                   {order.shippingAddress.country}
                 </p>
@@ -208,10 +208,10 @@ export const OrderSuccessPage: React.FC<OrderSuccessPageProps> = ({ orderId, onN
                   <span className="text-stone-500">Subtotal</span>
                   <span className="font-semibold text-stone-900">${order.subtotal.toFixed(2)}</span>
                 </div>
-                {order.discountTotal > 0 && (
+                {((order.discountTotal ?? order.discount ?? 0) > 0) && (
                   <div className="flex justify-between text-amber-900">
                     <span>Discount</span>
-                    <span>-${order.discountTotal.toFixed(2)}</span>
+                    <span>-${(order.discountTotal ?? order.discount ?? 0).toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
@@ -220,7 +220,7 @@ export const OrderSuccessPage: React.FC<OrderSuccessPageProps> = ({ orderId, onN
                 </div>
                 <div className="flex justify-between text-sm font-bold text-stone-900 pt-2 border-t border-stone-100">
                   <span>Grand Total</span>
-                  <span className="text-amber-900 font-sans">${order.grandTotal.toFixed(2)}</span>
+                  <span className="text-amber-900 font-sans">${(order.grandTotal ?? order.total).toFixed(2)}</span>
                 </div>
               </div>
             </div>

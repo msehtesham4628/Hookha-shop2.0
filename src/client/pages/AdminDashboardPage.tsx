@@ -3015,15 +3015,15 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                         {auditLogs.map((log) => (
                           <tr key={log.id} className="hover:bg-stone-50/70">
                             <td className="py-3 px-4 text-stone-400 font-mono text-[11px]">
-                              {new Date(log.timestamp).toLocaleString()}
+                              {new Date(log.timestamp || log.createdAt).toLocaleString()}
                             </td>
-                            <td className="py-3 px-4 font-semibold text-stone-900">{log.userEmail}</td>
+                            <td className="py-3 px-4 font-semibold text-stone-900">{log.userEmail || log.userName}</td>
                             <td className="py-3 px-4">
                               <span className="bg-stone-100 text-stone-800 px-2 py-0.5 rounded-xs font-mono text-[10px] font-bold">
                                 {log.action}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-amber-900 font-medium">{log.entityType}</td>
+                            <td className="py-3 px-4 text-amber-900 font-medium">{log.entityType || log.resource}</td>
                             <td className="py-3 px-4 text-stone-600 text-[11px] font-mono truncate max-w-xs">
                               {JSON.stringify(log.details)}
                             </td>
