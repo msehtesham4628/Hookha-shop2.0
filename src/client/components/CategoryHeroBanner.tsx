@@ -154,6 +154,13 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
   return (
     <section className="relative left-1/2 -mt-6 mb-10 w-screen -translate-x-1/2 overflow-hidden bg-stone-950 text-white sm:-mt-8">
       <div className="relative min-h-[620px] sm:min-h-[680px] lg:min-h-[760px]">
+        {/* Ambient atmospheric backdrop */}
+        <img
+          src={activeImage}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover object-center filter blur-3xl opacity-40 scale-125 pointer-events-none"
+        />
         <img
           key={activeImage}
           src={activeImage}

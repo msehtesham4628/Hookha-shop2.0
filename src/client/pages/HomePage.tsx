@@ -20,7 +20,8 @@ import {
   Mail,
   ArrowRight,
   CheckCircle2,
-  Loader2
+  Loader2,
+  Sparkles
 } from 'lucide-react';
 
 interface HomePageProps {
@@ -56,6 +57,9 @@ interface CategoryConfig {
   accentColor: string;
   brands: BrandAvatar[];
   fallbackImage: string;
+  heroImages?: string[];
+  headline?: string;
+  description?: string;
 }
 
 const CATEGORIES: CategoryConfig[] = [
@@ -143,6 +147,13 @@ const CATEGORIES: CategoryConfig[] = [
     title: 'ACCESSORIES',
     accentColor: '#8b5cf6',
     fallbackImage: '/accessories/accessories_1.jpg',
+    heroImages: [
+      '/accessories/accessories_1.jpg',
+      '/accessories/accessories_2.jpg',
+      '/accessories/accessories_3.jpg'
+    ],
+    headline: 'Heat Management Devices, Silicone Hoses & Session Essentials',
+    description: 'Kaloud Lotus • Na Grani • Blade Hookah • Alpha Hookah Tongs • Burners & Wind Covers',
     brands: [
       { name: 'Kaloud', slug: 'kaloud', bgClass: 'bg-white', textColor: 'text-stone-950', borderClass: 'border border-stone-300', badgeText: 'KALOUD', imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=300&auto=format&fit=crop' },
       { name: 'Na Grani HMD', slug: 'na-grani', bgClass: 'bg-stone-900', textColor: 'text-stone-200', badgeText: 'NA GRANI', imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=300&auto=format&fit=crop' },
@@ -242,6 +253,15 @@ interface CategorySliderProps {
 
 const CategorySliderSection: React.FC<CategorySliderProps> = ({ config, products, onNavigate }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [heroSlide, setHeroSlide] = useState(0);
+
+  useEffect(() => {
+    if (!config.heroImages || config.heroImages.length <= 1) return;
+    const interval = setInterval(() => {
+      setHeroSlide((prev) => (prev + 1) % config.heroImages!.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [config.heroImages]);
 
   const handleScroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -290,6 +310,97 @@ const CategorySliderSection: React.FC<CategorySliderProps> = ({ config, products
           </button>
         </div>
       </div>
+
+      {/* Featured Category Hero Section (Accessories & High Priority Categories) */}
+      {config.heroImages && config.heroImages.length > 0 && (
+        <div className="mb-8 relative rounded-xl overflow-hidden border border-stone-800 bg-stone-950 shadow-lg group">
+          <div className="relative h-48 sm:h-60 md:h-68 lg:h-76 w-full overflow-hidden">
+            {/* Ambient atmospheric backdrop */}
+            <img
+              src={config.heroImages[heroSlide % config.heroImages.length]}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full object-cover object-center filter blur-3xl opacity-40 scale-125 pointer-events-none"
+            />
+            {/* Active hero image */}
+            <img
+              key={config.heroImages[heroSlide % config.heroImages.length]}
+              src={config.heroImages[heroSlide % config.heroImages.length]}
+              alt={config.title}
+              className="absolute inset-0 h-full w-full object-cover object-center transition-all duration-700 group-hover:scale-101"
+              loading="lazy"
+            />
+
+            {/* Gradient overlays for crisp contrast & text legibility */}
+            <div className="absolute inset-0 bg-gradient-to-r from-stone-950/95 via-stone-950/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-stone-950/20" />
+
+            {/* Hero content & CTA */}
+            <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-10 lg:px-12 max-w-2xl z-10 text-left">
+              <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-black uppercase tracking-widest text-amber-400 mb-1.5">
+                <Sparkles className="w-3.5 h-3.5" /> Session Essentials
+              </span>
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white leading-tight drop-shadow-sm">
+                {config.headline || `${config.title} Collection`}
+              </h3>
+              <p className="mt-2 text-xs sm:text-sm text-stone-300 line-clamp-2 leading-relaxed">
+                {config.description || 'Premium accessories, heat management devices & professional gear.'}
+              </p>
+              <div className="mt-4 flex items-center gap-3">
+                <button
+                  onClick={() => onNavigate(`/shop?category=${config.apiCategory}`)}
+                  className="bg-white hover:bg-stone-200 text-stone-950 text-xs font-black uppercase tracking-wider px-4 py-2.5 rounded-lg shadow-sm transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                >
+                  Shop {config.title} <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Carousel Controls */}
+            {config.heroImages.length > 1 && (
+              <>
+                <button
+                  aria-label="Previous banner slide"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setHeroSlide((prev) => (prev + config.heroImages!.length - 1) % config.heroImages!.length);
+                  }}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-xs transition-colors border border-white/15 cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  aria-label="Next banner slide"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setHeroSlide((prev) => (prev + 1) % config.heroImages!.length);
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-xs transition-colors border border-white/15 cursor-pointer"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-3 right-4 z-20 flex items-center gap-1.5">
+                  {config.heroImages.map((_, idx) => (
+                    <button
+                      key={idx}
+                      aria-label={`Slide ${idx + 1}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setHeroSlide(idx);
+                      }}
+                      className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                        idx === (heroSlide % config.heroImages!.length)
+                          ? 'w-6 bg-amber-400'
+                          : 'w-2 bg-white/40 hover:bg-white/70'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <div
         ref={scrollRef}

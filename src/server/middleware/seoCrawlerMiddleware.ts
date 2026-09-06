@@ -49,6 +49,11 @@ export function createSeoMiddleware() {
     const isRussianQuery = req.query.lang === 'ru' || (req.headers['accept-language'] || '').toLowerCase().includes('ru');
     const isBot = /googlebot|yandex|bingbot|baiduspider|slurp|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|vkshare|w3c_validator|telegrambot/i.test(userAgent);
 
+    // In development mode, only intercept known crawler bots so Vite can transform index.html for browser users
+    if (process.env.NODE_ENV !== 'production' && !isBot) {
+      return next();
+    }
+
     const fullUrl = `${SITE_DOMAIN}${req.originalUrl}`;
     const cleanPath = req.path;
 

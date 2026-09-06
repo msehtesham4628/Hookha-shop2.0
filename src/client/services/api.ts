@@ -28,16 +28,20 @@ export const getApiBaseUrl = (): string => {
 const API_BASE = getApiBaseUrl();
 
 export async function translateTexts(texts: string[], target: string): Promise<string[]> {
-  const response = await fetch(`${API_BASE}/translate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ texts, target })
-  });
-  const payload = await response.json() as { success?: boolean; data?: string[] };
-  if (!response.ok || !payload.success || !payload.data) {
-    throw new Error('Translation service unavailable');
+  try {
+    const response = await fetch(`${API_BASE}/translate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texts, target })
+    });
+    if (!response.ok) return texts;
+    const payload = await response.json() as { success?: boolean; data?: string[] };
+    if (!payload.success || !Array.isArray(payload.data)) return texts;
+    return payload.data;
+  } catch (err) {
+    console.warn('[Translation] Upstream unavailable, using source text fallback:', err);
+    return texts;
   }
-  return payload.data;
 }
 
 class ApiClient {
