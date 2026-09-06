@@ -79,7 +79,8 @@ function loadSplitCatalog(): Product[] {
         if (!name && !sourceUrl) continue;
 
         const categoryText = catalogText(rawProduct.category);
-        const category = categoryText || (/e-?hookah|electronic hookah|hookah pod/i.test(`${name} ${sourceUrl}`) ? 'E-Hookah' : /vape|puff|nicotine|pod system|disposable/i.test(`${name} ${sourceUrl}`) ? 'Vapes' : /charcoal|coconut coal|quick light/i.test(`${name} ${sourceUrl}`) ? 'Coal' : /tobacco|shisha|molasses/i.test(`${name} ${sourceUrl}`) ? 'Tobacco' : 'Accessories');
+        const productText = `${name} ${sourceUrl.replace(/^https?:\/\/[^/]+/i, '')}`;
+        const category = categoryText || (/e-?hookah|electronic hookah|hookah pod/i.test(productText) ? 'E-Hookah' : /vape|puff|nicotine|pod system|disposable/i.test(productText) ? 'Vapes' : /charcoal|coconut coal|quick light/i.test(productText) ? 'Coal' : /tobacco|shisha|molasses/i.test(productText) ? 'Tobacco' : /bowl|phunnel|clay bowl/i.test(productText) ? 'Bowls' : /base|glass vase|vase for hookah/i.test(productText) ? 'Bases' : /hookah|shisha pipe|nargile/i.test(productText) ? 'Hookahs' : 'Accessories');
         const brand = catalogText(rawProduct.brand) || knownBrands.find(knownBrand => name.toLowerCase().startsWith(knownBrand.toLowerCase())) || name.split(/\s+/)[0] || 'Fumare Hookah';
         const slug = catalogSlug(name || sourceUrl);
         const priceMatch = String(rawProduct.price ?? '').replace(/,/g, '').match(/\d+(?:\.\d{1,2})?/);
@@ -175,6 +176,7 @@ export class DatabaseStore {
     if (this.users && this.users.length > 0) return;
 
     const superAdminPasswordHash = bcrypt.hashSync('Admin123!', 10);
+    const inzyAdminPasswordHash = bcrypt.hashSync('Umair@4628', 10);
     const sultanAdminHash = bcrypt.hashSync('Sultan@Admin2026!', 10);
     const staffPasswordHash = bcrypt.hashSync('Staff123!', 10);
     const sultanManagerHash = bcrypt.hashSync('Sultan@Manager2026!', 10);
@@ -213,6 +215,22 @@ export class DatabaseStore {
         passwordHash: superAdminPasswordHash,
         createdAt: '2026-01-01T00:00:00Z',
         updatedAt: '2026-01-01T00:00:00Z'
+      },
+      {
+        id: 'usr-inzy-admin',
+        email: 'inzy@admin.com',
+        firstName: 'Inzy',
+        lastName: 'Administrator',
+        phone: '+1 (800) 785-8260',
+        role: 'SUPER_ADMIN',
+        status: 'ACTIVE',
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        totalSpent: 0,
+        orderCount: 0,
+        passwordHash: inzyAdminPasswordHash,
+        createdAt: '2026-09-06T00:00:00Z',
+        updatedAt: '2026-09-06T00:00:00Z'
       },
       {
         id: 'usr-super-admin-whm',
@@ -370,12 +388,10 @@ export class DatabaseStore {
       console.warn('[Store] Could not load scrapedProducts.json:', e);
     }
 
-    // Merge INITIAL_PRODUCTS and catalogProducts, prioritizing enriched catalog and deduplicating by ID
+    // Use the imported catalog when available; demo products are only a fallback.
     const productMap = new Map<string, Product>();
-    for (const p of INITIAL_PRODUCTS) {
-      productMap.set(p.id, p);
-    }
-    for (const p of catalogProducts) {
+    const productsToLoad = catalogProducts.length > 0 ? catalogProducts : INITIAL_PRODUCTS;
+    for (const p of productsToLoad) {
       productMap.set(p.id, p);
     }
     this.products = Array.from(productMap.values());

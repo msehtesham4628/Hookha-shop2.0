@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Category, Brand } from '../../types/index.js';
 import { useTranslation } from '../i18n/LanguageContext.js';
 import { Sparkles, ChevronRight, ChevronLeft } from 'lucide-react';
+import { api } from '../services/api.js';
 
 interface CategoryHeroBannerProps {
   category?: Category;
@@ -281,11 +282,32 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
   const slides = config.slides || [];
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [catalogImage, setCatalogImage] = useState<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Reset slide index when category changes
   useEffect(() => {
     setCurrentSlideIndex(0);
+  }, [categorySlug, brandSlug]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setCatalogImage(null);
+    api.getProducts({
+      category: categorySlug || undefined,
+      brand: brandSlug || undefined,
+      limit: 1,
+      sort: 'newest'
+    }).then((response) => {
+      const imageUrl = response.data?.products?.[0]?.images?.[0]?.url;
+      if (!cancelled && response.success && imageUrl) {
+        setCatalogImage(`/api/image-proxy?url=${encodeURIComponent(imageUrl)}`);
+      }
+    }).catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
   }, [categorySlug, brandSlug]);
 
   // Auto-advance slides every 5 seconds
@@ -334,7 +356,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
               }`}
             >
               <img
-                src={slide.image}
+                src={idx === currentSlideIndex && catalogImage ? catalogImage : slide.image}
                 alt={`${displayTitle} - Slide ${idx + 1}`}
                 className={`w-full h-full object-cover object-center transition-transform duration-7000 ease-out filter brightness-70 contrast-105 ${
                   isActive ? 'scale-105' : 'scale-100'
