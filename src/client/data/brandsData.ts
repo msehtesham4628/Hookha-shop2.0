@@ -7,12 +7,13 @@ export interface BrandAvatar {
   borderClass?: string;
   badgeText: string;
   origin?: string;
+  imageUrl?: string;
+  logoUrl?: string;
 }
 
 // Brand directory aligned with the brands currently exposed by World Hookah Market.
-// Logos are intentionally not fabricated here; product/category imagery comes from the synced WHM catalog.
-const make = (name: string, slug: string, category: string, badgeText = name.toUpperCase()): BrandAvatar => ({
-  name, slug, category, bgClass: 'bg-white', textColor: 'text-stone-900', borderClass: 'border border-stone-200', badgeText
+const make = (name: string, slug: string, category: string, badgeText = name.toUpperCase(), imageUrl?: string): BrandAvatar => ({
+  name, slug, category, bgClass: 'bg-white', textColor: 'text-stone-900', borderClass: 'border border-stone-200', badgeText, imageUrl
 });
 
 export const CATEGORY_BRAND_MAP: Record<string, BrandAvatar[]> = {

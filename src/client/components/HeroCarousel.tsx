@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowRight, ShieldCheck, Sparkles, Search, ShoppingBag, Heart, User as UserIcon, Menu, X, ChevronDown, Truck } from 'lucide-react';
-import { api } from '../services/api.js';
 import { useStore } from '../store/useStore.js';
 import { useTranslation } from '../i18n/LanguageContext.js';
 import { LanguageSelector } from './LanguageSelector.js';
@@ -9,10 +8,14 @@ interface HeroCarouselProps {
   onNavigate: (path: string) => void;
 }
 
-const fallbackImage = 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=2000&auto=format&fit=crop';
+const heroSlides = [
+  '/home/home_1.jpg',
+  '/home/home_2.jpg',
+  '/home/home_3.jpg'
+];
 
 export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onNavigate }) => {
-  const [heroImage, setHeroImage] = useState(fallbackImage);
+  const [activeSlide, setActiveSlide] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -20,16 +23,17 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onNavigate }) => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    api.getProducts({ category: 'hookahs', limit: 1, sort: 'newest' }).then((response) => {
-      const imageUrl = response.data?.products?.[0]?.images?.[0]?.url;
-      if (response.success && imageUrl) {
-        setHeroImage(`/api/image-proxy?url=${encodeURIComponent(imageUrl)}`);
-      }
-    }).catch(() => {});
+    const intervalId = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % heroSlides.length);
+    }, 5000);
 
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const navLinks = [
@@ -49,12 +53,15 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onNavigate }) => {
   return (
     <section id="hero-carousel" className="relative w-full overflow-hidden bg-[#0d0f12] text-white select-none">
       <div className="relative min-h-[620px] w-full overflow-hidden sm:min-h-[680px] lg:min-h-[740px]">
-        <img
-          src={heroImage}
-          alt="Imported hookah catalog"
-          className="absolute inset-0 h-full w-full object-cover object-center"
-          referrerPolicy="no-referrer"
-        />
+        {heroSlides.map((image, index) => (
+          <img
+            key={image}
+            src={image}
+            alt={index === activeSlide ? 'Premium hookah collection' : 'Hookah lifestyle background'}
+            className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-1000 ${index === activeSlide ? 'opacity-100' : 'opacity-0'}`}
+            referrerPolicy="no-referrer"
+          />
+        ))}
         <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/55 to-stone-950/10" />
         <div className="absolute inset-0 bg-gradient-to-r from-stone-950/95 via-stone-950/55 to-transparent" />
 

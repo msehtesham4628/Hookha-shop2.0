@@ -35,6 +35,7 @@ interface BrandAvatar {
   borderClass?: string;
   badgeText?: string;
   imageUrl?: string;
+  logoUrl?: string;
 }
 
 interface BlogPostCard {
@@ -181,52 +182,52 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
   // Top Brands / Subcategories for each category
   const tobaccoBrands: BrandAvatar[] = [
-    { name: 'MustHave Tobacco', slug: 'musthave-tobacco', bgClass: 'bg-white', textColor: 'text-stone-900', borderClass: 'border border-stone-300 shadow-xs', badgeText: 'MUSTHAVE' },
-    { name: 'DarkSide Tobacco', slug: 'darkside-tobacco', bgClass: 'bg-stone-900', textColor: 'text-white', badgeText: 'DARKSIDE' },
-    { name: 'BlackBurn Tobacco', slug: 'blackburn-tobacco', bgClass: 'bg-stone-900', textColor: 'text-stone-100', borderClass: 'border border-stone-700 shadow-xs', badgeText: 'BLACKBURN' },
-    { name: 'Bonche Tobacco', slug: 'bonche-tobacco', bgClass: 'bg-stone-800', textColor: 'text-amber-200', badgeText: 'BONCHE' },
-    { name: 'Tangiers', slug: 'tangiers', bgClass: 'bg-emerald-950', textColor: 'text-emerald-300', badgeText: 'TANGIERS' },
-    { name: 'Adalya Tobacco', slug: 'adalya-tobacco', bgClass: 'bg-red-900', textColor: 'text-white', badgeText: 'ADALYA' },
-    { name: 'Serbetli tobacco', slug: 'serbetli-tobacco', bgClass: 'bg-rose-50', textColor: 'text-rose-800', borderClass: 'border border-rose-200', badgeText: 'Serbetli' },
-    { name: 'Banger Hookah Tobacco', slug: 'banger-tobacco', bgClass: 'bg-amber-900', textColor: 'text-amber-100', badgeText: 'BANGER' },
-    { name: 'Element Tobacco', slug: 'element-tobacco', bgClass: 'bg-cyan-900', textColor: 'text-cyan-100', badgeText: 'ELEMENT' }
+    { name: 'MustHave Tobacco', slug: 'musthave-tobacco', bgClass: 'bg-white', textColor: 'text-stone-900', borderClass: 'border border-stone-300 shadow-xs', badgeText: 'MUSTHAVE', imageUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop' },
+    { name: 'DarkSide Tobacco', slug: 'darkside-tobacco', bgClass: 'bg-stone-900', textColor: 'text-white', badgeText: 'DARKSIDE', imageUrl: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=300&auto=format&fit=crop' },
+    { name: 'BlackBurn Tobacco', slug: 'blackburn-tobacco', bgClass: 'bg-stone-900', textColor: 'text-stone-100', borderClass: 'border border-stone-700 shadow-xs', badgeText: 'BLACKBURN', imageUrl: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Bonche Tobacco', slug: 'bonche-tobacco', bgClass: 'bg-stone-800', textColor: 'text-amber-200', badgeText: 'BONCHE', imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Tangiers', slug: 'tangiers', bgClass: 'bg-emerald-950', textColor: 'text-emerald-300', badgeText: 'TANGIERS', imageUrl: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Adalya Tobacco', slug: 'adalya-tobacco', bgClass: 'bg-red-900', textColor: 'text-white', badgeText: 'ADALYA', imageUrl: 'https://images.unsplash.com/photo-1599507593548-5d817dcf87bf?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Serbetli tobacco', slug: 'serbetli-tobacco', bgClass: 'bg-rose-50', textColor: 'text-rose-800', borderClass: 'border border-rose-200', badgeText: 'Serbetli', imageUrl: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Banger Hookah Tobacco', slug: 'banger-tobacco', bgClass: 'bg-amber-900', textColor: 'text-amber-100', badgeText: 'BANGER', imageUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Element Tobacco', slug: 'element-tobacco', bgClass: 'bg-cyan-900', textColor: 'text-cyan-100', badgeText: 'ELEMENT', imageUrl: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=300&auto=format&fit=crop' }
   ];
 
   const hookahBrands: BrandAvatar[] = [
-    { name: 'Alpha Hookah', slug: 'alpha-hookah', bgClass: 'bg-white', textColor: 'text-stone-900', borderClass: 'border border-stone-300 shadow-xs', badgeText: 'ALPHA' },
-    { name: 'El Bomber Hookah', slug: 'el-bomber', bgClass: 'bg-stone-900', textColor: 'text-red-500', badgeText: 'EL BOMBER' },
-    { name: 'MattPear Hookah', slug: 'mattpear', bgClass: 'bg-emerald-900', textColor: 'text-emerald-100', badgeText: 'MATTPEAR' },
-    { name: 'Maklaud Hookah', slug: 'maklaud-hookah', bgClass: 'bg-stone-950', textColor: 'text-amber-400', badgeText: 'MAKLAUD' },
-    { name: 'WOOKAH Hookah', slug: 'wookah', bgClass: 'bg-amber-900', textColor: 'text-amber-100', badgeText: 'WOOKAH' },
-    { name: 'Japona Hookah', slug: 'japona-hookah', bgClass: 'bg-stone-800', textColor: 'text-stone-100', badgeText: 'JAPONA' },
-    { name: 'Steamulation Hookah', slug: 'steamulation-hookah', bgClass: 'bg-slate-100', textColor: 'text-slate-900', borderClass: 'border border-slate-300', badgeText: 'STEAM' }
+    { name: 'Alpha Hookah', slug: 'alpha-hookah', bgClass: 'bg-white', textColor: 'text-stone-900', borderClass: 'border border-stone-300 shadow-xs', badgeText: 'ALPHA', imageUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop' },
+    { name: 'El Bomber Hookah', slug: 'el-bomber', bgClass: 'bg-stone-900', textColor: 'text-red-500', badgeText: 'EL BOMBER', imageUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=300&auto=format&fit=crop' },
+    { name: 'MattPear Hookah', slug: 'mattpear', bgClass: 'bg-emerald-900', textColor: 'text-emerald-100', badgeText: 'MATTPEAR', imageUrl: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Maklaud Hookah', slug: 'maklaud-hookah', bgClass: 'bg-stone-950', textColor: 'text-amber-400', badgeText: 'MAKLAUD', imageUrl: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=300&auto=format&fit=crop' },
+    { name: 'WOOKAH Hookah', slug: 'wookah', bgClass: 'bg-amber-900', textColor: 'text-amber-100', badgeText: 'WOOKAH', imageUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Japona Hookah', slug: 'japona-hookah', bgClass: 'bg-stone-800', textColor: 'text-stone-100', badgeText: 'JAPONA', imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Steamulation Hookah', slug: 'steamulation-hookah', bgClass: 'bg-slate-100', textColor: 'text-slate-900', borderClass: 'border border-slate-300', badgeText: 'STEAM', imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=300&auto=format&fit=crop' }
   ];
 
   const bowlBrands: BrandAvatar[] = [
-    { name: 'Oblako bowls', slug: 'oblako-bowls', bgClass: 'bg-sky-50', textColor: 'text-sky-800', borderClass: 'border border-sky-300', badgeText: 'OBLAKO' },
-    { name: 'Kong Bowls', slug: 'kong-bowls', bgClass: 'bg-orange-950', textColor: 'text-orange-400', badgeText: 'KONG' },
-    { name: 'Alpaca Bowls', slug: 'alpaca-bowls', bgClass: 'bg-stone-800', textColor: 'text-stone-100', badgeText: 'ALPACA' },
-    { name: 'Solaris Bowls', slug: 'solaris-bowls', bgClass: 'bg-indigo-900', textColor: 'text-indigo-200', badgeText: 'SOLARIS' },
-    { name: 'Target Bowls', slug: 'target-bowls', bgClass: 'bg-rose-950', textColor: 'text-rose-300', badgeText: 'TARGET' }
+    { name: 'Oblako bowls', slug: 'oblako-bowls', bgClass: 'bg-sky-50', textColor: 'text-sky-800', borderClass: 'border border-sky-300', badgeText: 'OBLAKO', imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Kong Bowls', slug: 'kong-bowls', bgClass: 'bg-orange-950', textColor: 'text-orange-400', badgeText: 'KONG', imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Alpaca Bowls', slug: 'alpaca-bowls', bgClass: 'bg-stone-800', textColor: 'text-stone-100', badgeText: 'ALPACA', imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Solaris Bowls', slug: 'solaris-bowls', bgClass: 'bg-indigo-900', textColor: 'text-indigo-200', badgeText: 'SOLARIS', imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Target Bowls', slug: 'target-bowls', bgClass: 'bg-rose-950', textColor: 'text-rose-300', badgeText: 'TARGET', imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=300&auto=format&fit=crop' }
   ];
 
   const baseBrands: BrandAvatar[] = [
-    { name: 'Caesar Crystal', slug: 'caesar-crystal', bgClass: 'bg-blue-950', textColor: 'text-blue-200', badgeText: 'CAESAR' },
-    { name: 'Craft Glass', slug: 'craft-glass', bgClass: 'bg-stone-800', textColor: 'text-amber-300', badgeText: 'CRAFT' },
-    { name: 'WOOKAH Crystal', slug: 'wookah', bgClass: 'bg-amber-900', textColor: 'text-amber-100', badgeText: 'WOOKAH' }
+    { name: 'Caesar Crystal', slug: 'caesar-crystal', bgClass: 'bg-blue-950', textColor: 'text-blue-200', badgeText: 'CAESAR', imageUrl: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Craft Glass', slug: 'craft-glass', bgClass: 'bg-stone-800', textColor: 'text-amber-300', badgeText: 'CRAFT', imageUrl: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=300&auto=format&fit=crop' },
+    { name: 'WOOKAH Crystal', slug: 'wookah', bgClass: 'bg-amber-900', textColor: 'text-amber-100', badgeText: 'WOOKAH', imageUrl: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=300&auto=format&fit=crop' }
   ];
 
   const coalBrands: BrandAvatar[] = [
-    { name: 'Coco Loco', slug: 'coco-loco', bgClass: 'bg-stone-900', textColor: 'text-amber-400', badgeText: 'COCO LOCO' },
-    { name: 'One Nation', slug: 'one-nation', bgClass: 'bg-red-950', textColor: 'text-red-200', badgeText: '1 NATION' },
-    { name: 'Oasis Charcoal', slug: 'oasis-charcoal', bgClass: 'bg-emerald-900', textColor: 'text-emerald-100', badgeText: 'OASIS' }
+    { name: 'Coco Loco', slug: 'coco-loco', bgClass: 'bg-stone-900', textColor: 'text-amber-400', badgeText: 'COCO LOCO', imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=300&auto=format&fit=crop' },
+    { name: 'One Nation', slug: 'one-nation', bgClass: 'bg-red-950', textColor: 'text-red-200', badgeText: '1 NATION', imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Oasis Charcoal', slug: 'oasis-charcoal', bgClass: 'bg-emerald-900', textColor: 'text-emerald-100', badgeText: 'OASIS', imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=300&auto=format&fit=crop' }
   ];
 
   const accessoryBrands: BrandAvatar[] = [
-    { name: 'Kaloud', slug: 'kaloud', bgClass: 'bg-white', textColor: 'text-stone-950', borderClass: 'border border-stone-300', badgeText: 'KALOUD' },
-    { name: 'Na Grani HMD', slug: 'na-grani', bgClass: 'bg-stone-900', textColor: 'text-stone-200', badgeText: 'NA GRANI' },
-    { name: 'Blade Hookah', slug: 'blade-hookah', bgClass: 'bg-purple-950', textColor: 'text-purple-200', badgeText: 'BLADE' },
-    { name: 'Alpha Tongs', slug: 'alpha-hookah', bgClass: 'bg-stone-800', textColor: 'text-amber-400', badgeText: 'ALPHA' }
+    { name: 'Kaloud', slug: 'kaloud', bgClass: 'bg-white', textColor: 'text-stone-950', borderClass: 'border border-stone-300', badgeText: 'KALOUD', imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Na Grani HMD', slug: 'na-grani', bgClass: 'bg-stone-900', textColor: 'text-stone-200', badgeText: 'NA GRANI', imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Blade Hookah', slug: 'blade-hookah', bgClass: 'bg-purple-950', textColor: 'text-purple-200', badgeText: 'BLADE', imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Alpha Tongs', slug: 'alpha-hookah', bgClass: 'bg-stone-800', textColor: 'text-amber-400', badgeText: 'ALPHA', imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=300&auto=format&fit=crop' }
   ];
 
   const ehookahBrands: BrandAvatar[] = [
@@ -307,18 +308,18 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   ];
 
   const categoryFallbackImages = {
-    tobacco: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=600&auto=format&fit=crop',
-    hookahs: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=600&auto=format&fit=crop',
-    bowls: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=600&auto=format&fit=crop',
-    bases: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=600&auto=format&fit=crop',
-    coal: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=600&auto=format&fit=crop',
-    accessories: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=600&auto=format&fit=crop',
-    ehookah: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=600&auto=format&fit=crop',
-    vapes: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=600&auto=format&fit=crop'
+    tobacco: '/tobacco/tobacco_1.jpg',
+    hookahs: '/hookahs/hookahs_1.jpg',
+    bowls: '/bowls/bowls_1.jpg',
+    bases: '/bases/bases_1.jpg',
+    coal: '/tobacco/tobacco_1.jpg',
+    accessories: '/accessories/accessories_1.jpg',
+    ehookah: '/e-hookah/e-hookah_1.jpg',
+    vapes: '/vapes/vapes_1.jpg'
   } as const;
 
   const BrandAvatarBadge: React.FC<{ brand: BrandAvatar; category: keyof typeof categoryFallbackImages }> = ({ brand, category }) => {
-    const imageSrc = brand.imageUrl || categoryFallbackImages[category];
+    const imageSrc = brand.imageUrl || brand.logoUrl || categoryFallbackImages[category];
 
     return (
       <div
@@ -382,7 +383,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
           <div className="relative">
             <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
-              TOBACCO
+              TOBACCOS
             </h2>
             {/* Solid Royal Blue Underline Bar */}
             <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#0088cc] z-10"></div>
@@ -541,7 +542,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
           <div className="relative">
             <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
-              BOWLS
+              HOOKAH BOWLS
             </h2>
             {/* Solid Coral Underline Bar */}
             <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#f26c60] z-10"></div>
@@ -691,7 +692,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
           <div className="relative">
             <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
-              COAL
+              COALS
             </h2>
             <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#f97316] z-10"></div>
           </div>
@@ -837,7 +838,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
           <div className="relative">
             <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
-              E-HOOKAH
+              E-HOOKAHS
             </h2>
             <div className="absolute -bottom-[14px] left-0 h-[4px] w-full bg-[#06b6d4] z-10"></div>
           </div>

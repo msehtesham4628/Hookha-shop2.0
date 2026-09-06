@@ -16,17 +16,19 @@ interface CategoryHeroBannerProps {
 }
 
 const HEROES: Record<string, { image: string; title: string; description: string }> = {
-  hookahs: { image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=2200&auto=format&fit=crop', title: 'Russian & European Master Hookahs', description: 'Alpha Hookah • El Bomber • Maklaud • Steamulation • WOOKAH • MattPear' },
-  tobacco: { image: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=2200&auto=format&fit=crop', title: 'Dark & Blonde Leaf Shisha Tobacco', description: 'MustHave • DarkSide • BlackBurn • Tangiers • Bonche • Chabacco • Spectrum' },
-  bowls: { image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2200&auto=format&fit=crop', title: 'Artisan Thermal Retention Bowls', description: 'Oblako • Kong Bowls • Alpaca • Solaris • Target • Cosmo' },
-  bases: { image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=2200&auto=format&fit=crop', title: 'Crystal Glass & Russian Drop Vases', description: 'Caesar Crystal • Craft Glass • Big Maks • WOOKAH Crystal' },
-  coal: { image: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=2200&auto=format&fit=crop', title: 'High Calorie Natural Coconut Charcoal', description: 'Coco Loco • One Nation • Oasis Charcoal • 26mm & 28mm Cubes' },
-  accessories: { image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=2200&auto=format&fit=crop', title: 'HMD, Hoses, Tongs & Session Gear', description: 'Kaloud Lotus • Na Grani • Blade Hookah • Alpha Tongs • Silicone Hoses' },
-  'e-hookah': { image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=2200&auto=format&fit=crop', title: 'Electronic Hookahs & Smart Heads', description: 'Ooka • Aspire Proteus • Clean Charcoal-Free Vapor' },
-  vapes: { image: 'https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=2200&auto=format&fit=crop', title: 'Pod Mods, Disposables & Coils', description: 'GeekVape • Vaporesso • Lost Mary • Elf Bar • SMOK' },
-  'wholesale-supplies': { image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=2200&auto=format&fit=crop', title: 'Wholesale Lounge Supplies & Bulk Packs', description: '1kg Shisha Tins • 20kg Master Coal Cartons • Lounge Hygiene Packs' },
-  all: { image: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=2200&auto=format&fit=crop', title: 'All Masterpieces & Shisha Tobacco', description: 'Russian & European Hookahs • Dark Leaf Tobacco • Artisan Bowls • Crystal Bases' }
+  hookahs: { image: '/hookahs/hookahs_1.jpg', title: 'Russian & European Master Hookahs', description: 'Alpha Hookah • El Bomber • Maklaud • Steamulation • WOOKAH • MattPear' },
+  tobacco: { image: '/tobacco/tobacco_1.jpg', title: 'Dark & Blonde Leaf Tobaccos', description: 'MustHave • DarkSide • BlackBurn • Tangiers • Bonche • Chabacco • Spectrum' },
+  bowls: { image: '/bowls/bowls_1.jpg', title: 'Hookah Bowls', description: 'Oblako • Kong Bowls • Alpaca • Solaris • Target • Cosmo' },
+  bases: { image: '/bases/bases_1.jpg', title: 'Crystal Glass & Russian Drop Vases', description: 'Caesar Crystal • Craft Glass • Big Maks • WOOKAH Crystal' },
+  coal: { image: '/tobacco/tobacco_1.jpg', title: 'Coals', description: 'Coco Loco • One Nation • Oasis Charcoal • 26mm & 28mm Cubes' },
+  accessories: { image: '/accessories/accessories_1.jpg', title: 'HMD, Hoses, Tongs & Session Gear', description: 'Kaloud Lotus • Na Grani • Blade Hookah • Alpha Tongs • Silicone Hoses' },
+  'e-hookah': { image: '/e-hookah/e-hookah_1.jpg', title: 'E-Hookahs', description: 'Ooka • Aspire Proteus • Clean Charcoal-Free Vapor' },
+  vapes: { image: '/vapes/vapes_1.jpg', title: 'Vapes', description: 'GeekVape • Vaporesso • Lost Mary • Elf Bar • SMOK' },
+  'wholesale-supplies': { image: '/home/home_1.jpg', title: 'Wholesale Lounge Supplies & Bulk Packs', description: '1kg Shisha Tins • 20kg Master Coal Cartons • Lounge Hygiene Packs' },
+  all: { image: '/home/home_1.jpg', title: 'All Hookahs & Tobaccos', description: 'Russian & European Hookahs • Dark Leaf Tobacco • Artisan Bowls • Crystal Bases' }
 };
+
+const HOOKAH_SLIDES = ['/hookahs/hookahs_1.jpg', '/hookahs/hookahs_2.jpg', '/hookahs/hookahs_3.jpg'];
 
 export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({ category, categorySlug, brand, brandSlug, subcategories, selectedSubcategory, onSelectSubcategory, productCount, onNavigate }) => {
   const key = categorySlug || 'all';
@@ -42,13 +44,13 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({ category
 
   const title = brand?.name ? `${brand.name} Collection` : category?.name || hero.title;
   const headline = brand?.name ? `${brand.name} — Premium Collection` : hero.title;
-  const slides = [hero, hero, hero];
+  const slides = key === 'hookahs' ? HOOKAH_SLIDES.map((image) => ({ ...hero, image })) : [hero, hero, hero];
   const active = slides[slide];
 
   useEffect(() => {
     const timer = window.setInterval(() => setSlide((s) => (s + 1) % slides.length), 5500);
     return () => window.clearInterval(timer);
-  }, [key]);
+  }, [key, slides.length]);
 
   return (
     <section className="relative -mx-4 -mt-6 mb-10 w-[calc(100%+2rem)] overflow-hidden bg-stone-950 text-white sm:-mx-6 sm:-mt-8 sm:w-[calc(100%+3rem)] lg:-mx-8 lg:w-[calc(100%+4rem)]">
