@@ -58,6 +58,87 @@ interface StoredWishlist {
   productIds: string[];
 }
 
+const catalogSlug = (value: unknown) => String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'uncategorized';
+const catalogText = (value: unknown) => String(value ?? '').replace(/\s+/g, ' ').trim();
+
+function loadSplitCatalog(): Product[] {
+  const products: Product[] = [];
+  const knownBrands = ['Al Fakher', 'Alpha Hookah', 'Blackburn', 'Bonche', 'Element', 'Adalya', 'Tangiers', 'MustHave', 'DarkSide', 'Trifecta', 'Fumari', 'Starbuzz', 'Mason', 'Steamulation', 'Vyro', 'Moze', 'Kaloud', 'Werkbund', 'Oblako', 'Maklaud'];
+
+  for (let partNumber = 1; partNumber <= 6; partNumber++) {
+    const catalogPath = path.join(process.cwd(), `src/server/db/products-${partNumber}.json`);
+    if (!fs.existsSync(catalogPath)) continue;
+
+    try {
+      const rawProducts = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
+      if (!Array.isArray(rawProducts)) continue;
+
+      for (const rawProduct of rawProducts) {
+        const name = catalogText(rawProduct.product_name || rawProduct.name);
+        const sourceUrl = catalogText(rawProduct.product_url || rawProduct.url);
+        if (!name && !sourceUrl) continue;
+
+        const categoryText = catalogText(rawProduct.category);
+        const category = categoryText || (/e-?hookah|electronic hookah|hookah pod/i.test(`${name} ${sourceUrl}`) ? 'E-Hookah' : /vape|puff|nicotine|pod system|disposable/i.test(`${name} ${sourceUrl}`) ? 'Vapes' : /charcoal|coconut coal|quick light/i.test(`${name} ${sourceUrl}`) ? 'Coal' : /tobacco|shisha|molasses/i.test(`${name} ${sourceUrl}`) ? 'Tobacco' : 'Accessories');
+        const brand = catalogText(rawProduct.brand) || knownBrands.find(knownBrand => name.toLowerCase().startsWith(knownBrand.toLowerCase())) || name.split(/\s+/)[0] || 'Fumare Hookah';
+        const slug = catalogSlug(name || sourceUrl);
+        const priceMatch = String(rawProduct.price ?? '').replace(/,/g, '').match(/\d+(?:\.\d{1,2})?/);
+        const price = priceMatch ? Number(priceMatch[0]) : 0;
+        const imageUrls = Array.isArray(rawProduct.image_urls) ? rawProduct.image_urls : Array.isArray(rawProduct.images) ? rawProduct.images : [];
+        const images = imageUrls
+          .map((image: unknown) => typeof image === 'string' ? image : (image as { url?: string })?.url || '')
+          .filter((url: string) => /^https?:\/\//i.test(url) && !/placeholder|spinner|loading|gravatar|avatar/i.test(url))
+          .slice(0, 20)
+          .map((url: string, imageIndex: number) => ({
+            id: `${slug}-image-${imageIndex + 1}`,
+            url,
+            thumbnailUrl: url,
+            alt: `${name} product image ${imageIndex + 1}`,
+            isPrimary: imageIndex === 0,
+            sortOrder: imageIndex
+          }));
+
+        products.push({
+          id: `whm-${slug}`,
+          name,
+          slug,
+          sku: catalogText(rawProduct.sku),
+          description: catalogText(rawProduct.description),
+          shortDescription: catalogText(rawProduct.description).slice(0, 240),
+          price,
+          currency: 'USD',
+          brand,
+          brandSlug: catalogSlug(brand),
+          category,
+          categorySlug: catalogSlug(category),
+          images,
+          stock: 100,
+          lowStockThreshold: 5,
+          tags: [category, brand].filter(Boolean),
+          specifications: [],
+          rating: 0,
+          reviewCount: 0,
+          isFeatured: false,
+          isNewArrival: false,
+          isBestSeller: false,
+          isOnSale: false,
+          isActive: true,
+          ageRestricted: true,
+          seoTitle: `${name} | Fumare Hookah`,
+          seoDescription: catalogText(rawProduct.description).slice(0, 155),
+          sourceUrl,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.warn(`[Store] Could not load products-${partNumber}.json:`, error);
+    }
+  }
+
+  return products;
+}
+
 export class DatabaseStore {
   public permissions: Permission[] = [];
   public roles: Role[] = [];
@@ -273,13 +354,17 @@ export class DatabaseStore {
     this.brands = [...INITIAL_BRANDS];
 
     // Load full authentic product catalog
-    let catalogProducts: Product[] = [];
+    let catalogProducts: Product[] = loadSplitCatalog();
+    if (catalogProducts.length > 0) {
+      console.log(`[Store] Loaded ${catalogProducts.length} products from split catalogs.`);
+    }
     try {
       const catalogPath = path.join(process.cwd(), 'src/server/db/scrapedProducts.json');
       if (fs.existsSync(catalogPath)) {
         const fileData = fs.readFileSync(catalogPath, 'utf8');
-        catalogProducts = JSON.parse(fileData);
-        console.log(`[Store] Loaded ${catalogProducts.length} authentic products from catalog.`);
+        const scrapedProducts: Product[] = JSON.parse(fileData);
+        catalogProducts = [...catalogProducts, ...scrapedProducts];
+        console.log(`[Store] Loaded ${scrapedProducts.length} authentic products from catalog.`);
       }
     } catch (e) {
       console.warn('[Store] Could not load scrapedProducts.json:', e);
