@@ -27,6 +27,19 @@ export const getApiBaseUrl = (): string => {
 
 const API_BASE = getApiBaseUrl();
 
+export async function translateTexts(texts: string[], target: string): Promise<string[]> {
+  const response = await fetch(`${API_BASE}/translate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ texts, target })
+  });
+  const payload = await response.json() as { success?: boolean; data?: string[] };
+  if (!response.ok || !payload.success || !payload.data) {
+    throw new Error('Translation service unavailable');
+  }
+  return payload.data;
+}
+
 class ApiClient {
   private getHeaders(): HeadersInit {
     const headers: HeadersInit = {

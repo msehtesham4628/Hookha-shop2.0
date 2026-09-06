@@ -46,6 +46,36 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+app.post('/api/translate', async (req, res) => {
+  const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
+  const { texts, target } = req.body as { texts?: unknown; target?: unknown };
+
+  if (!Array.isArray(texts) || texts.length === 0 || texts.length > 128 || typeof target !== 'string') {
+    return res.status(400).json({ success: false, error: { code: 'INVALID_TRANSLATION_REQUEST', message: 'Provide 1-128 texts and a target language.' } });
+  }
+  if (texts.some(text => typeof text !== 'string' || text.length > 5000) || !/^[a-z]{2,3}(?:-[A-Z]{2})?$/i.test(target)) {
+    return res.status(400).json({ success: false, error: { code: 'INVALID_TRANSLATION_REQUEST', message: 'Invalid text or target language.' } });
+  }
+  if (!apiKey) {
+    return res.status(503).json({ success: false, error: { code: 'TRANSLATION_NOT_CONFIGURED', message: 'Google Translation is not configured.' } });
+  }
+
+  try {
+    const upstream = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${encodeURIComponent(apiKey)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ q: texts, source: 'en', target: target.toLowerCase(), format: 'text' })
+    });
+    const payload = await upstream.json() as { data?: { translations?: Array<{ translatedText?: string }> }; error?: { message?: string } };
+    if (!upstream.ok || !payload.data?.translations) {
+      return res.status(502).json({ success: false, error: { code: 'TRANSLATION_PROVIDER_ERROR', message: payload.error?.message || 'Translation provider request failed.' } });
+    }
+    return res.json({ success: true, data: payload.data.translations.map(item => item.translatedText || '') });
+  } catch {
+    return res.status(502).json({ success: false, error: { code: 'TRANSLATION_PROVIDER_ERROR', message: 'Translation provider is unavailable.' } });
+  }
+});
+
 // High-performance image proxy to avoid upstream 403 Forbidden hotlink blocks
 app.get('/api/image-proxy', async (req, res) => {
   const imageUrl = req.query.url as string;

@@ -1,0 +1,15 @@
+{
+  "sections": [
+    "home",
+    "hookahs",
+    "tobacco",
+    "bowls",
+    "bases",
+    "accessories",
+    "e-hookah",
+    "vapes"
+  ],
+  "images_per_section": 3,
+  "total_images": 24,
+  "purpose": "Hero background images only; no navbar or website UI."
+}

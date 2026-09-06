@@ -22,6 +22,7 @@ import {
 interface NavbarProps {
   currentPath: string;
   onNavigate: (path: string) => void;
+  overlay?: boolean;
 }
 
 interface CategoryNavItem {
@@ -31,7 +32,7 @@ interface CategoryNavItem {
   brands?: { name: string; slug: string }[];
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
+export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay = false }) => {
   const { user, isAdmin, cart, wishlistIds, setCartOpen, setSearchOpen, logout } = useStore();
   const { t } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -157,7 +158,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white">
+    <header className={`${overlay ? 'navbar-overlay absolute' : 'sticky'} top-0 z-40 w-full bg-white`}>
       {/* Top Announcement & Language Selector Bar */}
       <div className="bg-[#15181e] text-stone-200 text-[10px] sm:text-[11px] font-bold py-1.5 px-4 border-b border-stone-800 tracking-wider uppercase">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">

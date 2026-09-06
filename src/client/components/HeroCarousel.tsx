@@ -21,9 +21,12 @@ interface HeroCarouselProps {
 }
 
 const HERO_SLIDES = [
-  '/home/home_1.jpg',
-  '/home/home_2.jpg',
-  '/home/home_3.jpg'
+  '/accessories/accessories_1.jpg',
+  '/accessories/accessories_2.jpg',
+  '/accessories/accessories_3.jpg',
+  '/tobacco/tobacco_1.jpg',
+  '/tobacco/tobacco_2.jpg',
+  '/tobacco/tobacco_3.jpg'
 ];
 
 export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onNavigate }) => {
@@ -130,7 +133,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onNavigate }) => {
         {/* Navigation Header */}
         <header
           className={`absolute inset-x-0 top-0 z-30 transition-all duration-300 ${
-            isScrolled ? 'bg-stone-950/90 shadow-lg backdrop-blur-md' : 'bg-gradient-to-b from-stone-950/80 to-transparent'
+            isScrolled ? 'bg-stone-950/90 shadow-lg backdrop-blur-md' : 'bg-transparent'
           }`}
         >
           {/* Compliance Topbar */}

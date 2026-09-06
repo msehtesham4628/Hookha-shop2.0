@@ -57,6 +57,6 @@ export default function App() {
     return <HomePage onNavigate={navigate} />;
   };
   const isAdminRoute = currentPath.startsWith('/dashboard') || currentPath.startsWith('/admin');
-  const isImmersiveStorefrontRoute = !isAdminRoute && (currentPath === '/' || currentPath.startsWith('/shop'));
-  return <LanguageProvider><div className="min-h-screen flex flex-col bg-white text-stone-900 selection:bg-amber-100 selection:text-amber-900"><AgeGateModal /><SearchModal onNavigate={navigate} /><QuickViewModal onNavigate={navigate} /><CartDrawer onNavigate={navigate} /><ToastContainer />{!isAdminRoute && !isImmersiveStorefrontRoute && <Navbar currentPath={currentPath} onNavigate={navigate} />}<div className="flex-1">{renderRoute()}</div>{!isAdminRoute && <Footer onNavigate={navigate} />}</div></LanguageProvider>;
+  const isImmersiveStorefrontRoute = !isAdminRoute && currentPath === '/';
+  return <LanguageProvider><div className="min-h-screen flex flex-col bg-white text-stone-900 selection:bg-amber-100 selection:text-amber-900"><AgeGateModal /><SearchModal onNavigate={navigate} /><QuickViewModal onNavigate={navigate} /><CartDrawer onNavigate={navigate} /><ToastContainer />{!isAdminRoute && !isImmersiveStorefrontRoute && <Navbar currentPath={currentPath} onNavigate={navigate} overlay={currentPath.startsWith('/shop')} />}<div className="flex-1">{renderRoute()}</div>{!isAdminRoute && <Footer onNavigate={navigate} />}</div></LanguageProvider>;
 }

@@ -152,7 +152,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
   const activeImage = images[slide % images.length];
 
   return (
-    <section className="relative -mx-4 -mt-6 mb-10 w-[calc(100%+2rem)] overflow-hidden bg-stone-950 text-white sm:-mx-6 sm:-mt-8 sm:w-[calc(100%+3rem)] lg:-mx-8 lg:w-[calc(100%+4rem)]">
+    <section className="relative left-1/2 -mt-6 mb-10 w-screen -translate-x-1/2 overflow-hidden bg-stone-950 text-white sm:-mt-8">
       <div className="relative min-h-[620px] sm:min-h-[680px] lg:min-h-[760px]">
         <img
           key={activeImage}
@@ -166,55 +166,6 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/60 to-stone-950/10" />
         <div className="absolute inset-0 bg-gradient-to-r from-stone-950/90 via-stone-950/45 to-transparent" />
-
-        {/* Top Navbar */}
-        <div
-          className={`absolute inset-x-0 top-0 z-20 border-b border-white/10 transition-colors duration-300 ${
-            scrolled ? 'bg-stone-950/90 backdrop-blur-xl' : 'bg-stone-950/25 backdrop-blur-sm'
-          }`}
-        >
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-            <button
-              onClick={() => {
-                if (onResetCategory) onResetCategory();
-                onNavigate('/');
-              }}
-              className="text-left leading-none cursor-pointer"
-            >
-              <span className="block font-serif text-xl font-black tracking-[0.14em] sm:text-2xl">FUMARE HOOKAH</span>
-              <span className="block pt-1 text-[8px] font-bold uppercase tracking-[0.38em] text-amber-300">EST. 2018</span>
-            </button>
-
-            <nav className="hidden items-center gap-5 lg:flex">
-              {['hookahs', 'tobacco', 'bowls', 'bases', 'coal', 'accessories', 'e-hookah', 'vapes'].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => onNavigate(`/shop?category=${item}`)}
-                  className={`text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                    categorySlug === item ? 'text-amber-300 underline underline-offset-4' : 'text-stone-200 hover:text-amber-300'
-                  }`}
-                >
-                  {item.replace('-', ' ')}
-                </button>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => onNavigate('/shop')}
-                className="cursor-pointer rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md transition hover:bg-white/20"
-              >
-                Shop
-              </button>
-              <button
-                onClick={() => onNavigate('/account?tab=wishlist')}
-                className="cursor-pointer rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md transition hover:bg-white/20"
-              >
-                Account
-              </button>
-            </div>
-          </div>
-        </div>
 
         {/* Hero Content */}
         <div className="absolute inset-x-0 bottom-0 z-10 mx-auto flex max-w-7xl items-end px-4 pb-12 pt-48 sm:px-8 sm:pb-16 lg:px-12">

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { LanguageCode, LanguageOption, SUPPORTED_LANGUAGES, translations } from './translations.js';
+import { translateTexts } from '../services/api.js';
 
 interface LanguageContextType {
   currentLanguage: LanguageCode;
@@ -25,12 +26,7 @@ function detectBrowserLanguage(): LanguageCode {
 
   for (const l of userLangs) {
     const code = l.toLowerCase().split('-')[0];
-    if (code === 'ru') return 'ru';
-    if (code === 'ar') return 'ar';
-    if (code === 'es') return 'es';
-    if (code === 'de') return 'de';
-    if (code === 'fr') return 'fr';
-    if (code === 'en') return 'en';
+    if (/^[a-z]{2,3}$/.test(code)) return code;
   }
 
   return 'en';
@@ -39,10 +35,13 @@ function detectBrowserLanguage(): LanguageCode {
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentLanguage, setCurrentLanguageState] = useState<LanguageCode>('en');
   const [autoDetected, setAutoDetected] = useState<boolean>(false);
+  const [translatedDictionary, setTranslatedDictionary] = useState<Record<string, string> | null>(null);
+
+  const isLocalLanguage = (language: LanguageCode) => Object.prototype.hasOwnProperty.call(translations, language);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY) as LanguageCode | null;
-    if (saved && ['en', 'ru', 'ar', 'es', 'de', 'fr'].includes(saved)) {
+    if (saved && /^[a-z]{2,3}$/i.test(saved)) {
       setCurrentLanguageState(saved);
       setAutoDetected(false);
     } else {
@@ -53,6 +52,27 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
       localStorage.setItem(AUTO_KEY, 'true');
     }
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    setTranslatedDictionary(null);
+    if (isLocalLanguage(currentLanguage) || currentLanguage === 'en') return;
+
+    const sourceEntries = Object.entries(translations.en);
+    translateTexts(sourceEntries.map(([, text]) => text), currentLanguage)
+      .then((translated) => {
+        if (!cancelled) {
+          setTranslatedDictionary(Object.fromEntries(sourceEntries.map(([key], index) => [key, translated[index] || sourceEntries[index][1]])));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setTranslatedDictionary(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentLanguage]);
 
   useEffect(() => {
     const opt = SUPPORTED_LANGUAGES.find(l => l.code === currentLanguage) || SUPPORTED_LANGUAGES[0];
@@ -67,7 +87,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   const t = (key: string, defaultVal?: string, vars?: Record<string, string | number>): string => {
-    const langDict = translations[currentLanguage] || translations.en;
+    const langDict = translatedDictionary || translations[currentLanguage] || translations.en;
     let text = langDict[key] || translations.en[key] || defaultVal || key;
 
     if (vars) {
@@ -79,7 +99,13 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     return text;
   };
 
-  const languageOption = SUPPORTED_LANGUAGES.find(l => l.code === currentLanguage) || SUPPORTED_LANGUAGES[0];
+  const languageOption = SUPPORTED_LANGUAGES.find(l => l.code === currentLanguage) || {
+    code: currentLanguage,
+    label: currentLanguage.toUpperCase(),
+    nativeLabel: currentLanguage.toUpperCase(),
+    flag: '🌐',
+    dir: ['ar', 'fa', 'he', 'ur'].includes(currentLanguage) ? 'rtl' as const : 'ltr' as const
+  };
 
   return (
     <LanguageContext.Provider
