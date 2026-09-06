@@ -6,13 +6,13 @@ interface CategoryHeroBannerProps {
   category?: Category;
   categorySlug: string;
   brand?: Brand;
-  brandSlug: string;
+  brandSlug?: string;
   subcategories: string[];
   selectedSubcategory: string;
   onSelectSubcategory: (subcategory: string) => void;
   productCount: number;
   onNavigate: (path: string) => void;
-  onResetCategory: () => void;
+  onResetCategory?: () => void;
 }
 
 type HeroConfig = {
@@ -28,7 +28,7 @@ const LOCAL_IMAGES: Record<string, string[]> = {
   tobacco: ['/tobacco/tobacco_1.jpg', '/tobacco/tobacco_2.jpg', '/tobacco/tobacco_3.jpg'],
   bowls: ['/bowls/bowls_1.jpg', '/bowls/bowls_2.jpg', '/bowls/bowls_3.jpg'],
   bases: ['/bases/bases_1.jpg', '/bases/bases_2.jpg', '/bases/bases_3.jpg'],
-  coal: ['/tobacco/tobacco_1.jpg', '/tobacco/tobacco_2.jpg', '/tobacco/tobacco_3.jpg'],
+  coal: ['/coal/coal_1.jpg', '/coal/coal_2.jpg', '/coal/coal_3.jpg'],
   accessories: ['/accessories/accessories_1.jpg', '/accessories/accessories_2.jpg', '/accessories/accessories_3.jpg'],
   'e-hookah': ['/e-hookah/e-hookah_1.jpg', '/e-hookah/e-hookah_2.jpg', '/e-hookah/e-hookah_3.jpg'],
   vapes: ['/vapes/vapes_1.jpg', '/vapes/vapes_2.jpg', '/vapes/vapes_3.jpg'],
@@ -113,11 +113,13 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
   category,
   categorySlug,
   brand,
+  brandSlug,
   subcategories,
   selectedSubcategory,
   onSelectSubcategory,
   productCount,
-  onNavigate
+  onNavigate,
+  onResetCategory
 }) => {
   const key = categorySlug || 'all';
   const config = CONFIGS[key] || CONFIGS.all;
@@ -128,11 +130,11 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
 
   useEffect(() => {
     setSlide(0);
-  }, [key]);
+  }, [key, brandSlug]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
-    window.addEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
@@ -156,15 +158,29 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
           key={activeImage}
           src={activeImage}
           alt={title}
-          className="absolute inset-0 h-full w-full object-cover object-center"
-          referrerPolicy="no-referrer"
+          className="absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700"
+          loading="eager"
+          onError={(e) => {
+            e.currentTarget.src = LOCAL_IMAGES.all[0];
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/60 to-stone-950/10" />
         <div className="absolute inset-0 bg-gradient-to-r from-stone-950/90 via-stone-950/45 to-transparent" />
 
-        <div className={`absolute inset-x-0 top-0 z-20 border-b border-white/10 transition-all duration-300 ${scrolled ? 'bg-stone-950/90 backdrop-blur-xl' : 'bg-stone-950/25 backdrop-blur-sm'}`}>
+        {/* Top Navbar */}
+        <div
+          className={`absolute inset-x-0 top-0 z-20 border-b border-white/10 transition-colors duration-300 ${
+            scrolled ? 'bg-stone-950/90 backdrop-blur-xl' : 'bg-stone-950/25 backdrop-blur-sm'
+          }`}
+        >
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-            <button onClick={() => onNavigate('/')} className="text-left leading-none">
+            <button
+              onClick={() => {
+                if (onResetCategory) onResetCategory();
+                onNavigate('/');
+              }}
+              className="text-left leading-none cursor-pointer"
+            >
               <span className="block font-serif text-xl font-black tracking-[0.14em] sm:text-2xl">FUMARE HOOKAH</span>
               <span className="block pt-1 text-[8px] font-bold uppercase tracking-[0.38em] text-amber-300">EST. 2018</span>
             </button>
@@ -174,7 +190,9 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
                 <button
                   key={item}
                   onClick={() => onNavigate(`/shop?category=${item}`)}
-                  className="text-[10px] font-bold uppercase tracking-wider text-stone-200 transition hover:text-amber-300"
+                  className={`text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                    categorySlug === item ? 'text-amber-300 underline underline-offset-4' : 'text-stone-200 hover:text-amber-300'
+                  }`}
                 >
                   {item.replace('-', ' ')}
                 </button>
@@ -182,16 +200,23 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
             </nav>
 
             <div className="flex items-center gap-2">
-              <button onClick={() => onNavigate('/shop')} className="rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md hover:bg-white/20">
+              <button
+                onClick={() => onNavigate('/shop')}
+                className="cursor-pointer rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md transition hover:bg-white/20"
+              >
                 Shop
               </button>
-              <button onClick={() => onNavigate('/account?tab=wishlist')} className="rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md hover:bg-white/20">
+              <button
+                onClick={() => onNavigate('/account?tab=wishlist')}
+                className="cursor-pointer rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md transition hover:bg-white/20"
+              >
                 Account
               </button>
             </div>
           </div>
         </div>
 
+        {/* Hero Content */}
         <div className="absolute inset-x-0 bottom-0 z-10 mx-auto flex max-w-7xl items-end px-4 pb-12 pt-48 sm:px-8 sm:pb-16 lg:px-12">
           <div className="max-w-4xl">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/35 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-200 backdrop-blur-md">
@@ -208,7 +233,10 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
-              <button onClick={() => onNavigate('/shop')} className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-xs font-black uppercase tracking-wide text-stone-950 transition hover:bg-stone-200">
+              <button
+                onClick={() => onNavigate('/shop')}
+                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-white px-5 py-3 text-xs font-black uppercase tracking-wide text-stone-950 transition hover:bg-stone-200"
+              >
                 Browse Catalog <ArrowRight className="h-4 w-4" />
               </button>
               <span className="rounded-xl border border-white/15 bg-black/35 px-4 py-3 text-xs font-semibold text-stone-200 backdrop-blur-md">
@@ -222,7 +250,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
                   <button
                     key={sub}
                     onClick={() => onSelectSubcategory(sub)}
-                    className={`rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide backdrop-blur-md transition ${
+                    className={`cursor-pointer rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide backdrop-blur-md transition ${
                       selectedSubcategory === sub
                         ? 'border-white bg-white text-stone-950'
                         : 'border-white/20 bg-black/30 text-white hover:bg-white/15'
@@ -236,19 +264,20 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
           </div>
         </div>
 
+        {/* Carousel Nav & Indicators */}
         {images.length > 1 && (
           <>
             <button
               aria-label="Previous hero"
-              onClick={() => setSlide((slide + images.length - 1) % images.length)}
-              className="absolute left-3 top-1/2 z-20 rounded-full border border-white/20 bg-black/30 p-2 backdrop-blur-md hover:bg-black/50"
+              onClick={() => setSlide((prev) => (prev + images.length - 1) % images.length)}
+              className="absolute left-3 top-1/2 z-20 -translate-y-1/2 cursor-pointer rounded-full border border-white/20 bg-black/30 p-2 backdrop-blur-md transition hover:bg-black/50"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
             <button
               aria-label="Next hero"
-              onClick={() => setSlide((slide + 1) % images.length)}
-              className="absolute right-3 top-1/2 z-20 rounded-full border border-white/20 bg-black/30 p-2 backdrop-blur-md hover:bg-black/50"
+              onClick={() => setSlide((prev) => (prev + 1) % images.length)}
+              className="absolute right-3 top-1/2 z-20 -translate-y-1/2 cursor-pointer rounded-full border border-white/20 bg-black/30 p-2 backdrop-blur-md transition hover:bg-black/50"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -258,7 +287,9 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
                   key={index}
                   aria-label={`Hero slide ${index + 1}`}
                   onClick={() => setSlide(index)}
-                  className={`h-1.5 rounded-full transition-all ${index === slide ? 'w-8 bg-white' : 'w-2 bg-white/40'}`}
+                  className={`h-1.5 cursor-pointer rounded-full transition-all ${
+                    index === slide ? 'w-8 bg-white' : 'w-2 bg-white/40 hover:bg-white/60'
+                  }`}
                 />
               ))}
             </div>
