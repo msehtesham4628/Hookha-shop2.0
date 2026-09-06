@@ -4,6 +4,17 @@ import { createRoot } from 'react-dom/client';
 import App from './App.js';
 import './index.css';
 
+// Defensive fallback for the homepage vape-brand section. The build scripts
+// normally inject this data into HomePage.tsx, but the app must never white-screen
+// if a stale/generated bundle is missing that local binding.
+const vapeBrandFallback = [
+  { name: 'Adalya', slug: 'adalya', bgClass: 'bg-rose-900', textColor: 'text-rose-100', badgeText: 'ADALYA' },
+  { name: 'Flamingo', slug: 'flamingo', bgClass: 'bg-pink-700', textColor: 'text-white', badgeText: 'FLAMINGO' },
+  { name: 'Kori Hola', slug: 'kori-hola', bgClass: 'bg-blue-900', textColor: 'text-blue-100', badgeText: 'KORI HOLA' },
+  { name: 'ZColors', slug: 'zcolors', bgClass: 'bg-purple-900', textColor: 'text-purple-100', badgeText: 'ZCOLORS' },
+];
+(globalThis as typeof globalThis & { vapeBrands?: typeof vapeBrandFallback }).vapeBrands = vapeBrandFallback;
+
 class AppErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
   state = { error: null as Error | null };
 
