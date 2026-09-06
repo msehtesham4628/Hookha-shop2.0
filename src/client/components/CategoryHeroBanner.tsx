@@ -282,7 +282,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
   const slides = config.slides || [];
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [catalogImage, setCatalogImage] = useState<string | null>(null);
+  const [catalogImages, setCatalogImages] = useState<string[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Reset slide index when category changes
@@ -292,16 +292,19 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
 
   useEffect(() => {
     let cancelled = false;
-    setCatalogImage(null);
+    setCatalogImages([]);
     api.getProducts({
       category: categorySlug || undefined,
       brand: brandSlug || undefined,
-      limit: 1,
+      limit: 3,
       sort: 'newest'
     }).then((response) => {
-      const imageUrl = response.data?.products?.[0]?.images?.[0]?.url;
-      if (!cancelled && response.success && imageUrl) {
-        setCatalogImage(`/api/image-proxy?url=${encodeURIComponent(imageUrl)}`);
+      const images = (response.data?.products || [])
+        .map(product => product.images?.[0]?.url)
+        .filter((imageUrl): imageUrl is string => Boolean(imageUrl))
+        .map(imageUrl => `/api/image-proxy?url=${encodeURIComponent(imageUrl)}`);
+      if (!cancelled && response.success && images.length > 0) {
+        setCatalogImages(images);
       }
     }).catch(() => {});
 
@@ -356,13 +359,17 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
               }`}
             >
               <img
-                src={idx === currentSlideIndex && catalogImage ? catalogImage : slide.image}
+                src={catalogImages[idx] || catalogImages[0] || slide.image}
                 alt={`${displayTitle} - Slide ${idx + 1}`}
                 className={`w-full h-full object-cover object-center transition-transform duration-7000 ease-out filter brightness-70 contrast-105 ${
                   isActive ? 'scale-105' : 'scale-100'
                 }`}
                 referrerPolicy="no-referrer"
                 loading={idx === 0 ? 'eager' : 'lazy'}
+                onError={(event) => {
+                  const fallback = catalogImages[0] || slide.image;
+                  if (event.currentTarget.src !== fallback) event.currentTarget.src = fallback;
+                }}
               />
 
               {/* Natural Dark Gradient Scrims */}
