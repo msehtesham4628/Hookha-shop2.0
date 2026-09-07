@@ -189,12 +189,14 @@ router.post('/products/:id/reviews', optionalAuthenticateToken, (req: Authentica
   };
 
   db.reviews.push(newReview);
+  db.persist('reviews', newReview);
 
   // Recalculate product aggregate rating
   const approvedReviews = db.reviews.filter(r => r.productId === product.id && r.status === 'APPROVED');
   const avg = approvedReviews.reduce((sum, r) => sum + r.rating, 0) / approvedReviews.length;
   product.rating = Math.round(avg * 100) / 100;
   product.reviewCount = approvedReviews.length;
+  db.persist('products', product);
 
   db.createNotification('REVIEW', 'New Product Review', `${reviewerName} reviewed ${product.name} (${numRating}★)`, `/admin/reviews`);
 
@@ -233,6 +235,7 @@ router.post('/wholesale/apply', generalRateLimiter, (req, res) => {
   };
 
   db.wholesaleApplications.push(application);
+  db.persist('wholesaleApplications', application);
   return res.status(201).json({ success: true, data: application });
 });
 

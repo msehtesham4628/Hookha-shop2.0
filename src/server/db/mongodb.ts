@@ -183,7 +183,7 @@ class MongoDatabaseService {
       const coll = this.db.collection(collectionName);
       const query = doc.id ? { id: doc.id } : { _id: (doc as any)._id };
       await coll.updateOne(query, { $set: doc }, { upsert: true });
-      this.cachedCounts[collectionName] = (this.cachedCounts[collectionName] || 0) + 1;
+      await this.refreshCounts();
       return true;
     } catch (err: any) {
       console.log(`[MongoDB] Notice: Could not save document to ${collectionName}. Local store active.`);
@@ -332,55 +332,12 @@ class MongoDatabaseService {
           }
           store.users = Array.from(userMap.values());
         }
-        if (mongoOrders.length > 0) {
-          const orderMap = new Map<string, Order>();
-          for (const o of store.orders) {
-            orderMap.set(o.id, o);
-            if (o.orderNumber) orderMap.set(o.orderNumber.toUpperCase(), o);
-          }
-          for (const o of mongoOrders) {
-            orderMap.set(o.id, o);
-            if (o.orderNumber) orderMap.set(o.orderNumber.toUpperCase(), o);
-          }
-          const uniqueOrders = new Map<string, Order>();
-          for (const o of orderMap.values()) {
-            uniqueOrders.set(o.id, o);
-          }
-          store.orders = Array.from(uniqueOrders.values());
-          this.saveManyDocuments('orders', store.orders).catch(err => {
-            console.error('[MongoDB] Auto-sync combined orders err:', err);
-          });
-        }
-        if (mongoCategories.length > 0) {
-          const catMap = new Map<string, Category>();
-          for (const c of store.categories) catMap.set(c.id, c);
-          for (const c of mongoCategories) catMap.set(c.id, c);
-          store.categories = Array.from(catMap.values());
-        }
-        if (mongoBrands.length > 0) {
-          const brandMap = new Map<string, Brand>();
-          for (const b of store.brands) brandMap.set(b.id, b);
-          for (const b of mongoBrands) brandMap.set(b.id, b);
-          store.brands = Array.from(brandMap.values());
-        }
-        if (mongoReviews.length > 0) {
-          const revMap = new Map<string, Review>();
-          for (const r of store.reviews) revMap.set(r.id, r);
-          for (const r of mongoReviews) revMap.set(r.id, r);
-          store.reviews = Array.from(revMap.values());
-        }
-        if (mongoCoupons.length > 0) {
-          const coupMap = new Map<string, Coupon>();
-          for (const c of store.coupons) coupMap.set(c.code.toUpperCase(), c);
-          for (const c of mongoCoupons) coupMap.set(c.code.toUpperCase(), c);
-          store.coupons = Array.from(coupMap.values());
-        }
-        if (mongoWholesale.length > 0) {
-          const wMap = new Map<string, WholesaleApplication>();
-          for (const w of store.wholesaleApplications) wMap.set(w.id, w);
-          for (const w of mongoWholesale) wMap.set(w.id, w);
-          store.wholesaleApplications = Array.from(wMap.values());
-        }
+        if (mongoOrders.length > 0) store.orders = mongoOrders;
+        if (mongoCategories.length > 0) store.categories = mongoCategories;
+        if (mongoBrands.length > 0) store.brands = mongoBrands;
+        if (mongoReviews.length > 0) store.reviews = mongoReviews;
+        if (mongoCoupons.length > 0) store.coupons = mongoCoupons;
+        if (mongoWholesale.length > 0) store.wholesaleApplications = mongoWholesale;
         if (mongoSettings.length > 0) store.settings = mongoSettings[0];
 
         loaded = true;
@@ -397,6 +354,15 @@ class MongoDatabaseService {
     }
   }
 
+  private async replaceCollection(collectionName: string, docs: any[]): Promise<void> {
+    if (!this.db || !this.isConnected) return;
+    const coll = this.db.collection(collectionName);
+    await coll.deleteMany({});
+    if (!docs.length) return;
+    const cleanDocs = docs.map((doc: any) => { const copy = { ...doc }; delete copy._id; return copy; });
+    await coll.insertMany(cleanDocs, { ordered: false });
+  }
+
   public async pushAllToMongo(store: any): Promise<boolean> {
     if (!this.isConnected || !this.db) {
       const connected = await this.connect();
@@ -406,18 +372,26 @@ class MongoDatabaseService {
     try {
       console.log('[MongoDB] Pushing all in-memory store records to MongoDB...');
       await Promise.all([
-        this.saveManyDocuments('products', store.products, 500),
-        this.saveManyDocuments('categories', store.categories),
-        this.saveManyDocuments('brands', store.brands),
-        this.saveManyDocuments('users', store.users),
-        this.saveManyDocuments('orders', store.orders),
-        this.saveManyDocuments('coupons', store.coupons),
-        this.saveManyDocuments('reviews', store.reviews),
-        this.saveManyDocuments('wholesaleApplications', store.wholesaleApplications),
-        this.saveManyDocuments('cartItems', store.cartItems),
-        this.saveManyDocuments('wishlists', store.wishlists),
-        this.saveManyDocuments('auditLogs', store.auditLogs),
-        this.saveDocument('settings', { id: 'store_settings', ...store.settings })
+        this.replaceCollection('products', store.products),
+        this.replaceCollection('categories', store.categories),
+        this.replaceCollection('brands', store.brands),
+        this.replaceCollection('users', store.users),
+        this.replaceCollection('orders', store.orders),
+        this.replaceCollection('coupons', store.coupons),
+        this.replaceCollection('reviews', store.reviews),
+        this.replaceCollection('wholesaleApplications', store.wholesaleApplications),
+        this.replaceCollection('roles', store.roles),
+        this.replaceCollection('permissions', store.permissions),
+        this.replaceCollection('inventoryTransactions', store.inventoryTransactions),
+        this.replaceCollection('auditLogs', store.auditLogs),
+        this.replaceCollection('notifications', store.notifications),
+        this.replaceCollection('mediaLibrary', store.mediaLibrary),
+        this.replaceCollection('addresses', store.addresses),
+        this.replaceCollection('cartItems', store.cartItems),
+        this.replaceCollection('wishlists', store.wishlists),
+        this.replaceCollection('contactMessages', store.contactMessages),
+        this.replaceCollection('newsletterSubscribers', store.newsletterSubscribers),
+        this.replaceCollection('settings', [{ id: 'store_settings', ...store.settings }])
       ]);
       await this.refreshCounts();
       this.lastSyncAt = new Date().toISOString();

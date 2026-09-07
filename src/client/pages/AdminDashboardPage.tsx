@@ -1257,7 +1257,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   };
 
   const filteredOrders = orders.filter(o => {
-    if (orderStatusFilter !== 'ALL' && o.status !== orderStatusFilter) return false;
+    if (orderStatusFilter !== 'ALL' && (o.status || o.orderStatus) !== orderStatusFilter) return false;
     if (adminSearch) {
       const q = adminSearch.toLowerCase();
       return (
@@ -2378,7 +2378,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     {categories
                       .filter(c => !adminSearch || c.name.toLowerCase().includes(adminSearch.toLowerCase()) || (c.subcategories && c.subcategories.some(s => s.toLowerCase().includes(adminSearch.toLowerCase()))))
                       .map((cat) => {
-                        const matchingProductsCount = products.filter(p => p.category.toLowerCase() === cat.name.toLowerCase() || p.categoryId === cat.id).length;
+                        const matchingProductsCount = cat.productCount ?? 0;
                         return (
                           <div key={cat.id} className="bg-white border border-stone-200 rounded-xs overflow-hidden shadow-xs flex flex-col justify-between hover:border-amber-800/60 transition-colors">
                             <div>
@@ -2494,7 +2494,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     {brands
                       .filter(b => !adminSearch || b.name.toLowerCase().includes(adminSearch.toLowerCase()) || (b.origin && b.origin.toLowerCase().includes(adminSearch.toLowerCase())))
                       .map((brand, bIdx) => {
-                        const matchingProductsCount = products.filter(p => p.brand.toLowerCase() === brand.name.toLowerCase()).length;
+                        const matchingProductsCount = brand.productCount ?? 0;
                         return (
                           <div key={`${brand.id}-${brand.slug || bIdx}`} className="bg-white border border-stone-200 rounded-xs overflow-hidden shadow-xs flex flex-col justify-between hover:border-amber-300 transition-colors">
                             <div className="p-4 space-y-3">

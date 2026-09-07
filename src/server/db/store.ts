@@ -844,6 +844,7 @@ export class DatabaseStore {
       createdAt: new Date().toISOString()
     };
     this.auditLogs.unshift(entry);
+    this.persist('auditLogs', entry);
     return entry;
   }
 
@@ -859,6 +860,7 @@ export class DatabaseStore {
       createdAt: new Date().toISOString()
     };
     this.notifications.unshift(notif);
+    this.persist('notifications', notif);
     return notif;
   }
 }

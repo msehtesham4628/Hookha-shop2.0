@@ -357,6 +357,7 @@ router.post('/products/import', requirePermission('products.import'), (req: Auth
       };
 
       db.products.push(newProd);
+      db.persist('products', newProd);
       successful++;
     } catch (err: any) {
       failed++;
@@ -658,6 +659,7 @@ router.post('/customers/:id/suspend', requirePermission('customers.suspend'), (r
 
   customer.status = customer.status === 'SUSPENDED' ? 'ACTIVE' : 'SUSPENDED';
   customer.updatedAt = new Date().toISOString();
+  db.persist('users', customer);
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
@@ -731,6 +733,8 @@ router.post('/inventory/:id/adjust', requirePermission('inventory.adjust'), (req
   };
 
   db.inventoryTransactions.unshift(tx);
+  db.persist('products', product);
+  db.persist('inventoryTransactions', tx);
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
@@ -771,11 +775,12 @@ router.post('/categories', requirePermission('categories.create'), (req: Authent
   };
 
   db.categories.push(cat);
+  db.persist('categories', cat);
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_CREATED_CATEGORY', 'CATEGORY', cat.id, { name });
   return res.status(201).json({ success: true, data: cat });
 });
 
-router.put('/categories/:id', (req: AuthenticatedRequest, res) => {
+router.put('/categories/:id', requirePermission('categories.update'), (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const { name, description, imageUrl, bannerUrl, subcategories, isActive } = req.body;
@@ -799,7 +804,7 @@ router.put('/categories/:id', (req: AuthenticatedRequest, res) => {
   return res.json({ success: true, data: cat });
 });
 
-router.delete('/categories/:id', (req: AuthenticatedRequest, res) => {
+router.delete('/categories/:id', requirePermission('categories.delete'), (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const index = db.categories.findIndex(c => c.id === id || c.slug === id);
@@ -808,6 +813,7 @@ router.delete('/categories/:id', (req: AuthenticatedRequest, res) => {
   }
 
   const removed = db.categories.splice(index, 1)[0];
+  db.deletePersisted('categories', { id: removed.id });
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_DELETED_CATEGORY', 'CATEGORY', id, { name: removed.name });
   return res.json({ success: true, message: `Category "${removed.name}" deleted successfully` });
 });
@@ -833,11 +839,12 @@ router.post('/brands', requirePermission('brands.create'), (req: AuthenticatedRe
   };
 
   db.brands.push(brand);
+  db.persist('brands', brand);
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_CREATED_BRAND', 'BRAND', brand.id, { name });
   return res.status(201).json({ success: true, data: brand });
 });
 
-router.put('/brands/:id', (req: AuthenticatedRequest, res) => {
+router.put('/brands/:id', requirePermission('brands.update'), (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const { name, origin, description, logoUrl, isActive } = req.body;
@@ -860,7 +867,7 @@ router.put('/brands/:id', (req: AuthenticatedRequest, res) => {
   return res.json({ success: true, data: brand });
 });
 
-router.delete('/brands/:id', (req: AuthenticatedRequest, res) => {
+router.delete('/brands/:id', requirePermission('brands.delete'), (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const index = db.brands.findIndex(b => b.id === id || b.slug === id);
@@ -869,6 +876,7 @@ router.delete('/brands/:id', (req: AuthenticatedRequest, res) => {
   }
 
   const removed = db.brands.splice(index, 1)[0];
+  db.deletePersisted('brands', { id: removed.id });
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_DELETED_BRAND', 'BRAND', id, { name: removed.name });
   return res.json({ success: true, message: `Brand "${removed.name}" deleted successfully` });
 });
@@ -904,6 +912,7 @@ router.post('/coupons', requirePermission('coupons.create'), (req: Authenticated
   };
 
   db.coupons.push(coupon);
+  db.persist('coupons', coupon);
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_CREATED_COUPON', 'COUPON', coupon.id, { code: coupon.code });
   return res.status(201).json({ success: true, data: coupon });
 });
@@ -912,6 +921,7 @@ router.delete('/coupons/:id', requirePermission('coupons.delete'), (req: Authent
   const user = req.user!;
   const { id } = req.params;
   db.coupons = db.coupons.filter(c => c.id !== id);
+  db.deletePersisted('coupons', { id });
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_DELETED_COUPON', 'COUPON', id);
   return res.json({ success: true, message: 'Coupon deleted' });
 });
@@ -931,6 +941,7 @@ router.put('/reviews/:id', requirePermission('reviews.moderate'), (req: Authenti
   if (!rev) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Review not found' } });
 
   rev.status = status;
+  db.persist('reviews', rev);
   return res.json({ success: true, data: rev });
 });
 
@@ -949,6 +960,7 @@ router.put('/wholesale/:id', requirePermission('wholesale.update'), (req: Authen
   if (status) app.status = status;
   if (adminNotes !== undefined) app.adminNotes = adminNotes;
   app.updatedAt = new Date().toISOString();
+  db.persist('wholesaleApplications', app);
 
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_UPDATED_WHOLESALE', 'WHOLESALE', app.id, { status: app.status });
   return res.json({ success: true, data: app });
@@ -976,6 +988,7 @@ router.post('/media', requirePermission('media.upload'), (req: AuthenticatedRequ
   };
 
   db.mediaLibrary.unshift(item);
+  db.persist('mediaLibrary', item);
   return res.status(201).json({ success: true, data: item });
 });
 
@@ -1024,6 +1037,7 @@ router.post('/roles', requirePermission('roles.create'), (req: AuthenticatedRequ
   };
 
   db.roles.push(newRole);
+  db.persist('roles', newRole);
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
@@ -1120,6 +1134,7 @@ router.post('/staff', requirePermission('staff.create'), async (req: Authenticat
   };
 
   db.users.push(newStaff);
+  db.persist('users', newStaff);
 
   db.logAudit(
     { id: currentUser.id, name: `${currentUser.firstName} ${currentUser.lastName}`, role: currentUser.role, ip: req.ip },
@@ -1162,6 +1177,7 @@ router.put('/staff/:id', requirePermission('staff.update'), async (req: Authenti
     targetStaff.passwordHash = await bcrypt.hash(password, 10);
   }
   targetStaff.updatedAt = new Date().toISOString();
+  db.persist('users', targetStaff);
 
   db.logAudit(
     { id: currentUser.id, name: `${currentUser.firstName} ${currentUser.lastName}`, role: currentUser.role, ip: req.ip },
