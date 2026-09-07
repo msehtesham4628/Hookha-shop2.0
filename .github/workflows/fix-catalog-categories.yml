@@ -1,3 +1,4 @@
+# Catalog classification repair workflow
 name: Fix catalog category matching
 
 on:
@@ -20,10 +21,6 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-
-          # Storefront runtime classifier: use name + description + URL so scraped
-          # category errors do not put tobacco, bowls, bases or other products in
-          # the wrong storefront category.
           p = Path('src/server/db/store.ts')
           s = p.read_text()
           old = """        const categoryText = catalogText(rawProduct.category);\n        const productText = `${name} ${sourceUrl.replace(/^https?:\\/\\/[^/]+/i, '')}`;\n        const category = categoryText || (/e-?hookah|electronic hookah|hookah pod/i.test(productText) ? 'E-Hookah' : /vape|puff|nicotine|pod system|disposable/i.test(productText) ? 'Vapes' : /charcoal|coconut coal|quick light/i.test(productText) ? 'Coal' : /tobacco|shisha|molasses/i.test(productText) ? 'Tobacco' : /bowl|phunnel|clay bowl/i.test(productText) ? 'Bowls' : /base|glass vase|vase for hookah/i.test(productText) ? 'Bases' : /hookah|shisha pipe|nargile/i.test(productText) ? 'Hookahs' : 'Accessories');"""
@@ -31,7 +28,6 @@ jobs:
           if old in s:
               p.write_text(s.replace(old, new, 1))
 
-          # Keep the import script consistent for future catalog refreshes.
           p = Path('scripts/import-clean-catalog.mjs')
           s = p.read_text()
           old = """const category = p => {\n  const explicit = text(p.category);\n  if (explicit) return explicit;\n  const s = `${p.product_name || ''} ${p.product_url || ''}`.toLowerCase();\n  if (/e-?hookah|electronic hookah|hookah pod/.test(s)) return 'E-Hookah';\n  if (/vape|puff|nicotine|pod system|disposable/.test(s)) return 'Vapes';\n  if (/charcoal|coconut coal|quick light/.test(s)) return 'Coal';\n  if (/tobacco|shisha|molasses/.test(s)) return 'Tobacco';\n  return 'Accessories';\n};"""
