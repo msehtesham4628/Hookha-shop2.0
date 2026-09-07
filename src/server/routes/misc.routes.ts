@@ -3,18 +3,61 @@ import { z } from 'zod';
 import { db } from '../db/store.js';
 import { optionalAuthenticateToken, AuthenticatedRequest } from '../middleware/auth.middleware.js';
 import { generalRateLimiter } from '../middleware/rateLimit.middleware.js';
-import { Review, WholesaleApplication } from '../../types/index.js';
+import { Review, WholesaleApplication, Category } from '../../types/index.js';
 
 const router = Router();
 
+const normalizeCatalogSlug = (value: unknown) => String(value ?? '')
+  .trim()
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-|-$/g, '');
+
+const productMatchesCategory = (product: any, category: Category) => {
+  const categorySlug = normalizeCatalogSlug(category.slug);
+  return normalizeCatalogSlug(product.categorySlug) === categorySlug ||
+    normalizeCatalogSlug(product.category) === categorySlug ||
+    normalizeCatalogSlug(product.category) === normalizeCatalogSlug(category.name);
+};
+
+const getStorefrontCategories = (): Category[] => {
+  const categories = [...db.categories];
+  const existingSlugs = new Set(categories.map(c => normalizeCatalogSlug(c.slug)));
+  const productCategories = new Map<string, string>();
+
+  for (const product of db.products) {
+    if (!product.isActive) continue;
+    const name = String(product.category || '').trim();
+    const slug = normalizeCatalogSlug(product.categorySlug || name);
+    if (slug && name && !productCategories.has(slug)) productCategories.set(slug, name);
+  }
+
+  for (const [slug, name] of productCategories) {
+    if (existingSlugs.has(slug)) continue;
+    categories.push({
+      id: `cat-${slug}`,
+      name,
+      slug,
+      description: `${name} from the Fumare Hookah catalog.`,
+      subcategories: [],
+      productCount: 0,
+      isActive: true,
+      sortOrder: 100 + categories.length
+    });
+    existingSlugs.add(slug);
+  }
+
+  return categories;
+};
+
 // GET /api/categories
 router.get('/categories', (req, res) => {
-  const activeCategories = db.categories
+  const activeCategories = getStorefrontCategories()
     .filter(c => c.isActive)
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map(cat => ({
       ...cat,
-      productCount: db.products.filter(p => p.categorySlug === cat.slug && p.isActive).length
+      productCount: db.products.filter(p => p.isActive && productMatchesCategory(p, cat)).length
     }));
 
   return res.json({ success: true, data: activeCategories });
@@ -23,13 +66,25 @@ router.get('/categories', (req, res) => {
 // GET /api/categories/:slug
 router.get('/categories/:slug', (req, res) => {
   const { slug } = req.params;
-  const category = db.categories.find(c => c.slug === slug || c.id === slug);
+  const normalizedSlug = normalizeCatalogSlug(slug);
+  const category = getStorefrontCategories().find(c =>
+    normalizeCatalogSlug(c.slug) === normalizedSlug ||
+    normalizeCatalogSlug(c.id) === normalizedSlug ||
+    normalizeCatalogSlug(c.name) === normalizedSlug
+  );
   if (!category) {
     return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Category not found' } });
   }
 
-  const products = db.products.filter(p => p.categorySlug === category.slug && p.isActive);
-  return res.json({ success: true, data: { category, products } });
+  const products = db.products.filter(p => p.isActive && productMatchesCategory(p, category));
+  return res.json({
+    success: true,
+    data: {
+      category: { ...category, productCount: products.length },
+      products,
+      pagination: { total: products.length, page: 1, limit: products.length, totalPages: 1 }
+    }
+  });
 });
 
 // GET /api/brands
@@ -138,110 +193,24 @@ router.post('/wholesale/apply', generalRateLimiter, (req, res) => {
     });
   }
 
-  const app: WholesaleApplication = {
-    id: `whs-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+  const application: WholesaleApplication = {
+    id: `wholesale-${Date.now()}`,
     companyName,
     contactName,
     email,
     phone,
-    businessType: businessType || 'LOUNGE',
+    businessType: businessType || 'OTHER',
     taxId,
     website,
-    estimatedMonthlyVolume,
+    estimatedMonthlyVolume: Number(estimatedMonthlyVolume),
     notes,
     status: 'PENDING',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
 
-  db.wholesaleApplications.push(app);
-
-  db.createNotification(
-    'WHOLESALE',
-    'New Wholesale B2B Application',
-    `${companyName} (${businessType}) applied for wholesale pricing. Volume: ${estimatedMonthlyVolume}`,
-    `/admin/wholesale`
-  );
-
-  return res.status(201).json({
-    success: true,
-    message: 'Your wholesale account application has been received. Our B2B concierge team will review your business credentials within 24 business hours.',
-    data: app
-  });
-});
-
-// POST /api/newsletter/subscribe
-router.post('/newsletter/subscribe', generalRateLimiter, (req, res) => {
-  const { email } = req.body;
-  if (!email || !email.includes('@')) {
-    return res.status(400).json({ success: false, error: { code: 'INVALID_EMAIL', message: 'Valid email required' } });
-  }
-
-  const normalized = email.toLowerCase().trim();
-  const exists = db.newsletterSubscribers.some(s => s.email === normalized);
-
-  if (!exists) {
-    db.newsletterSubscribers.push({ email: normalized, createdAt: new Date().toISOString() });
-  }
-
-  return res.json({
-    success: true,
-    message: 'You have been added to the Sultan Private Reserve newsletter.'
-  });
-});
-
-// POST /api/newsletter/unsubscribe
-router.post('/newsletter/unsubscribe', (req, res) => {
-  const { email } = req.body;
-  if (email) {
-    db.newsletterSubscribers = db.newsletterSubscribers.filter(s => s.email !== email.toLowerCase().trim());
-  }
-  return res.json({ success: true, message: 'Unsubscribed successfully' });
-});
-
-// POST /api/contact
-router.post('/contact', generalRateLimiter, (req, res) => {
-  const { name, email, phone, subject, message } = req.body;
-  if (!name || !email || !message) {
-    return res.status(400).json({ success: false, error: { code: 'REQUIRED_FIELDS', message: 'Name, email, and message are required' } });
-  }
-
-  const msg = {
-    id: `msg-${Date.now()}`,
-    name,
-    email,
-    phone,
-    subject: subject || 'General Inquiry',
-    message,
-    createdAt: new Date().toISOString()
-  };
-
-  db.contactMessages.push(msg);
-  db.createNotification('SYSTEM', 'New Contact Message', `Message from ${name} regarding "${subject || 'General Inquiry'}"`);
-
-  return res.json({
-    success: true,
-    message: 'Thank you. Your message has been received by our concierge desk.'
-  });
-});
-
-// GET /api/settings
-router.get('/settings', (req, res) => {
-  return res.json({
-    success: true,
-    data: {
-      storeName: db.settings.storeName,
-      supportEmail: db.settings.supportEmail,
-      supportPhone: db.settings.supportPhone,
-      currency: db.settings.currency,
-      currencySymbol: db.settings.currencySymbol,
-      freeShippingThreshold: db.settings.freeShippingThreshold,
-      standardShippingFee: db.settings.standardShippingFee,
-      ageVerificationRequired: db.settings.ageVerificationRequired,
-      minimumPurchaseAge: db.settings.minimumPurchaseAge,
-      bannerAnnouncement: db.settings.bannerAnnouncement
-    }
-  });
+  db.wholesaleApplications.push(application);
+  return res.status(201).json({ success: true, data: application });
 });
 
 export default router;
