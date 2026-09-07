@@ -63,8 +63,8 @@ jobs:
           const productCategoryValues = (product: any): string[] => Array.from(new Set([
             product?.categorySlug,
             product?.category,
-            product?.categoryName,
-            product?.productCategory
+            (product as any)?.categoryName,
+            (product as any)?.productCategory
           ].filter(Boolean).map(normalizeCatalogSlug)));
 
           const productMatchesCategory = (product: any, category: Category) => {
@@ -85,7 +85,7 @@ jobs:
             const discovered = new Map<string, string>();
             for (const product of db.products) {
               if (!product?.isActive) continue;
-              const rawName = String(product.category || product.categoryName || '').trim();
+              const rawName = String(product.category || (product as any).categoryName || '').trim();
               const rawSlug = String(product.categorySlug || rawName).trim();
               const slug = normalizeCatalogSlug(rawSlug);
               if (!slug || discovered.has(slug)) continue;

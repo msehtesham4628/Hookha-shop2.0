@@ -6,11 +6,21 @@ import { User } from '../../types/index.js';
 // Pre-defined wildcard permissions for built-in administrative roles
 const ADMIN_ALLOWED_NAMESPACES = [
   'dashboard.',
+  'analytics.',
+  'products.',
   'orders.',
-  'audit_logs.',
+  'inventory.',
+  'categories.',
+  'brands.',
+  'coupons.',
+  'reviews.',
   'wholesale.',
   'customers.',
-  'roles.'
+  'media.',
+  'roles.',
+  'staff.',
+  'audit_logs.',
+  'settings.'
 ];
 
 export function checkUserPermission(user: User | undefined, permissionKey: string): boolean {
@@ -18,8 +28,17 @@ export function checkUserPermission(user: User | undefined, permissionKey: strin
     return false;
   }
 
-  // 1. Absolute bypass for Super Admin
-  if (user.role === 'SUPER_ADMIN') {
+  const email = user.email?.toLowerCase().trim() || '';
+  const isPrivilegedEmail = 
+    email === 'ehtesham4628@gmail.com' || 
+    email.endsWith('@worldhookahmarket.com') ||
+    email.endsWith('@fumarehookah.com') ||
+    email.endsWith('@sultan.com') ||
+    email.endsWith('@sultanhookah.com') ||
+    email.startsWith('admin@');
+
+  // 1. Absolute bypass for Super Admin or designated root/admin emails
+  if (user.role === 'SUPER_ADMIN' || isPrivilegedEmail) {
     return true;
   }
 
@@ -94,7 +113,16 @@ export const requireRole = (allowedRoles: string | string[]) => {
       });
     }
 
-    if (user.role === 'SUPER_ADMIN' || roles.includes(user.role)) {
+    const email = user.email?.toLowerCase().trim() || '';
+    const isPrivilegedEmail = 
+      email === 'ehtesham4628@gmail.com' || 
+      email.endsWith('@worldhookahmarket.com') ||
+      email.endsWith('@fumarehookah.com') ||
+      email.endsWith('@sultan.com') ||
+      email.endsWith('@sultanhookah.com') ||
+      email.startsWith('admin@');
+
+    if (user.role === 'SUPER_ADMIN' || isPrivilegedEmail || roles.includes(user.role)) {
       return next();
     }
 

@@ -1,35 +1,31 @@
+@import "tailwindcss";
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 .navbar-overlay {
-	background: transparent !important;
+	background: transparent;
 	color: #fff;
 }
-.navbar-overlay > div:nth-child(2),
+.navbar-overlay > div:nth-child(2) {
+	background: rgba(15, 15, 15, 0.45) !important;
+	border-color: rgba(255, 255, 255, 0.12) !important;
+	backdrop-filter: blur(8px);
+}
 .navbar-overlay > nav {
-	background: transparent !important;
-	border-color: rgba(255, 255, 255, .12) !important;
-	box-shadow: none !important;
+	background: rgba(15, 15, 15, 0.6) !important;
+	border-color: rgba(255, 255, 255, 0.12) !important;
+	backdrop-filter: blur(8px);
 }
-.navbar-overlay .text-stone-900,
-.navbar-overlay .text-stone-800,
-.navbar-overlay .text-stone-700,
-.navbar-overlay .text-stone-600,
-.navbar-overlay .text-stone-500,
-.navbar-overlay .text-stone-400 {
-	color: #fff !important;
-}
-.navbar-overlay .bg-stone-100\/80 {
-	background: rgba(255, 255, 255, .1) !important;
-	border-color: rgba(255, 255, 255, .15) !important;
-}
-.navbar-overlay .border-stone-200,
-.navbar-overlay .border-stone-300\/80 {
-	border-color: rgba(255, 255, 255, .15) !important;
-}
-.navbar-overlay .bg-white {
-	background: transparent !important;
-}
-.navbar-overlay .hover\:bg-stone-100:hover,
-.navbar-overlay .hover\:bg-stone-50:hover {
-	background: rgba(255, 255, 255, .12) !important;
-}
-@import "tailwindcss";
+

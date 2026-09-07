@@ -61,12 +61,28 @@ interface StoredWishlist {
 const catalogSlug = (value: unknown) => String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'uncategorized';
 const catalogText = (value: unknown) => String(value ?? '').replace(/\s+/g, ' ').trim();
 
+function resolveDbFilePath(fileName: string): string {
+  const cwdPath = path.join(process.cwd(), 'src/server/db', fileName);
+  if (fs.existsSync(cwdPath)) return cwdPath;
+
+  const vercelTaskPath = path.join('/var/task', 'src/server/db', fileName);
+  if (fs.existsSync(vercelTaskPath)) return vercelTaskPath;
+
+  try {
+    const dir = typeof __dirname !== 'undefined' ? __dirname : path.dirname(new URL(import.meta.url).pathname);
+    const localPath = path.join(dir, fileName);
+    if (fs.existsSync(localPath)) return localPath;
+  } catch {}
+
+  return cwdPath;
+}
+
 function loadSplitCatalog(): Product[] {
   const products: Product[] = [];
   const knownBrands = ['Al Fakher', 'Alpha Hookah', 'Blackburn', 'Bonche', 'Element', 'Adalya', 'Tangiers', 'MustHave', 'DarkSide', 'Trifecta', 'Fumari', 'Starbuzz', 'Mason', 'Steamulation', 'Vyro', 'Moze', 'Kaloud', 'Werkbund', 'Oblako', 'Maklaud'];
 
   for (let partNumber = 1; partNumber <= 6; partNumber++) {
-    const catalogPath = path.join(process.cwd(), `src/server/db/products-${partNumber}.json`);
+    const catalogPath = resolveDbFilePath(`products-${partNumber}.json`);
     if (!fs.existsSync(catalogPath)) continue;
 
     try {
@@ -385,7 +401,7 @@ export class DatabaseStore {
       console.log(`[Store] Loaded ${catalogProducts.length} products from split catalogs.`);
     }
     try {
-      const catalogPath = path.join(process.cwd(), 'src/server/db/scrapedProducts.json');
+      const catalogPath = resolveDbFilePath('scrapedProducts.json');
       if (fs.existsSync(catalogPath)) {
         const fileData = fs.readFileSync(catalogPath, 'utf8');
         const scrapedProducts: Product[] = JSON.parse(fileData);

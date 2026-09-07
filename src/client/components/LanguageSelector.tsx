@@ -5,9 +5,10 @@ import { LanguageCode } from '../i18n/translations.js';
 
 interface LanguageSelectorProps {
   variant?: 'topbar' | 'compact' | 'drawer';
+  theme?: 'light' | 'dark';
 }
 
-export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ variant = 'topbar' }) => {
+export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ variant = 'topbar', theme = 'light' }) => {
   const { currentLanguage, languageOption, setLanguage, autoDetected, supportedLanguages, t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -28,35 +29,43 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ variant = 't
   };
 
   if (variant === 'drawer') {
+    const isDark = theme === 'dark';
     return (
-      <div className="border-t border-stone-200 pt-4 mt-4">
-        <div className="flex items-center gap-2 mb-2.5 text-xs font-bold text-stone-900 uppercase tracking-wider">
-          <Globe className="w-3.5 h-3.5 text-amber-900" />
+      <div className={`border-t ${isDark ? 'border-stone-800' : 'border-stone-200'} pt-4 mt-4`}>
+        <div className={`flex items-center gap-2 mb-2.5 text-xs font-bold uppercase tracking-wider ${isDark ? 'text-stone-300' : 'text-stone-900'}`}>
+          <Globe className={`w-3.5 h-3.5 ${isDark ? 'text-amber-400' : 'text-amber-900'}`} />
           <span>{t('topbar.switch_language', 'Select Language')}</span>
           {autoDetected && (
-            <span className="text-[9px] bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded-xs font-semibold">
+            <span className={`text-[9px] px-1.5 py-0.5 rounded-xs font-semibold ${isDark ? 'bg-amber-950 text-amber-300 border border-amber-800/60' : 'bg-amber-100 text-amber-900'}`}>
               Auto
             </span>
           )}
         </div>
         <div className="grid grid-cols-2 gap-1.5">
-          {supportedLanguages.map((lang) => (
-            <button
-              key={lang.code}
-              onClick={() => handleSelect(lang.code)}
-              className={`flex items-center justify-between px-2.5 py-2 text-xs rounded-xs border transition-colors ${
-                currentLanguage === lang.code
-                  ? 'bg-amber-900 text-white border-amber-900 font-semibold'
-                  : 'bg-stone-50 hover:bg-stone-100 text-stone-800 border-stone-200'
-              }`}
-            >
-              <span className="flex items-center gap-1.5">
-                <span className="text-sm">{lang.flag}</span>
-                <span>{lang.nativeLabel}</span>
-              </span>
-              {currentLanguage === lang.code && <Check className="w-3.5 h-3.5 text-amber-300" />}
-            </button>
-          ))}
+          {supportedLanguages.map((lang) => {
+            const isSelected = currentLanguage === lang.code;
+            return (
+              <button
+                key={lang.code}
+                onClick={() => handleSelect(lang.code)}
+                className={`flex items-center justify-between px-2.5 py-2 text-xs rounded-sm border transition-colors cursor-pointer ${
+                  isSelected
+                    ? isDark
+                      ? 'bg-amber-800 text-white border-amber-600 font-bold shadow-xs'
+                      : 'bg-amber-900 text-white border-amber-900 font-bold shadow-xs'
+                    : isDark
+                      ? 'bg-stone-800/90 hover:bg-stone-700 text-stone-200 border-stone-700'
+                      : 'bg-stone-100 hover:bg-stone-200 text-stone-800 border-stone-300 font-medium'
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <span className="text-sm">{lang.flag}</span>
+                  <span>{lang.nativeLabel}</span>
+                </span>
+                {isSelected && <Check className="w-3.5 h-3.5 text-amber-300" />}
+              </button>
+            );
+          })}
         </div>
       </div>
     );

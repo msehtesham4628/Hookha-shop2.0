@@ -105,9 +105,14 @@ class ApiClient {
 
       return data;
     } catch (err: any) {
-      // Don't format expected user-level authentication responses as system-level [API Error] crashes
-      if (endpoint.startsWith('/auth/login') || endpoint.startsWith('/auth/admin-login') || endpoint.startsWith('/auth/otp')) {
+      // Don't format expected user-level authentication responses or transient network drops as system-level crashes
+      const isAuthEndpoint = endpoint.startsWith('/auth/login') || endpoint.startsWith('/auth/admin-login') || endpoint.startsWith('/auth/otp');
+      const isNetworkDrop = err?.message === 'Failed to fetch' || err?.name === 'TypeError';
+
+      if (isAuthEndpoint) {
         console.warn(`[Auth Notice] ${options.method || 'GET'} ${endpoint}:`, err.message);
+      } else if (isNetworkDrop) {
+        console.warn(`[Network Retry] ${options.method || 'GET'} ${endpoint} temporarily unreachable (retrying on next interval)`);
       } else {
         console.error(`[API Error] ${options.method || 'GET'} ${endpoint}:`, err);
       }
@@ -472,8 +477,8 @@ class ApiClient {
   }
 
   public async getAdminOrders(params?: any) {
-    const qs = new URLSearchParams(params || {}).toString();
-    return this.request<{ success: boolean; data: Order[] }>(`/admin/orders?${qs}`);
+    const qs = params ? new URLSearchParams(params).toString() : '';
+    return this.request<{ success: boolean; data: Order[]; total?: number }>(qs ? `/admin/orders?${qs}` : '/admin/orders');
   }
 
   public async updateAdminOrderStatus(id: string, payload: { status: string; trackingNumber?: string; carrier?: string; note?: string }) {

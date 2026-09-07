@@ -50,7 +50,7 @@ const getStorefrontCategories = (): Category[] => {
   const discovered = new Map<string, string>();
   for (const product of db.products) {
     if (!product?.isActive) continue;
-    const rawName = String(product.category || product.categoryName || '').trim();
+    const rawName = String(product.category || (product as any).categoryName || '').trim();
     const rawSlug = String(product.categorySlug || rawName).trim();
     const slug = normalizeCatalogSlug(rawSlug);
     if (!slug || discovered.has(slug)) continue;
@@ -227,7 +227,7 @@ router.post('/wholesale/apply', generalRateLimiter, (req, res) => {
     businessType: businessType || 'OTHER',
     taxId,
     website,
-    estimatedMonthlyVolume: Number(estimatedMonthlyVolume),
+    estimatedMonthlyVolume: String(estimatedMonthlyVolume ?? ''),
     notes,
     status: 'PENDING',
     createdAt: new Date().toISOString(),
@@ -236,7 +236,98 @@ router.post('/wholesale/apply', generalRateLimiter, (req, res) => {
 
   db.wholesaleApplications.push(application);
   db.persist('wholesaleApplications', application);
-  return res.status(201).json({ success: true, data: application });
+
+  db.createNotification(
+    'WHOLESALE',
+    'New Wholesale B2B Application',
+    `${companyName} (${businessType || 'OTHER'}) applied for wholesale pricing. Volume: ${estimatedMonthlyVolume}`,
+    `/admin/wholesale`
+  );
+
+  return res.status(201).json({
+    success: true,
+    message: 'Your wholesale account application has been received. Our B2B concierge team will review your business credentials within 24 business hours.',
+    data: application
+  });
+});
+
+// POST /api/newsletter/subscribe
+router.post('/newsletter/subscribe', generalRateLimiter, (req, res) => {
+  const { email } = req.body;
+  if (!email || !email.includes('@')) {
+    return res.status(400).json({ success: false, error: { code: 'INVALID_EMAIL', message: 'Valid email required' } });
+  }
+
+  const normalized = email.toLowerCase().trim();
+  const exists = db.newsletterSubscribers.some(s => s.email === normalized);
+
+  if (!exists) {
+    const subscriber = { id: normalized, email: normalized, createdAt: new Date().toISOString() };
+    db.newsletterSubscribers.push(subscriber);
+    db.persist('newsletterSubscribers', subscriber);
+  }
+
+  return res.json({
+    success: true,
+    message: 'You have been added to the Sultan Private Reserve newsletter.'
+  });
+});
+
+// POST /api/newsletter/unsubscribe
+router.post('/newsletter/unsubscribe', (req, res) => {
+  const { email } = req.body;
+  if (email) {
+    const normalized = email.toLowerCase().trim();
+    db.newsletterSubscribers = db.newsletterSubscribers.filter(s => s.email !== normalized);
+    db.deletePersisted('newsletterSubscribers', { email: normalized });
+  }
+  return res.json({ success: true, message: 'Unsubscribed successfully' });
+});
+
+// POST /api/contact
+router.post('/contact', generalRateLimiter, (req, res) => {
+  const { name, email, phone, subject, message } = req.body;
+  if (!name || !email || !message) {
+    return res.status(400).json({ success: false, error: { code: 'REQUIRED_FIELDS', message: 'Name, email, and message are required' } });
+  }
+
+  const msg = {
+    id: `msg-${Date.now()}`,
+    name,
+    email,
+    phone,
+    subject: subject || 'General Inquiry',
+    message,
+    createdAt: new Date().toISOString()
+  };
+
+  db.contactMessages.push(msg);
+  db.persist('contactMessages', msg);
+  db.createNotification('SYSTEM', 'New Contact Message', `Message from ${name} regarding "${subject || 'General Inquiry'}"`);
+
+  return res.json({
+    success: true,
+    message: 'Thank you. Your message has been received by our concierge desk.'
+  });
+});
+
+// GET /api/settings
+router.get('/settings', (req, res) => {
+  return res.json({
+    success: true,
+    data: {
+      storeName: db.settings.storeName,
+      supportEmail: db.settings.supportEmail,
+      supportPhone: db.settings.supportPhone,
+      currency: db.settings.currency,
+      currencySymbol: db.settings.currencySymbol,
+      freeShippingThreshold: db.settings.freeShippingThreshold,
+      standardShippingFee: db.settings.standardShippingFee,
+      ageVerificationRequired: db.settings.ageVerificationRequired,
+      minimumPurchaseAge: db.settings.minimumPurchaseAge,
+      bannerAnnouncement: db.settings.bannerAnnouncement
+    }
+  });
 });
 
 export default router;

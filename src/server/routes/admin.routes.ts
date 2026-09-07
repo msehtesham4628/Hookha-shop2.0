@@ -543,20 +543,40 @@ router.post('/products/bulk-update', requirePermission('products.update'), (req:
 
 // GET /api/admin/orders
 router.get('/orders', requirePermission('orders.view'), (req, res) => {
-  const { status, search } = req.query as Record<string, string>;
-  let result = [...db.orders];
+  try {
+    const { status, search, limit } = req.query as Record<string, string>;
+    let result = Array.isArray(db.orders) ? [...db.orders].filter(Boolean) : [];
 
-  if (status) {
-    result = result.filter(o => o.orderStatus === status || o.paymentStatus === status);
+    if (status) {
+      result = result.filter(o => o && (o.orderStatus === status || o.paymentStatus === status));
+    }
+
+    if (search) {
+      const s = String(search).toLowerCase().trim();
+      result = result.filter(o => {
+        if (!o) return false;
+        const num = String(o.orderNumber || '').toLowerCase();
+        const name = String(o.customerName || '').toLowerCase();
+        const email = String(o.customerEmail || '').toLowerCase();
+        return num.includes(s) || name.includes(s) || email.includes(s);
+      });
+    }
+
+    result.sort((a, b) => {
+      const timeB = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
+      const timeA = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
+      return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
+    });
+
+    if (limit && !isNaN(Number(limit)) && Number(limit) > 0) {
+      result = result.slice(0, Number(limit));
+    }
+
+    return res.json({ success: true, data: result, total: result.length });
+  } catch (err: any) {
+    console.error('[Admin Orders Error]:', err);
+    return res.status(500).json({ success: false, error: { code: 'SERVER_ERROR', message: err?.message || 'Failed to retrieve orders' } });
   }
-
-  if (search) {
-    const s = search.toLowerCase();
-    result = result.filter(o => o.orderNumber.toLowerCase().includes(s) || o.customerName.toLowerCase().includes(s) || o.customerEmail.toLowerCase().includes(s));
-  }
-
-  result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  return res.json({ success: true, data: result });
 });
 
 // GET /api/admin/orders/:id
