@@ -177,7 +177,6 @@ class MongoDatabaseService {
     }
   }
 
-  // Generic document saver (Upsert by `id`)
   public async saveDocument<T extends { id?: string }>(collectionName: string, doc: T): Promise<boolean> {
     if (!this.db || !this.isConnected) return false;
     try {
@@ -192,7 +191,6 @@ class MongoDatabaseService {
     }
   }
 
-  // Batch document saver (Used for bulk catalog sync)
   public async saveManyDocuments<T extends { id?: string }>(collectionName: string, docs: T[], batchSize = 500): Promise<number> {
     if (!this.db || !this.isConnected || docs.length === 0) return 0;
     try {
@@ -220,7 +218,6 @@ class MongoDatabaseService {
     }
   }
 
-  // Generic document deleter
   public async deleteDocument(collectionName: string, filter: Record<string, any>): Promise<boolean> {
     if (!this.db || !this.isConnected) return false;
     try {
@@ -234,7 +231,6 @@ class MongoDatabaseService {
     }
   }
 
-  // Fetch all documents from a collection
   public async getDocuments<T>(collectionName: string, filter: Record<string, any> = {}): Promise<T[]> {
     if (!this.db || !this.isConnected) return [];
     try {
@@ -247,7 +243,6 @@ class MongoDatabaseService {
     }
   }
 
-  // Synchronize entire state: seeds MongoDB if empty, or loads MongoDB documents if present
   public async syncWithStore(store: any): Promise<{ seeded: boolean; loaded: boolean; summary: Record<string, number> }> {
     const isConnected = await this.connect();
     if (!isConnected || !this.db) {
@@ -278,8 +273,10 @@ class MongoDatabaseService {
         console.log('[MongoDB] Master collections successfully seeded into MongoDB!');
       } else if (productCount > 0) {
         console.log(`[MongoDB] Discovered ${productCount} existing products in MongoDB. Loading documents into memory...`);
-        // Load MongoDB records into store memory
+        // Load MongoDB records into store memory. Products are included here so
+        // the public storefront, which reads from db.products, uses MongoDB data.
         const [
+          mongoProducts,
           mongoUsers,
           mongoOrders,
           mongoCategories,
@@ -289,6 +286,7 @@ class MongoDatabaseService {
           mongoWholesale,
           mongoSettings
         ] = await Promise.all([
+          this.getDocuments<Product>('products'),
           this.getDocuments<User & { passwordHash?: string }>('users'),
           this.getDocuments<Order>('orders'),
           this.getDocuments<Category>('categories'),
@@ -299,6 +297,16 @@ class MongoDatabaseService {
           this.getDocuments<any>('settings', { id: 'store_settings' })
         ]);
 
+        if (mongoProducts.length > 0) {
+          // MongoDB is authoritative for persisted catalog records. Merge by id
+          // so any local seed-only products are retained if MongoDB is incomplete.
+          const productMap = new Map<string, Product>();
+          for (const p of store.products) productMap.set(p.id, p);
+          for (const p of mongoProducts) productMap.set(p.id, p);
+          store.products = Array.from(productMap.values());
+          console.log(`[MongoDB] Loaded ${mongoProducts.length} products into storefront memory.`);
+        }
+
         if (mongoUsers.length > 0) {
           const userMap = new Map<string, User & { passwordHash?: string }>();
           for (const u of store.users) {
@@ -307,7 +315,6 @@ class MongoDatabaseService {
           for (const u of mongoUsers) {
             userMap.set(u.email.toLowerCase(), u);
           }
-          // Ensure essential administrative and demo accounts are always preserved with valid credentials and active status
           for (const u of store.users) {
             const isPrivileged = u.email === 'admin@worldhookahmarket.com' || u.email === 'ehtesham4628@gmail.com' || u.email === 'customer@example.com' || u.role === 'SUPER_ADMIN';
             if (isPrivileged) {
@@ -315,7 +322,6 @@ class MongoDatabaseService {
               if (!existing) {
                 userMap.set(u.email.toLowerCase(), u);
               } else {
-                // Keep known valid passwordHash and active status
                 existing.status = 'ACTIVE';
                 existing.role = u.role;
                 if (u.passwordHash) {
@@ -328,24 +334,19 @@ class MongoDatabaseService {
         }
         if (mongoOrders.length > 0) {
           const orderMap = new Map<string, Order>();
-          // Preserve all in-memory / seed orders first
           for (const o of store.orders) {
             orderMap.set(o.id, o);
             if (o.orderNumber) orderMap.set(o.orderNumber.toUpperCase(), o);
           }
-          // Merge in orders from MongoDB, updating existing records or adding user orders
           for (const o of mongoOrders) {
             orderMap.set(o.id, o);
             if (o.orderNumber) orderMap.set(o.orderNumber.toUpperCase(), o);
           }
-          // Deduplicate by ID
           const uniqueOrders = new Map<string, Order>();
           for (const o of orderMap.values()) {
             uniqueOrders.set(o.id, o);
           }
           store.orders = Array.from(uniqueOrders.values());
-
-          // Persist the combined set back to MongoDB so MongoDB contains all valid seed & customer orders
           this.saveManyDocuments('orders', store.orders).catch(err => {
             console.error('[MongoDB] Auto-sync combined orders err:', err);
           });
@@ -396,7 +397,6 @@ class MongoDatabaseService {
     }
   }
 
-  // Force push all memory state to MongoDB
   public async pushAllToMongo(store: any): Promise<boolean> {
     if (!this.isConnected || !this.db) {
       const connected = await this.connect();
