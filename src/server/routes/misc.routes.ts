@@ -10,30 +10,54 @@ const router = Router();
 const normalizeCatalogSlug = (value: unknown) => String(value ?? '')
   .trim()
   .toLowerCase()
+  .replace(/&/g, ' and ')
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-|-$/g, '');
 
+const CATEGORY_ALIASES: Record<string, string[]> = {
+  tobacco: ['tobacco', 'hookah-tobacco', 'shisha-tobacco', 'shisha'],
+  hookahs: ['hookah', 'hookahs', 'water-pipe', 'water-pipes'],
+  bowls: ['bowl', 'bowls', 'hookah-bowl', 'hookah-bowls'],
+  bases: ['base', 'bases', 'hookah-base', 'hookah-bases', 'vase', 'vases'],
+  coal: ['coal', 'coals', 'charcoal', 'charcoals', 'hookah-coal', 'hookah-charcoal'],
+  accessories: ['accessory', 'accessories', 'hookah-accessories'],
+  'e-hookah': ['e-hookah', 'e-hookah-electronic', 'electronic-hookah', 'electronic-hookahs'],
+  vapes: ['vape', 'vapes', 'vape-pod', 'vape-pods', 'pod-systems', 'disposable-vapes']
+};
+
+const productCategoryValues = (product: any): string[] => Array.from(new Set([
+  product?.categorySlug,
+  product?.category,
+  product?.categoryName,
+  product?.productCategory
+].filter(Boolean).map(normalizeCatalogSlug)));
+
 const productMatchesCategory = (product: any, category: Category) => {
-  const categorySlug = normalizeCatalogSlug(category.slug);
-  return normalizeCatalogSlug(product.categorySlug) === categorySlug ||
-    normalizeCatalogSlug(product.category) === categorySlug ||
-    normalizeCatalogSlug(product.category) === normalizeCatalogSlug(category.name);
+  if (!product?.isActive) return false;
+  const requested = new Set<string>([
+    normalizeCatalogSlug(category.slug),
+    normalizeCatalogSlug(category.name)
+  ].filter(Boolean));
+  const canonical = normalizeCatalogSlug(category.slug || category.name);
+  for (const alias of CATEGORY_ALIASES[canonical] || []) requested.add(normalizeCatalogSlug(alias));
+  const values = productCategoryValues(product);
+  return values.some(value => requested.has(value));
 };
 
 const getStorefrontCategories = (): Category[] => {
   const categories = [...db.categories];
-  const existingSlugs = new Set(categories.map(c => normalizeCatalogSlug(c.slug)));
-  const productCategories = new Map<string, string>();
-
+  const existing = new Set(categories.map(c => normalizeCatalogSlug(c.slug)));
+  const discovered = new Map<string, string>();
   for (const product of db.products) {
-    if (!product.isActive) continue;
-    const name = String(product.category || '').trim();
-    const slug = normalizeCatalogSlug(product.categorySlug || name);
-    if (slug && name && !productCategories.has(slug)) productCategories.set(slug, name);
+    if (!product?.isActive) continue;
+    const rawName = String(product.category || product.categoryName || '').trim();
+    const rawSlug = String(product.categorySlug || rawName).trim();
+    const slug = normalizeCatalogSlug(rawSlug);
+    if (!slug || discovered.has(slug)) continue;
+    discovered.set(slug, rawName || slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()));
   }
-
-  for (const [slug, name] of productCategories) {
-    if (existingSlugs.has(slug)) continue;
+  for (const [slug, name] of discovered) {
+    if (existing.has(slug)) continue;
     categories.push({
       id: `cat-${slug}`,
       name,
@@ -44,9 +68,8 @@ const getStorefrontCategories = (): Category[] => {
       isActive: true,
       sortOrder: 100 + categories.length
     });
-    existingSlugs.add(slug);
+    existing.add(slug);
   }
-
   return categories;
 };
 
