@@ -9,13 +9,15 @@ const slug = v => String(v || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-
 const text = v => String(v ?? '').replace(/\s+/g, ' ').trim();
 const category = p => {
   const explicit = text(p.category);
-  if (explicit) return explicit;
-  const s = `${p.product_name || ''} ${p.product_url || ''}`.toLowerCase();
-  if (/e-?hookah|electronic hookah|hookah pod/.test(s)) return 'E-Hookah';
+  const s = `${p.product_name || ''} ${p.description || ''} ${p.product_url || ''}`.toLowerCase();
+  if (/e-?hookah|electronic hookah|smart head|hookah pod/.test(s)) return 'E-Hookah';
   if (/vape|puff|nicotine|pod system|disposable/.test(s)) return 'Vapes';
-  if (/charcoal|coconut coal|quick light/.test(s)) return 'Coal';
-  if (/tobacco|shisha|molasses/.test(s)) return 'Tobacco';
-  return 'Accessories';
+  if (/charcoal|coconut coal|quick light|hookah coal|hookah charcoal/.test(s)) return 'Coal';
+  if (/tobacco|shisha tobacco|hookah tobacco|molasses|dark leaf|blonde leaf|cigar leaf/.test(s)) return 'Tobacco';
+  if (/\bbowls?\b|phunnel|killer bowl|hookah bowl|clay bowl/.test(s)) return 'Bowls';
+  if (/\bbases?\b|glass vase|vase for hookah|crystal base|hookah base/.test(s)) return 'Bases';
+  if (/\bhookahs?\b|shisha pipe|nargile|hookah stem|hookah set/.test(s)) return 'Hookahs';
+  return explicit || 'Accessories';
 };
 const brand = p => {
   const explicit = text(p.brand); if (explicit) return explicit;

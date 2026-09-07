@@ -79,8 +79,16 @@ function loadSplitCatalog(): Product[] {
         if (!name && !sourceUrl) continue;
 
         const categoryText = catalogText(rawProduct.category);
-        const productText = `${name} ${sourceUrl.replace(/^https?:\/\/[^/]+/i, '')}`;
-        const category = categoryText || (/e-?hookah|electronic hookah|hookah pod/i.test(productText) ? 'E-Hookah' : /vape|puff|nicotine|pod system|disposable/i.test(productText) ? 'Vapes' : /charcoal|coconut coal|quick light/i.test(productText) ? 'Coal' : /tobacco|shisha|molasses/i.test(productText) ? 'Tobacco' : /bowl|phunnel|clay bowl/i.test(productText) ? 'Bowls' : /base|glass vase|vase for hookah/i.test(productText) ? 'Bases' : /hookah|shisha pipe|nargile/i.test(productText) ? 'Hookahs' : 'Accessories');
+        const productText = `${name} ${catalogText(rawProduct.description)} ${sourceUrl.replace(/^https?:\/\/[^/]+/i, '')}`.toLowerCase();
+        const category =
+          /e-?hookah|electronic hookah|smart head|hookah pod/.test(productText) ? 'E-Hookah' :
+          /vape|puff|nicotine|pod system|disposable/.test(productText) ? 'Vapes' :
+          /charcoal|coconut coal|quick light|hookah coal|hookah charcoal/.test(productText) ? 'Coal' :
+          /tobacco|shisha tobacco|hookah tobacco|molasses|dark leaf|blonde leaf|cigar leaf/.test(productText) ? 'Tobacco' :
+          /\bbowls?\b|phunnel|killer bowl|hookah bowl|clay bowl/.test(productText) ? 'Bowls' :
+          /\bbases?\b|glass vase|vase for hookah|crystal base|hookah base/.test(productText) ? 'Bases' :
+          /\bhookahs?\b|shisha pipe|nargile|hookah stem|hookah set/.test(productText) ? 'Hookahs' :
+          categoryText || 'Accessories';
         const brand = catalogText(rawProduct.brand) || knownBrands.find(knownBrand => name.toLowerCase().startsWith(knownBrand.toLowerCase())) || name.split(/\s+/)[0] || 'Fumare Hookah';
         const slug = catalogSlug(name || sourceUrl);
         const priceMatch = String(rawProduct.price ?? '').replace(/,/g, '').match(/\d+(?:\.\d{1,2})?/);
