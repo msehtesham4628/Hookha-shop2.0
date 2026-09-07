@@ -28,8 +28,8 @@ const CATEGORY_ALIASES: Record<string, string[]> = {
 const productCategoryValues = (product: any): string[] => Array.from(new Set([
   product?.categorySlug,
   product?.category,
-  product?.categoryName,
-  product?.productCategory
+  (product as any)?.categoryName,
+  (product as any)?.productCategory
 ].filter(Boolean).map(normalizeCatalogSlug)));
 
 const productMatchesCategory = (product: any, category: Category) => {
