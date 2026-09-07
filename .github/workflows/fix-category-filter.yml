@@ -1,42 +1,118 @@
-name: Fix category filter aliases
+name: Audit dashboard persistence and catalog logic
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
   fix:
-    if: ${{ !contains(github.event.head_commit.message, '[category-filter-fixed]') }}
+    if: ${{ github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, '[dashboard-audited]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Normalize category aliases
+      - name: Patch persistence, counts and Mongo authority
+        shell: bash
         run: |
-          python3 - <<'PY'
+          python3 <<'PY'
           from pathlib import Path
-          p = Path('src/server/routes/product.routes.ts')
-          s = p.read_text()
-          old = """      const catLower = category.toLowerCase().trim();\n      result = result.filter(p =>\n        p.categorySlug === catLower ||\n        p.category.toLowerCase() === catLower ||\n        p.categorySlug.replace(/-/g, ' ') === catLower.replace(/-/g, ' ') ||\n        p.category.toLowerCase().replace(/\\s+/g, '-') === catLower\n      );"""
-          new = """      const catLower = category.toLowerCase().trim();\n      const categoryAliases: Record<string, string[]> = {\n        'e-hookah': ['e-hookah', 'e hookah', 'e-hookah & electronic', 'e hookah electronic', 'electronic hookah', 'electronic hookah heads'],\n        'vapes': ['vapes', 'vape', 'vapes & pod systems', 'vape & pod systems', 'pod systems', 'disposable vapes']\n      };\n      const aliases = categoryAliases[catLower] || [catLower];\n      result = result.filter(p => {\n        const pSlug = (p.categorySlug || '').toLowerCase().trim();\n        const pCategory = (p.category || '').toLowerCase().trim();\n        const pSlugSpaced = pSlug.replace(/-/g, ' ');\n        const pCategorySlug = pCategory.replace(/\\s+/g, '-');\n        return aliases.some(alias => {\n          const a = alias.toLowerCase().trim();\n          return pSlug === a || pCategory === a || pSlugSpaced === a.replace(/-/g, ' ') || pCategorySlug === a.replace(/\\s+/g, '-');\n        });\n      });"""
-          if old not in s:
-              raise SystemExit('Expected category filter block not found')
-          s = s.replace(old, new, 1)
-          marker = '// [category-filter-fixed]'
-          if marker not in s:
-              s = s.replace("import { Router } from 'express';", "import { Router } from 'express';\n\n// [category-filter-fixed]", 1)
+          import re
+
+          def repl(path, old, new, label):
+              p=Path(path); s=p.read_text()
+              if old not in s: raise SystemExit(f'missing: {label}')
+              p.write_text(s.replace(old,new,1))
+
+          # Dashboard: category/brand cards must use server-wide counts, not the current 50-product page.
+          p=Path('src/client/pages/AdminDashboardPage.tsx'); s=p.read_text()
+          s=s.replace("const matchingProductsCount = products.filter(p => p.category.toLowerCase() === cat.name.toLowerCase() || p.categoryId === cat.id).length;", "const matchingProductsCount = cat.productCount ?? 0;", 1)
+          s=s.replace("const matchingProductsCount = products.filter(p => p.brand.toLowerCase() === brand.name.toLowerCase()).length;", "const matchingProductsCount = brand.productCount ?? 0;", 1)
+          s=s.replace("if (orderStatusFilter !== 'ALL' && o.status !== orderStatusFilter) return false;", "if (orderStatusFilter !== 'ALL' && (o.status || o.orderStatus) !== orderStatusFilter) return false;", 1)
+          p.write_text(s)
+
+          # Admin mutations that were only in memory.
+          p=Path('src/server/routes/admin.routes.ts'); s=p.read_text()
+          pairs=[
+            ("db.products.push(newProd);\n      successful++;", "db.products.push(newProd);\n      db.persist('products', newProd);\n      successful++;"),
+            ("db.inventoryTransactions.unshift(tx);\n\n  db.logAudit(", "db.inventoryTransactions.unshift(tx);\n  db.persist('products', product);\n  db.persist('inventoryTransactions', tx);\n\n  db.logAudit("),
+            ("db.categories.push(cat);\n  db.logAudit(", "db.categories.push(cat);\n  db.persist('categories', cat);\n  db.logAudit("),
+            ("db.brands.push(brand);\n  db.logAudit(", "db.brands.push(brand);\n  db.persist('brands', brand);\n  db.logAudit("),
+            ("db.coupons.push(coupon);\n  db.logAudit(", "db.coupons.push(coupon);\n  db.persist('coupons', coupon);\n  db.logAudit("),
+            ("db.mediaLibrary.unshift(item);\n  return res.status(201).json({ success: true, data: item });", "db.mediaLibrary.unshift(item);\n  db.persist('mediaLibrary', item);\n  return res.status(201).json({ success: true, data: item });"),
+            ("db.roles.push(newRole);\n\n  db.logAudit(", "db.roles.push(newRole);\n  db.persist('roles', newRole);\n\n  db.logAudit("),
+            ("db.users.push(newStaff);\n\n  db.logAudit(", "db.users.push(newStaff);\n  db.persist('users', newStaff);\n\n  db.logAudit("),
+            ("targetStaff.updatedAt = new Date().toISOString();\n\n  db.logAudit(", "targetStaff.updatedAt = new Date().toISOString();\n  db.persist('users', targetStaff);\n\n  db.logAudit("),
+            ("customer.updatedAt = new Date().toISOString();\n\n  db.logAudit(", "customer.updatedAt = new Date().toISOString();\n  db.persist('users', customer);\n\n  db.logAudit("),
+            ("rev.status = status;\n  return res.json({ success: true, data: rev });", "rev.status = status;\n  db.persist('reviews', rev);\n  return res.json({ success: true, data: rev });"),
+            ("app.updatedAt = new Date().toISOString();\n\n  db.logAudit(", "app.updatedAt = new Date().toISOString();\n  db.persist('wholesaleApplications', app);\n\n  db.logAudit("),
+            ("db.coupons = db.coupons.filter(c => c.id !== id);\n  db.logAudit", "db.coupons = db.coupons.filter(c => c.id !== id);\n  db.deletePersisted('coupons', { id });\n  db.logAudit"),
+            ("const removed = db.categories.splice(index, 1)[0];\n  db.logAudit", "const removed = db.categories.splice(index, 1)[0];\n  db.deletePersisted('categories', { id: removed.id });\n  db.logAudit"),
+            ("const removed = db.brands.splice(index, 1)[0];\n  db.logAudit", "const removed = db.brands.splice(index, 1)[0];\n  db.deletePersisted('brands', { id: removed.id });\n  db.logAudit"),
+            ("router.put('/categories/:id', (req: AuthenticatedRequest, res) => {", "router.put('/categories/:id', requirePermission('categories.update'), (req: AuthenticatedRequest, res) => {"),
+            ("router.delete('/categories/:id', (req: AuthenticatedRequest, res) => {", "router.delete('/categories/:id', requirePermission('categories.delete'), (req: AuthenticatedRequest, res) => {"),
+            ("router.put('/brands/:id', (req: AuthenticatedRequest, res) => {", "router.put('/brands/:id', requirePermission('brands.update'), (req: AuthenticatedRequest, res) => {"),
+            ("router.delete('/brands/:id', (req: AuthenticatedRequest, res) => {", "router.delete('/brands/:id', requirePermission('brands.delete'), (req: AuthenticatedRequest, res) => {"),
+          ]
+          for a,b in pairs:
+              if a in s: s=s.replace(a,b,1)
+          p.write_text(s)
+
+          # Persist audit logs and notifications whenever the helper creates them.
+          p=Path('src/server/db/store.ts'); s=p.read_text()
+          s=s.replace("this.auditLogs.unshift(entry);\n    return entry;", "this.auditLogs.unshift(entry);\n    this.persist('auditLogs', entry);\n    return entry;", 1)
+          s=s.replace("this.notifications.unshift(notif);\n    return notif;", "this.notifications.unshift(notif);\n    this.persist('notifications', notif);\n    return notif;", 1)
+          p.write_text(s)
+
+          # Public review/wholesale writes must also survive a restart.
+          p=Path('src/server/routes/misc.routes.ts'); s=p.read_text()
+          s=s.replace("db.reviews.push(newReview);\n\n  // Recalculate", "db.reviews.push(newReview);\n  db.persist('reviews', newReview);\n\n  // Recalculate", 1)
+          s=s.replace("product.reviewCount = approvedReviews.length;\n", "product.reviewCount = approvedReviews.length;\n  db.persist('products', product);\n", 1)
+          s=s.replace("db.wholesaleApplications.push(application);\n  return", "db.wholesaleApplications.push(application);\n  db.persist('wholesaleApplications', application);\n  return", 1)
+          p.write_text(s)
+
+          # MongoDB: do not re-merge deleted records from local seed data, and make manual sync remove stale records.
+          p=Path('src/server/db/mongodb.ts'); s=p.read_text()
+          old="""      await coll.updateOne(query, { $set: doc }, { upsert: true });\n      this.cachedCounts[collectionName] = (this.cachedCounts[collectionName] || 0) + 1;\n      return true;"""
+          new="""      await coll.updateOne(query, { $set: doc }, { upsert: true });\n      await this.refreshCounts();\n      return true;"""
+          if old in s: s=s.replace(old,new,1)
+
+          old="""        if (mongoUsers.length > 0) {\n          const userMap = new Map<string, User & { passwordHash?: string }>();\n          for (const u of store.users) {\n            userMap.set(u.email.toLowerCase(), u);\n          }\n          for (const u of mongoUsers) {\n            userMap.set(u.email.toLowerCase(), u);\n          }\n          for (const u of store.users) {\n            const isPrivileged = u.email === 'admin@worldhookahmarket.com' || u.email === 'ehtesham4628@gmail.com' || u.email === 'customer@example.com' || u.role === 'SUPER_ADMIN';\n            if (isPrivileged) {\n              const existing = userMap.get(u.email.toLowerCase());\n              if (!existing) {\n                userMap.set(u.email.toLowerCase(), u);\n              } else {\n                existing.status = 'ACTIVE';\n                existing.role = u.role;\n                if (u.passwordHash) {\n                  existing.passwordHash = u.passwordHash;\n                }\n              }\n            }\n          }\n          store.users = Array.from(userMap.values());\n        }"""
+          new="""        // MongoDB is authoritative for persisted users. Do not recreate deleted staff from seed data.\n        if (mongoUsers.length > 0) store.users = mongoUsers;"""
+          if old in s: s=s.replace(old,new,1)
+
+          # Replace the merge logic for the remaining persisted collections with Mongo-authoritative records.
+          blocks=[
+            ("if (mongoOrders.length > 0) {", "if (mongoOrders.length > 0) {"),
+          ]
+          # These simple assignments are safe because the branch is entered only when Mongo has persisted catalog data.
+          s=re.sub(r"if \(mongoOrders\.length > 0\) \{.*?\n        \}\n        if \(mongoCategories\.length > 0\) \{.*?\n        \}\n        if \(mongoBrands\.length > 0\) \{.*?\n        \}\n        if \(mongoReviews\.length > 0\) \{.*?\n        \}\n        if \(mongoCoupons\.length > 0\) \{.*?\n        \}\n        if \(mongoWholesale\.length > 0\) \{.*?\n        \}\n        if \(mongoSettings\.length > 0\) store\.settings = mongoSettings\[0\];", "if (mongoOrders.length > 0) store.orders = mongoOrders;\n        if (mongoCategories.length > 0) store.categories = mongoCategories;\n        if (mongoBrands.length > 0) store.brands = mongoBrands;\n        if (mongoReviews.length > 0) store.reviews = mongoReviews;\n        if (mongoCoupons.length > 0) store.coupons = mongoCoupons;\n        if (mongoWholesale.length > 0) store.wholesaleApplications = mongoWholesale;\n        if (mongoSettings.length > 0) store.settings = mongoSettings[0];", s, count=1, flags=re.S)
+
+          marker="  public async pushAllToMongo(store: any): Promise<boolean> {"
+          helper="""  private async replaceCollection(collectionName: string, docs: any[]): Promise<void> {\n    if (!this.db || !this.isConnected) return;\n    const coll = this.db.collection(collectionName);\n    await coll.deleteMany({});\n    if (!docs.length) return;\n    const cleanDocs = docs.map((doc: any) => { const copy = { ...doc }; delete copy._id; return copy; });\n    await coll.insertMany(cleanDocs, { ordered: false });\n  }\n\n"""
+          if marker in s and 'private async replaceCollection' not in s: s=s.replace(marker,helper+marker,1)
+          old="""      await Promise.all([\n        this.saveManyDocuments('products', store.products, 500),\n        this.saveManyDocuments('categories', store.categories),\n        this.saveManyDocuments('brands', store.brands),\n        this.saveManyDocuments('users', store.users),\n        this.saveManyDocuments('orders', store.orders),\n        this.saveManyDocuments('coupons', store.coupons),\n        this.saveManyDocuments('reviews', store.reviews),\n        this.saveManyDocuments('wholesaleApplications', store.wholesaleApplications),\n        this.saveManyDocuments('cartItems', store.cartItems),\n        this.saveManyDocuments('wishlists', store.wishlists),\n        this.saveManyDocuments('auditLogs', store.auditLogs),\n        this.saveDocument('settings', { id: 'store_settings', ...store.settings })\n      ]);"""
+          new="""      await Promise.all([\n        this.replaceCollection('products', store.products),\n        this.replaceCollection('categories', store.categories),\n        this.replaceCollection('brands', store.brands),\n        this.replaceCollection('users', store.users),\n        this.replaceCollection('orders', store.orders),\n        this.replaceCollection('coupons', store.coupons),\n        this.replaceCollection('reviews', store.reviews),\n        this.replaceCollection('wholesaleApplications', store.wholesaleApplications),\n        this.replaceCollection('roles', store.roles),\n        this.replaceCollection('permissions', store.permissions),\n        this.replaceCollection('inventoryTransactions', store.inventoryTransactions),\n        this.replaceCollection('auditLogs', store.auditLogs),\n        this.replaceCollection('notifications', store.notifications),\n        this.replaceCollection('mediaLibrary', store.mediaLibrary),\n        this.replaceCollection('addresses', store.addresses),\n        this.replaceCollection('cartItems', store.cartItems),\n        this.replaceCollection('wishlists', store.wishlists),\n        this.replaceCollection('contactMessages', store.contactMessages),\n        this.replaceCollection('newsletterSubscribers', store.newsletterSubscribers),\n        this.replaceCollection('settings', [{ id: 'store_settings', ...store.settings }])\n      ]);"""
+          if old in s: s=s.replace(old,new,1)
           p.write_text(s)
           PY
 
-      - name: Commit fix
+      - name: Typecheck
         run: |
+          npm ci --ignore-scripts
+          npm run lint
+
+      - name: Commit fixes and remove temporary workflow
+        shell: bash
+        run: |
+          rm -f .github/workflows/fix-category-filter.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/server/routes/product.routes.ts
-          git diff --cached --quiet || git commit -m "fix: normalize e-hookah and vape category aliases [category-filter-fixed]"
+          git add src/client/pages/AdminDashboardPage.tsx src/server/routes/admin.routes.ts src/server/routes/misc.routes.ts src/server/db/store.ts src/server/db/mongodb.ts .github/workflows/fix-category-filter.yml
+          git commit -m "fix: audit dashboard persistence and catalog counts [dashboard-audited]" || exit 0
           git push
