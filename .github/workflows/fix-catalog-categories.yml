@@ -20,6 +20,30 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+
+          # Storefront runtime classifier: do not trust the scraped category field
+          # when it is empty or incorrectly broad. Use name + description + URL so
+          # tobacco/bowls/bases/coal/e-hookah/vapes are not dumped into Accessories.
+          p = Path('src/server/db/store.ts')
+          s = p.read_text()
+          old = """        const categoryText = catalogText(rawProduct.category);\n        const productText = `${name} ${sourceUrl.replace(/^https?:\\/\\/[^/]+/i, '')}`;\n        const category = categoryText || (/e-?hookah|electronic hookah|hookah pod/i.test(productText) ? 'E-Hookah' : /vape|puff|nicotine|pod system|disposable/i.test(productText) ? 'Vapes' : /charcoal|coconut coal|quick light/i.test(productText) ? 'Coal' : /tobacco|shisha|molasses/i.test(productText) ? 'Tobacco' : /bowl|phunnel|clay bowl/i.test(productText) ? 'Bowls' : /base|glass vase|vase for hookah/i.test(productText) ? 'Bases' : /hookah|shisha pipe|nargile/i.test(productText) ? 'Hookahs' : 'Accessories');"""
+          new = """        const categoryText = catalogText(rawProduct.category);\n        const productText = `${name} ${catalogText(rawProduct.description)} ${sourceUrl.replace(/^https?:\\/\\/[^/]+/i, '')}`.toLowerCase();\n        const category =\n          /e-?hookah|electronic hookah|smart head|hookah pod/.test(productText) ? 'E-Hookah' :\n          /vape|puff|nicotine|pod system|disposable/.test(productText) ? 'Vapes' :\n          /charcoal|coconut coal|quick light|hookah coal|hookah charcoal/.test(productText) ? 'Coal' :\n          /tobacco|shisha tobacco|hookah tobacco|molasses|dark leaf|blonde leaf|cigar leaf/.test(productText) ? 'Tobacco' :\n          /\\bbowls?\\b|phunnel|killer bowl|hookah bowl|clay bowl/.test(productText) ? 'Bowls' :\n          /\\bbases?\\b|glass vase|vase for hookah|crystal base|hookah base/.test(productText) ? 'Bases' :\n          /\\bhookahs?\\b|shisha pipe|nargile|hookah stem|hookah set/.test(productText) ? 'Hookahs' :\n          categoryText || 'Accessories';"""
+          if old not in s:
+              raise SystemExit('store.ts category block not found; refusing unsafe patch')
+          p.write_text(s.replace(old, new, 1))
+
+          # Keep the catalog import script consistent with the runtime classifier.
+          p = Path('scripts/import-clean-catalog.mjs')
+          s = p.read_text()
+          old = """const category = p => {\n  const explicit = text(p.category);\n  if (explicit) return explicit;\n  const s = `${p.product_name || ''} ${p.product_url || ''}`.toLowerCase();\n  if (/e-?hookah|electronic hookah|hookah pod/.test(s)) return 'E-Hookah';\n  if (/vape|puff|nicotine|pod system|disposable/.test(s)) return 'Vapes';\n  if (/charcoal|coconut coal|quick light/.test(s)) return 'Coal';\n  if (/tobacco|shisha|molasses/.test(s)) return 'Tobacco';\n  return 'Accessories';\n};"""
+          new = """const category = p => {\n  const explicit = text(p.category);\n  const s = `${p.product_name || ''} ${p.description || ''} ${p.product_url || ''}`.toLowerCase();\n  if (/e-?hookah|electronic hookah|smart head|hookah pod/.test(s)) return 'E-Hookah';\n  if (/vape|puff|nicotine|pod system|disposable/.test(s)) return 'Vapes';\n  if (/charcoal|coconut coal|quick light|hookah coal|hookah charcoal/.test(s)) return 'Coal';\n  if (/tobacco|shisha tobacco|hookah tobacco|molasses|dark leaf|blonde leaf|cigar leaf/.test(s)) return 'Tobacco';\n  if (/\\bbowls?\\b|phunnel|killer bowl|hookah bowl|clay bowl/.test(s)) return 'Bowls';\n  if (/\\bbases?\\b|glass vase|vase for hookah|crystal base|hookah base/.test(s)) return 'Bases';\n  if (/\\bhookahs?\\b|shisha pipe|nargile|hookah stem|hookah set/.test(s)) return 'Hookahs';\n  return explicit || 'Accessories';\n};"""
+          if old not in s:
+              raise SystemExit('import-clean-catalog.mjs category block not found; refusing unsafe patch')
+          p.write_text(s.replace(old, new, 1))
+          PY
+
+          python3 - <<'PY'
+          from pathlib import Path
           p = Path('src/server/routes/misc.routes.ts')
           s = p.read_text()
           start = s.index('const normalizeCatalogSlug')
@@ -91,14 +115,13 @@ jobs:
           };
 
           '''
-          s = s[:start] + block + s[end:]
-          p.write_text(s)
+          p.write_text(s[:start] + block + s[end:])
           PY
 
       - name: Commit catalog fix
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/server/routes/misc.routes.ts .github/workflows/fix-catalog-categories.yml
-          git diff --cached --quiet || git commit -m "fix: normalize catalog category matching [catalog-category-fixed]"
+          git add src/server/db/store.ts scripts/import-clean-catalog.mjs src/server/routes/misc.routes.ts .github/workflows/fix-catalog-categories.yml
+          git diff --cached --quiet || git commit -m "fix: classify catalog products from full product text"
           git push
