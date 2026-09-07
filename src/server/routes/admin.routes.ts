@@ -1176,7 +1176,7 @@ router.put('/staff/:id', requirePermission('staff.update'), async (req: Authenti
 });
 
 // DELETE /api/admin/staff/:id
-router.delete('/staff/:id', requirePermission('staff.update'), async (req: AuthenticatedRequest, res) => {
+router.delete('/staff/:id', requirePermission('staff.delete'), async (req: AuthenticatedRequest, res) => {
   const currentUser = req.user!;
   const { id } = req.params;
 
@@ -1195,6 +1195,8 @@ router.delete('/staff/:id', requirePermission('staff.update'), async (req: Authe
   }
 
   db.users.splice(targetStaffIndex, 1);
+  // Persist the deletion so the staff account is not recreated after a restart.
+  db.deletePersisted('users', { id });
 
   db.logAudit(
     { id: currentUser.id, name: `${currentUser.firstName} ${currentUser.lastName}`, role: currentUser.role, ip: req.ip },
