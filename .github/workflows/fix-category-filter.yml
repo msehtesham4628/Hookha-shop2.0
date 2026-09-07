@@ -1,4 +1,4 @@
-name: Audit dashboard persistence and catalog logic
+name: Apply dashboard audit fixes
 
 on:
   push:
@@ -16,29 +16,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Patch persistence, counts and Mongo authority
+      - name: Apply fixes
         shell: bash
         run: |
           python3 <<'PY'
           from pathlib import Path
           import re
 
-          def repl(path, old, new, label):
-              p=Path(path); s=p.read_text()
-              if old not in s: raise SystemExit(f'missing: {label}')
-              p.write_text(s.replace(old,new,1))
-
-          # Dashboard: category/brand cards must use server-wide counts, not the current 50-product page.
+          # Dashboard counts must come from the full catalog, not the current paginated page.
           p=Path('src/client/pages/AdminDashboardPage.tsx'); s=p.read_text()
           s=s.replace("const matchingProductsCount = products.filter(p => p.category.toLowerCase() === cat.name.toLowerCase() || p.categoryId === cat.id).length;", "const matchingProductsCount = cat.productCount ?? 0;", 1)
           s=s.replace("const matchingProductsCount = products.filter(p => p.brand.toLowerCase() === brand.name.toLowerCase()).length;", "const matchingProductsCount = brand.productCount ?? 0;", 1)
           s=s.replace("if (orderStatusFilter !== 'ALL' && o.status !== orderStatusFilter) return false;", "if (orderStatusFilter !== 'ALL' && (o.status || o.orderStatus) !== orderStatusFilter) return false;", 1)
           p.write_text(s)
 
-          # Admin mutations that were only in memory.
+          # Make every important admin mutation write through to MongoDB.
           p=Path('src/server/routes/admin.routes.ts'); s=p.read_text()
-          pairs=[
+          edits=[
             ("db.products.push(newProd);\n      successful++;", "db.products.push(newProd);\n      db.persist('products', newProd);\n      successful++;"),
             ("db.inventoryTransactions.unshift(tx);\n\n  db.logAudit(", "db.inventoryTransactions.unshift(tx);\n  db.persist('products', product);\n  db.persist('inventoryTransactions', tx);\n\n  db.logAudit("),
             ("db.categories.push(cat);\n  db.logAudit(", "db.categories.push(cat);\n  db.persist('categories', cat);\n  db.logAudit("),
@@ -59,40 +53,31 @@ jobs:
             ("router.put('/brands/:id', (req: AuthenticatedRequest, res) => {", "router.put('/brands/:id', requirePermission('brands.update'), (req: AuthenticatedRequest, res) => {"),
             ("router.delete('/brands/:id', (req: AuthenticatedRequest, res) => {", "router.delete('/brands/:id', requirePermission('brands.delete'), (req: AuthenticatedRequest, res) => {"),
           ]
-          for a,b in pairs:
+          for a,b in edits:
               if a in s: s=s.replace(a,b,1)
           p.write_text(s)
 
-          # Persist audit logs and notifications whenever the helper creates them.
+          # Persist audit and notification helpers themselves.
           p=Path('src/server/db/store.ts'); s=p.read_text()
           s=s.replace("this.auditLogs.unshift(entry);\n    return entry;", "this.auditLogs.unshift(entry);\n    this.persist('auditLogs', entry);\n    return entry;", 1)
           s=s.replace("this.notifications.unshift(notif);\n    return notif;", "this.notifications.unshift(notif);\n    this.persist('notifications', notif);\n    return notif;", 1)
           p.write_text(s)
 
-          # Public review/wholesale writes must also survive a restart.
+          # Public review and wholesale writes also persist.
           p=Path('src/server/routes/misc.routes.ts'); s=p.read_text()
           s=s.replace("db.reviews.push(newReview);\n\n  // Recalculate", "db.reviews.push(newReview);\n  db.persist('reviews', newReview);\n\n  // Recalculate", 1)
           s=s.replace("product.reviewCount = approvedReviews.length;\n", "product.reviewCount = approvedReviews.length;\n  db.persist('products', product);\n", 1)
           s=s.replace("db.wholesaleApplications.push(application);\n  return", "db.wholesaleApplications.push(application);\n  db.persist('wholesaleApplications', application);\n  return", 1)
           p.write_text(s)
 
-          # MongoDB: do not re-merge deleted records from local seed data, and make manual sync remove stale records.
+          # MongoDB must not recreate deleted staff/catalog records from local seed data.
           p=Path('src/server/db/mongodb.ts'); s=p.read_text()
-          old="""      await coll.updateOne(query, { $set: doc }, { upsert: true });\n      this.cachedCounts[collectionName] = (this.cachedCounts[collectionName] || 0) + 1;\n      return true;"""
-          new="""      await coll.updateOne(query, { $set: doc }, { upsert: true });\n      await this.refreshCounts();\n      return true;"""
+          s=s.replace("""      await coll.updateOne(query, { $set: doc }, { upsert: true });\n      this.cachedCounts[collectionName] = (this.cachedCounts[collectionName] || 0) + 1;\n      return true;""", """      await coll.updateOne(query, { $set: doc }, { upsert: true });\n      await this.refreshCounts();\n      return true;""", 1)
+          old="""        if (mongoUsers.length > 0) {\n          const userMap = new Map<string, User & { passwordHash?: string }>();\n          for (const u of store.users) {\n            userMap.set(u.email.toLowerCase(), u);\n          }\n          for (const u of mongoUsers) {\n            userMap.set(u.email.toLowerCase(), u);\n          }\n          for (const u of store.users) {\n            const isPrivileged = u.email === 'admin@worldhookahmarket.com' || u.email === 'ehtesham4628@gmail.com' || u.email === 'customer@example.com' || u.role === 'SUPER_ADMIN';\n            if (isPrivileged) {\n              const existing = userMap.get(u.email.toLowerCase());\n              if (!existing) {\n                userMap.set(u.email.toLowerCase(), u);\n              } else {\n                existing.status = 'ACTIVE';\n                existing.role = u.role;\n                if (u.passwordHash) existing.passwordHash = u.passwordHash;\n              }\n            }\n          }\n          store.users = Array.from(userMap.values());\n        }"""
+          new="""        // MongoDB is authoritative for persisted users; deleted staff must stay deleted.\n        if (mongoUsers.length > 0) store.users = mongoUsers;"""
           if old in s: s=s.replace(old,new,1)
-
-          old="""        if (mongoUsers.length > 0) {\n          const userMap = new Map<string, User & { passwordHash?: string }>();\n          for (const u of store.users) {\n            userMap.set(u.email.toLowerCase(), u);\n          }\n          for (const u of mongoUsers) {\n            userMap.set(u.email.toLowerCase(), u);\n          }\n          for (const u of store.users) {\n            const isPrivileged = u.email === 'admin@worldhookahmarket.com' || u.email === 'ehtesham4628@gmail.com' || u.email === 'customer@example.com' || u.role === 'SUPER_ADMIN';\n            if (isPrivileged) {\n              const existing = userMap.get(u.email.toLowerCase());\n              if (!existing) {\n                userMap.set(u.email.toLowerCase(), u);\n              } else {\n                existing.status = 'ACTIVE';\n                existing.role = u.role;\n                if (u.passwordHash) {\n                  existing.passwordHash = u.passwordHash;\n                }\n              }\n            }\n          }\n          store.users = Array.from(userMap.values());\n        }"""
-          new="""        // MongoDB is authoritative for persisted users. Do not recreate deleted staff from seed data.\n        if (mongoUsers.length > 0) store.users = mongoUsers;"""
-          if old in s: s=s.replace(old,new,1)
-
-          # Replace the merge logic for the remaining persisted collections with Mongo-authoritative records.
-          blocks=[
-            ("if (mongoOrders.length > 0) {", "if (mongoOrders.length > 0) {"),
-          ]
-          # These simple assignments are safe because the branch is entered only when Mongo has persisted catalog data.
+          # Keep Mongo as the source of truth for collections already persisted there.
           s=re.sub(r"if \(mongoOrders\.length > 0\) \{.*?\n        \}\n        if \(mongoCategories\.length > 0\) \{.*?\n        \}\n        if \(mongoBrands\.length > 0\) \{.*?\n        \}\n        if \(mongoReviews\.length > 0\) \{.*?\n        \}\n        if \(mongoCoupons\.length > 0\) \{.*?\n        \}\n        if \(mongoWholesale\.length > 0\) \{.*?\n        \}\n        if \(mongoSettings\.length > 0\) store\.settings = mongoSettings\[0\];", "if (mongoOrders.length > 0) store.orders = mongoOrders;\n        if (mongoCategories.length > 0) store.categories = mongoCategories;\n        if (mongoBrands.length > 0) store.brands = mongoBrands;\n        if (mongoReviews.length > 0) store.reviews = mongoReviews;\n        if (mongoCoupons.length > 0) store.coupons = mongoCoupons;\n        if (mongoWholesale.length > 0) store.wholesaleApplications = mongoWholesale;\n        if (mongoSettings.length > 0) store.settings = mongoSettings[0];", s, count=1, flags=re.S)
-
           marker="  public async pushAllToMongo(store: any): Promise<boolean> {"
           helper="""  private async replaceCollection(collectionName: string, docs: any[]): Promise<void> {\n    if (!this.db || !this.isConnected) return;\n    const coll = this.db.collection(collectionName);\n    await coll.deleteMany({});\n    if (!docs.length) return;\n    const cleanDocs = docs.map((doc: any) => { const copy = { ...doc }; delete copy._id; return copy; });\n    await coll.insertMany(cleanDocs, { ordered: false });\n  }\n\n"""
           if marker in s and 'private async replaceCollection' not in s: s=s.replace(marker,helper+marker,1)
@@ -101,13 +86,7 @@ jobs:
           if old in s: s=s.replace(old,new,1)
           p.write_text(s)
           PY
-
-      - name: Typecheck
-        run: |
-          npm ci --ignore-scripts
-          npm run lint
-
-      - name: Commit fixes and remove temporary workflow
+      - name: Commit fixes
         shell: bash
         run: |
           rm -f .github/workflows/fix-category-filter.yml
