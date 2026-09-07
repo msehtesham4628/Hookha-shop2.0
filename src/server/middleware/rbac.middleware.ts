@@ -3,49 +3,55 @@ import { AuthenticatedRequest } from './auth.middleware.js';
 import { db } from '../db/store.js';
 import { User } from '../../types/index.js';
 
-export function checkUserPermission(user: User, permissionKey: string): boolean {
-  if (!user) return false;
-  if (user.status && user.status.toUpperCase() !== 'ACTIVE') return false;
+// Pre-defined wildcard permissions for built-in administrative roles
+const ADMIN_ALLOWED_NAMESPACES = [
+  'dashboard.',
+  'orders.',
+  'audit_logs.',
+  'wholesale.',
+  'customers.',
+  'roles.'
+];
 
-  const email = user.email?.toLowerCase().trim() || '';
-  const isPrivilegedEmail = 
-    email === 'ehtesham4628@gmail.com' || 
-    email.endsWith('@worldhookahmarket.com') ||
-    email.endsWith('@fumarehookah.com') ||
-    email.endsWith('@sultan.com') ||
-    email.endsWith('@sultanhookah.com') ||
-    email.startsWith('admin@');
+export function checkUserPermission(user: User | undefined, permissionKey: string): boolean {
+  if (!user || (user.status && user.status.toUpperCase() !== 'ACTIVE')) {
+    return false;
+  }
 
-  // SUPER_ADMIN role or privileged administrator email has unrestricted bypass
-  if (user.role === 'SUPER_ADMIN' || isPrivilegedEmail) {
+  // 1. Absolute bypass for Super Admin
+  if (user.role === 'SUPER_ADMIN') {
     return true;
   }
 
-  // General ADMIN role has comprehensive view & manage access
+  // 2. Explicit User-level Overrides
+  if (user.customPermissions?.length) {
+    if (user.customPermissions.includes('*') || user.customPermissions.includes(permissionKey)) {
+      return true;
+    }
+  }
+
+  // 3. Built-in ADMIN Role Policy
   if (user.role === 'ADMIN') {
+    // Explicit deny list for standard Admins
+    if (permissionKey.startsWith('roles.delete')) {
+      return false;
+    }
+    // Allow standard admin namespaces or generic read permissions
     if (
-      permissionKey.endsWith('.view') || 
-      permissionKey.startsWith('dashboard.') || 
-      permissionKey.startsWith('orders.') || 
-      permissionKey.startsWith('audit_logs.') || 
-      permissionKey.startsWith('wholesale.') || 
-      permissionKey.startsWith('customers.') || 
-      permissionKey.startsWith('roles.') ||
-      !permissionKey.startsWith('roles.delete')
+      permissionKey.endsWith('.view') ||
+      ADMIN_ALLOWED_NAMESPACES.some((prefix) => permissionKey.startsWith(prefix))
     ) {
       return true;
     }
   }
 
-  // Check custom individual user permissions first
-  if (user.customPermissions && (user.customPermissions.includes(permissionKey) || user.customPermissions.includes('*'))) {
-    return true;
-  }
-
-  // Check role-based database permissions
-  const roleRecord = db.roles.find(r => r.code === user.role);
-  if (roleRecord && (roleRecord.permissions.includes(permissionKey) || roleRecord.permissions.includes('*'))) {
-    return true;
+  // 4. Role-based DB permissions
+  const roleRecord = db.roles.find((r) => r.code === user.role);
+  if (roleRecord?.permissions) {
+    return (
+      roleRecord.permissions.includes('*') || 
+      roleRecord.permissions.includes(permissionKey)
+    );
   }
 
   return false;
@@ -57,15 +63,11 @@ export const requirePermission = (permissionKey: string) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'Authentication required. Please sign in.'
-        }
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required. Please sign in.' }
       });
     }
 
-    const hasAccess = checkUserPermission(user, permissionKey);
-    if (!hasAccess) {
+    if (!checkUserPermission(user, permissionKey)) {
       return res.status(403).json({
         success: false,
         error: {
@@ -88,37 +90,21 @@ export const requireRole = (allowedRoles: string | string[]) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'Authentication required. Please sign in.'
-        }
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required. Please sign in.' }
       });
     }
 
-    const email = user.email?.toLowerCase().trim() || '';
-    const isPrivilegedEmail = 
-      email === 'ehtesham4628@gmail.com' || 
-      email.endsWith('@worldhookahmarket.com') ||
-      email.endsWith('@fumarehookah.com') ||
-      email.endsWith('@sultan.com') ||
-      email.endsWith('@sultanhookah.com') ||
-      email.startsWith('admin@');
-
-    if (user.role === 'SUPER_ADMIN' || isPrivilegedEmail) {
+    if (user.role === 'SUPER_ADMIN' || roles.includes(user.role)) {
       return next();
     }
 
-    if (!roles.includes(user.role)) {
-      return res.status(403).json({
-        success: false,
-        error: {
-          code: 'FORBIDDEN',
-          message: `Access denied. Role not permitted.`,
-          allowedRoles: roles
-        }
-      });
-    }
-
-    next();
+    return res.status(403).json({
+      success: false,
+      error: {
+        code: 'FORBIDDEN',
+        message: 'Access denied. Role not permitted.',
+        allowedRoles: roles
+      }
+    });
   };
 };
