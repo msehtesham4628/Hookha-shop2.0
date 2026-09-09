@@ -45,11 +45,11 @@ const productMatchesCategory = (product: any, category: Category) => {
 };
 
 const getStorefrontCategories = (): Category[] => {
-  const categories = [...db.categories];
+  const categories = db.categories.filter(c => !db.isCategoryDeleted(c.id) && !db.isCategoryDeleted(c.slug) && !db.isCategoryDeleted(c.name));
   const existing = new Set(categories.map(c => normalizeCatalogSlug(c.slug)));
   const discovered = new Map<string, string>();
   for (const product of db.products) {
-    if (!product?.isActive) continue;
+    if (!product?.isActive || db.isProductDeleted(product.id)) continue;
     const rawName = String(product.category || (product as any).categoryName || '').trim();
     const rawSlug = String(product.categorySlug || rawName).trim();
     const slug = normalizeCatalogSlug(rawSlug);
@@ -57,7 +57,7 @@ const getStorefrontCategories = (): Category[] => {
     discovered.set(slug, rawName || slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()));
   }
   for (const [slug, name] of discovered) {
-    if (existing.has(slug)) continue;
+    if (existing.has(slug) || db.isCategoryDeleted(slug) || db.isCategoryDeleted(name)) continue;
     categories.push({
       id: `cat-${slug}`,
       name,
@@ -113,10 +113,10 @@ router.get('/categories/:slug', (req, res) => {
 // GET /api/brands
 router.get('/brands', (req, res) => {
   const activeBrands = db.brands
-    .filter(b => b.isActive)
+    .filter(b => b.isActive && !db.isBrandDeleted(b.id) && !db.isBrandDeleted(b.slug) && !db.isBrandDeleted(b.name))
     .map(brand => ({
       ...brand,
-      productCount: db.products.filter(p => p.brandSlug === brand.slug && p.isActive).length
+      productCount: db.products.filter(p => p.brandSlug === brand.slug && p.isActive && !db.isProductDeleted(p.id)).length
     }));
 
   return res.json({ success: true, data: activeBrands });

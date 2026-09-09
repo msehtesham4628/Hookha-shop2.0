@@ -222,7 +222,23 @@ class MongoDatabaseService {
     if (!this.db || !this.isConnected) return false;
     try {
       const coll = this.db.collection(collectionName);
-      await coll.deleteOne(filter);
+      const queryParts: any[] = [];
+      if (filter.id) {
+        queryParts.push({ id: filter.id });
+        queryParts.push({ _id: filter.id });
+      }
+      if (filter.slug) {
+        queryParts.push({ slug: filter.slug });
+      }
+      if (filter.name) {
+        queryParts.push({ name: filter.name });
+      }
+      if (filter.sku) {
+        queryParts.push({ sku: filter.sku });
+      }
+      const finalQuery = queryParts.length > 0 ? { $or: queryParts } : filter;
+      const res = await coll.deleteMany(finalQuery);
+      console.log(`[MongoDB] Deleted ${res.deletedCount} documents from ${collectionName} matching:`, filter);
       await this.refreshCounts();
       return true;
     } catch (err: any) {
@@ -250,6 +266,48 @@ class MongoDatabaseService {
     }
 
     try {
+      // 1. First, restore and merge cloud persistence overrides
+      try {
+        const mongoPersDocs = await this.getDocuments<any>('persistence', { id: 'store_persistence' });
+        if (mongoPersDocs && mongoPersDocs.length > 0) {
+          store.mergePersistenceData(mongoPersDocs[0]);
+          console.log('[MongoDB] Restored cloud persistence state:', {
+            deletedProducts: store.persistenceData.deletedProductIds.length,
+            deletedCategories: store.persistenceData.deletedCategoryIds.length,
+            deletedBrands: store.persistenceData.deletedBrandIds.length,
+          });
+        }
+      } catch (err) {
+        console.warn('[MongoDB] Notice: Could not read persistence collection:', err);
+      }
+
+      // 2. Clean up any deleted items from MongoDB itself so they never linger
+      try {
+        if (store.persistenceData.deletedCategoryIds?.length > 0) {
+          const catOrs = store.persistenceData.deletedCategoryIds.flatMap((idOrSlug: string) => [
+            { id: idOrSlug },
+            { slug: idOrSlug },
+            { name: idOrSlug }
+          ]);
+          await this.db.collection('categories').deleteMany({ $or: catOrs });
+        }
+        if (store.persistenceData.deletedBrandIds?.length > 0) {
+          const brandOrs = store.persistenceData.deletedBrandIds.flatMap((idOrSlug: string) => [
+            { id: idOrSlug },
+            { slug: idOrSlug },
+            { name: idOrSlug }
+          ]);
+          await this.db.collection('brands').deleteMany({ $or: brandOrs });
+        }
+        if (store.persistenceData.deletedProductIds?.length > 0) {
+          await this.db.collection('products').deleteMany({
+            id: { $in: store.persistenceData.deletedProductIds }
+          });
+        }
+      } catch (e) {
+        console.warn('[MongoDB] Notice: Purging deleted entities deferred:', e);
+      }
+
       const productCount = await this.db.collection('products').countDocuments();
       let seeded = false;
       let loaded = false;
@@ -269,6 +327,7 @@ class MongoDatabaseService {
         if (store.settings) {
           await this.saveDocument('settings', { id: 'store_settings', ...store.settings });
         }
+        await this.saveDocument('persistence', { id: 'store_persistence', ...store.persistenceData });
         seeded = true;
         console.log('[MongoDB] Master collections successfully seeded into MongoDB!');
       } else if (productCount > 0) {
@@ -301,8 +360,16 @@ class MongoDatabaseService {
           // MongoDB is authoritative for persisted catalog records. Merge by id
           // so any local seed-only products are retained if MongoDB is incomplete.
           const productMap = new Map<string, Product>();
-          for (const p of store.products) productMap.set(p.id, p);
-          for (const p of mongoProducts) productMap.set(p.id, p);
+          for (const p of store.products) {
+            if (!store.isProductDeleted(p.id)) {
+              productMap.set(p.id, p);
+            }
+          }
+          for (const p of mongoProducts) {
+            if (!store.isProductDeleted(p.id)) {
+              productMap.set(p.id, p);
+            }
+          }
           store.products = Array.from(productMap.values());
           console.log(`[MongoDB] Loaded ${mongoProducts.length} products into storefront memory.`);
         }
@@ -333,12 +400,30 @@ class MongoDatabaseService {
           store.users = Array.from(userMap.values());
         }
         if (mongoOrders.length > 0) store.orders = mongoOrders;
-        if (mongoCategories.length > 0) store.categories = mongoCategories;
-        if (mongoBrands.length > 0) store.brands = mongoBrands;
+        if (mongoCategories.length > 0) {
+          store.categories = mongoCategories.filter((c: any) =>
+            !store.isCategoryDeleted(c.id) &&
+            !store.isCategoryDeleted(c.slug) &&
+            !store.isCategoryDeleted(c.name)
+          );
+        }
+        if (mongoBrands.length > 0) {
+          store.brands = mongoBrands.filter((b: any) =>
+            !store.isBrandDeleted(b.id) &&
+            !store.isBrandDeleted(b.slug) &&
+            !store.isBrandDeleted(b.name)
+          );
+        }
         if (mongoReviews.length > 0) store.reviews = mongoReviews;
         if (mongoCoupons.length > 0) store.coupons = mongoCoupons;
         if (mongoWholesale.length > 0) store.wholesaleApplications = mongoWholesale;
         if (mongoSettings.length > 0) store.settings = mongoSettings[0];
+
+        // Apply all overrides and persistence filters
+        store.applyPersistence();
+
+        // Save current persistence document back to MongoDB to ensure it stays synchronized
+        await this.saveDocument('persistence', { id: 'store_persistence', ...store.persistenceData });
 
         loaded = true;
       }

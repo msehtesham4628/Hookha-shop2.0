@@ -834,7 +834,7 @@ router.delete('/categories/:id', requirePermission('categories.delete'), (req: A
   }
 
   const removed = db.categories.splice(index, 1)[0];
-  db.deletePersisted('categories', { id: removed.id, slug: removed.slug });
+  db.deletePersisted('categories', { id: removed.id, slug: removed.slug, name: removed.name });
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_DELETED_CATEGORY', 'CATEGORY', id, { name: removed.name });
   return res.json({ success: true, message: `Category "${removed.name}" deleted successfully` });
 });
@@ -898,7 +898,7 @@ router.delete('/brands/:id', requirePermission('brands.delete'), (req: Authentic
   }
 
   const removed = db.brands.splice(index, 1)[0];
-  db.deletePersisted('brands', { id: removed.id, slug: removed.slug });
+  db.deletePersisted('brands', { id: removed.id, slug: removed.slug, name: removed.name });
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_DELETED_BRAND', 'BRAND', id, { name: removed.name });
   return res.json({ success: true, message: `Brand "${removed.name}" deleted successfully` });
 });

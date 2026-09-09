@@ -29,7 +29,7 @@ router.get('/', (req, res) => {
       q
     } = req.query as Record<string, string>;
 
-    let result = db.products.filter(p => p.isActive);
+    let result = db.products.filter(p => p.isActive && !db.isProductDeleted(p.id));
 
     // Text search query
     if (q && q.trim()) {

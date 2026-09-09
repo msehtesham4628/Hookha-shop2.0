@@ -2,10 +2,20 @@
   "deletedProductIds": [],
   "productOverrides": {},
   "deletedCategoryIds": [
-    "test-temporary-category"
+    "test-temporary-category",
+    "cat-accessories",
+    "accessories",
+    "cat-1788947086226",
+    "Test Temporary Category",
+    "test temporary category"
   ],
   "categoryOverrides": {},
-  "deletedBrandIds": [],
+  "deletedBrandIds": [
+    "brand-test-12345",
+    "persistent-hookah-co",
+    "Persistent Hookah Co",
+    "persistent hookah co"
+  ],
   "brandOverrides": {},
   "deletedCouponIds": [],
   "couponOverrides": {},
@@ -14,21 +24,23 @@
   "deletedUserIds": [],
   "userOverrides": {
     "usr-ehtesham-root": {
+      "_id": "6a9dbb20f0ee40c44ce5a9cc",
       "id": "usr-ehtesham-root",
+      "createdAt": "2026-01-01T00:00:00Z",
       "email": "ehtesham4628@gmail.com",
       "firstName": "Ehtesham",
+      "isEmailVerified": true,
+      "isPhoneVerified": true,
       "lastName": "Admin",
+      "orderCount": 0,
+      "passwordHash": "$2b$10$a.H4Hr65lS8rN8A1bCfs3enhKnrROA8cfXRWvwStcA.rl68L4M4LK",
       "phone": "+1 (800) 785-8260",
       "role": "SUPER_ADMIN",
       "status": "ACTIVE",
-      "isEmailVerified": true,
-      "isPhoneVerified": true,
       "totalSpent": 0,
-      "orderCount": 0,
-      "passwordHash": "$2b$10$2PUvE/CGWWwBBQIZ8IX75.v77.uKyal1qiz6d9w3caxm6aeBXbsuC",
-      "createdAt": "2026-01-01T00:00:00Z",
       "updatedAt": "2026-09-09T09:44:36.653Z",
-      "lastLoginAt": "2026-09-09T09:44:36.653Z"
+      "lastLoginAt": "2026-09-09T09:58:08.165Z",
+      "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocK3RsyRK4rwoiQM5BFEBEGILVHufdqbU_2GNsBL-Ge8nmokfQ=s96-c"
     }
   },
   "roleOverrides": {},
