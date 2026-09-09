@@ -668,6 +668,18 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     };
   }, [isAdmin, user?.email]);
 
+  const refreshCatalogView = async () => {
+    await fetchAdminCatalog(
+      catalogPage,
+      catalogLimit,
+      adminSearch,
+      catalogCategory,
+      catalogBrand,
+      catalogStockFilter,
+      catalogSortBy
+    );
+  };
+
   useEffect(() => {
     if (activeTab === 'products') {
       fetchAdminCatalog(catalogPage, catalogLimit, adminSearch, catalogCategory, catalogBrand, catalogStockFilter, catalogSortBy);
@@ -791,22 +803,34 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         rating: parseFloat(prodRating) || 5.0
       };
 
+      let savedProduct: Product | null = null;
       if (editingProduct) {
         const res = await api.updateProduct(editingProduct.id, payload);
         if (res.success) {
+          savedProduct = ((res as any).data || { ...editingProduct, ...payload }) as Product;
           showToast(`Product "${prodName}" updated successfully!`, 'success');
-          broadcastSync('PRODUCT_UPDATED', { product: res.data, action: 'update' });
+          broadcastSync('PRODUCT_UPDATED', { product: savedProduct, action: 'update' });
         }
       } else {
         const res = await api.createProduct(payload);
         if (res.success) {
+          savedProduct = (res as any).data as Product;
           showToast(`New product "${prodName}" added to catalog!`, 'success');
-          broadcastSync('PRODUCT_UPDATED', { product: res.data, action: 'create' });
+          broadcastSync('PRODUCT_UPDATED', { product: savedProduct, action: 'create' });
         }
       }
       setIsProductModalOpen(false);
-      await loadAllAdminData();
-      await fetchAdminCatalog(catalogPage, catalogLimit, adminSearch, catalogCategory, catalogBrand, catalogStockFilter, catalogSortBy);
+
+      // Update the visible row immediately, then re-fetch using the exact current
+      // page/search/filter state instead of resetting the catalog to page 1.
+      if (savedProduct?.id) {
+        if (editingProduct) {
+          setProducts(prev => prev.map(p => p.id === savedProduct!.id ? { ...p, ...savedProduct } : p));
+        } else {
+          setProducts(prev => [savedProduct!, ...prev]);
+        }
+      }
+      await refreshCatalogView();
     } catch (err: any) {
       showToast(err.message || 'Failed to save product', 'error');
     }
@@ -826,11 +850,11 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           if (res.success) {
             showToast('Product decommissioned successfully', 'info');
             broadcastSync('PRODUCT_UPDATED', { id, action: 'delete' });
-            loadAllAdminData();
+            await refreshCatalogView();
           }
         } catch (err: any) {
           showToast(err.message || 'Failed to delete product', 'error');
-          loadAllAdminData();
+          await refreshCatalogView();
         }
       }
     });
@@ -879,18 +903,21 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       if (editingCategory) {
         const res = await api.updateAdminCategory(editingCategory.id, payload);
         if (res.success) {
+          const saved = ((res as any).data || { ...editingCategory, ...payload }) as Category;
+          setCategories(prev => prev.map(c => c.id === editingCategory.id ? { ...c, ...saved } : c));
           showToast(`Category "${catName}" updated successfully!`, 'success');
-          broadcastSync('CATEGORY_UPDATED', { category: res.data, action: 'update' });
+          broadcastSync('CATEGORY_UPDATED', { category: saved, action: 'update' });
         }
       } else {
         const res = await api.createAdminCategory(payload);
         if (res.success) {
+          const saved = (res as any).data as Category;
+          if (saved?.id) setCategories(prev => [...prev, saved]);
           showToast(`New category "${catName}" created!`, 'success');
-          broadcastSync('CATEGORY_UPDATED', { category: res.data, action: 'create' });
+          broadcastSync('CATEGORY_UPDATED', { category: saved, action: 'create' });
         }
       }
       setIsCategoryModalOpen(false);
-      loadAllAdminData();
     } catch (err: any) {
       showToast(err.message || 'Failed to save category', 'error');
     }
@@ -955,18 +982,21 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       if (editingBrand) {
         const res = await api.updateAdminBrand(editingBrand.id, payload);
         if (res.success) {
+          const saved = ((res as any).data || { ...editingBrand, ...payload }) as Brand;
+          setBrands(prev => prev.map(b => b.id === editingBrand.id ? { ...b, ...saved } : b));
           showToast(`Brand "${brandName}" updated successfully!`, 'success');
-          broadcastSync('CATEGORY_UPDATED', { brand: res.data });
+          broadcastSync('CATEGORY_UPDATED', { brand: saved });
         }
       } else {
         const res = await api.createAdminBrand(payload);
         if (res.success) {
+          const saved = (res as any).data as Brand;
+          if (saved?.id) setBrands(prev => [...prev, saved]);
           showToast(`New brand "${brandName}" created!`, 'success');
-          broadcastSync('CATEGORY_UPDATED', { brand: res.data });
+          broadcastSync('CATEGORY_UPDATED', { brand: saved });
         }
       }
       setIsBrandModalOpen(false);
-      loadAllAdminData();
     } catch (err: any) {
       showToast(err.message || 'Failed to save brand', 'error');
     }

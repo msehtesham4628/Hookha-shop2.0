@@ -12,6 +12,7 @@ import miscRoutes from './routes/misc.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import seoRoutes from './routes/seo.routes.js';
 import { createSeoMiddleware } from './middleware/seoCrawlerMiddleware.js';
+import { db } from './db/store.js';
 
 export const app = express();
 
@@ -32,6 +33,18 @@ app.options('*', cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Wait for the database store to finish cloud hydration before serving API requests.
+// This prevents Vercel cold starts from returning seed-only data before MongoDB
+// tombstones and persisted overrides have been merged into memory.
+app.use('/api', async (_req, _res, next) => {
+  try {
+    await db.ready;
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 // API Health & Info
 app.get('/api/health', (req, res) => {

@@ -197,6 +197,7 @@ export class DatabaseStore {
   public persistenceData: StorePersistenceData = getDefaultPersistenceData();
 
   private isInitialized = false;
+  public ready: Promise<void>;
 
   public loadPersistence() {
     this.persistenceData = loadPersistenceData();
@@ -381,8 +382,10 @@ export class DatabaseStore {
   }
 
   constructor() {
+    // Load durable tombstones before seeding any built-in users.
+    this.loadPersistence();
     this.seedDefaultUsers();
-    this.init();
+    this.ready = this.init();
   }
 
   public seedDefaultUsers() {
@@ -574,6 +577,10 @@ export class DatabaseStore {
         updatedAt: '2026-01-10T00:00:00Z'
       }
     ];
+
+    // Never resurrect a user whose deletion is recorded in durable persistence.
+    const deletedUserSet = new Set((this.persistenceData.deletedUserIds || []).map(id => id.toLowerCase().trim()));
+    this.users = this.users.filter(u => !deletedUserSet.has(u.id.toLowerCase().trim()));
   }
 
   public async init() {
@@ -778,8 +785,6 @@ export class DatabaseStore {
       this.settings = { ...this.settings, ...this.persistenceData.settingsOverride };
     }
 
-    this.seedDefaultUsers();
-
     this.addresses = [
       {
         id: 'addr-1',
@@ -853,16 +858,19 @@ export class DatabaseStore {
     const deletedUserSet = new Set(this.persistenceData.deletedUserIds);
     this.users = this.users.filter(u => !deletedUserSet.has(u.id));
 
+    // Mark initialization complete, but keep the readiness promise pending until
+    // MongoDB persistence has been hydrated. API requests wait on `db.ready`,
+    // preventing a cold Lambda from serving seed-only data before cloud tombstones
+    // and overrides are applied.
     this.isInitialized = true;
-
-    // Connect to MongoDB and synchronize overrides
-    mongoService.connect().then(connected => {
-      if (connected) {
-        mongoService.syncWithStore(this).catch(err => {
-          console.warn('[Store] MongoDB background hydration error:', err);
-        });
+    try {
+      const summary = await mongoService.syncWithStore(this);
+      if (summary.loaded || summary.seeded) {
+        console.log('[Store] MongoDB startup hydration complete:', summary.summary);
       }
-    }).catch(() => {});
+    } catch (err) {
+      console.warn('[Store] MongoDB startup hydration error:', err);
+    }
   }
 
   // Durable Storage Persistence with guaranteed Promise resolution
