@@ -1,15 +1,41 @@
-import app from '../src/server/app.js';
-import { db } from '../src/server/db/store.js';
-import { mongoService } from '../src/server/db/mongodb.js';
+import fs from 'fs';
 
-// MongoDB hydration is deliberately NOT awaited for every request.
-// The store initializes its local seed/catalog synchronously and starts cloud
-// hydration in the background. Waiting for a full Mongo sync on login/product
-// requests can exceed Vercel's function timeout because syncWithStore also
-// refreshes many collections and indexes.
+// MongoDB is the runtime source of truth. The six checked-in split catalogs are
+// retained as source/import material, but must not be parsed on every Vercel
+// cold start. Parsing thousands of products before auth was contributing to
+// slow/504 requests and could temporarily resurrect stale catalog data.
+const originalReadFileSync = fs.readFileSync.bind(fs);
+(fs as any).readFileSync = (filePath: any, ...args: any[]) => {
+  const normalized = String(filePath || '').replace(/\\/g, '/');
+  if (/\/src\/server\/db\/products-[1-6]\.json$/i.test(normalized) || /\/src\/server\/db\/scrapedProducts\.json$/i.test(normalized)) {
+    return typeof args[0] === 'string' || (args[0] && typeof args[0] === 'object' && args[0].encoding)
+      ? ''
+      : Buffer.from('');
+  }
+  return originalReadFileSync(filePath, ...args);
+};
+
+let appPromise: Promise<any> | null = null;
+let dbPromise: Promise<any> | null = null;
+let mongoPromise: Promise<any> | null = null;
 let adminDbSyncPromise: Promise<boolean> | null = null;
 
+async function loadRuntime() {
+  if (!appPromise || !dbPromise || !mongoPromise) {
+    const runtime = await Promise.all([
+      import('../src/server/app.js'),
+      import('../src/server/db/store.js'),
+      import('../src/server/db/mongodb.js')
+    ]);
+    appPromise = Promise.resolve(runtime[0].default);
+    dbPromise = Promise.resolve(runtime[1].db);
+    mongoPromise = Promise.resolve(runtime[2].mongoService);
+  }
+  return Promise.all([appPromise, dbPromise, mongoPromise]);
+}
+
 async function ensureAdminDatabaseReady(): Promise<boolean> {
+  const [, db, mongoService] = await loadRuntime();
   if (!process.env.MONGODB_URI) return false;
 
   if (!adminDbSyncPromise) {
@@ -23,7 +49,7 @@ async function ensureAdminDatabaseReady(): Promise<boolean> {
 
       console.log('[Vercel Serverless] Admin MongoDB hydration complete:', summary.summary);
       return true;
-    })().catch((err) => {
+    })().catch((err: any) => {
       console.warn('[Vercel Serverless] Admin MongoDB hydration notice:', err);
       adminDbSyncPromise = null;
       return false;
@@ -34,12 +60,8 @@ async function ensureAdminDatabaseReady(): Promise<boolean> {
 }
 
 export default async function vercelApiHandler(req: any, res: any) {
-  // IMPORTANT: do not await db.ready here. DatabaseStore seeds users and the
-  // local catalog before its MongoDB hydration await point. Public/auth routes
-  // must remain available even when Atlas is slow or temporarily unavailable.
-  // Admin APIs below explicitly wait for MongoDB when persistence is required.
+  const [app] = await loadRuntime();
 
-  // Handle URL reconstruction from Vercel rewrites or direct API requests.
   const queryPath = typeof req.query?.path === 'string' ? req.query.path : '';
   let normalizedRequestPath = '';
 
@@ -69,9 +91,8 @@ export default async function vercelApiHandler(req: any, res: any) {
     normalizedRequestPath = req.url?.split('?')[0] || '';
   }
 
-  // Only administrative requests are gated on MongoDB hydration. Login,
-  // registration, Google auth, products, cart and other public APIs must not
-  // inherit a multi-second Atlas connection/synchronization timeout.
+  // Only admin APIs wait for the full MongoDB hydration. Login, registration,
+  // Google auth and public storefront requests never wait for catalog sync.
   if (normalizedRequestPath.startsWith('/api/admin')) {
     const mongoReady = await ensureAdminDatabaseReady();
     if (!mongoReady) {
