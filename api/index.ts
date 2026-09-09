@@ -10,9 +10,6 @@ let dbSyncPromise: Promise<void> | null = null;
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function waitForInFlightMongoConnection() {
-  // Store initialization may start MongoDB in the background. mongoService's
-  // connect() returns false while another connection is in progress, so wait
-  // for that connection to settle before attempting the authoritative sync.
   for (let attempt = 0; attempt < 70; attempt++) {
     const status = mongoService.getStatus();
     if (!status.isConnecting) return;
@@ -27,8 +24,6 @@ async function ensureDatabaseSynced(): Promise<boolean> {
     dbSyncPromise = (async () => {
       await waitForInFlightMongoConnection();
 
-      // syncWithStore connects if necessary and then restores persisted
-      // deletions, overrides, custom categories/brands, users, orders, etc.
       const summary = await mongoService.syncWithStore(db);
       const status = mongoService.getStatus();
 
@@ -39,8 +34,6 @@ async function ensureDatabaseSynced(): Promise<boolean> {
       console.log('[Vercel Serverless] MongoDB startup hydration complete:', summary.summary);
     })().catch((err) => {
       console.warn('[Vercel Serverless] MongoDB initial sync notice:', err);
-      // Do not permanently mark this function instance as ready after a
-      // transient database failure. A later request can retry initialization.
       dbSyncPromise = null;
       throw err;
     });
@@ -55,13 +48,33 @@ async function ensureDatabaseSynced(): Promise<boolean> {
 }
 
 export default async function vercelApiHandler(req: any, res: any) {
-  // Always initialize the local store first.
+  // db.ready loads the current split catalog before MongoDB hydration.
   await db.ready;
 
-  // Then explicitly wait for MongoDB hydration. This is the cold-start guard
-  // that prevents persisted deletes/updates from being overwritten by the
-  // local split catalog before Express handles the request.
+  // Keep the catalog that was shipped with this deployment. MongoDB may still
+  // contain products from an older, larger catalog. We reconcile those stale
+  // whm-* records after hydration while preserving admin/imported prod-* items.
+  const currentCatalogIds = new Set(
+    db.products.filter((p: any) => String(p.id).startsWith('whm-')).map((p: any) => p.id)
+  );
+
   const mongoReady = await ensureDatabaseSynced();
+
+  if (mongoReady && currentCatalogIds.size > 0) {
+    const staleCatalogProducts = db.products.filter(
+      (p: any) => String(p.id).startsWith('whm-') && !currentCatalogIds.has(p.id)
+    );
+
+    if (staleCatalogProducts.length > 0) {
+      const staleIds = staleCatalogProducts.map((p: any) => p.id);
+      console.log(`[Vercel Serverless] Removing ${staleIds.length} stale whm-* catalog products from MongoDB and memory.`);
+
+      // deleteDocument supports MongoDB operators in the id field. The _id
+      // alternative is harmless because these catalog records use string ids.
+      await mongoService.deleteDocument('products', { id: { $in: staleIds } });
+      db.products = db.products.filter((p: any) => !staleIds.includes(p.id));
+    }
+  }
 
   // Handle URL reconstruction from Vercel rewrites or direct API requests.
   const queryPath = typeof req.query?.path === 'string' ? req.query.path : '';
@@ -94,8 +107,7 @@ export default async function vercelApiHandler(req: any, res: any) {
   }
 
   // Administrative APIs must never serve the unhydrated local seed when
-  // MongoDB is configured but unavailable. Public storefront requests retain
-  // the existing resilient-cache behavior during a temporary outage.
+  // MongoDB is configured but unavailable.
   if (normalizedRequestPath.startsWith('/api/admin') && !mongoReady) {
     return res.status(503).json({
       error: 'Database initialization unavailable',
