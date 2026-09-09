@@ -3,18 +3,16 @@ import { db } from '../src/server/db/store.js';
 import { mongoService } from '../src/server/db/mongodb.js';
 
 // Share one hydration promise across concurrent requests in the same Vercel
-// function instance. A boolean allowed request #2 to run while request #1 was
-// still hydrating MongoDB, which could expose the pre-hydration in-memory seed.
+// function instance. This prevents request #2 from serving the pre-hydration
+// in-memory catalog while request #1 is still loading MongoDB overrides.
 let dbSyncPromise: Promise<void> | null = null;
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function waitForInFlightMongoConnection() {
-  // The store can start MongoDB hydration during module initialization. If the
-  // request arrives while that connection is still in progress, mongoService's
-  // old connect() behavior returned false immediately. That made the request
-  // continue with the local split catalog instead of waiting for persisted
-  // MongoDB overrides/tombstones. Wait for that in-flight connection to settle.
+  // Store initialization may start MongoDB in the background. mongoService's
+  // connect() returns false while another connection is in progress, so wait
+  // for that connection to settle before attempting the authoritative sync.
   for (let attempt = 0; attempt < 70; attempt++) {
     const status = mongoService.getStatus();
     if (!status.isConnecting) return;
@@ -22,15 +20,15 @@ async function waitForInFlightMongoConnection() {
   }
 }
 
-async function ensureDatabaseSynced() {
-  if (!process.env.MONGODB_URI) return;
+async function ensureDatabaseSynced(): Promise<boolean> {
+  if (!process.env.MONGODB_URI) return false;
 
   if (!dbSyncPromise) {
     dbSyncPromise = (async () => {
       await waitForInFlightMongoConnection();
 
-      // If the connection already completed, syncWithStore performs the actual
-      // cloud -> memory hydration. If it failed, it will retry the connection.
+      // syncWithStore connects if necessary and then restores persisted
+      // deletions, overrides, custom categories/brands, users, orders, etc.
       const summary = await mongoService.syncWithStore(db);
       const status = mongoService.getStatus();
 
@@ -41,8 +39,8 @@ async function ensureDatabaseSynced() {
       console.log('[Vercel Serverless] MongoDB startup hydration complete:', summary.summary);
     })().catch((err) => {
       console.warn('[Vercel Serverless] MongoDB initial sync notice:', err);
-      // Allow a later invocation in the same warm instance to retry after a
-      // transient MongoDB/network failure.
+      // Do not permanently mark this function instance as ready after a
+      // transient database failure. A later request can retry initialization.
       dbSyncPromise = null;
       throw err;
     });
@@ -50,46 +48,59 @@ async function ensureDatabaseSynced() {
 
   try {
     await dbSyncPromise;
+    return true;
   } catch {
-    // Preserve the existing resilient-cache behavior. A database outage should
-    // not turn the storefront into a 500, but a successful MongoDB connection
-    // is required before persisted admin state is considered hydrated.
+    return false;
   }
 }
 
 export default async function vercelApiHandler(req: any, res: any) {
-  // Wait for the store's normal initialization first.
+  // Always initialize the local store first.
   await db.ready;
 
-  // Then perform an explicit MongoDB readiness/hydration gate. This is the
-  // critical cold-start protection: if store initialization kicked off MongoDB
-  // in the background, the first request now waits for that connection to
-  // finish and for persisted deletes/updates to be applied before Express can
-  // serve the request.
-  await ensureDatabaseSynced();
+  // Then explicitly wait for MongoDB hydration. This is the cold-start guard
+  // that prevents persisted deletes/updates from being overwritten by the
+  // local split catalog before Express handles the request.
+  const mongoReady = await ensureDatabaseSynced();
 
-  // Handle URL reconstruction from Vercel rewrites or direct API requests
+  // Handle URL reconstruction from Vercel rewrites or direct API requests.
   const queryPath = typeof req.query?.path === 'string' ? req.query.path : '';
+  let normalizedRequestPath = '';
+
   if (queryPath) {
+    const normalizedPath = queryPath.startsWith('/') ? queryPath : `/${queryPath}`;
+    normalizedRequestPath = `/api${normalizedPath}`;
     const requestUrl = new URL(req.url || '/', 'http://vercel.local');
     requestUrl.searchParams.delete('path');
-    const normalizedPath = queryPath.startsWith('/') ? queryPath : `/${queryPath}`;
-    const search = requestUrl.search || '';
-    req.url = `/api${normalizedPath}${search}`;
+    req.url = `${normalizedRequestPath}${requestUrl.search || ''}`;
   } else if (req.url && (req.url === '/api/index' || req.url.startsWith('/api/index?'))) {
     const requestUrl = new URL(req.url, 'http://vercel.local');
     const param = requestUrl.searchParams.get('path');
     if (param) {
       requestUrl.searchParams.delete('path');
       const normalizedPath = param.startsWith('/') ? param : `/${param}`;
-      const search = requestUrl.search || '';
-      req.url = `/api${normalizedPath}${search}`;
+      normalizedRequestPath = `/api${normalizedPath}`;
+      req.url = `${normalizedRequestPath}${requestUrl.search || ''}`;
     } else {
+      normalizedRequestPath = '/api/health';
       req.url = `/api/health${requestUrl.search || ''}`;
     }
   } else if (req.url && !req.url.startsWith('/api')) {
     const normalized = req.url.startsWith('/') ? req.url : `/${req.url}`;
-    req.url = `/api${normalized}`;
+    normalizedRequestPath = `/api${normalized}`;
+    req.url = normalizedRequestPath;
+  } else {
+    normalizedRequestPath = req.url?.split('?')[0] || '';
+  }
+
+  // Administrative APIs must never serve the unhydrated local seed when
+  // MongoDB is configured but unavailable. Public storefront requests retain
+  // the existing resilient-cache behavior during a temporary outage.
+  if (normalizedRequestPath.startsWith('/api/admin') && !mongoReady) {
+    return res.status(503).json({
+      error: 'Database initialization unavailable',
+      message: 'MongoDB hydration has not completed. Please retry the request.'
+    });
   }
 
   return app(req, res);
