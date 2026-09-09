@@ -66,6 +66,13 @@ function slugify(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
+function autoSku(name: string, brand: string, category: string): string {
+  const seed = `${normalizeHeader(name)}|${normalizeHeader(brand)}|${normalizeHeader(category)}`;
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+  return `AUTO-${slugify(name).slice(0, 32) || 'PRODUCT'}-${Math.abs(hash).toString(36).toUpperCase()}`;
+}
+
 function normalizeImages(row: Record<string, unknown>, name: string) {
   const rawImages = readValue(row, 'images');
   const primary = readValue(row, 'imageUrl');
@@ -84,9 +91,10 @@ function normalizeImages(row: Record<string, unknown>, name: string) {
 function rowToProduct(row: Record<string, unknown>, existing?: Product): Product {
   const now = new Date().toISOString();
   const name = String(readValue(row, 'name') ?? existing?.name ?? '').trim();
-  const sku = String(readValue(row, 'sku') ?? existing?.sku ?? '').trim().toUpperCase();
   const category = String(readValue(row, 'category') ?? existing?.category ?? 'Accessories').trim();
   const brand = String(readValue(row, 'brand') ?? existing?.brand ?? 'Imported Brand').trim();
+  const rawSku = String(readValue(row, 'sku') ?? '').trim().toUpperCase();
+  const sku = rawSku || existing?.sku || autoSku(name, brand, category);
   const price = toNumber(readValue(row, 'price'), existing?.price ?? 0) ?? 0;
   const salePrice = toNumber(readValue(row, 'salePrice'), existing?.salePrice);
   const stock = Math.max(0, Math.trunc(toNumber(readValue(row, 'stock'), existing?.stock ?? 0) ?? 0));
@@ -136,9 +144,6 @@ function rowToProduct(row: Record<string, unknown>, existing?: Product): Product
   return product;
 }
 
-// POST /api/admin/products/excel-sync
-// SKU is the stable product key. The workbook is authoritative: rows are upserted
-// and products missing from the workbook are removed from MongoDB and memory.
 router.post('/products/excel-sync', async (req: AuthenticatedRequest, res) => {
   const rows = req.body?.rows;
   if (!Array.isArray(rows) || rows.length === 0) {
@@ -147,15 +152,26 @@ router.post('/products/excel-sync', async (req: AuthenticatedRequest, res) => {
 
   const normalizedRows = rows.filter(row => row && typeof row === 'object') as Record<string, unknown>[];
   const errors: string[] = [];
-  const seenSkus = new Set<string>();
+  const seenKeys = new Set<string>();
+
   for (let i = 0; i < normalizedRows.length; i++) {
-    const sku = String(readValue(normalizedRows[i], 'sku') ?? '').trim().toUpperCase();
-    const name = String(readValue(normalizedRows[i], 'name') ?? '').trim();
-    const price = toNumber(readValue(normalizedRows[i], 'price'));
-    if (!sku || !name || price === undefined) errors.push(`Row ${i + 2}: SKU, Name and Price are required.`);
-    else if (seenSkus.has(sku)) errors.push(`Row ${i + 2}: duplicate SKU '${sku}'.`);
-    seenSkus.add(sku);
+    const row = normalizedRows[i];
+    const sku = String(readValue(row, 'sku') ?? '').trim().toUpperCase();
+    const name = String(readValue(row, 'name') ?? '').trim();
+    const brand = String(readValue(row, 'brand') ?? 'Imported Brand').trim();
+    const category = String(readValue(row, 'category') ?? 'Accessories').trim();
+    const price = toNumber(readValue(row, 'price'));
+
+    if (!name || price === undefined) {
+      errors.push(`Row ${i + 2}: Name and Price are required.`);
+      continue;
+    }
+
+    const key = sku || autoSku(name, brand, category);
+    if (seenKeys.has(key)) errors.push(`Row ${i + 2}: duplicate product key '${key}'.`);
+    seenKeys.add(key);
   }
+
   if (errors.length > 0) {
     return res.status(400).json({ success: false, error: { code: 'INVALID_EXCEL', message: errors.slice(0, 50).join(' ') }, errors });
   }
@@ -166,17 +182,28 @@ router.post('/products/excel-sync', async (req: AuthenticatedRequest, res) => {
   try {
     const existing = await mongoService.getDocuments<Product>('products');
     const bySku = new Map(existing.map(p => [String(p.sku).trim().toUpperCase(), p]));
-    const imported = normalizedRows.map(row => rowToProduct(row, bySku.get(String(readValue(row, 'sku')).trim().toUpperCase())));
+    const byIdentity = new Map<string, Product>();
+    for (const p of existing) byIdentity.set(`${normalizeHeader(p.name)}|${normalizeHeader(p.brand)}|${normalizeHeader(p.category)}`, p);
+
+    const imported = normalizedRows.map(row => {
+      const rawSku = String(readValue(row, 'sku') ?? '').trim().toUpperCase();
+      const name = String(readValue(row, 'name') ?? '').trim();
+      const brand = String(readValue(row, 'brand') ?? 'Imported Brand').trim();
+      const category = String(readValue(row, 'category') ?? 'Accessories').trim();
+      const existingProduct = rawSku
+        ? bySku.get(rawSku)
+        : byIdentity.get(`${normalizeHeader(name)}|${normalizeHeader(brand)}|${normalizeHeader(category)}`);
+      return rowToProduct(row, existingProduct);
+    });
 
     await mongoService.saveManyDocuments('products', imported, 250);
 
-    const importedSkus = new Set(imported.map(p => p.sku.toUpperCase()));
-    const removed = existing.filter(p => !importedSkus.has(String(p.sku).trim().toUpperCase()));
+    const importedIds = new Set(imported.map(p => p.id));
+    const importedKeys = new Set(imported.map(p => p.sku.toUpperCase()));
+    const removed = existing.filter(p => !importedIds.has(p.id) && !importedKeys.has(String(p.sku).trim().toUpperCase()));
     for (const product of removed) await mongoService.deleteDocument('products', { id: product.id });
 
-    // Make the current Lambda memory exactly match the workbook immediately.
     db.products = imported;
-    const importedIds = new Set(imported.map(p => p.id));
     db.persistenceData.deletedProductIds = db.persistenceData.deletedProductIds.filter(id => !importedIds.has(id));
     db.persistenceData.productOverrides = {};
     await mongoService.saveDocument('persistence', { id: 'store_persistence', ...db.persistenceData });
@@ -188,8 +215,8 @@ router.post('/products/excel-sync', async (req: AuthenticatedRequest, res) => {
       message: `Excel catalog synchronized successfully. ${imported.length} products are now authoritative.`,
       data: {
         imported: imported.length,
-        updated: imported.filter(p => bySku.has(p.sku.toUpperCase())).length,
-        created: imported.filter(p => !bySku.has(p.sku.toUpperCase())).length,
+        updated: imported.filter(p => existing.some(e => e.id === p.id)).length,
+        created: imported.filter(p => !existing.some(e => e.id === p.id)).length,
         removed: removed.length,
         total: imported.length
       }
