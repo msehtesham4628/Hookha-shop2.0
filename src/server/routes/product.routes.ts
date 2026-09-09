@@ -29,7 +29,13 @@ router.get('/', (req, res) => {
       q
     } = req.query as Record<string, string>;
 
-    let result = db.products.filter(p => p.isActive && !db.isProductDeleted(p.id));
+    // Build the deletion set ONCE per request. db.isProductDeleted() builds a
+    // new Set for every product, which turns an 11k-product request into a
+    // needless nested O(n*m) operation.
+    const deletedProductIds = new Set(
+      db.persistenceData.deletedProductIds.map(id => id.toLowerCase().trim())
+    );
+    let result = db.products.filter(p => p.isActive && !deletedProductIds.has(p.id.toLowerCase().trim()));
 
     // Text search query
     if (q && q.trim()) {
