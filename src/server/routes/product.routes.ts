@@ -5,9 +5,30 @@ import { db } from '../db/store.js';
 
 const router = Router();
 
+// The storefront can mount/focus/re-render several sections at once. Keep a
+// very short per-instance response cache so identical requests arriving within
+// the same burst do not repeatedly scan and sort the full 11k-product catalog.
+// Mutations still become visible immediately after the short 750ms window.
+const PRODUCT_RESPONSE_CACHE_TTL_MS = 750;
+const productResponseCache = new Map<string, { expiresAt: number; payload: any }>();
+
+const productQueryCacheKey = (query: Record<string, unknown>) =>
+  Object.keys(query)
+    .sort()
+    .map(key => `${key}=${String(query[key] ?? '')}`)
+    .join('&');
+
 // GET /api/products (with filtering, sorting, pagination)
 router.get('/', (req, res) => {
   try {
+    const cacheKey = productQueryCacheKey(req.query as Record<string, unknown>);
+    const now = Date.now();
+    const cached = productResponseCache.get(cacheKey);
+    if (cached && cached.expiresAt > now) {
+      return res.json(cached.payload);
+    }
+    if (cached) productResponseCache.delete(cacheKey);
+
     const {
       category,
       subcategory,
@@ -227,7 +248,7 @@ router.get('/', (req, res) => {
     const offset = (pageNum - 1) * limitNum;
     const paginatedProducts = result.slice(offset, offset + limitNum);
 
-    return res.json({
+    const payload = {
       success: true,
       data: {
         products: paginatedProducts,
@@ -240,7 +261,21 @@ router.get('/', (req, res) => {
           hasPrevPage: pageNum > 1
         }
       }
+    };
+
+    productResponseCache.set(cacheKey, {
+      expiresAt: Date.now() + PRODUCT_RESPONSE_CACHE_TTL_MS,
+      payload
     });
+
+    // Prevent unbounded growth if the app receives many unique search queries.
+    if (productResponseCache.size > 200) {
+      for (const [key, entry] of productResponseCache) {
+        if (entry.expiresAt <= Date.now()) productResponseCache.delete(key);
+      }
+    }
+
+    return res.json(payload);
   } catch (err: any) {
     return res.status(500).json({
       success: false,
