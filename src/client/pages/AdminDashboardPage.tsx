@@ -346,7 +346,10 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
 
     // If no valid session token exists, require manual authentication
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
@@ -385,34 +388,39 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         }
       }
       if (productsRes.success && productsRes.data) {
-        setProducts(productsRes.data.products || []);
+        const prodList: Product[] = Array.isArray(productsRes.data)
+          ? productsRes.data
+          : Array.isArray((productsRes.data as any).products)
+          ? (productsRes.data as any).products
+          : [];
+        setProducts(prodList);
         const pagination = (productsRes.data as any).pagination;
         if (pagination) {
           setTotalProductsCount(pagination.totalCount || 0);
           setCatalogTotalPages(pagination.totalPages || 1);
           setCatalogPage(pagination.page || 1);
         } else {
-          setTotalProductsCount(productsRes.data.products?.length || 0);
+          setTotalProductsCount(prodList.length || 0);
           setCatalogTotalPages(1);
         }
       }
       if (ordersRes.success && ordersRes.data) {
-        setOrders(ordersRes.data || []);
+        setOrders(Array.isArray(ordersRes.data) ? ordersRes.data : []);
       }
       if (customersRes.success && customersRes.data) {
-        setCustomers(customersRes.data || []);
+        setCustomers(Array.isArray(customersRes.data) ? customersRes.data : []);
       }
       if (wholesaleRes.success && wholesaleRes.data) {
-        setWholesaleApps(wholesaleRes.data || []);
+        setWholesaleApps(Array.isArray(wholesaleRes.data) ? wholesaleRes.data : []);
       }
       if (rolesRes.success && rolesRes.data) {
-        setRoles(rolesRes.data || []);
+        setRoles(Array.isArray(rolesRes.data) ? rolesRes.data : []);
       }
       if (permsRes.success && permsRes.data) {
-        setPermissions(permsRes.data || []);
+        setPermissions(Array.isArray(permsRes.data) ? permsRes.data : []);
       }
       if (auditRes.success && auditRes.data) {
-        setAuditLogs(auditRes.data || []);
+        setAuditLogs(Array.isArray(auditRes.data) ? auditRes.data : []);
       }
       if (settingsRes.success && settingsRes.data) {
         setSettings(settingsRes.data);
@@ -422,13 +430,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         if (settingsRes.data.announcement) setSettingAnnouncement(settingsRes.data.announcement);
       }
       if (catsRes.success && catsRes.data) {
-        setCategories(catsRes.data || []);
+        setCategories(Array.isArray(catsRes.data) ? catsRes.data : (catsRes.data as any)?.categories || []);
       }
       if (brandsRes.success && brandsRes.data) {
-        setBrands(brandsRes.data || []);
+        setBrands(Array.isArray(brandsRes.data) ? brandsRes.data : (brandsRes.data as any)?.brands || []);
       }
       if (staffRes.success && staffRes.data) {
-        setStaffMembers(staffRes.data || []);
+        setStaffMembers(Array.isArray(staffRes.data) ? staffRes.data : []);
       }
 
       // Fetch MongoDB connection & collection metrics
@@ -610,7 +618,10 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   };
 
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!isAdmin) {
+      setLoading(false);
+      return;
+    }
 
     // Initial load
     loadAllAdminData();
@@ -644,21 +655,23 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         const token = localStorage.getItem('sultan_auth_token');
         if (!token) return;
         const res = await api.getAdminOrders({ limit: 50 });
-        if (res.success && res.data) {
+        if (res.success && Array.isArray(res.data)) {
           const freshOrders = res.data;
           setOrders(prev => {
             const prevIds = new Set(prev.map(o => o.id));
             const brandNewOrders = freshOrders.filter(o => !prevIds.has(o.id));
             if (brandNewOrders.length > 0) {
               const newest = brandNewOrders[0];
-              playOrderChime();
-              showToast(`🔔 New Order #${newest.orderNumber} placed by ${newest.customerName} ($${(newest.grandTotal || newest.total || 0).toFixed(2)})!`, 'success');
-              setHighlightedOrderId(newest.id);
-              setTimeout(() => setHighlightedOrderId(null), 10000);
-              api.getAnalytics().then(aRes => {
-                if (aRes.success && aRes.data) setAnalytics(aRes.data);
-              }).catch(() => {});
-              return freshOrders;
+              // Defer UI side effects outside state updater
+              setTimeout(() => {
+                playOrderChime();
+                showToast(`🔔 New Order #${newest.orderNumber} placed by ${newest.customerName} ($${(newest.grandTotal || newest.total || 0).toFixed(2)})!`, 'success');
+                setHighlightedOrderId(newest.id);
+                setTimeout(() => setHighlightedOrderId(null), 10000);
+                api.getAnalytics().then(aRes => {
+                  if (aRes.success && aRes.data) setAnalytics(aRes.data);
+                }).catch(() => {});
+              }, 0);
             }
             return freshOrders;
           });
@@ -674,7 +687,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         const token = localStorage.getItem('sultan_auth_token');
         if (!token) return;
         api.getAdminOrders({ limit: 50 }).then(res => {
-          if (res.success && res.data) setOrders(res.data);
+          if (res.success && Array.isArray(res.data)) setOrders(res.data);
         }).catch(() => {});
         api.getAnalytics().then(res => {
           if (res.success && res.data) setAnalytics(res.data);
@@ -690,7 +703,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('focus', handleVisibility);
     };
-  }, [isAdmin]);
+  }, [isAdmin, user?.email]);
 
   // Fetch products whenever catalog pagination or filters change
   useEffect(() => {
