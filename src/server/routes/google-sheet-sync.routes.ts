@@ -80,12 +80,24 @@ async function sync(rows: Record<string, unknown>[]) {
     return product(r, existingProduct);
   });
 
-  await mongoService.saveManyDocuments('products', imported, 250);
-  const keys = new Set(imported.map(p => p.sku.toUpperCase())); const removed = existing.filter(p => !keys.has(String(p.sku).trim().toUpperCase()));
-  for (const p of removed) await mongoService.deleteDocument('products', { id:p.id });
-  db.products=imported; db.persistenceData.productOverrides={}; db.persistenceData.deletedProductIds=db.persistenceData.deletedProductIds.filter(id=>!new Set(imported.map(p=>p.id)).has(id));
-  await mongoService.saveDocument('persistence',{id:'store_persistence',...db.persistenceData}); await mongoService.refreshCounts();
-  return { imported:imported.length, updated:imported.filter(p=>existing.some(e => e.id === p.id)).length, created:imported.filter(p=>!existing.some(e => e.id === p.id)).length, removed:removed.length, total:imported.length };
+  const mongoConnected = await mongoService.connect();
+  if (mongoConnected) {
+    await mongoService.saveManyDocuments('products', imported, 250);
+    const keys = new Set(imported.map(p => p.sku.toUpperCase())); const removed = existing.filter(p => !keys.has(String(p.sku).trim().toUpperCase()));
+    for (const p of removed) await mongoService.deleteDocument('products', { id:p.id });
+    db.products=imported; db.persistenceData.productOverrides={}; db.persistenceData.deletedProductIds=db.persistenceData.deletedProductIds.filter(id=>!new Set(imported.map(p=>p.id)).has(id));
+    await mongoService.saveDocument('persistence',{id:'store_persistence',...db.persistenceData}); await mongoService.refreshCounts();
+    return { imported:imported.length, updated:imported.filter(p=>existing.some(e => e.id === p.id)).length, created:imported.filter(p=>!existing.some(e => e.id === p.id)).length, removed:removed.length, total:imported.length, mongoConnected:true };
+  }
+
+  // MongoDB can be temporarily unavailable on Vercel. Keep the running
+  // storefront/admin catalog synchronized from the Sheet so the next request
+  // does not fall back to the old seed catalog. MongoDB will be populated on
+  // the next successful sync when its connection is restored.
+  db.products = imported;
+  db.persistenceData.productOverrides = {};
+  db.persistenceData.deletedProductIds = [];
+  return { imported:imported.length, updated:0, created:imported.length, removed:0, total:imported.length, mongoConnected:false, localCacheUpdated:true };
 }
 
 router.get('/google-sheet-sync', async (req, res) => {
@@ -96,8 +108,7 @@ router.get('/google-sheet-sync', async (req, res) => {
     const url=`https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/export?format=csv&gid=${encodeURIComponent(gid)}`;
     const upstream=await fetch(url,{redirect:'follow'}); if(!upstream.ok) throw new Error(`Google Sheet returned HTTP ${upstream.status}`);
     const rows=csvParse(await upstream.text()); if(!rows.length) throw new Error('Google Sheet contains no product rows');
-    const connected=await mongoService.connect(); if(!connected) return res.status(503).json({success:false,error:'MongoDB unavailable'});
-    const data=await sync(rows); console.log(`[Google Sheet Sync] ${data.imported} products applied; ${data.removed} removed.`); return res.json({success:true,data});
+    const data=await sync(rows); console.log(`[Google Sheet Sync] ${data.imported} products applied; MongoDB connected: ${data.mongoConnected}.`); return res.json({success:true,data});
   } catch(err:any) { console.error('[Google Sheet Sync]',err); return res.status(500).json({success:false,error:err?.message||'Google Sheet sync failed'}); }
 });
 export default router;
