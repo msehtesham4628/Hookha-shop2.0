@@ -14,7 +14,6 @@ import {
   StoreSettings
 } from '../../types/index.js';
 
-// Base API URL configuration supporting standalone frontend deployment pointing to remote/local backend
 export const getApiBaseUrl = (): string => {
   const metaEnv = typeof import.meta !== 'undefined' ? (import.meta as any).env : undefined;
   const envUrl = (metaEnv?.VITE_API_BASE_URL || metaEnv?.VITE_API_URL) as string | undefined;
@@ -47,10 +46,12 @@ export async function translateTexts(texts: string[], target: string): Promise<s
 class ApiClient {
   private getHeaders(): HeadersInit {
     const headers: HeadersInit = {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
     };
-    
-    // Check for guest ID
+
     let guestId = localStorage.getItem('sultan_guest_id');
     if (!guestId) {
       guestId = `guest_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
@@ -58,7 +59,6 @@ class ApiClient {
     }
     headers['x-guest-id'] = guestId;
 
-    // Attach auth token if available
     const token = localStorage.getItem('sultan_auth_token');
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
@@ -72,7 +72,11 @@ class ApiClient {
     const headers = { ...this.getHeaders(), ...(options.headers || {}) };
 
     try {
-      const response = await fetch(url, { ...options, headers });
+      const response = await fetch(url, {
+        ...options,
+        cache: 'no-store',
+        headers
+      });
       const contentType = response.headers.get('content-type') || '';
 
       let data: any;
@@ -96,7 +100,6 @@ class ApiClient {
       }
 
       if (!response.ok) {
-        // Only clear stored auth token if the session token itself is invalid or expired
         if (response.status === 401 && data?.error?.code === 'INVALID_TOKEN') {
           localStorage.removeItem('sultan_auth_token');
         }
@@ -116,13 +119,11 @@ class ApiClient {
           err.message.toLowerCase().includes('abort')
         ));
 
-      // Automatically retry idempotent GET requests when server is reloading or network drops
       if (isGet && isNetworkDrop && retries > 0) {
         await new Promise(resolve => setTimeout(resolve, (3 - retries) * 450));
         return this.request<T>(endpoint, options, retries - 1);
       }
 
-      // Don't format expected user-level authentication responses or transient network drops as system-level crashes
       const isAuthEndpoint = endpoint.startsWith('/auth/login') || endpoint.startsWith('/auth/admin-login') || endpoint.startsWith('/auth/otp');
 
       if (isAuthEndpoint) {
@@ -136,7 +137,6 @@ class ApiClient {
     }
   }
 
-  // --- Auth Endpoints ---
   public async register(payload: {
     email?: string;
     password: string;
@@ -263,7 +263,6 @@ class ApiClient {
     });
   }
 
-  // --- Products & Catalog ---
   public async getProducts(params: Record<string, any> = {}) {
     const qs = new URLSearchParams();
     Object.entries(params).forEach(([key, val]) => {
@@ -290,7 +289,6 @@ class ApiClient {
     return this.request<{ success: boolean; data: Brand[] }>('/brands');
   }
 
-  // --- Cart & Checkout ---
   public async getCart(coupon?: string) {
     const qs = coupon ? `?coupon=${encodeURIComponent(coupon)}` : '';
     return this.request<{ success: boolean; data: Cart }>(`/cart${qs}`);
@@ -344,7 +342,6 @@ class ApiClient {
     });
   }
 
-  // --- Wishlist ---
   public async getWishlist() {
     return this.request<{ success: boolean; data: { items: Product[]; productIds: string[] } }>('/wishlist');
   }
@@ -361,7 +358,6 @@ class ApiClient {
     }
   }
 
-  // --- Orders ---
   public async getMyOrders() {
     return this.request<{ success: boolean; data: { orders: Order[] } }>('/orders');
   }
@@ -403,7 +399,6 @@ class ApiClient {
     });
   }
 
-  // --- Reviews, Wholesale, Contact, Newsletter ---
   public async submitReview(productId: string, review: { rating: number; title: string; comment: string; userName?: string; userEmail?: string }) {
     return this.request<{ success: boolean; message: string; data: Review }>(`/products/${productId}/reviews`, {
       method: 'POST',
@@ -437,7 +432,7 @@ class ApiClient {
   }
 
   // ==========================================
-  // ADMIN API CALLS
+  // ADMIN API CALLS (Bypass Cache)
   // ==========================================
   public async getAdminDashboard() {
     return this.request<{ success: boolean; data: any }>('/admin/dashboard');
@@ -565,7 +560,6 @@ class ApiClient {
     });
   }
 
-  // Categories Admin
   public async getAdminCategories() {
     return this.request<{ success: boolean; data: Category[] }>('/admin/categories');
   }
@@ -590,7 +584,6 @@ class ApiClient {
     });
   }
 
-  // Brands Admin
   public async getAdminBrands() {
     return this.request<{ success: boolean; data: Brand[] }>('/admin/brands');
   }
@@ -699,7 +692,6 @@ class ApiClient {
     });
   }
 
-  // --- MongoDB Operations ---
   public async getMongoStatus() {
     return this.request<{
       success: boolean;
