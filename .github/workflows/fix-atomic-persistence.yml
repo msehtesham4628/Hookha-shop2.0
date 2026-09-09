@@ -1,0 +1,121 @@
+name: Fix atomic persistence tombstones
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: ${{ !contains(github.event.head_commit.message, '[atomic-persistence-fixed]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch MongoDB atomic tombstones
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('src/server/db/mongodb.ts')
+          s = p.read_text()
+
+          marker = "  public async syncWithStore(store: any): Promise<{ seeded: boolean; loaded: boolean; summary: Record<string, number> }> {"
+          method = '''  /**
+           * Atomically append deletion tombstones to the shared persistence document.
+           * This prevents concurrent Vercel Lambdas from overwriting each other's
+           * deletions when they save the whole persistence document at the same time.
+           */
+          public async persistDeletion(collectionName: string, ids: string[]): Promise<boolean> {
+            if (!this.db || !this.isConnected || !ids.length) return false;
+            try {
+              const fieldByCollection: Record<string, string> = {
+                products: 'deletedProductIds',
+                categories: 'deletedCategoryIds',
+                brands: 'deletedBrandIds',
+                coupons: 'deletedCouponIds',
+                users: 'deletedUserIds'
+              };
+              const field = fieldByCollection[collectionName];
+              if (!field) return false;
+
+              const uniqueIds = Array.from(new Set(ids.filter(Boolean)));
+              await this.db.collection('persistence').updateOne(
+                { id: 'store_persistence' },
+                { $addToSet: { [field]: { $each: uniqueIds } } },
+                { upsert: true }
+              );
+              await this.refreshCounts();
+              console.log(`[MongoDB] Atomically persisted ${uniqueIds.length} ${field} tombstone(s).`);
+              return true;
+            } catch (err: any) {
+              console.warn(`[MongoDB] Atomic persistence tombstone failed for ${collectionName}:`, err?.message);
+              return false;
+            }
+          }
+
+'''
+          if 'public async persistDeletion(collectionName: string, ids: string[])' not in s:
+              if marker not in s:
+                  raise SystemExit('MongoDB sync marker not found')
+              s = s.replace(marker, method + marker, 1)
+              p.write_text(s)
+          PY
+
+      - name: Patch delete persistence to use atomic tombstones
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('src/server/db/store.ts')
+          s = p.read_text()
+
+          old = """    await this.savePersistence();
+
+    try {
+      if (mongoService.getStatus().isConnected) {
+        await mongoService.deleteDocument(collection, filter);
+      }
+    } catch (err) {
+      console.warn(`[Store] Direct MongoDB deletion failed for ${collection}:`, err);
+    }
+"""
+          new = """    // Keep the local persistence snapshot for non-Mongo environments, but also
+    // atomically append the tombstone in MongoDB. A whole-document save can race
+    // with another Vercel Lambda and otherwise resurrect a deletion.
+    await this.savePersistence();
+
+    try {
+      if (mongoService.getStatus().isConnected) {
+        const tombstoneIds = collection === 'categories' || collection === 'brands'
+          ? [id, slug, name].filter(Boolean) as string[]
+          : id ? [id] : [];
+        if (tombstoneIds.length > 0) {
+          await mongoService.persistDeletion(collection, tombstoneIds);
+        }
+        await mongoService.deleteDocument(collection, filter);
+      }
+    } catch (err) {
+      console.warn(`[Store] Direct MongoDB deletion failed for ${collection}:`, err);
+    }
+"""
+          if old not in s:
+              raise SystemExit('deletePersisted Mongo block not found')
+          if 'mongoService.persistDeletion(collection, tombstoneIds)' not in s:
+              s = s.replace(old, new, 1)
+              p.write_text(s)
+          PY
+
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/server/db/mongodb.ts src/server/db/store.ts
+          if git diff --cached --quiet; then
+            echo "No changes needed."
+            exit 0
+          fi
+          git commit -m "fix: atomic persistence tombstones [atomic-persistence-fixed]"
+          git push
