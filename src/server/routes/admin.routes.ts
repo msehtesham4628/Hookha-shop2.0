@@ -13,7 +13,7 @@ const router = Router();
 // Apply authentication to all admin routes
 router.use(authenticateToken);
 
-// Disable ETags and bypass all Vercel/browser caches for administrative endpoints
+// Force fresh data and disable HTTP caching across all administrative endpoints
 router.use((req, res, next) => {
   res.set({
     'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -1016,10 +1016,12 @@ router.post('/media', requirePermission('media.upload'), (req: AuthenticatedRequ
 // 10. STAFF, ROLES & PERMISSION MATRIX (RBAC)
 // ==========================================
 
+// GET /api/admin/permissions
 router.get('/permissions', requirePermission('roles.view'), (req, res) => {
   return res.json({ success: true, data: db.permissions });
 });
 
+// GET /api/admin/roles
 router.get('/roles', requirePermission('roles.view'), (req, res) => {
   const rolesWithUserCount = db.roles.map(r => ({
     ...r,
@@ -1028,6 +1030,7 @@ router.get('/roles', requirePermission('roles.view'), (req, res) => {
   return res.json({ success: true, data: rolesWithUserCount });
 });
 
+// POST /api/admin/roles
 router.post('/roles', requirePermission('roles.create'), (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { name, code, description, permissions } = req.body;
@@ -1067,6 +1070,7 @@ router.post('/roles', requirePermission('roles.create'), (req: AuthenticatedRequ
   return res.status(201).json({ success: true, message: 'Custom role created', data: newRole });
 });
 
+// PUT /api/admin/roles/:id
 router.put('/roles/:id', requirePermission('roles.update'), (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
@@ -1100,6 +1104,7 @@ router.put('/roles/:id', requirePermission('roles.update'), (req: AuthenticatedR
   return res.json({ success: true, message: 'Role permissions updated', data: role });
 });
 
+// GET /api/admin/staff
 router.get('/staff', requirePermission('staff.view'), (req, res) => {
   const staff = db.users
     .filter(u => u.role !== 'CUSTOMER')
@@ -1110,6 +1115,7 @@ router.get('/staff', requirePermission('staff.view'), (req, res) => {
   return res.json({ success: true, data: staff });
 });
 
+// POST /api/admin/staff
 router.post('/staff', requirePermission('staff.create'), async (req: AuthenticatedRequest, res) => {
   const currentUser = req.user!;
   const { email, firstName, lastName, phone, role, password } = req.body;
@@ -1160,6 +1166,7 @@ router.post('/staff', requirePermission('staff.create'), async (req: Authenticat
   return res.status(201).json({ success: true, message: 'Staff member added', data: safeStaff });
 });
 
+// PUT /api/admin/staff/:id
 router.put('/staff/:id', requirePermission('staff.update'), async (req: AuthenticatedRequest, res) => {
   const currentUser = req.user!;
   const { id } = req.params;
@@ -1201,6 +1208,7 @@ router.put('/staff/:id', requirePermission('staff.update'), async (req: Authenti
   return res.json({ success: true, message: 'Staff profile updated', data: safe });
 });
 
+// DELETE /api/admin/staff/:id
 router.delete('/staff/:id', requirePermission('staff.delete'), async (req: AuthenticatedRequest, res) => {
   const currentUser = req.user!;
   const { id } = req.params;
@@ -1237,6 +1245,7 @@ router.delete('/staff/:id', requirePermission('staff.delete'), async (req: Authe
 // 11. AUDIT LOGS & SYSTEM SETTINGS
 // ==========================================
 
+// GET /api/admin/audit-logs
 router.get('/audit-logs', requirePermission('audit_logs.view'), (req, res) => {
   const { action, resource, userId } = req.query as Record<string, string>;
   let result = [...db.auditLogs];
@@ -1248,10 +1257,12 @@ router.get('/audit-logs', requirePermission('audit_logs.view'), (req, res) => {
   return res.json({ success: true, data: result });
 });
 
+// GET /api/admin/settings
 router.get('/settings', requirePermission('settings.view'), (req, res) => {
   return res.json({ success: true, data: db.settings });
 });
 
+// PUT /api/admin/settings
 router.put('/settings', requirePermission('settings.update'), (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   Object.assign(db.settings, req.body);
@@ -1268,6 +1279,7 @@ router.put('/settings', requirePermission('settings.update'), (req: Authenticate
   return res.json({ success: true, message: 'Store settings updated', data: db.settings });
 });
 
+// Notifications
 router.get('/notifications', (req, res) => {
   return res.json({ success: true, data: db.notifications });
 });
@@ -1283,11 +1295,13 @@ router.post('/notifications/:id/read', (req, res) => {
 // MONGODB STORAGE & CLOUD PERSISTENCE
 // ==========================================
 
+// GET /api/admin/mongodb/status
 router.get('/mongodb/status', (req, res) => {
   const status = mongoService.getStatus();
   return res.json({ success: true, data: status });
 });
 
+// POST /api/admin/mongodb/sync
 router.post('/mongodb/sync', async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   try {
@@ -1310,6 +1324,7 @@ router.post('/mongodb/sync', async (req: AuthenticatedRequest, res) => {
   }
 });
 
+// POST /api/admin/mongodb/reconnect
 router.post('/mongodb/reconnect', async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   try {
@@ -1334,6 +1349,7 @@ router.post('/mongodb/reconnect', async (req: AuthenticatedRequest, res) => {
 // 12. EXCEL EXPORTS (CUSTOMERS & INVENTORY)
 // ==========================================
 
+// GET /api/admin/export/customers/excel
 router.get('/export/customers/excel', requirePermission('customers.view'), (req: AuthenticatedRequest, res) => {
   try {
     const customers = db.users.filter(u => u.role === 'CUSTOMER');
@@ -1392,6 +1408,7 @@ router.get('/export/customers/excel', requirePermission('customers.view'), (req:
   }
 });
 
+// GET /api/admin/export/inventory/excel
 router.get('/export/inventory/excel', requirePermission('inventory.view'), (req: AuthenticatedRequest, res) => {
   try {
     const products = db.products;
