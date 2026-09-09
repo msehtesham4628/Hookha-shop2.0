@@ -6,10 +6,10 @@ import { db } from '../db/store.js';
 const router = Router();
 
 // The storefront can mount/focus/re-render several sections at once. Keep a
-// very short per-instance response cache so identical requests arriving within
-// the same burst do not repeatedly scan and sort the full 11k-product catalog.
-// Mutations still become visible immediately after the short 750ms window.
-const PRODUCT_RESPONSE_CACHE_TTL_MS = 750;
+// short per-instance response cache so identical requests arriving in the same
+// burst do not repeatedly scan and sort the full 11k-product catalog.
+// Mutations become visible shortly after the cache window expires.
+const PRODUCT_RESPONSE_CACHE_TTL_MS = 5000;
 const productResponseCache = new Map<string, { expiresAt: number; payload: any }>();
 
 const productQueryCacheKey = (query: Record<string, unknown>) =>
@@ -91,7 +91,7 @@ router.get('/', (req, res) => {
       });
     }
 
-    // Subcategory filter (supports direct subcategory matches, brand-based subcategories, and cleaned term variations)
+    // Subcategory filter
     if (subcategory) {
       const subLower = subcategory.toLowerCase().trim();
       const subClean = subLower.replace(/\b(tobacco|hookahs?|bowls?|vases?|bases?|charcoals?|coals?|hmd|supplies|accessories)\b/gi, '').trim();
@@ -120,7 +120,7 @@ router.get('/', (req, res) => {
       });
     }
 
-    // Brand filter (matches brandSlug, exact brand name, and normalized brand slug aliases)
+    // Brand filter
     if (brand) {
       const brandLower = brand.toLowerCase().trim();
       const brandClean = brandLower.replace(/-(tobacco|hookah|bowls|vapes|shisha)$/i, '').replace(/-/g, ' ').trim();
@@ -143,34 +143,17 @@ router.get('/', (req, res) => {
     // Price range
     if (minPrice) {
       const min = parseFloat(minPrice);
-      if (!isNaN(min)) {
-        result = result.filter(p => (p.salePrice || p.price) >= min);
-      }
+      if (!isNaN(min)) result = result.filter(p => (p.salePrice || p.price) >= min);
     }
-
     if (maxPrice) {
       const max = parseFloat(maxPrice);
-      if (!isNaN(max)) {
-        result = result.filter(p => (p.salePrice || p.price) <= max);
-      }
+      if (!isNaN(max)) result = result.filter(p => (p.salePrice || p.price) <= max);
     }
 
-    // Flavor
-    if (flavor) {
-      result = result.filter(p => p.flavor?.toLowerCase().includes(flavor.toLowerCase()));
-    }
+    if (flavor) result = result.filter(p => p.flavor?.toLowerCase().includes(flavor.toLowerCase()));
+    if (material) result = result.filter(p => p.material?.toLowerCase().includes(material.toLowerCase()));
+    if (color) result = result.filter(p => p.color?.toLowerCase().includes(color.toLowerCase()));
 
-    // Material
-    if (material) {
-      result = result.filter(p => p.material?.toLowerCase().includes(material.toLowerCase()));
-    }
-
-    // Color
-    if (color) {
-      result = result.filter(p => p.color?.toLowerCase().includes(color.toLowerCase()));
-    }
-
-    // Stock & Stock Status
     if (stockStatus === 'low') {
       result = result.filter(p => p.stock <= (p.lowStockThreshold || 5) && p.stock > 0);
     } else if (stockStatus === 'out') {
@@ -179,24 +162,11 @@ router.get('/', (req, res) => {
       result = result.filter(p => p.stock > 0);
     }
 
-    // Badges & Flags
-    if (onSale === 'true') {
-      result = result.filter(p => p.isOnSale || (p.salePrice && p.salePrice < p.price));
-    }
+    if (onSale === 'true') result = result.filter(p => p.isOnSale || (p.salePrice && p.salePrice < p.price));
+    if (featured === 'true') result = result.filter(p => p.isFeatured);
+    if (newArrival === 'true') result = result.filter(p => p.isNewArrival);
+    if (bestSeller === 'true') result = result.filter(p => p.isBestSeller);
 
-    if (featured === 'true') {
-      result = result.filter(p => p.isFeatured);
-    }
-
-    if (newArrival === 'true') {
-      result = result.filter(p => p.isNewArrival);
-    }
-
-    if (bestSeller === 'true') {
-      result = result.filter(p => p.isBestSeller);
-    }
-
-    // Sorting
     switch (sort) {
       case 'price-low-high':
       case 'price_asc':
@@ -240,7 +210,6 @@ router.get('/', (req, res) => {
         break;
     }
 
-    // Pagination
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
     const limitNum = Math.min(10000, Math.max(1, parseInt(limit, 10) || 24));
     const totalCount = result.length;
@@ -268,10 +237,10 @@ router.get('/', (req, res) => {
       payload
     });
 
-    // Prevent unbounded growth if the app receives many unique search queries.
     if (productResponseCache.size > 200) {
+      const cleanupNow = Date.now();
       for (const [key, entry] of productResponseCache) {
-        if (entry.expiresAt <= Date.now()) productResponseCache.delete(key);
+        if (entry.expiresAt <= cleanupNow) productResponseCache.delete(key);
       }
     }
 
@@ -287,9 +256,7 @@ router.get('/', (req, res) => {
 // GET /api/products/search?q=
 router.get('/search', (req, res) => {
   const term = (req.query.q as string || '').toLowerCase().trim();
-  if (!term) {
-    return res.json({ success: true, data: { results: [], suggestions: [] } });
-  }
+  if (!term) return res.json({ success: true, data: { results: [], suggestions: [] } });
 
   const matches = db.products
     .filter(p => p.isActive)
@@ -305,7 +272,6 @@ router.get('/search', (req, res) => {
   const matchedCategories = db.categories
     .filter(c => c.name.toLowerCase().includes(term))
     .map(c => ({ name: c.name, slug: c.slug, type: 'category' }));
-
   const matchedBrands = db.brands
     .filter(b => b.name.toLowerCase().includes(term))
     .map(b => ({ name: b.name, slug: b.slug, type: 'brand' }));
@@ -331,17 +297,14 @@ router.get('/:slug', (req, res) => {
     });
   }
 
-  // Find related products in same category
   const relatedProducts = db.products
     .filter(p => p.isActive && p.id !== product.id && (p.categorySlug === product.categorySlug || p.brandSlug === product.brandSlug))
     .slice(0, 4);
 
-  // Frequently bought together bundle
   const frequentlyBoughtTogether = db.products
     .filter(p => p.isActive && p.id !== product.id && p.categorySlug !== product.categorySlug)
     .slice(0, 2);
 
-  // Associated reviews
   const reviews = db.reviews.filter(r => r.productId === product.id && r.status === 'APPROVED');
 
   return res.json({
