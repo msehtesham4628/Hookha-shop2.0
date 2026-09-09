@@ -10,6 +10,7 @@ import wishlistRoutes from './routes/wishlist.routes.js';
 import orderRoutes from './routes/order.routes.js';
 import miscRoutes from './routes/misc.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import excelSyncRoutes from './routes/excel-sync.routes.js';
 import seoRoutes from './routes/seo.routes.js';
 import { createSeoMiddleware } from './middleware/seoCrawlerMiddleware.js';
 
@@ -56,10 +57,7 @@ app.post('/api/translate', async (req, res) => {
     return res.status(400).json({ success: false, error: { code: 'INVALID_TRANSLATION_REQUEST', message: 'Provide texts array and a target language.' } });
   }
 
-  // Gracefully fallback to source texts if Google Translate API is not configured
-  if (!apiKey) {
-    return res.json({ success: true, data: texts });
-  }
+  if (!apiKey) return res.json({ success: true, data: texts });
 
   try {
     const stringTexts = texts.map(t => String(t ?? ''));
@@ -74,13 +72,9 @@ app.post('/api/translate', async (req, res) => {
         body: JSON.stringify({ q: batch, source: 'en', target: target.toLowerCase(), format: 'text' })
       });
       const payload = await upstream.json() as { data?: { translations?: Array<{ translatedText?: string }> }; error?: { message?: string } };
-      if (!upstream.ok || !payload.data?.translations) {
-        results.push(...batch);
-      } else {
-        results.push(...payload.data.translations.map((item, idx) => item.translatedText || batch[idx]));
-      }
+      if (!upstream.ok || !payload.data?.translations) results.push(...batch);
+      else results.push(...payload.data.translations.map((item, idx) => item.translatedText || batch[idx]));
     }
-
     return res.json({ success: true, data: results });
   } catch {
     return res.json({ success: true, data: texts });
@@ -102,9 +96,7 @@ app.get('/api/image-proxy', async (req, res) => {
         'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
       }
     });
-    if (!upstreamRes.ok) {
-      return res.status(upstreamRes.status).send('Upstream image error');
-    }
+    if (!upstreamRes.ok) return res.status(upstreamRes.status).send('Upstream image error');
     const contentType = upstreamRes.headers.get('content-type') || 'image/jpeg';
     res.setHeader('Content-Type', contentType);
     res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
@@ -117,8 +109,6 @@ app.get('/api/image-proxy', async (req, res) => {
 
 // SEO Routes: sitemaps, robots.txt, opensearch, and SEO inspection
 app.use('/', seoRoutes);
-
-// SEO Crawler Prerendering Middleware for Search Engine Crawlers (Googlebot, Yandex, Bingbot)
 app.use(createSeoMiddleware());
 
 // Mount API Endpoints
@@ -127,9 +117,10 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/payments', orderRoutes); // Checkout & payments aliased
+app.use('/api/payments', orderRoutes);
+app.use('/api/admin', excelSyncRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api', miscRoutes); // categories, brands, wholesale, newsletter, reviews, settings
+app.use('/api', miscRoutes);
 
 // 404 handler for API routes
 app.use('/api/*', (req, res) => {
