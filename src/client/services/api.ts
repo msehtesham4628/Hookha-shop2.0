@@ -67,7 +67,7 @@ class ApiClient {
     return headers;
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}, retries = 2): Promise<T> {
     const url = `${API_BASE}${endpoint}`;
     const headers = { ...this.getHeaders(), ...(options.headers || {}) };
 
@@ -105,14 +105,30 @@ class ApiClient {
 
       return data;
     } catch (err: any) {
+      const isGet = !options.method || options.method.toUpperCase() === 'GET';
+      const isNetworkDrop =
+        err?.name === 'TypeError' ||
+        (typeof err?.message === 'string' && (
+          err.message.toLowerCase().includes('failed to fetch') ||
+          err.message.toLowerCase().includes('networkerror') ||
+          err.message.toLowerCase().includes('load failed') ||
+          err.message.toLowerCase().includes('network request failed') ||
+          err.message.toLowerCase().includes('abort')
+        ));
+
+      // Automatically retry idempotent GET requests when server is reloading or network drops
+      if (isGet && isNetworkDrop && retries > 0) {
+        await new Promise(resolve => setTimeout(resolve, (3 - retries) * 450));
+        return this.request<T>(endpoint, options, retries - 1);
+      }
+
       // Don't format expected user-level authentication responses or transient network drops as system-level crashes
       const isAuthEndpoint = endpoint.startsWith('/auth/login') || endpoint.startsWith('/auth/admin-login') || endpoint.startsWith('/auth/otp');
-      const isNetworkDrop = err?.message === 'Failed to fetch' || err?.name === 'TypeError';
 
       if (isAuthEndpoint) {
         console.warn(`[Auth Notice] ${options.method || 'GET'} ${endpoint}:`, err.message);
       } else if (isNetworkDrop) {
-        console.warn(`[Network Retry] ${options.method || 'GET'} ${endpoint} temporarily unreachable (retrying on next interval)`);
+        console.warn(`[Network Deferred] ${options.method || 'GET'} ${endpoint} temporarily unavailable.`);
       } else {
         console.error(`[API Error] ${options.method || 'GET'} ${endpoint}:`, err);
       }

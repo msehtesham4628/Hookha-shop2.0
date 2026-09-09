@@ -63,6 +63,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // Filters State
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || '');
@@ -80,21 +81,34 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
-  // Load Categories and Brands metadata
+  // Load Categories and Brands metadata with retry resilience
   useEffect(() => {
-    const loadMeta = async () => {
+    let isMounted = true;
+    const loadMeta = async (attempt = 1) => {
       try {
         const [catRes, brandRes] = await Promise.all([
-          api.getCategories(),
-          api.getBrands()
+          api.getCategories().catch(() => ({ success: false, data: [] })),
+          api.getBrands().catch(() => ({ success: false, data: [] }))
         ]);
-        if (catRes.success) setCategories(catRes.data);
-        if (brandRes.success) setBrands(brandRes.data);
-      } catch (err) {
-        console.error('Failed to load filter metadata:', err);
+        if (!isMounted) return;
+        if (catRes.success && Array.isArray(catRes.data) && catRes.data.length > 0) {
+          setCategories(catRes.data);
+        }
+        if (brandRes.success && Array.isArray(brandRes.data) && brandRes.data.length > 0) {
+          setBrands(brandRes.data);
+        }
+      } catch (err: any) {
+        if (attempt <= 2 && isMounted) {
+          setTimeout(() => {
+            if (isMounted) loadMeta(attempt + 1);
+          }, attempt * 750);
+        } else {
+          console.warn('Filter metadata deferred:', err?.message || err);
+        }
       }
     };
     loadMeta();
+    return () => { isMounted = false; };
   }, []);
 
   // Update on prop changes
@@ -125,10 +139,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     sortBy
   ]);
 
-  // Fetch filtered products
-  const fetchProducts = async () => {
+  // Fetch filtered products with graceful retry handling
+  const fetchProducts = async (retryCount = 0) => {
     try {
       setLoading(true);
+      setLoadError(null);
       const params: Record<string, any> = {
         category: selectedCategory || undefined,
         subcategory: selectedSubcategory || undefined,
@@ -155,9 +170,16 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           setTotalCount(res.data.products?.length || 0);
           setTotalPages(1);
         }
+      } else {
+        setProducts([]);
       }
-    } catch (err) {
-      console.error('Failed to fetch filtered products:', err);
+    } catch (err: any) {
+      if (retryCount < 2) {
+        setTimeout(() => fetchProducts(retryCount + 1), (retryCount + 1) * 700);
+        return;
+      }
+      console.warn('Products fetch temporarily deferred:', err?.message || err);
+      setLoadError(err?.message || 'Unable to retrieve catalog items. Please check your connection.');
     } finally {
       setLoading(false);
     }
@@ -634,6 +656,22 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                     </div>
                   </div>
                 ))}
+              </div>
+            ) : loadError ? (
+              <div className="bg-white border border-stone-200 rounded-sm p-12 text-center space-y-4 shadow-2xs">
+                <h3 className="font-serif text-lg font-bold text-stone-900">
+                  {t('category.error_title', 'Unable to Retrieve Catalog')}
+                </h3>
+                <p className="text-xs text-stone-500 max-w-sm mx-auto">
+                  {loadError}
+                </p>
+                <button
+                  onClick={() => fetchProducts()}
+                  className="bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold px-6 py-2.5 rounded-xs transition-colors cursor-pointer inline-flex items-center gap-2"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>{t('common.try_again', 'Retry Connection')}</span>
+                </button>
               </div>
             ) : products.length === 0 ? (
               <div className="bg-white border border-stone-200 rounded-sm p-12 text-center space-y-4 shadow-2xs">
