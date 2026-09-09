@@ -140,7 +140,7 @@ router.get('/analytics/overview', requirePermission('analytics.view'), (req, res
 });
 
 // ==========================================
-// 2. PRODUCT MANAGEMENT (CRUD, CSV Import, Export)
+// 2. PRODUCT MANAGEMENT
 // ==========================================
 
 // GET /api/admin/products
@@ -167,7 +167,7 @@ router.get('/products', requirePermission('products.view'), (req, res) => {
 });
 
 // POST /api/admin/products
-router.post('/products', requirePermission('products.create'), (req: AuthenticatedRequest, res) => {
+router.post('/products', requirePermission('products.create'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const body = req.body;
 
@@ -221,7 +221,7 @@ router.post('/products', requirePermission('products.create'), (req: Authenticat
   };
 
   db.products.unshift(newProduct);
-  db.persist('products', newProduct);
+  await db.persist('products', newProduct);
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
@@ -235,7 +235,7 @@ router.post('/products', requirePermission('products.create'), (req: Authenticat
 });
 
 // PUT /api/admin/products/:id
-router.put('/products/:id', requirePermission('products.update'), (req: AuthenticatedRequest, res) => {
+router.put('/products/:id', requirePermission('products.update'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const product = db.products.find(p => p.id === id);
@@ -248,11 +248,11 @@ router.put('/products/:id', requirePermission('products.update'), (req: Authenti
   const prevPrice = product.price;
 
   Object.assign(product, req.body, { updatedAt: new Date().toISOString() });
-  db.persist('products', product);
+  await db.persist('products', product);
 
   if (req.body.stock !== undefined && parseInt(req.body.stock, 10) !== prevStock) {
     const newStock = parseInt(req.body.stock, 10);
-    db.inventoryTransactions.push({
+    const tx = {
       id: `inv-${Date.now()}`,
       productId: product.id,
       productName: product.name,
@@ -264,7 +264,9 @@ router.put('/products/:id', requirePermission('products.update'), (req: Authenti
       actor: `${user.firstName} ${user.lastName}`,
       notes: 'Admin updated stock directly in product editor',
       createdAt: new Date().toISOString()
-    });
+    };
+    db.inventoryTransactions.push(tx);
+    await db.persist('inventoryTransactions', tx);
   }
 
   db.logAudit(
@@ -279,7 +281,7 @@ router.put('/products/:id', requirePermission('products.update'), (req: Authenti
 });
 
 // DELETE /api/admin/products/:id
-router.delete('/products/:id', requirePermission('products.delete'), (req: AuthenticatedRequest, res) => {
+router.delete('/products/:id', requirePermission('products.delete'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const index = db.products.findIndex(p => p.id === id);
@@ -290,7 +292,7 @@ router.delete('/products/:id', requirePermission('products.delete'), (req: Authe
 
   const deleted = db.products[index];
   db.products.splice(index, 1);
-  db.deletePersisted('products', { id });
+  await db.deletePersisted('products', { id });
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
@@ -304,7 +306,7 @@ router.delete('/products/:id', requirePermission('products.delete'), (req: Authe
 });
 
 // POST /api/admin/products/import
-router.post('/products/import', requirePermission('products.import'), (req: AuthenticatedRequest, res) => {
+router.post('/products/import', requirePermission('products.import'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { products: importList } = req.body;
 
@@ -363,7 +365,7 @@ router.post('/products/import', requirePermission('products.import'), (req: Auth
       };
 
       db.products.push(newProd);
-      db.persist('products', newProd);
+      await db.persist('products', newProd);
       successful++;
     } catch (err: any) {
       failed++;
@@ -387,7 +389,7 @@ router.post('/products/import', requirePermission('products.import'), (req: Auth
 });
 
 // POST /api/admin/products/bulk-update
-router.post('/products/bulk-update', requirePermission('products.update'), (req: AuthenticatedRequest, res) => {
+router.post('/products/bulk-update', requirePermission('products.update'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { updates } = req.body;
 
@@ -438,7 +440,7 @@ router.post('/products/bulk-update', requirePermission('products.update'), (req:
           product.stock = parsedStock;
           hasChanges = true;
 
-          db.inventoryTransactions.unshift({
+          const tx = {
             id: `inv-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
             productId: product.id,
             productName: product.name,
@@ -450,7 +452,9 @@ router.post('/products/bulk-update', requirePermission('products.update'), (req:
             actor: `${user.firstName} ${user.lastName}`,
             notes: `Bulk updated via CSV/JSON import (${prevStock} -> ${product.stock})`,
             createdAt: new Date().toISOString()
-          });
+          };
+          db.inventoryTransactions.unshift(tx);
+          await db.persist('inventoryTransactions', tx);
         }
       }
 
@@ -492,7 +496,7 @@ router.post('/products/bulk-update', requirePermission('products.update'), (req:
 
       if (hasChanges) {
         product.updatedAt = new Date().toISOString();
-        db.persist('products', product);
+        await db.persist('products', product);
         updatedCount++;
         updatedItems.push({
           id: product.id,
@@ -588,7 +592,7 @@ router.get('/orders/:id', requirePermission('orders.view'), (req, res) => {
 });
 
 // PUT /api/admin/orders/:id/status
-router.put('/orders/:id/status', requirePermission('orders.update'), (req: AuthenticatedRequest, res) => {
+router.put('/orders/:id/status', requirePermission('orders.update'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const { status, trackingNumber, carrier, note } = req.body;
@@ -610,7 +614,7 @@ router.put('/orders/:id/status', requirePermission('orders.update'), (req: Authe
     actor: `${user.firstName} ${user.lastName}`
   });
   order.updatedAt = new Date().toISOString();
-  db.persist('orders', order);
+  await db.persist('orders', order);
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
@@ -666,7 +670,7 @@ router.get('/customers', requirePermission('customers.view'), (req, res) => {
 });
 
 // POST /api/admin/customers/:id/suspend
-router.post('/customers/:id/suspend', requirePermission('customers.suspend'), (req: AuthenticatedRequest, res) => {
+router.post('/customers/:id/suspend', requirePermission('customers.suspend'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const customer = db.users.find(u => u.id === id);
@@ -677,7 +681,7 @@ router.post('/customers/:id/suspend', requirePermission('customers.suspend'), (r
 
   customer.status = customer.status === 'SUSPENDED' ? 'ACTIVE' : 'SUSPENDED';
   customer.updatedAt = new Date().toISOString();
-  db.persist('users', customer);
+  await db.persist('users', customer);
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
@@ -718,7 +722,7 @@ router.get('/inventory', requirePermission('inventory.view'), (req, res) => {
 });
 
 // POST /api/admin/inventory/:id/adjust
-router.post('/inventory/:id/adjust', requirePermission('inventory.adjust'), (req: AuthenticatedRequest, res) => {
+router.post('/inventory/:id/adjust', requirePermission('inventory.adjust'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const { adjustment, reason, notes } = req.body;
@@ -751,8 +755,8 @@ router.post('/inventory/:id/adjust', requirePermission('inventory.adjust'), (req
   };
 
   db.inventoryTransactions.unshift(tx);
-  db.persist('products', product);
-  db.persist('inventoryTransactions', tx);
+  await db.persist('products', product);
+  await db.persist('inventoryTransactions', tx);
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
@@ -773,7 +777,7 @@ router.get('/categories', requirePermission('categories.view'), (req, res) => {
   return res.json({ success: true, data: db.categories });
 });
 
-router.post('/categories', requirePermission('categories.create'), (req: AuthenticatedRequest, res) => {
+router.post('/categories', requirePermission('categories.create'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { name, description, imageUrl, bannerUrl, subcategories } = req.body;
   if (!name) return res.status(400).json({ success: false, error: { code: 'NAME_REQUIRED', message: 'Category name is required' } });
@@ -793,12 +797,12 @@ router.post('/categories', requirePermission('categories.create'), (req: Authent
   };
 
   db.categories.push(cat);
-  db.persist('categories', cat);
+  await db.persist('categories', cat);
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_CREATED_CATEGORY', 'CATEGORY', cat.id, { name });
   return res.status(201).json({ success: true, data: cat });
 });
 
-router.put('/categories/:id', requirePermission('categories.update'), (req: AuthenticatedRequest, res) => {
+router.put('/categories/:id', requirePermission('categories.update'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const { name, description, imageUrl, bannerUrl, subcategories, isActive } = req.body;
@@ -818,12 +822,12 @@ router.put('/categories/:id', requirePermission('categories.update'), (req: Auth
   if (Array.isArray(subcategories)) cat.subcategories = subcategories;
   if (isActive !== undefined) cat.isActive = isActive;
 
-  db.persist('categories', cat);
+  await db.persist('categories', cat);
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_UPDATED_CATEGORY', 'CATEGORY', cat.id, { name: cat.name });
   return res.json({ success: true, data: cat });
 });
 
-router.delete('/categories/:id', requirePermission('categories.delete'), (req: AuthenticatedRequest, res) => {
+router.delete('/categories/:id', requirePermission('categories.delete'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const index = db.categories.findIndex(c => c.id === id || c.slug === id);
@@ -832,7 +836,7 @@ router.delete('/categories/:id', requirePermission('categories.delete'), (req: A
   }
 
   const removed = db.categories.splice(index, 1)[0];
-  db.deletePersisted('categories', { id: removed.id, slug: removed.slug, name: removed.name });
+  await db.deletePersisted('categories', { id: removed.id, slug: removed.slug, name: removed.name });
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_DELETED_CATEGORY', 'CATEGORY', id, { name: removed.name });
   return res.json({ success: true, message: `Category "${removed.name}" deleted successfully` });
 });
@@ -841,7 +845,7 @@ router.get('/brands', requirePermission('brands.view'), (req, res) => {
   return res.json({ success: true, data: db.brands });
 });
 
-router.post('/brands', requirePermission('brands.create'), (req: AuthenticatedRequest, res) => {
+router.post('/brands', requirePermission('brands.create'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { name, origin, description, logoUrl } = req.body;
   if (!name) return res.status(400).json({ success: false, error: { code: 'NAME_REQUIRED', message: 'Brand name required' } });
@@ -858,12 +862,12 @@ router.post('/brands', requirePermission('brands.create'), (req: AuthenticatedRe
   };
 
   db.brands.push(brand);
-  db.persist('brands', brand);
+  await db.persist('brands', brand);
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_CREATED_BRAND', 'BRAND', brand.id, { name });
   return res.status(201).json({ success: true, data: brand });
 });
 
-router.put('/brands/:id', requirePermission('brands.update'), (req: AuthenticatedRequest, res) => {
+router.put('/brands/:id', requirePermission('brands.update'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const { name, origin, description, logoUrl, isActive } = req.body;
@@ -882,12 +886,12 @@ router.put('/brands/:id', requirePermission('brands.update'), (req: Authenticate
   if (logoUrl !== undefined) brand.logoUrl = logoUrl;
   if (isActive !== undefined) brand.isActive = isActive;
 
-  db.persist('brands', brand);
+  await db.persist('brands', brand);
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_UPDATED_BRAND', 'BRAND', brand.id, { name: brand.name });
   return res.json({ success: true, data: brand });
 });
 
-router.delete('/brands/:id', requirePermission('brands.delete'), (req: AuthenticatedRequest, res) => {
+router.delete('/brands/:id', requirePermission('brands.delete'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const index = db.brands.findIndex(b => b.id === id || b.slug === id);
@@ -896,7 +900,7 @@ router.delete('/brands/:id', requirePermission('brands.delete'), (req: Authentic
   }
 
   const removed = db.brands.splice(index, 1)[0];
-  db.deletePersisted('brands', { id: removed.id, slug: removed.slug, name: removed.name });
+  await db.deletePersisted('brands', { id: removed.id, slug: removed.slug, name: removed.name });
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_DELETED_BRAND', 'BRAND', id, { name: removed.name });
   return res.json({ success: true, message: `Brand "${removed.name}" deleted successfully` });
 });
@@ -909,7 +913,7 @@ router.get('/coupons', requirePermission('coupons.view'), (req, res) => {
   return res.json({ success: true, data: db.coupons });
 });
 
-router.post('/coupons', requirePermission('coupons.create'), (req: AuthenticatedRequest, res) => {
+router.post('/coupons', requirePermission('coupons.create'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { code, description, discountType, discountValue, minOrderAmount, maxDiscountAmount, usageLimit } = req.body;
 
@@ -932,16 +936,16 @@ router.post('/coupons', requirePermission('coupons.create'), (req: Authenticated
   };
 
   db.coupons.push(coupon);
-  db.persist('coupons', coupon);
+  await db.persist('coupons', coupon);
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_CREATED_COUPON', 'COUPON', coupon.id, { code: coupon.code });
   return res.status(201).json({ success: true, data: coupon });
 });
 
-router.delete('/coupons/:id', requirePermission('coupons.delete'), (req: AuthenticatedRequest, res) => {
+router.delete('/coupons/:id', requirePermission('coupons.delete'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   db.coupons = db.coupons.filter(c => c.id !== id);
-  db.deletePersisted('coupons', { id });
+  await db.deletePersisted('coupons', { id });
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_DELETED_COUPON', 'COUPON', id);
   return res.json({ success: true, message: 'Coupon deleted' });
 });
@@ -954,14 +958,14 @@ router.get('/reviews', requirePermission('reviews.view'), (req, res) => {
   return res.json({ success: true, data: db.reviews });
 });
 
-router.put('/reviews/:id', requirePermission('reviews.moderate'), (req: AuthenticatedRequest, res) => {
+router.put('/reviews/:id', requirePermission('reviews.moderate'), async (req: AuthenticatedRequest, res) => {
   const { id } = req.params;
   const { status } = req.body;
   const rev = db.reviews.find(r => r.id === id);
   if (!rev) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Review not found' } });
 
   rev.status = status;
-  db.persist('reviews', rev);
+  await db.persist('reviews', rev);
   return res.json({ success: true, data: rev });
 });
 
@@ -969,7 +973,7 @@ router.get('/wholesale', requirePermission('wholesale.view'), (req, res) => {
   return res.json({ success: true, data: db.wholesaleApplications });
 });
 
-router.put('/wholesale/:id', requirePermission('wholesale.update'), (req: AuthenticatedRequest, res) => {
+router.put('/wholesale/:id', requirePermission('wholesale.update'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const { status, adminNotes } = req.body;
@@ -980,7 +984,7 @@ router.put('/wholesale/:id', requirePermission('wholesale.update'), (req: Authen
   if (status) app.status = status;
   if (adminNotes !== undefined) app.adminNotes = adminNotes;
   app.updatedAt = new Date().toISOString();
-  db.persist('wholesaleApplications', app);
+  await db.persist('wholesaleApplications', app);
 
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_UPDATED_WHOLESALE', 'WHOLESALE', app.id, { status: app.status });
   return res.json({ success: true, data: app });
@@ -994,7 +998,7 @@ router.get('/media', requirePermission('media.view'), (req, res) => {
   return res.json({ success: true, data: db.mediaLibrary });
 });
 
-router.post('/media', requirePermission('media.upload'), (req: AuthenticatedRequest, res) => {
+router.post('/media', requirePermission('media.upload'), async (req: AuthenticatedRequest, res) => {
   const { url, alt, category } = req.body;
   if (!url) return res.status(400).json({ success: false, error: { code: 'URL_REQUIRED', message: 'Image URL is required' } });
 
@@ -1008,7 +1012,7 @@ router.post('/media', requirePermission('media.upload'), (req: AuthenticatedRequ
   };
 
   db.mediaLibrary.unshift(item);
-  db.persist('mediaLibrary', item);
+  await db.persist('mediaLibrary', item);
   return res.status(201).json({ success: true, data: item });
 });
 
@@ -1031,7 +1035,7 @@ router.get('/roles', requirePermission('roles.view'), (req, res) => {
 });
 
 // POST /api/admin/roles
-router.post('/roles', requirePermission('roles.create'), (req: AuthenticatedRequest, res) => {
+router.post('/roles', requirePermission('roles.create'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { name, code, description, permissions } = req.body;
 
@@ -1057,7 +1061,7 @@ router.post('/roles', requirePermission('roles.create'), (req: AuthenticatedRequ
   };
 
   db.roles.push(newRole);
-  db.persist('roles', newRole);
+  await db.persist('roles', newRole);
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
@@ -1071,7 +1075,7 @@ router.post('/roles', requirePermission('roles.create'), (req: AuthenticatedRequ
 });
 
 // PUT /api/admin/roles/:id
-router.put('/roles/:id', requirePermission('roles.update'), (req: AuthenticatedRequest, res) => {
+router.put('/roles/:id', requirePermission('roles.update'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
   const { name, description, permissions } = req.body;
@@ -1091,7 +1095,7 @@ router.put('/roles/:id', requirePermission('roles.update'), (req: AuthenticatedR
     role.permissions = role.code === 'SUPER_ADMIN' ? db.permissions.map(p => p.key) : permissions;
   }
   role.updatedAt = new Date().toISOString();
-  db.persist('roles', role);
+  await db.persist('roles', role);
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
@@ -1152,7 +1156,7 @@ router.post('/staff', requirePermission('staff.create'), async (req: Authenticat
   };
 
   db.users.push(newStaff);
-  db.persist('users', newStaff);
+  await db.persist('users', newStaff);
 
   db.logAudit(
     { id: currentUser.id, name: `${currentUser.firstName} ${currentUser.lastName}`, role: currentUser.role, ip: req.ip },
@@ -1194,7 +1198,7 @@ router.put('/staff/:id', requirePermission('staff.update'), async (req: Authenti
     targetStaff.passwordHash = await bcrypt.hash(password, 10);
   }
   targetStaff.updatedAt = new Date().toISOString();
-  db.persist('users', targetStaff);
+  await db.persist('users', targetStaff);
 
   db.logAudit(
     { id: currentUser.id, name: `${currentUser.firstName} ${currentUser.lastName}`, role: currentUser.role, ip: req.ip },
@@ -1228,7 +1232,7 @@ router.delete('/staff/:id', requirePermission('staff.delete'), async (req: Authe
   }
 
   db.users.splice(targetStaffIndex, 1);
-  db.deletePersisted('users', { id });
+  await db.deletePersisted('users', { id });
 
   db.logAudit(
     { id: currentUser.id, name: `${currentUser.firstName} ${currentUser.lastName}`, role: currentUser.role, ip: req.ip },
@@ -1263,10 +1267,10 @@ router.get('/settings', requirePermission('settings.view'), (req, res) => {
 });
 
 // PUT /api/admin/settings
-router.put('/settings', requirePermission('settings.update'), (req: AuthenticatedRequest, res) => {
+router.put('/settings', requirePermission('settings.update'), async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   Object.assign(db.settings, req.body);
-  db.persist('settings', { id: 'store_settings', ...db.settings });
+  await db.persist('settings', { id: 'store_settings', ...db.settings });
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
