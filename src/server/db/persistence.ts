@@ -52,8 +52,7 @@ export function getDefaultPersistenceData(): StorePersistenceData {
 }
 
 export function getPersistenceFilePath(): string {
-  const primaryPath = path.join(process.cwd(), 'src/server/db', 'store-persistence.json');
-  return primaryPath;
+  return path.join(process.cwd(), 'src/server/db', 'store-persistence.json');
 }
 
 export function loadPersistenceData(): StorePersistenceData {
@@ -89,6 +88,12 @@ export function loadPersistenceData(): StorePersistenceData {
 }
 
 export function savePersistenceData(data: StorePersistenceData): void {
+  // Vercel serverless deployments have a read-only application filesystem.
+  // Persistence is stored in MongoDB by DatabaseStore.savePersistence().
+  if (process.env.VERCEL || process.env.VERCEL_ENV) {
+    return;
+  }
+
   const filePath = getPersistenceFilePath();
   try {
     const dir = path.dirname(filePath);
