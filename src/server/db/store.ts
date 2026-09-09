@@ -37,7 +37,7 @@ import {
 } from './persistence.js';
 
 interface StoredOTP {
-  identifier: string; // email or phone
+  identifier: string;
   codeHash: string;
   type: 'EMAIL' | 'SMS';
   expiresAt: number;
@@ -186,7 +186,7 @@ export class DatabaseStore {
   public settings: StoreSettings = { ...DEFAULT_SETTINGS };
   public notifications: AdminNotification[] = [];
   public addresses: Address[] = [];
-  
+
   public cartItems: StoredCartItem[] = [];
   public wishlists: StoredWishlist[] = [];
   public otps: StoredOTP[] = [];
@@ -202,17 +202,20 @@ export class DatabaseStore {
     this.persistenceData = loadPersistenceData();
   }
 
-  public savePersistence() {
+  public async savePersistence() {
     savePersistenceData(this.persistenceData);
-    if (mongoService.getStatus().isConnected) {
-      mongoService.saveDocument('persistence', { id: 'store_persistence', ...this.persistenceData }).catch(() => {});
+    try {
+      if (mongoService.getStatus().isConnected) {
+        await mongoService.saveDocument('persistence', { id: 'store_persistence', ...this.persistenceData });
+      }
+    } catch (err) {
+      console.warn('[Store] Cloud persistence sync notice:', err);
     }
   }
 
   public mergePersistenceData(incoming: Partial<StorePersistenceData>) {
     if (!incoming) return;
 
-    // Union deleted sets
     const delProducts = new Set([...this.persistenceData.deletedProductIds, ...(incoming.deletedProductIds || [])]);
     const delCats = new Set([...this.persistenceData.deletedCategoryIds, ...(incoming.deletedCategoryIds || [])]);
     const delBrands = new Set([...this.persistenceData.deletedBrandIds, ...(incoming.deletedBrandIds || [])]);
@@ -225,7 +228,6 @@ export class DatabaseStore {
     this.persistenceData.deletedCouponIds = Array.from(delCoupons);
     this.persistenceData.deletedUserIds = Array.from(delUsers);
 
-    // Merge overrides
     this.persistenceData.productOverrides = {
       ...(incoming.productOverrides || {}),
       ...this.persistenceData.productOverrides
@@ -257,7 +259,6 @@ export class DatabaseStore {
       };
     }
 
-    // Remove overrides for deleted items
     for (const id of this.persistenceData.deletedProductIds) {
       delete this.persistenceData.productOverrides[id];
     }
@@ -268,6 +269,7 @@ export class DatabaseStore {
       delete this.persistenceData.brandOverrides[id];
     }
 
+    this.applyPersistence();
     savePersistenceData(this.persistenceData);
   }
 
@@ -306,7 +308,6 @@ export class DatabaseStore {
     const deletedCouponSet = new Set(this.persistenceData.deletedCouponIds);
     const deletedUserSet = new Set(this.persistenceData.deletedUserIds);
 
-    // 1. Products
     this.products = this.products.filter(p => !this.isProductDeleted(p.id));
     const prodMap = new Map<string, Product>();
     for (const p of this.products) prodMap.set(p.id, p);
@@ -320,7 +321,6 @@ export class DatabaseStore {
     }
     this.products = Array.from(prodMap.values());
 
-    // 2. Categories
     this.categories = this.categories.filter(c =>
       !this.isCategoryDeleted(c.id) &&
       !this.isCategoryDeleted(c.slug) &&
@@ -338,7 +338,6 @@ export class DatabaseStore {
     }
     this.categories = Array.from(catMap.values());
 
-    // 3. Brands
     this.brands = this.brands.filter(b =>
       !this.isBrandDeleted(b.id) &&
       !this.isBrandDeleted(b.slug) &&
@@ -356,7 +355,6 @@ export class DatabaseStore {
     }
     this.brands = Array.from(brandMap.values());
 
-    // 4. Coupons
     this.coupons = this.coupons.filter(c => !deletedCouponSet.has(c.id));
     const couponMap = new Map<string, Coupon>();
     for (const c of this.coupons) couponMap.set(c.id, c);
@@ -366,7 +364,6 @@ export class DatabaseStore {
     }
     this.coupons = Array.from(couponMap.values());
 
-    // 5. Users
     this.users = this.users.filter(u => !deletedUserSet.has(u.id));
     for (const [id, override] of Object.entries(this.persistenceData.userOverrides)) {
       if (deletedUserSet.has(id)) continue;
@@ -378,7 +375,6 @@ export class DatabaseStore {
       }
     }
 
-    // 6. Settings
     if (this.persistenceData.settingsOverride) {
       this.settings = { ...this.settings, ...this.persistenceData.settingsOverride };
     }
@@ -582,13 +578,12 @@ export class DatabaseStore {
 
   public async init() {
     if (this.isInitialized) return;
-    
+
     this.permissions = [...DEFAULT_PERMISSIONS];
     this.roles = [...DEFAULT_ROLES];
     this.categories = [...INITIAL_CATEGORIES];
     this.brands = [...INITIAL_BRANDS];
 
-    // Load full authentic product catalog
     let catalogProducts: Product[] = loadSplitCatalog();
     if (catalogProducts.length > 0) {
       console.log(`[Store] Loaded ${catalogProducts.length} products from split catalogs.`);
@@ -599,29 +594,24 @@ export class DatabaseStore {
         const fileData = fs.readFileSync(catalogPath, 'utf8');
         const scrapedProducts: Product[] = JSON.parse(fileData);
         catalogProducts = [...catalogProducts, ...scrapedProducts];
-        console.log(`[Store] Loaded ${scrapedProducts.length} authentic products from catalog.`);
       }
     } catch (e) {
       console.warn('[Store] Could not load scrapedProducts.json:', e);
     }
 
-    // Load persisted store overrides before assembling the catalog
     this.loadPersistence();
 
-    // Use the imported catalog when available; demo products are only a fallback.
     const productMap = new Map<string, Product>();
     const productsToLoad = catalogProducts.length > 0 ? catalogProducts : INITIAL_PRODUCTS;
     for (const p of productsToLoad) {
       productMap.set(p.id, p);
     }
 
-    // Filter out deleted products
     const deletedProductSet = new Set(this.persistenceData.deletedProductIds);
     for (const deletedId of deletedProductSet) {
       productMap.delete(deletedId);
     }
 
-    // Apply product overrides (edits & newly created products)
     for (const [id, override] of Object.entries(this.persistenceData.productOverrides)) {
       if (deletedProductSet.has(id)) continue;
       if (productMap.has(id)) {
@@ -633,9 +623,7 @@ export class DatabaseStore {
     }
 
     this.products = Array.from(productMap.values());
-    console.log(`[Store] Master catalog initialized with ${this.products.length} products (${deletedProductSet.size} deleted, ${Object.keys(this.persistenceData.productOverrides).length} overrides applied).`);
 
-    // Sanitize image URLs (strip broken -916x916 WordPress thumbnails and deduplicate)
     this.products.forEach(p => {
       if (p.images && p.images.length > 0) {
         const seen = new Set<string>();
@@ -662,7 +650,6 @@ export class DatabaseStore {
       }
     });
 
-    // Filter deleted categories and apply category overrides
     const deletedCategorySet = new Set(this.persistenceData.deletedCategoryIds.map(s => s.toLowerCase()));
     this.categories = this.categories.filter(c =>
       !deletedCategorySet.has(c.id.toLowerCase()) &&
@@ -683,16 +670,14 @@ export class DatabaseStore {
     }
     this.categories = Array.from(catMap.values());
 
-    // Compute dynamic product counts for categories
     this.categories.forEach(cat => {
       cat.productCount = this.products.filter(p =>
         p.categorySlug === cat.slug || p.category.toLowerCase() === cat.name.toLowerCase()
       ).length;
     });
 
-    // Populate and compute brand catalog with strict deduplication
     const brandsById = new Map<string, Brand>();
-    const brandLookup = new Map<string, string>(); // alias / name / slug / root -> brand.id
+    const brandLookup = new Map<string, string>();
     const deletedBrandSet = new Set(this.persistenceData.deletedBrandIds.map(s => s.toLowerCase()));
 
     const registerLookup = (brand: Brand) => {
@@ -704,7 +689,6 @@ export class DatabaseStore {
       brandLookup.set(brand.name.toLowerCase(), brand.id);
       brandLookup.set(brand.slug.toLowerCase(), brand.id);
 
-      // Normalized base name without common category suffixes
       const stripped = brand.name
         .toLowerCase()
         .replace(/\s+(hookah|tobacco|bowls|bowl|vapes|vape|charcoal|crystal|accessories|coals)$/i, '')
@@ -736,7 +720,6 @@ export class DatabaseStore {
         return;
       }
 
-      // Find matching brand by name, slug, brandId, or stripped root
       const matchedId =
         brandLookup.get(searchKey) ||
         brandLookup.get(strippedSearchKey) ||
@@ -764,7 +747,6 @@ export class DatabaseStore {
       }
     });
 
-    // Apply brand overrides
     for (const [id, override] of Object.entries(this.persistenceData.brandOverrides)) {
       if (deletedBrandSet.has(id.toLowerCase()) || (override.slug && deletedBrandSet.has(override.slug.toLowerCase()))) continue;
       if (brandsById.has(id)) {
@@ -778,7 +760,6 @@ export class DatabaseStore {
       .filter(b => !deletedBrandSet.has(b.id.toLowerCase()) && !deletedBrandSet.has(b.slug.toLowerCase()))
       .sort((a, b) => b.productCount - a.productCount);
 
-    // Apply coupons with persistence
     const deletedCouponSet = new Set(this.persistenceData.deletedCouponIds);
     this.coupons = [...INITIAL_COUPONS].filter(c => !deletedCouponSet.has(c.id));
     const couponMap = new Map<string, Coupon>();
@@ -797,20 +778,8 @@ export class DatabaseStore {
       this.settings = { ...this.settings, ...this.persistenceData.settingsOverride };
     }
 
-    // Initialize media library with high res assets
-    this.mediaLibrary = [
-      { id: 'med-1', url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop', alt: 'Luxury Shisha Stainless Steel Studio Photo', category: 'Products', size: '1.4 MB', createdAt: new Date().toISOString() },
-      { id: 'med-2', url: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200&auto=format&fit=crop', alt: 'Bohemian Cut Crystal Shisha Base', category: 'Bases', size: '1.8 MB', createdAt: new Date().toISOString() },
-      { id: 'med-3', url: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1200&auto=format&fit=crop', alt: 'Artisan Dark Leaf Shisha Tobacco Leaf', category: 'Tobacco', size: '2.1 MB', createdAt: new Date().toISOString() },
-      { id: 'med-4', url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop', alt: 'Stoneware Handthrown Hookah Bowl Phunnel', category: 'Bowls', size: '1.1 MB', createdAt: new Date().toISOString() },
-      { id: 'med-5', url: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=1200&auto=format&fit=crop', alt: 'Organic Coconut Charcoal Coals Glowing', category: 'Charcoal', size: '1.6 MB', createdAt: new Date().toISOString() },
-      { id: 'med-6', url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop', alt: 'Silver Heat Management Device', category: 'Accessories', size: '980 KB', createdAt: new Date().toISOString() }
-    ];
-
-    // Seed default administrative users and demo customer if not already seeded
     this.seedDefaultUsers();
 
-    // Seed addresses for demo customer
     this.addresses = [
       {
         id: 'addr-1',
@@ -827,7 +796,6 @@ export class DatabaseStore {
       }
     ];
 
-    // Seed initial orders for demonstration
     this.orders = [
       {
         id: 'ord-1001',
@@ -879,283 +847,26 @@ export class DatabaseStore {
         ],
         createdAt: '2026-02-01T14:30:00Z',
         updatedAt: '2026-02-04T13:45:00Z'
-      },
-      {
-        id: 'ord-1002',
-        orderNumber: 'SLT-2026-1002',
-        userId: 'usr-customer-1',
-        customerName: 'Julian Vance',
-        customerEmail: 'customer@example.com',
-        customerPhone: '+1 (555) 219-4402',
-        items: [
-          {
-            productId: 'prod-kaloud-lotus-plus',
-            productName: 'Kaloud Lotus I+ Heat Management Device (Silver Nectar)',
-            productSku: 'KLD-LOT-SLV',
-            productImage: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=400&auto=format&fit=crop',
-            price: 54.95,
-            quantity: 1,
-            subtotal: 54.95
-          },
-          {
-            productId: 'prod-alpaca-symphony',
-            productName: 'Alpaca Symphony Hand-Thrown Clay Phunnel Bowl',
-            productSku: 'ALP-BOWL-SYM',
-            productImage: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=400&auto=format&fit=crop',
-            price: 29.99,
-            quantity: 1,
-            subtotal: 29.99
-          },
-          {
-            productId: 'prod-cocourth-cubes-26mm',
-            productName: 'CocoUrth 100% Organic Coconut Charcoal (26mm Cubes - 1kg)',
-            productSku: 'COCO-26MM-1KG',
-            productImage: 'https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=400&auto=format&fit=crop',
-            price: 14.50,
-            quantity: 2,
-            subtotal: 29.00
-          }
-        ],
-        shippingAddress: this.addresses[0],
-        billingAddress: this.addresses[0],
-        subtotal: 113.94,
-        discount: 17.09,
-        couponCode: 'WELCOME15',
-        shippingFee: 0,
-        tax: 8.23,
-        total: 105.08,
-        paymentMethod: 'STRIPE',
-        paymentStatus: 'PAID',
-        orderStatus: 'PROCESSING',
-        timeline: [
-          { status: 'PLACED', timestamp: '2026-02-26T10:15:00Z', note: 'Customer applied coupon WELCOME15' },
-          { status: 'PAYMENT_CONFIRMED', timestamp: '2026-02-26T10:16:00Z', note: 'Stripe charge verified' },
-          { status: 'PROCESSING', timestamp: '2026-02-26T11:00:00Z', note: 'Fragile packing in progress' }
-        ],
-        createdAt: '2026-02-26T10:15:00Z',
-        updatedAt: '2026-02-26T11:00:00Z'
-      },
-      {
-        id: 'ord-1003',
-        orderNumber: 'SLT-2026-1003',
-        userId: 'usr-customer-1',
-        customerName: 'Julian Vance',
-        customerEmail: 'customer@example.com',
-        customerPhone: '+1 (555) 219-4402',
-        items: [
-          {
-            productId: 'prod-steamulation-pro-x-iii',
-            productName: 'Steamulation Pro X III Platinum Metallic Shisha',
-            productSku: 'STM-PRO-X3',
-            productImage: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400&auto=format&fit=crop',
-            price: 529.00,
-            quantity: 1,
-            subtotal: 529.00
-          },
-          {
-            productId: 'prod-darkside-core-cola',
-            productName: 'Darkside Core Supernova & Falling Star (200g)',
-            productSku: 'DKS-CORE-COLA',
-            productImage: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400&auto=format&fit=crop',
-            price: 26.50,
-            quantity: 2,
-            subtotal: 53.00
-          }
-        ],
-        shippingAddress: this.addresses[0],
-        billingAddress: this.addresses[0],
-        subtotal: 582.00,
-        discount: 0,
-        shippingFee: 0,
-        tax: 49.47,
-        total: 631.47,
-        paymentMethod: 'STRIPE',
-        paymentStatus: 'PAID',
-        paymentIntentId: 'pi_test_983719283719',
-        orderStatus: 'SHIPPED',
-        trackingNumber: '9400111899223397612345',
-        carrier: 'FedEx Priority Overnight',
-        timeline: [
-          { status: 'PLACED', timestamp: '2026-03-01T09:20:00Z', note: 'Priority expedited order confirmed', actor: 'Julian Vance' },
-          { status: 'PAYMENT_CONFIRMED', timestamp: '2026-03-01T09:21:00Z', note: 'Payment verified via Stripe', actor: 'System' },
-          { status: 'PROCESSING', timestamp: '2026-03-01T10:30:00Z', note: 'Packed with luxury impact-resistant casing', actor: 'Warehouse Tech' },
-          { status: 'SHIPPED', timestamp: '2026-03-02T14:15:00Z', note: 'Picked up by FedEx Express courier. In transit to regional hub.', actor: 'FedEx Memphis Hub' }
-        ],
-        createdAt: '2026-03-01T09:20:00Z',
-        updatedAt: '2026-03-02T14:15:00Z'
-      },
-      {
-        id: 'ord-1004',
-        orderNumber: 'SLT-2026-1004',
-        userId: 'usr-customer-1',
-        customerName: 'Julian Vance',
-        customerEmail: 'customer@example.com',
-        customerPhone: '+1 (555) 219-4402',
-        items: [
-          {
-            productId: 'prod-wookah-classic-walnut',
-            productName: 'Wookah Classic Walnut Hookah Body & Crystal Vase',
-            productSku: 'WKH-WLN-02',
-            productImage: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400&auto=format&fit=crop',
-            price: 395.00,
-            quantity: 1,
-            subtotal: 395.00
-          }
-        ],
-        shippingAddress: this.addresses[0],
-        billingAddress: this.addresses[0],
-        subtotal: 395.00,
-        discount: 25.00,
-        shippingFee: 0,
-        tax: 31.45,
-        total: 401.45,
-        paymentMethod: 'STRIPE',
-        paymentStatus: 'PAID',
-        paymentIntentId: 'pi_test_102938475612',
-        orderStatus: 'OUT_FOR_DELIVERY',
-        trackingNumber: 'DHL9823410948',
-        carrier: 'DHL Express Worldwide Air',
-        timeline: [
-          { status: 'PLACED', timestamp: '2026-03-02T08:00:00Z', note: 'Order placed by client', actor: 'Julian Vance' },
-          { status: 'PAYMENT_CONFIRMED', timestamp: '2026-03-02T08:01:00Z', note: 'Payment processed', actor: 'System' },
-          { status: 'PROCESSING', timestamp: '2026-03-02T09:30:00Z', note: 'Quality check completed', actor: 'Dmitri Volkov' },
-          { status: 'SHIPPED', timestamp: '2026-03-03T11:00:00Z', note: 'Departed sorting facility in Cincinnati', actor: 'DHL Air Logistics' },
-          { status: 'OUT_FOR_DELIVERY', timestamp: '2026-03-04T07:45:00Z', note: 'With courier for final delivery today before 5:00 PM. Signature required.', actor: 'DHL Courier' }
-        ],
-        createdAt: '2026-03-02T08:00:00Z',
-        updatedAt: '2026-03-04T07:45:00Z'
       }
     ];
 
-    // Seed sample wholesale applications
-    this.wholesaleApplications = [
-      {
-        id: 'whs-1',
-        companyName: 'Lounge Mirage Shisha & Cocktails',
-        contactName: 'Karim Al-Hassan',
-        email: 'karim@loungemirage.com',
-        phone: '+1 (310) 882-9900',
-        businessType: 'LOUNGE',
-        taxId: 'US-94829104',
-        website: 'https://loungemirage.com',
-        estimatedMonthlyVolume: '$5,000 - $10,000',
-        notes: 'Premium hookah lounge in West Hollywood seeking monthly 50kg dark leaf supply and 10x custom stainless hookahs.',
-        status: 'PENDING',
-        createdAt: '2026-02-20T16:00:00Z',
-        updatedAt: '2026-02-20T16:00:00Z'
-      }
-    ];
-
-    // Seed system audit log entries
-    this.auditLogs = [
-      {
-        id: 'aud-1',
-        userId: 'usr-super-admin-1',
-        userName: 'Farhan Al-Mansoor',
-        userRole: 'SUPER_ADMIN',
-        action: 'SYSTEM_BOOTSTRAP',
-        resource: 'PLATFORM',
-        ipAddress: '127.0.0.1',
-        details: { message: 'Initialized Sultan Hookah enterprise catalog, RBAC system, and permission matrices.' },
-        createdAt: '2026-01-01T00:00:00Z'
-      },
-      {
-        id: 'aud-2',
-        userId: 'usr-product-manager-1',
-        userName: 'Dmitri Volkov',
-        userRole: 'PRODUCT_MANAGER',
-        action: 'PRODUCT_PUBLISHED',
-        resource: 'PRODUCT',
-        resourceId: 'prod-wookah-oak-crystal',
-        ipAddress: '192.168.1.45',
-        details: { sku: 'WKH-OAK-01', price: 449.00 },
-        createdAt: '2026-01-10T12:00:00Z'
-      }
-    ];
-
-    this.notifications = [
-      {
-        id: 'notif-1',
-        type: 'ORDER',
-        title: 'New High-Value Order',
-        message: 'Order #SLT-2026-1002 received for $105.08',
-        link: '/admin/orders',
-        isRead: false,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'notif-2',
-        type: 'WHOLESALE',
-        title: 'New B2B Lounge Application',
-        message: 'Lounge Mirage Shisha & Cocktails applied for wholesale tier.',
-        link: '/admin/wholesale',
-        isRead: false,
-        createdAt: new Date(Date.now() - 3600000).toISOString()
-      }
-    ];
-
-    // Apply order overrides
-    for (const [id, override] of Object.entries(this.persistenceData.orderOverrides)) {
-      const idx = this.orders.findIndex(o => o.id === id || o.orderNumber === id);
-      if (idx !== -1) {
-        this.orders[idx] = { ...this.orders[idx], ...override };
-      } else {
-        this.orders.unshift(override);
-      }
-    }
-
-    // Apply user / staff overrides
     const deletedUserSet = new Set(this.persistenceData.deletedUserIds);
     this.users = this.users.filter(u => !deletedUserSet.has(u.id));
-    for (const [id, override] of Object.entries(this.persistenceData.userOverrides)) {
-      if (deletedUserSet.has(id)) continue;
-      const idx = this.users.findIndex(u => u.id === id);
-      if (idx !== -1) {
-        this.users[idx] = { ...this.users[idx], ...override };
-      } else {
-        this.users.push(override as any);
-      }
-    }
-
-    // Apply role overrides
-    for (const [id, override] of Object.entries(this.persistenceData.roleOverrides)) {
-      const idx = this.roles.findIndex(r => r.id === id || r.code === id);
-      if (idx !== -1) {
-        this.roles[idx] = { ...this.roles[idx], ...override };
-      } else {
-        this.roles.push(override);
-      }
-    }
-
-    // Apply review overrides
-    for (const [id, override] of Object.entries(this.persistenceData.reviewOverrides)) {
-      const idx = this.reviews.findIndex(r => r.id === id);
-      if (idx !== -1) {
-        this.reviews[idx] = { ...this.reviews[idx], ...override };
-      }
-    }
-
-    // Apply wholesale application overrides
-    for (const [id, override] of Object.entries(this.persistenceData.wholesaleOverrides)) {
-      const idx = this.wholesaleApplications.findIndex(w => w.id === id);
-      if (idx !== -1) {
-        this.wholesaleApplications[idx] = { ...this.wholesaleApplications[idx], ...override };
-      }
-    }
 
     this.isInitialized = true;
 
-    // Asynchronously connect to MongoDB and sync all collections
-    const syncTimer = setTimeout(() => {
-      mongoService.syncWithStore(this).catch(() => {});
-    }, 100);
-    if (syncTimer && typeof syncTimer.unref === 'function') {
-      syncTimer.unref();
-    }
+    // Connect to MongoDB and synchronize overrides
+    mongoService.connect().then(connected => {
+      if (connected) {
+        mongoService.syncWithStore(this).catch(err => {
+          console.warn('[Store] MongoDB background hydration error:', err);
+        });
+      }
+    }).catch(() => {});
   }
 
-  // Durable Storage Persistence (Disk + MongoDB Write-Through)
-  public persist<T extends { id?: string }>(collection: string, doc: T) {
+  // Durable Storage Persistence with guaranteed Promise resolution
+  public async persist<T extends { id?: string }>(collection: string, doc: T): Promise<void> {
     if (!doc) return;
     const id = (doc as any).id || (doc as any).code || (doc as any).orderNumber;
 
@@ -1170,7 +881,6 @@ export class DatabaseStore {
       } else {
         this.products.unshift(p);
       }
-      this.savePersistence();
     } else if (collection === 'categories' && id) {
       const c = doc as any as Category;
       this.persistenceData.deletedCategoryIds = this.persistenceData.deletedCategoryIds.filter(cid => {
@@ -1185,7 +895,6 @@ export class DatabaseStore {
       } else {
         this.categories.push(c);
       }
-      this.savePersistence();
     } else if (collection === 'brands' && id) {
       const b = doc as any as Brand;
       this.persistenceData.deletedBrandIds = this.persistenceData.deletedBrandIds.filter(bid => {
@@ -1200,7 +909,6 @@ export class DatabaseStore {
       } else {
         this.brands.push(b);
       }
-      this.savePersistence();
     } else if (collection === 'coupons' && id) {
       const cpn = doc as any as Coupon;
       this.persistenceData.deletedCouponIds = this.persistenceData.deletedCouponIds.filter(cid => cid !== id);
@@ -1211,7 +919,6 @@ export class DatabaseStore {
       } else {
         this.coupons.unshift(cpn);
       }
-      this.savePersistence();
     } else if (collection === 'orders' && id) {
       const o = doc as any as Order;
       this.persistenceData.orderOverrides[id] = o;
@@ -1221,11 +928,9 @@ export class DatabaseStore {
       } else {
         this.orders.unshift(o);
       }
-      this.savePersistence();
     } else if (collection === 'settings') {
       this.persistenceData.settingsOverride = { ...this.settings, ...(doc as any) };
       this.settings = { ...this.settings, ...(doc as any) };
-      this.savePersistence();
     } else if (collection === 'users' && id) {
       const u = doc as any as User;
       this.persistenceData.deletedUserIds = this.persistenceData.deletedUserIds.filter(uid => uid !== id);
@@ -1236,41 +941,20 @@ export class DatabaseStore {
       } else {
         this.users.push(u);
       }
-      this.savePersistence();
-    } else if (collection === 'roles' && id) {
-      const r = doc as any as Role;
-      this.persistenceData.roleOverrides[id] = r;
-      const idx = this.roles.findIndex(item => item.id === id || item.code === r.code);
-      if (idx !== -1) {
-        this.roles[idx] = { ...this.roles[idx], ...r };
-      } else {
-        this.roles.push(r);
-      }
-      this.savePersistence();
-    } else if (collection === 'reviews' && id) {
-      const rev = doc as any as Review;
-      this.persistenceData.reviewOverrides[id] = rev;
-      const idx = this.reviews.findIndex(item => item.id === id);
-      if (idx !== -1) {
-        this.reviews[idx] = { ...this.reviews[idx], ...rev };
-      }
-      this.savePersistence();
-    } else if (collection === 'wholesale' && id) {
-      const whs = doc as any as WholesaleApplication;
-      this.persistenceData.wholesaleOverrides[id] = whs;
-      const idx = this.wholesaleApplications.findIndex(item => item.id === id);
-      if (idx !== -1) {
-        this.wholesaleApplications[idx] = { ...this.wholesaleApplications[idx], ...whs };
-      }
-      this.savePersistence();
     }
 
-    if (mongoService.getStatus().isConnected) {
-      mongoService.saveDocument(collection, doc).catch(() => {});
+    await this.savePersistence();
+
+    try {
+      if (mongoService.getStatus().isConnected) {
+        await mongoService.saveDocument(collection, doc);
+      }
+    } catch (err) {
+      console.warn(`[Store] Direct MongoDB write failed for ${collection}:`, err);
     }
   }
 
-  public deletePersisted(collection: string, filter: Record<string, any>) {
+  public async deletePersisted(collection: string, filter: Record<string, any>): Promise<void> {
     const id = filter?.id;
     const slug = filter?.slug;
     const name = filter?.name;
@@ -1281,7 +965,6 @@ export class DatabaseStore {
       }
       delete this.persistenceData.productOverrides[id];
       this.products = this.products.filter(p => p.id !== id);
-      this.savePersistence();
     } else if (collection === 'categories' && (id || slug || name)) {
       const keysToAdd = [id, slug, name].filter(Boolean) as string[];
       for (const k of keysToAdd) {
@@ -1303,7 +986,6 @@ export class DatabaseStore {
         !this.isCategoryDeleted(c.slug) &&
         !this.isCategoryDeleted(c.name)
       );
-      this.savePersistence();
     } else if (collection === 'brands' && (id || slug || name)) {
       const keysToAdd = [id, slug, name].filter(Boolean) as string[];
       for (const k of keysToAdd) {
@@ -1325,29 +1007,31 @@ export class DatabaseStore {
         !this.isBrandDeleted(b.slug) &&
         !this.isBrandDeleted(b.name)
       );
-      this.savePersistence();
     } else if (collection === 'coupons' && id) {
       if (!this.persistenceData.deletedCouponIds.includes(id)) {
         this.persistenceData.deletedCouponIds.push(id);
       }
       delete this.persistenceData.couponOverrides[id];
       this.coupons = this.coupons.filter(c => c.id !== id);
-      this.savePersistence();
     } else if (collection === 'users' && id) {
       if (!this.persistenceData.deletedUserIds.includes(id)) {
         this.persistenceData.deletedUserIds.push(id);
       }
       delete this.persistenceData.userOverrides[id];
       this.users = this.users.filter(u => u.id !== id);
-      this.savePersistence();
     }
 
-    if (mongoService.getStatus().isConnected) {
-      mongoService.deleteDocument(collection, filter).catch(() => {});
+    await this.savePersistence();
+
+    try {
+      if (mongoService.getStatus().isConnected) {
+        await mongoService.deleteDocument(collection, filter);
+      }
+    } catch (err) {
+      console.warn(`[Store] Direct MongoDB deletion failed for ${collection}:`, err);
     }
   }
 
-  // Audit Logging helper
   public logAudit(actor: { id: string; name: string; role: string; ip?: string }, action: string, resource: string, resourceId?: string, details?: Record<string, any>) {
     const entry: AuditLog = {
       id: `aud-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
@@ -1362,11 +1046,10 @@ export class DatabaseStore {
       createdAt: new Date().toISOString()
     };
     this.auditLogs.unshift(entry);
-    this.persist('auditLogs', entry);
+    this.persist('auditLogs', entry).catch(() => {});
     return entry;
   }
 
-  // Notification helper
   public createNotification(type: AdminNotification['type'], title: string, message: string, link?: string) {
     const notif: AdminNotification = {
       id: `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
@@ -1378,7 +1061,7 @@ export class DatabaseStore {
       createdAt: new Date().toISOString()
     };
     this.notifications.unshift(notif);
-    this.persist('notifications', notif);
+    this.persist('notifications', notif).catch(() => {});
     return notif;
   }
 }
