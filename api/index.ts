@@ -2,18 +2,33 @@ import app from '../src/server/app.js';
 import { db } from '../src/server/db/store.js';
 import { mongoService } from '../src/server/db/mongodb.js';
 
-let isDbSyncInitiated = false;
+// Share one hydration promise across concurrent requests in the same Vercel
+// function instance. A boolean allowed request #2 to run while request #1 was
+// still hydrating MongoDB, which could expose the pre-hydration in-memory seed.
+let dbSyncPromise: Promise<void> | null = null;
+
+async function ensureDatabaseSynced() {
+  if (!process.env.MONGODB_URI) return;
+  if (!dbSyncPromise) {
+    dbSyncPromise = mongoService.syncWithStore(db)
+      .then((summary) => {
+        console.log('[Vercel Serverless] MongoDB startup hydration complete:', summary.summary);
+      })
+      .catch((err) => {
+        console.warn('[Vercel Serverless] MongoDB initial sync notice:', err);
+        // Allow a later invocation in the same warm instance to retry after a
+        // transient MongoDB/network failure.
+        dbSyncPromise = null;
+      });
+  }
+  await dbSyncPromise;
+}
 
 export default async function vercelApiHandler(req: any, res: any) {
-  // Trigger initial database synchronization with MongoDB in serverless environment
-  if (!isDbSyncInitiated && process.env.MONGODB_URI) {
-    isDbSyncInitiated = true;
-    try {
-      await mongoService.syncWithStore(db);
-    } catch (err) {
-      console.warn('[Vercel Serverless] MongoDB initial sync notice:', err);
-    }
-  }
+  // Wait for the single shared MongoDB hydration operation before serving the
+  // first request. This prevents cold-start requests from seeing stale seeded
+  // users/products before MongoDB tombstones and overrides are applied.
+  await ensureDatabaseSynced();
 
   // Handle URL reconstruction from Vercel rewrites or direct API requests
   const queryPath = typeof req.query?.path === 'string' ? req.query.path : '';
@@ -41,4 +56,3 @@ export default async function vercelApiHandler(req: any, res: any) {
 
   return app(req, res);
 }
-
