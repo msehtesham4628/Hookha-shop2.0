@@ -7,7 +7,11 @@ import fs from 'fs';
 const originalReadFileSync = fs.readFileSync.bind(fs);
 (fs as any).readFileSync = (filePath: any, ...args: any[]) => {
   const normalized = String(filePath || '').replace(/\\/g, '/');
-  if (/\/src\/server\/db\/products-[1-6]\.json$/i.test(normalized) || /\/src\/server\/db\/scrapedProducts\.json$/i.test(normalized)) {
+  // resolveDbFilePath() can return either an absolute path (/.../src/...) or
+  // a relative path (src/...). Match both forms so the large source catalogs
+  // are never parsed during a Vercel serverless cold start.
+  if (/(?:^|\/)src\/server\/db\/products-[1-6]\.json$/i.test(normalized) ||
+      /(?:^|\/)src\/server\/db\/scrapedProducts\.json$/i.test(normalized)) {
     return typeof args[0] === 'string' || (args[0] && typeof args[0] === 'object' && args[0].encoding)
       ? ''
       : Buffer.from('');
