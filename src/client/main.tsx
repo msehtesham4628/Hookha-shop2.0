@@ -2,7 +2,42 @@ import React, { Component, type ErrorInfo, type ReactNode } from 'react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.js';
+import { api } from './services/api.js';
 import './index.css';
+
+// Keep the admin catalog refresh on the same page/search/filter view.
+// AdminDashboardPage performs a broad load after mutations with only
+// { page: 1, limit, sort }. Remember the most recent fully-qualified catalog
+// query so that mutation refreshes don't unexpectedly jump back to page 1.
+const originalGetProducts = api.getProducts.bind(api);
+const catalogQueryStorageKey = 'fumare_admin_catalog_query';
+const catalogQueryKeys = new Set(['page', 'limit', 'search', 'category', 'brand', 'stock', 'stockFilter', 'sort', 'sortBy']);
+
+api.getProducts = async (params: Record<string, any> = {}) => {
+  const hasCatalogViewState = Object.keys(params).some((key) =>
+    ['search', 'category', 'brand', 'stock', 'stockFilter'].includes(key) && params[key] !== undefined && params[key] !== null && params[key] !== ''
+  ) || (params.page !== undefined && Number(params.page) > 1);
+
+  if (hasCatalogViewState) {
+    try {
+      localStorage.setItem(catalogQueryStorageKey, JSON.stringify(
+        Object.fromEntries(Object.entries(params).filter(([key]) => catalogQueryKeys.has(key)))
+      ));
+    } catch {}
+  } else if (params.page === 1 && !params.search && !params.category && !params.brand && !params.stock && !params.stockFilter) {
+    try {
+      const saved = localStorage.getItem(catalogQueryStorageKey);
+      if (saved) {
+        const remembered = JSON.parse(saved);
+        if (remembered && typeof remembered === 'object') {
+          params = { ...remembered, ...params };
+        }
+      }
+    } catch {}
+  }
+
+  return originalGetProducts(params);
+};
 
 // Defensive fallback for the homepage vape-brand section. The build scripts
 // normally inject this data into HomePage.tsx, but the app must never white-screen
