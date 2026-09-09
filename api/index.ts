@@ -91,18 +91,16 @@ export default async function vercelApiHandler(req: any, res: any) {
     normalizedRequestPath = req.url?.split('?')[0] || '';
   }
 
-  // Only admin APIs wait for the full MongoDB hydration. Login, registration,
-  // Google auth and public storefront requests never wait for catalog sync.
+  // Only admin APIs attempt MongoDB hydration. If MongoDB is temporarily
+  // unavailable, keep the request alive in the resilient local-cache mode
+  // instead of returning a blanket 503. Product mutations are mirrored to
+  // Google Sheets by app.ts, so the admin UI remains usable while MongoDB
+  // reconnects.
   if (normalizedRequestPath.startsWith('/api/admin')) {
     const mongoReady = await ensureAdminDatabaseReady();
     if (!mongoReady) {
-      return res.status(503).json({
-        success: false,
-        error: {
-          code: 'DATABASE_UNAVAILABLE',
-          message: 'MongoDB is unavailable. Please retry the administrative request.'
-        }
-      });
+      res.setHeader('X-MongoDB-Mode', 'local-cache');
+      console.warn('[Vercel Serverless] MongoDB unavailable; continuing admin request in local-cache mode.');
     }
   }
 
