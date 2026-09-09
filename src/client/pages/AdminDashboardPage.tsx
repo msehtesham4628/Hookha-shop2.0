@@ -88,13 +88,11 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const { user, userPermissions, logout, showToast, isAdmin, isAuthLoading, setUser } = useStore();
   const [activeTab, setActiveTab] = useState<'analytics' | 'products' | 'categories' | 'brands' | 'orders' | 'customers' | 'wholesale' | 'rbac' | 'audit' | 'settings'>('analytics');
 
-  // Admin Login State for Gateway
   const [adminLoginEmail, setAdminLoginEmail] = useState('');
   const [adminLoginPassword, setAdminLoginPassword] = useState('');
   const [adminLoginLoading, setAdminLoginLoading] = useState(false);
   const [adminLoginError, setAdminLoginError] = useState('');
 
-  // Admin Data State
   const [analytics, setAnalytics] = useState<any>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [totalProductsCount, setTotalProductsCount] = useState<number>(5590);
@@ -109,7 +107,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // MongoDB Cloud Storage State
   const [mongoStatus, setMongoStatus] = useState<{
     isConnected: boolean;
     isConnecting: boolean;
@@ -121,11 +118,9 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   } | null>(null);
   const [mongoSyncing, setMongoSyncing] = useState(false);
 
-  // Excel Export State
   const [exportingCustomers, setExportingCustomers] = useState(false);
   const [exportingInventory, setExportingInventory] = useState(false);
 
-  // Modals & Sub-forms
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isBulkUpdateModalOpen, setIsBulkUpdateModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -134,7 +129,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [selectedOrderForTracking, setSelectedOrderForTracking] = useState<Order | null>(null);
   const [newTrackingNumber, setNewTrackingNumber] = useState('');
 
-  // Category Modal & Form State
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [catName, setCatName] = useState('');
@@ -143,7 +137,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [catBannerUrl, setCatBannerUrl] = useState('');
   const [catSubcategoriesStr, setCatSubcategoriesStr] = useState('');
 
-  // Brand Modal & Form State
   const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   const [brandName, setBrandName] = useState('');
@@ -151,7 +144,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [brandDesc, setBrandDesc] = useState('');
   const [brandLogoUrl, setBrandLogoUrl] = useState('');
 
-  // Delete Confirmation Modal State (replaces blocked window.confirm)
   const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -161,7 +153,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     onConfirm: () => Promise<void> | void;
   } | null>(null);
 
-  // Product Form Fields
   const [prodName, setProdName] = useState('');
   const [prodSku, setProdSku] = useState('');
   const [prodBrand, setProdBrand] = useState('Alpha Hookah');
@@ -181,7 +172,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [prodIsActive, setProdIsActive] = useState(true);
   const [prodRating, setProdRating] = useState('5.0');
 
-  // Staff Form Fields
   const [staffEmail, setStaffEmail] = useState('');
   const [staffPassword, setStaffPassword] = useState('');
   const [staffFirstName, setStaffFirstName] = useState('');
@@ -189,7 +179,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [staffPhone, setStaffPhone] = useState('');
   const [staffRole, setStaffRole] = useState('PRODUCT_SPECIALIST');
 
-  // Staff Management State
   const [staffMembers, setStaffMembers] = useState<User[]>([]);
   const [isEditStaffModalOpen, setIsEditStaffModalOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<User | null>(null);
@@ -201,7 +190,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [editStaffPassword, setEditStaffPassword] = useState('');
   const [staffToDelete, setStaffToDelete] = useState<User | null>(null);
 
-  // Catalog Pagination & Filtering State
   const [catalogPage, setCatalogPage] = useState<number>(1);
   const [catalogLimit, setCatalogLimit] = useState<number>(50);
   const [catalogCategory, setCatalogCategory] = useState<string>('');
@@ -212,7 +200,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [catalogLoading, setCatalogLoading] = useState<boolean>(false);
   const [jumpPageInput, setJumpPageInput] = useState<string>('');
 
-  // Bulk Product Selection & Actions State
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
   const [bulkPriceAction, setBulkPriceAction] = useState<'none' | 'set' | 'increase_percent' | 'decrease_percent' | 'increase_fixed' | 'decrease_fixed'>('none');
@@ -224,21 +211,17 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [bulkBadgeAction, setBulkBadgeAction] = useState<'none' | 'set_sale' | 'remove_sale' | 'set_bestseller' | 'remove_bestseller' | 'set_featured' | 'remove_featured'>('none');
   const [isApplyingBulk, setIsApplyingBulk] = useState(false);
 
-  // Search & Filter within Admin Tables
   const [adminSearch, setAdminSearch] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('ALL');
 
-  // Real-Time Live Order Alert & Highlight
   const [highlightedOrderId, setHighlightedOrderId] = useState<string | null>(null);
 
-  // Store Settings Editable Fields
   const [settingStoreName, setSettingStoreName] = useState('World Hookah Market');
   const [settingTaxRate, setSettingTaxRate] = useState('8.25');
   const [settingFreeShipping, setSettingFreeShipping] = useState('150');
   const [settingAnnouncement, setSettingAnnouncement] = useState('Free shipping on luxury orders above $150 • Authentic Russian & European Hookahs');
   const [settingsSaving, setSettingsSaving] = useState(false);
 
-  // Synthesized notification chime for instant order feedback
   const playOrderChime = () => {
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
@@ -246,7 +229,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       const ctx = new AudioCtx();
       const now = ctx.currentTime;
 
-      // Note 1 (D5)
       const osc1 = ctx.createOscillator();
       const gain1 = ctx.createGain();
       osc1.type = 'sine';
@@ -258,7 +240,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       osc1.start(now);
       osc1.stop(now + 0.35);
 
-      // Note 2 (A5)
       const osc2 = ctx.createOscillator();
       const gain2 = ctx.createGain();
       osc2.type = 'sine';
@@ -269,9 +250,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       gain2.connect(ctx.destination);
       osc2.start(now + 0.12);
       osc2.stop(now + 0.65);
-    } catch {
-      // AudioContext autoplay restrictions are handled silently
-    }
+    } catch {}
   };
 
   const handleAdminLogin = async (e?: React.FormEvent, customEmail?: string, customPass?: string) => {
@@ -306,7 +285,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const loadAllAdminData = async () => {
     if (!isAdmin) return;
 
-    // Ensure valid administrative auth token is available before calling administrative APIs
     let token = localStorage.getItem('sultan_auth_token');
     let needsTokenRefresh = !token;
 
@@ -345,7 +323,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       }
     }
 
-    // If no valid session token exists, require manual authentication
     if (!token) {
       setLoading(false);
       return;
@@ -439,7 +416,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         setStaffMembers(Array.isArray(staffRes.data) ? staffRes.data : []);
       }
 
-      // Fetch MongoDB connection & collection metrics
       api.getMongoStatus().then(res => {
         if (res.success && res.data) setMongoStatus(res.data);
       }).catch(() => {});
@@ -512,14 +488,12 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
-  // Download Customer Data in Excel (.xlsx)
   const handleDownloadCustomersExcel = async () => {
     try {
       setExportingCustomers(true);
       showToast('Preparing verified customer registry for Excel download...', 'info');
 
       let targetCustomers = customers;
-      // If customer list in state is empty or partial, re-fetch
       if (!targetCustomers || targetCustomers.length === 0) {
         const res = await api.getAdminCustomers();
         if (res.success && res.data) {
@@ -543,7 +517,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
-  // Download Inventory & Stock Matrix in Excel (.xlsx)
   const handleDownloadInventoryExcel = async (onlyFiltered: boolean = false) => {
     try {
       setExportingInventory(true);
@@ -551,7 +524,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
 
       let targetProducts = onlyFiltered ? filteredProducts : products;
 
-      // If exporting full catalog and loaded products are fewer than total, fetch all products
       if (!onlyFiltered && (products.length < totalProductsCount || products.length === 0)) {
         try {
           const res = await api.getAdminProducts();
@@ -623,10 +595,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       return;
     }
 
-    // Initial load
     loadAllAdminData();
 
-    // 1. Listen for real-time broadcast events (same-window or other tabs/devices)
     const unsub = onSync('*', (event) => {
       if (event.type === 'ORDER_PLACED' && event.payload?.order) {
         const newOrd = event.payload.order;
@@ -639,17 +609,14 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         showToast(`🔔 New Order #${newOrd.orderNumber} placed by ${newOrd.customerName} ($${(newOrd.grandTotal || newOrd.total || 0).toFixed(2)})!`, 'success');
         setTimeout(() => setHighlightedOrderId(null), 10000);
 
-        // Refresh analytics metrics in background
         api.getAnalytics().then(aRes => {
           if (aRes.success && aRes.data) setAnalytics(aRes.data);
         }).catch(() => {});
       } else if (event.type === 'INVENTORY_UPDATED' || event.type === 'PRODUCT_UPDATED') {
-        // Refresh catalog inventory table
         fetchAdminCatalog();
       }
     });
 
-    // 2. Continuous real-time polling: Every 4 seconds, check for any newly placed orders
     const pollInterval = setInterval(async () => {
       try {
         const token = localStorage.getItem('sultan_auth_token');
@@ -662,7 +629,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
             const brandNewOrders = freshOrders.filter(o => !prevIds.has(o.id));
             if (brandNewOrders.length > 0) {
               const newest = brandNewOrders[0];
-              // Defer UI side effects outside state updater
               setTimeout(() => {
                 playOrderChime();
                 showToast(`🔔 New Order #${newest.orderNumber} placed by ${newest.customerName} ($${(newest.grandTotal || newest.total || 0).toFixed(2)})!`, 'success');
@@ -676,12 +642,9 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
             return freshOrders;
           });
         }
-      } catch {
-        // silent polling catch
-      }
+      } catch {}
     }, 4000);
 
-    // 3. Tab visibility / window focus listener (refreshes immediately when admin opens or focuses tab)
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
         const token = localStorage.getItem('sultan_auth_token');
@@ -705,14 +668,12 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     };
   }, [isAdmin, user?.email]);
 
-  // Fetch products whenever catalog pagination or filters change
   useEffect(() => {
     if (activeTab === 'products') {
       fetchAdminCatalog(catalogPage, catalogLimit, adminSearch, catalogCategory, catalogBrand, catalogStockFilter, catalogSortBy);
     }
   }, [catalogPage, catalogLimit, catalogCategory, catalogBrand, catalogStockFilter, catalogSortBy, activeTab]);
 
-  // Debounced search for catalog filter
   useEffect(() => {
     if (activeTab !== 'products') return;
     const timer = setTimeout(() => {
@@ -722,7 +683,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     return () => clearTimeout(timer);
   }, [adminSearch]);
 
-  // Derived stats with safe fallbacks
   const statsRevenue = analytics?.totalRevenue ?? analytics?.stats?.totalRevenue ?? orders.reduce((acc, o) => acc + (o.grandTotal || o.total || 0), 0);
   const statsOrders = analytics?.totalOrders ?? analytics?.stats?.totalOrders ?? orders.length;
   const statsAOV = analytics?.averageOrderValue ?? (statsOrders > 0 ? statsRevenue / statsOrders : 0);
@@ -735,7 +695,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     { flavor: 'Tangiers Noir Cane Mint', units: 68 }
   ];
 
-  // Handlers for Product Management
   const handleOpenCreateProduct = () => {
     setEditingProduct(null);
     setProdName('');
@@ -784,14 +743,15 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
 
   const handleQuickStockUpdate = async (product: Product, delta: number) => {
     const newStock = Math.max(0, product.stock + delta);
+    setProducts(prev => prev.map(p => p.id === product.id ? { ...p, stock: newStock } : p));
     try {
       const res = await api.updateProduct(product.id, { stock: newStock });
       if (res.success) {
-        setProducts(prev => prev.map(p => p.id === product.id ? { ...p, stock: newStock } : p));
         showToast(`${product.name}: stock updated to ${newStock}`, 'success');
         broadcastSync('INVENTORY_UPDATED', { productId: product.id, newStock });
       }
     } catch (err: any) {
+      setProducts(prev => prev.map(p => p.id === product.id ? { ...p, stock: product.stock } : p));
       showToast(err.message || 'Stock update failed', 'error');
     }
   };
@@ -845,7 +805,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         }
       }
       setIsProductModalOpen(false);
-      loadAllAdminData();
+      await loadAllAdminData();
+      await fetchAdminCatalog(catalogPage, catalogLimit, adminSearch, catalogCategory, catalogBrand, catalogStockFilter, catalogSortBy);
     } catch (err: any) {
       showToast(err.message || 'Failed to save product', 'error');
     }
@@ -859,6 +820,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       itemType: 'product',
       description: 'This will remove the product from the storefront catalog and permanently persist the deletion across restarts.',
       onConfirm: async () => {
+        setProducts(prev => prev.filter(p => p.id !== id));
         try {
           const res = await api.deleteProduct(id);
           if (res.success) {
@@ -868,12 +830,12 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           }
         } catch (err: any) {
           showToast(err.message || 'Failed to delete product', 'error');
+          loadAllAdminData();
         }
       }
     });
   };
 
-  // Handlers for Category Management
   const handleOpenCreateCategory = () => {
     setEditingCategory(null);
     setCatName('');
@@ -942,6 +904,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       itemType: 'category',
       description: `Are you sure you wish to delete category "${name}"? This category will be removed and changes saved to cloud persistence.`,
       onConfirm: async () => {
+        setCategories(prev => prev.filter(c => c.id !== id));
         try {
           const res = await api.deleteAdminCategory(id);
           if (res.success) {
@@ -951,12 +914,12 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           }
         } catch (err: any) {
           showToast(err.message || 'Failed to delete category', 'error');
+          loadAllAdminData();
         }
       }
     });
   };
 
-  // Handlers for Brand Management
   const handleOpenCreateBrand = () => {
     setEditingBrand(null);
     setBrandName('');
@@ -1017,6 +980,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       itemType: 'brand',
       description: `Are you sure you wish to delete brand "${name}"? This brand will be removed and changes saved to cloud persistence.`,
       onConfirm: async () => {
+        setBrands(prev => prev.filter(b => b.id !== id));
         try {
           const res = await api.deleteAdminBrand(id);
           if (res.success) {
@@ -1026,12 +990,12 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           }
         } catch (err: any) {
           showToast(err.message || 'Failed to delete brand', 'error');
+          loadAllAdminData();
         }
       }
     });
   };
 
-  // Order status update
   const handleUpdateOrderStatus = async (orderId: string, status: any) => {
     try {
       const res = await api.updateOrderStatus(orderId, status);
@@ -1061,7 +1025,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
-  // Wholesale application review
   const handleReviewWholesale = async (id: string, status: 'APPROVED' | 'REJECTED') => {
     try {
       const res = await api.reviewWholesaleApplication(id, status);
@@ -1074,7 +1037,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
-  // Staff Management Handlers
   const handleCreateStaff = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -1153,8 +1115,10 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
 
   const handleConfirmDeleteStaff = async () => {
     if (!staffToDelete) return;
+    const deletedId = staffToDelete.id;
+    setStaffMembers(prev => prev.filter(s => s.id !== deletedId));
     try {
-      const res = await api.deleteAdminStaff(staffToDelete.id);
+      const res = await api.deleteAdminStaff(deletedId);
       if (res.success) {
         showToast(`Staff account "${staffToDelete.email}" removed successfully`, 'success');
         setStaffToDelete(null);
@@ -1162,6 +1126,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       }
     } catch (err: any) {
       showToast(err.message || 'Failed to remove staff account', 'error');
+      loadAllAdminData();
     }
   };
 
@@ -1178,7 +1143,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
-  // Bulk Product Selection Helpers
   const handleToggleSelectProduct = (id: string) => {
     setSelectedProductIds(prev =>
       prev.includes(id) ? prev.filter(pId => pId !== id) : [...prev, id]
@@ -1193,7 +1157,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
-  // Bulk Stock Delta (+10, -5, etc.)
   const handleBulkQuickStock = async (delta: number) => {
     if (selectedProductIds.length === 0) return;
     try {
@@ -1213,7 +1176,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
-  // Bulk Delete
   const handleBulkDelete = async () => {
     if (selectedProductIds.length === 0) return;
     const count = selectedProductIds.length;
@@ -1240,7 +1202,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     });
   };
 
-  // Bulk Edit Modal Submission
   const handleApplyBulkEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedProductIds.length === 0) return;
@@ -1252,7 +1213,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         if (!prod) continue;
         const updatePayload: any = {};
 
-        // Price action
         if (bulkPriceAction === 'set' && bulkPriceValue) {
           updatePayload.price = Math.max(0, parseFloat(bulkPriceValue) || 0);
         } else if (bulkPriceAction === 'increase_percent' && bulkPriceValue) {
@@ -1269,7 +1229,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           updatePayload.price = Math.max(0, Math.round((prod.price - amt) * 100) / 100);
         }
 
-        // Stock action
         if (bulkStockAction === 'set' && bulkStockValue) {
           updatePayload.stock = Math.max(0, parseInt(bulkStockValue) || 0);
         } else if (bulkStockAction === 'increase' && bulkStockValue) {
@@ -1278,7 +1237,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           updatePayload.stock = Math.max(0, prod.stock - (parseInt(bulkStockValue) || 0));
         }
 
-        // Category & Brand
         if (bulkCategoryAction) {
           updatePayload.category = bulkCategoryAction;
         }
@@ -1286,7 +1244,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           updatePayload.brand = bulkBrandAction;
         }
 
-        // Badges
         if (bulkBadgeAction === 'set_sale') updatePayload.isOnSale = true;
         if (bulkBadgeAction === 'remove_sale') updatePayload.isOnSale = false;
         if (bulkBadgeAction === 'set_bestseller') updatePayload.isBestSeller = true;
@@ -1323,7 +1280,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     return true;
   });
 
-  // Server-side paginated products for catalog view
   const filteredProducts = products;
 
   if (isAuthLoading) {
@@ -1337,17 +1293,15 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     );
   }
 
-  // Gateway Login Screen
   if (!isAdmin) {
     return (
       <div className="w-full min-h-screen bg-stone-950 text-stone-100 flex flex-col justify-between p-4 sm:p-8">
         <div className="max-w-md w-full mx-auto my-auto py-12 space-y-6">
-          {/* Header */}
           <div className="text-center space-y-2.5">
             <div className="w-12 h-12 bg-amber-950/80 border border-amber-600/40 text-amber-400 rounded-xs flex items-center justify-center mx-auto shadow-lg">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            
+
             <div className="inline-flex items-center gap-2 bg-stone-900 border border-amber-900/60 px-3 py-1 rounded-full text-[10px] font-mono text-amber-400">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>Operations Portal: domainname.com/dashboard</span>
@@ -1361,7 +1315,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
             </p>
           </div>
 
-          {/* Form */}
           <form onSubmit={(e) => handleAdminLogin(e)} className="bg-stone-900 border border-stone-800 rounded-xs p-6 space-y-4 shadow-xl">
             {adminLoginError && (
               <div className="bg-rose-950/80 border border-rose-800 text-rose-200 p-3 rounded-xs text-xs flex items-center gap-2">
@@ -1413,7 +1366,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
             </button>
           </form>
 
-          {/* Back to storefront */}
           <div className="text-center">
             <button
               type="button"
@@ -1430,7 +1382,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
 
   return (
     <div className="w-full bg-stone-100 min-h-screen text-stone-900 flex flex-col">
-      {/* Top Admin Bar */}
       <header className="bg-stone-900 text-stone-100 border-b border-stone-800 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-md">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-xs bg-amber-800 flex items-center justify-center font-bold text-amber-100 font-serif text-sm">
@@ -1445,7 +1396,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </div>
 
         <div className="flex items-center gap-3 text-xs">
-          {/* MongoDB Cloud State Pill & Sync Trigger */}
           <div className="flex items-center gap-2 bg-stone-800/90 border border-stone-700 px-2.5 py-1.5 rounded-xs">
             <Database className={`w-3.5 h-3.5 ${mongoStatus?.isConnected ? 'text-emerald-400' : 'text-amber-400'}`} />
             <span className="text-[11px] text-stone-200 font-medium font-mono hidden sm:inline">
@@ -1484,7 +1434,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </div>
       </header>
 
-      {/* Mobile Tab Scroller */}
       <div className="md:hidden bg-white border-b border-stone-200 px-2 py-2 flex gap-1 overflow-x-auto">
         <button
           onClick={() => setActiveTab('analytics')}
@@ -1548,10 +1497,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </button>
       </div>
 
-      {/* Main Admin Body */}
       <div className="flex-1 flex overflow-hidden">
-        
-        {/* Left Admin Navigation Sidebar */}
         <aside className="w-64 bg-white border-r border-stone-200 p-4 space-y-1 shrink-0 hidden md:block">
           <div className="text-[10px] uppercase font-bold tracking-widest text-stone-400 px-3 mb-2">
             Operations & Metrics
@@ -1701,9 +1647,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           </button>
         </aside>
 
-        {/* Content Workspace Area */}
         <main className="flex-1 p-4 sm:p-6 overflow-y-auto max-w-7xl">
-          
           {loading ? (
             <div className="w-full h-96 flex flex-col items-center justify-center text-stone-500">
               <div className="w-8 h-8 border-2 border-amber-900/30 border-t-amber-900 rounded-full animate-spin mb-3" />
@@ -1711,7 +1655,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
             </div>
           ) : (
             <>
-              {/* TAB 1: ANALYTICS */}
               {activeTab === 'analytics' && (
                 <div className="space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1750,7 +1693,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </div>
                   </div>
 
-                  {/* KPI Cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="bg-white border border-stone-200 p-5 rounded-xs shadow-xs">
                       <span className="text-[11px] uppercase font-bold text-stone-500 tracking-wider">Gross Revenue</span>
@@ -1809,7 +1751,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </div>
                   </div>
 
-                  {/* Top Selling Flavors & Hookahs */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="bg-white border border-stone-200 p-6 rounded-xs shadow-xs">
                       <h3 className="font-serif text-base font-bold text-stone-900 mb-4">Top Shisha Flavors & Blends</h3>
@@ -1851,7 +1792,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
               )}
 
-              {/* TAB 2: PRODUCT MANAGEMENT */}
               {activeTab === 'products' && (
                 <div className="space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1904,9 +1844,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </div>
                   </div>
 
-                  {/* Search Bar & Catalog Filters */}
                   <div className="bg-white border border-stone-200 p-4 rounded-xs flex flex-col gap-3 shadow-2xs">
-                    {/* Row 1: Search bar & Counter & Export */}
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3 flex-1 bg-stone-50 border border-stone-200 px-3 py-2 rounded-xs">
                         <Search className="w-4 h-4 text-stone-400 shrink-0" />
@@ -1951,9 +1889,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                       </div>
                     </div>
 
-                    {/* Row 2: Deep Filtering & Sorting Dropdowns */}
                     <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-stone-100 text-xs">
-                      {/* Filter by Category */}
                       <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-2.5 py-1.5 rounded-xs">
                         <span className="text-[11px] text-stone-500 font-medium">Category:</span>
                         <select
@@ -1971,7 +1907,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                         </select>
                       </div>
 
-                      {/* Filter by Brand */}
                       <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-2.5 py-1.5 rounded-xs">
                         <span className="text-[11px] text-stone-500 font-medium">Brand:</span>
                         <select
@@ -1989,7 +1924,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                         </select>
                       </div>
 
-                      {/* Filter by Stock Status */}
                       <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-2.5 py-1.5 rounded-xs">
                         <span className="text-[11px] text-stone-500 font-medium">Stock:</span>
                         <select
@@ -2007,7 +1941,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                         </select>
                       </div>
 
-                      {/* Sort Order */}
                       <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-2.5 py-1.5 rounded-xs">
                         <span className="text-[11px] text-stone-500 font-medium">Sort:</span>
                         <select
@@ -2028,7 +1961,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                         </select>
                       </div>
 
-                      {/* Items per page */}
                       <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-2.5 py-1.5 rounded-xs ml-auto">
                         <span className="text-[11px] text-stone-500 font-medium">Per Page:</span>
                         <select
@@ -2049,7 +1981,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                         </select>
                       </div>
 
-                      {/* Reset Filters */}
                       {(adminSearch || catalogCategory || catalogBrand || catalogStockFilter !== 'all' || catalogSortBy !== 'newest') && (
                         <button
                           type="button"
@@ -2069,7 +2000,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </div>
                   </div>
 
-                  {/* Bulk Selection Actions Bar */}
                   {selectedProductIds.length > 0 && (
                     <div className="bg-stone-900 text-white px-4 py-3 rounded-xs flex flex-wrap items-center justify-between gap-3 shadow-md animate-in fade-in">
                       <div className="flex items-center gap-3">
@@ -2122,7 +2052,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </div>
                   )}
 
-                  {/* Products Table */}
                   <div className="bg-white border border-stone-200 rounded-xs overflow-x-auto shadow-xs">
                     <table className="w-full text-left text-xs min-w-[750px]">
                       <thead className="bg-stone-50 border-b border-stone-200 text-stone-600 uppercase font-semibold text-[10px] tracking-wider">
@@ -2149,127 +2078,125 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                         {filteredProducts.map((prod) => {
                           const isSelected = selectedProductIds.includes(prod.id);
                           return (
-                          <tr key={prod.id} className={`transition-colors ${isSelected ? 'bg-amber-50/50' : 'hover:bg-stone-50/70'}`}>
-                            <td className="py-3 px-3 text-center">
-                              <input
-                                type="checkbox"
-                                checked={isSelected}
-                                onChange={() => handleToggleSelectProduct(prod.id)}
-                                className="rounded-xs border-stone-300 text-amber-900 focus:ring-amber-900 cursor-pointer"
-                              />
-                            </td>
-                            <td className="py-3 px-4 flex items-center gap-3">
-                              <div className="w-11 h-11 bg-stone-100 border border-stone-200 rounded-xs p-1 shrink-0 flex items-center justify-center overflow-hidden">
-                                <img src={prod.images[0]?.url} alt={prod.name} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
-                              </div>
-                              <div className="space-y-0.5">
-                                <p className="font-bold text-stone-900">{prod.name}</p>
-                                <div className="flex flex-wrap items-center gap-1.5">
-                                  <span className="text-[10px] text-stone-400 font-mono">{prod.sku}</span>
-                                  {prod.isBestSeller && (
-                                    <span className="bg-amber-100 text-amber-900 text-[9px] font-bold px-1.5 py-0.2 rounded-xs">Best Seller</span>
-                                  )}
-                                  {prod.isOnSale && (
-                                    <span className="bg-rose-100 text-rose-800 text-[9px] font-bold px-1.5 py-0.2 rounded-xs">Sale</span>
-                                  )}
-                                  {prod.isFeatured && (
-                                    <span className="bg-purple-100 text-purple-900 text-[9px] font-bold px-1.5 py-0.2 rounded-xs">Featured</span>
-                                  )}
+                            <tr key={prod.id} className={`transition-colors ${isSelected ? 'bg-amber-50/50' : 'hover:bg-stone-50/70'}`}>
+                              <td className="py-3 px-3 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={() => handleToggleSelectProduct(prod.id)}
+                                  className="rounded-xs border-stone-300 text-amber-900 focus:ring-amber-900 cursor-pointer"
+                                />
+                              </td>
+                              <td className="py-3 px-4 flex items-center gap-3">
+                                <div className="w-11 h-11 bg-stone-100 border border-stone-200 rounded-xs p-1 shrink-0 flex items-center justify-center overflow-hidden">
+                                  <img src={prod.images[0]?.url} alt={prod.name} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
                                 </div>
-                              </div>
-                            </td>
-                            <td className="py-3 px-4 text-stone-700">
-                              <div>{prod.category}</div>
-                              {prod.subcategory && (
-                                <span className="text-[10px] text-stone-400">{prod.subcategory}</span>
-                              )}
-                            </td>
-                            <td className="py-3 px-4 font-semibold text-amber-900">{prod.brand}</td>
-                            <td className="py-3 px-4 font-mono">
-                              {prod.salePrice ? (
-                                <div>
-                                  <span className="font-bold text-rose-700">${prod.salePrice.toFixed(2)}</span>
-                                  <span className="text-[10px] text-stone-400 line-through ml-1.5">${prod.price.toFixed(2)}</span>
+                                <div className="space-y-0.5">
+                                  <p className="font-bold text-stone-900">{prod.name}</p>
+                                  <div className="flex flex-wrap items-center gap-1.5">
+                                    <span className="text-[10px] text-stone-400 font-mono">{prod.sku}</span>
+                                    {prod.isBestSeller && (
+                                      <span className="bg-amber-100 text-amber-900 text-[9px] font-bold px-1.5 py-0.2 rounded-xs">Best Seller</span>
+                                    )}
+                                    {prod.isOnSale && (
+                                      <span className="bg-rose-100 text-rose-800 text-[9px] font-bold px-1.5 py-0.2 rounded-xs">Sale</span>
+                                    )}
+                                    {prod.isFeatured && (
+                                      <span className="bg-purple-100 text-purple-900 text-[9px] font-bold px-1.5 py-0.2 rounded-xs">Featured</span>
+                                    )}
+                                  </div>
                                 </div>
-                              ) : (
-                                <span className="font-bold text-stone-900">${prod.price.toFixed(2)}</span>
-                              )}
-                            </td>
-                            <td className="py-3 px-4">
-                              <div className="flex items-center gap-1.5">
+                              </td>
+                              <td className="py-3 px-4 text-stone-700">
+                                <div>{prod.category}</div>
+                                {prod.subcategory && (
+                                  <span className="text-[10px] text-stone-400">{prod.subcategory}</span>
+                                )}
+                              </td>
+                              <td className="py-3 px-4 font-semibold text-amber-900">{prod.brand}</td>
+                              <td className="py-3 px-4 font-mono">
+                                {prod.salePrice ? (
+                                  <div>
+                                    <span className="font-bold text-rose-700">${prod.salePrice.toFixed(2)}</span>
+                                    <span className="text-[10px] text-stone-400 line-through ml-1.5">${prod.price.toFixed(2)}</span>
+                                  </div>
+                                ) : (
+                                  <span className="font-bold text-stone-900">${prod.price.toFixed(2)}</span>
+                                )}
+                              </td>
+                              <td className="py-3 px-4">
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuickStockUpdate(prod, -1)}
+                                    className="w-5 h-5 flex items-center justify-center bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xs font-mono font-bold cursor-pointer transition-colors"
+                                    title="Decrease stock by 1"
+                                  >
+                                    -
+                                  </button>
+                                  <span className={`px-2 py-0.5 rounded-xs font-mono font-bold text-center min-w-[32px] ${prod.stock <= (prod.lowStockThreshold || 5) ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}`}>
+                                    {prod.stock}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuickStockUpdate(prod, 1)}
+                                    className="w-5 h-5 flex items-center justify-center bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xs font-mono font-bold cursor-pointer transition-colors"
+                                    title="Increase stock by 1"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </td>
+                              <td className="py-3 px-4 text-stone-600">{prod.rating ? prod.rating.toFixed(1) : '5.0'} ★ ({prod.reviewCount || 0})</td>
+                              <td className="py-3 px-4 text-right space-x-2">
+                                <button
+                                  onClick={() => handleOpenEditProduct(prod)}
+                                  className="p-1.5 bg-stone-100 hover:bg-amber-900 hover:text-white text-stone-700 rounded-xs transition-colors cursor-pointer"
+                                  title="Edit Product Specifications"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => requestDeleteProduct(prod.id, prod.name)}
+                                  className="p-1.5 bg-stone-100 hover:bg-rose-600 hover:text-white text-stone-400 rounded-xs transition-colors cursor-pointer"
+                                  title="Decommission Product"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                        {filteredProducts.length === 0 && (
+                          <tr>
+                            <td colSpan={8} className="py-12 text-center text-stone-500">
+                              <Package className="w-8 h-8 text-stone-300 mx-auto mb-2" />
+                              <p className="font-semibold text-stone-700">No products found matching the criteria.</p>
+                              <p className="text-xs text-stone-400 mt-0.5">Try adjusting your search terms or clearing current filter selections.</p>
+                              {(adminSearch || catalogCategory || catalogBrand || catalogStockFilter !== 'all') && (
                                 <button
                                   type="button"
-                                  onClick={() => handleQuickStockUpdate(prod, -1)}
-                                  className="w-5 h-5 flex items-center justify-center bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xs font-mono font-bold cursor-pointer transition-colors"
-                                  title="Decrease stock by 1"
+                                  onClick={() => {
+                                    setAdminSearch('');
+                                    setCatalogCategory('');
+                                    setCatalogBrand('');
+                                    setCatalogStockFilter('all');
+                                    setCatalogSortBy('newest');
+                                    setCatalogPage(1);
+                                  }}
+                                  className="mt-3 text-xs bg-stone-100 hover:bg-stone-200 text-stone-800 font-semibold px-3 py-1.5 rounded-xs transition-colors cursor-pointer"
                                 >
-                                  -
+                                  Reset All Filters
                                 </button>
-                                <span className={`px-2 py-0.5 rounded-xs font-mono font-bold text-center min-w-[32px] ${prod.stock <= (prod.lowStockThreshold || 5) ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}`}>
-                                  {prod.stock}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => handleQuickStockUpdate(prod, 1)}
-                                  className="w-5 h-5 flex items-center justify-center bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xs font-mono font-bold cursor-pointer transition-colors"
-                                  title="Increase stock by 1"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </td>
-                            <td className="py-3 px-4 text-stone-600">{prod.rating ? prod.rating.toFixed(1) : '5.0'} ★ ({prod.reviewCount || 0})</td>
-                            <td className="py-3 px-4 text-right space-x-2">
-                              <button
-                                onClick={() => handleOpenEditProduct(prod)}
-                                className="p-1.5 bg-stone-100 hover:bg-amber-900 hover:text-white text-stone-700 rounded-xs transition-colors cursor-pointer"
-                                title="Edit Product Specifications"
-                              >
-                                <Edit2 className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                onClick={() => requestDeleteProduct(prod.id, prod.name)}
-                                className="p-1.5 bg-stone-100 hover:bg-rose-600 hover:text-white text-stone-400 rounded-xs transition-colors cursor-pointer"
-                                title="Decommission Product"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                              )}
                             </td>
                           </tr>
-                        );
-                      })}
-                      {filteredProducts.length === 0 && (
-                        <tr>
-                          <td colSpan={8} className="py-12 text-center text-stone-500">
-                            <Package className="w-8 h-8 text-stone-300 mx-auto mb-2" />
-                            <p className="font-semibold text-stone-700">No products found matching the criteria.</p>
-                            <p className="text-xs text-stone-400 mt-0.5">Try adjusting your search terms or clearing current filter selections.</p>
-                            {(adminSearch || catalogCategory || catalogBrand || catalogStockFilter !== 'all') && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setAdminSearch('');
-                                  setCatalogCategory('');
-                                  setCatalogBrand('');
-                                  setCatalogStockFilter('all');
-                                  setCatalogSortBy('newest');
-                                  setCatalogPage(1);
-                                }}
-                                className="mt-3 text-xs bg-stone-100 hover:bg-stone-200 text-stone-800 font-semibold px-3 py-1.5 rounded-xs transition-colors cursor-pointer"
-                              >
-                                Reset All Filters
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      )}
+                        )}
                       </tbody>
                     </table>
                   </div>
 
-                  {/* Catalog Pagination Controls */}
                   <div className="bg-white border border-stone-200 px-4 py-3 rounded-xs flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
-                    {/* Left: Range and loading */}
                     <div className="text-xs text-stone-600 flex items-center gap-2">
                       <span>
                         Showing <strong className="text-stone-900 font-mono">{totalProductsCount === 0 ? 0 : (catalogPage - 1) * (catalogLimit === -1 ? totalProductsCount : catalogLimit) + 1}</strong>
@@ -2285,7 +2212,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                       )}
                     </div>
 
-                    {/* Center: Pagination controls */}
                     {catalogLimit !== -1 && catalogTotalPages > 1 && (
                       <div className="flex items-center gap-1">
                         <button
@@ -2299,7 +2225,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                           <span className="hidden sm:inline">Prev</span>
                         </button>
 
-                        {/* Page number buttons */}
                         <div className="flex items-center gap-1">
                           {getCatalogPageNumbers(catalogPage, catalogTotalPages).map((p, idx) => (
                             p === '...' ? (
@@ -2335,7 +2260,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                       </div>
                     )}
 
-                    {/* Right: Quick jump and page size */}
                     <div className="flex items-center gap-3">
                       {catalogLimit !== -1 && catalogTotalPages > 1 && (
                         <form
@@ -2393,7 +2317,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
               )}
 
-              {/* TAB: CATEGORIES MANAGEMENT */}
               {activeTab === 'categories' && (
                 <div className="space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -2415,7 +2338,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </button>
                   </div>
 
-                  {/* Search categories */}
                   <div className="bg-white border border-stone-200 p-4 rounded-xs flex items-center gap-3 shadow-2xs">
                     <Search className="w-4 h-4 text-stone-400" />
                     <input
@@ -2427,7 +2349,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     />
                   </div>
 
-                  {/* Categories Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {categories
                       .filter(c => !adminSearch || c.name.toLowerCase().includes(adminSearch.toLowerCase()) || (c.subcategories && c.subcategories.some(s => s.toLowerCase().includes(adminSearch.toLowerCase()))))
@@ -2461,7 +2382,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                                 <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed">
                                   {cat.description || 'No description provided.'}
                                 </p>
-                                
+
                                 {cat.subcategories && cat.subcategories.length > 0 && (
                                   <div className="pt-2">
                                     <span className="text-[10px] font-bold uppercase text-stone-400 tracking-wider block mb-1.5">Subcategories</span>
@@ -2509,7 +2430,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
               )}
 
-              {/* TAB: BRANDS MANAGEMENT */}
               {activeTab === 'brands' && (
                 <div className="space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -2531,7 +2451,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </button>
                   </div>
 
-                  {/* Search brands */}
                   <div className="bg-white border border-stone-200 p-4 rounded-xs flex items-center gap-3 shadow-2xs">
                     <Search className="w-4 h-4 text-stone-400" />
                     <input
@@ -2543,7 +2462,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     />
                   </div>
 
-                  {/* Brands Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {brands
                       .filter(b => !adminSearch || b.name.toLowerCase().includes(adminSearch.toLowerCase()) || (b.origin && b.origin.toLowerCase().includes(adminSearch.toLowerCase())))
@@ -2612,7 +2530,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
               )}
 
-              {/* TAB 3: ORDERS MANAGEMENT */}
               {activeTab === 'orders' && (
                 <div className="space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -2638,7 +2555,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </div>
                   </div>
 
-                  {/* Orders Table */}
                   <div className="bg-white border border-stone-200 rounded-xs overflow-x-auto shadow-xs">
                     <table className="w-full text-left text-xs min-w-[750px]">
                       <thead className="bg-stone-50 border-b border-stone-200 text-stone-600 uppercase font-semibold text-[10px] tracking-wider">
@@ -2720,7 +2636,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
               )}
 
-              {/* TAB 4: CUSTOMERS */}
               {activeTab === 'customers' && (
                 <div className="space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -2805,7 +2720,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
               )}
 
-              {/* TAB 5: WHOLESALE APPLICATIONS */}
               {activeTab === 'wholesale' && (
                 <div className="space-y-6">
                   <div>
@@ -2877,10 +2791,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
               )}
 
-              {/* TAB 6: RBAC & STAFF */}
               {activeTab === 'rbac' && (
                 <div className="space-y-8">
-                  {/* Staff Users Management Header */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <h2 className="font-serif text-2xl font-bold text-stone-900">Staff User Details & Management</h2>
@@ -2895,7 +2807,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </button>
                   </div>
 
-                  {/* Staff Accounts Table */}
                   <div className="bg-white border border-stone-200 rounded-xs overflow-x-auto shadow-xs">
                     <div className="px-5 py-3 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
                       <h3 className="font-serif text-sm font-bold text-stone-900 flex items-center gap-2">
@@ -3015,7 +2926,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </table>
                   </div>
 
-                  {/* System Roles Matrix */}
                   <div className="space-y-3">
                     <div className="border-b border-stone-200 pb-2">
                       <h3 className="font-serif text-lg font-bold text-stone-900">Roles & Permission Scopes Matrix</h3>
@@ -3046,7 +2956,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
               )}
 
-              {/* TAB 7: AUDIT LOGS */}
               {activeTab === 'audit' && (
                 <div className="space-y-6">
                   <div>
@@ -3089,7 +2998,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
               )}
 
-              {/* TAB 8: STORE SETTINGS */}
               {activeTab === 'settings' && (
                 <div className="bg-white border border-stone-200 rounded-xs p-6 shadow-xs max-w-2xl space-y-6">
                   <h2 className="font-serif text-xl font-bold text-stone-900 border-b border-stone-100 pb-3">
@@ -3156,7 +3064,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </button>
                   </form>
 
-                  {/* MongoDB Cluster & Storage Card */}
                   <div className="border-t border-stone-200 pt-6 space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -3240,11 +3147,9 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
               )}
             </>
           )}
-
         </main>
       </div>
 
-      {/* CREATE / EDIT PRODUCT MODAL */}
       {isProductModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
@@ -3535,7 +3440,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </div>
       )}
 
-      {/* TRACKING ASSIGN MODAL */}
       {isTrackingModalOpen && (
         <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-md w-full p-6 space-y-4">
@@ -3571,7 +3475,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </div>
       )}
 
-      {/* CREATE STAFF MODAL */}
       {isStaffModalOpen && (
         <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-md w-full p-6 space-y-4">
@@ -3660,7 +3563,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </div>
       )}
 
-      {/* EDIT STAFF MODAL */}
       {isEditStaffModalOpen && editingStaff && (
         <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-md w-full p-6 space-y-4">
@@ -3776,7 +3678,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </div>
       )}
 
-      {/* CONFIRM DELETE STAFF MODAL */}
       {staffToDelete && (
         <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-rose-200 rounded-sm shadow-2xl max-w-md w-full p-6 space-y-4">
@@ -3826,7 +3727,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </div>
       )}
 
-      {/* IN-APP CONFIRM DELETE MODAL (Replaces blocked window.confirm) */}
       {deleteConfirmModal && (
         <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-md w-full p-6 space-y-4">
@@ -3879,7 +3779,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </div>
       )}
 
-      {/* BULK EDIT PRODUCT SPECIFICATIONS MODAL */}
       {isBulkEditModalOpen && (
         <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-lg w-full p-6 space-y-4 my-8">
@@ -3903,7 +3802,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
             </div>
 
             <form onSubmit={handleApplyBulkEdit} className="space-y-4 text-xs">
-              {/* Price Action */}
               <div className="bg-stone-50 p-3 rounded-xs border border-stone-200 space-y-2">
                 <label className="block font-bold text-stone-800 uppercase tracking-wider text-[10px]">
                   Price Adjustment
@@ -3936,7 +3834,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
               </div>
 
-              {/* Stock Inventory Action */}
               <div className="bg-stone-50 p-3 rounded-xs border border-stone-200 space-y-2">
                 <label className="block font-bold text-stone-800 uppercase tracking-wider text-[10px]">
                   Inventory Stock Level
@@ -3966,7 +3863,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
               </div>
 
-              {/* Category & Brand Reassignment */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">Assign Category</label>
@@ -3996,7 +3892,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
               </div>
 
-              {/* Badges / Visibility */}
               <div>
                 <label className="block font-semibold text-stone-700 mb-1">Promotional Badges</label>
                 <select
@@ -4043,7 +3938,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </div>
       )}
 
-      {/* CREATE / EDIT CATEGORY MODAL */}
       {isCategoryModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-lg w-full p-6 space-y-4">
@@ -4137,7 +4031,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </div>
       )}
 
-      {/* CREATE / EDIT BRAND MODAL */}
       {isBrandModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-lg w-full p-6 space-y-4">
@@ -4221,7 +4114,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </div>
       )}
 
-      {/* BULK CSV / JSON STOCK & PRICE UPDATE MODAL */}
       {isBulkUpdateModalOpen && (
         <BulkProductUpdateModal
           isOpen={isBulkUpdateModalOpen}
@@ -4234,7 +4126,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           }}
         />
       )}
-
     </div>
   );
 };
