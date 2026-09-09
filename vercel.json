@@ -8,18 +8,15 @@
       "maxDuration": 30
     }
   },
-  "rewrites": [
+  "crons": [
     {
-      "source": "/api",
-      "destination": "/api/index"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index?path=/$1"
-    },
-    {
-      "source": "/((?!api).*)",
-      "destination": "/index.html"
+      "path": "/api/admin/google-sheet-sync",
+      "schedule": "*/5 * * * *"
     }
+  ],
+  "rewrites": [
+    { "source": "/api", "destination": "/api/index" },
+    { "source": "/api/(.*)", "destination": "/api/index?path=/$1" },
+    { "source": "/((?!api).*)", "destination": "/index.html" }
   ]
 }
