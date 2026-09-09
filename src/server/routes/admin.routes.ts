@@ -820,6 +820,7 @@ router.put('/categories/:id', requirePermission('categories.update'), (req: Auth
   if (Array.isArray(subcategories)) cat.subcategories = subcategories;
   if (isActive !== undefined) cat.isActive = isActive;
 
+  db.persist('categories', cat);
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_UPDATED_CATEGORY', 'CATEGORY', cat.id, { name: cat.name });
   return res.json({ success: true, data: cat });
 });
@@ -833,7 +834,7 @@ router.delete('/categories/:id', requirePermission('categories.delete'), (req: A
   }
 
   const removed = db.categories.splice(index, 1)[0];
-  db.deletePersisted('categories', { id: removed.id });
+  db.deletePersisted('categories', { id: removed.id, slug: removed.slug });
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_DELETED_CATEGORY', 'CATEGORY', id, { name: removed.name });
   return res.json({ success: true, message: `Category "${removed.name}" deleted successfully` });
 });
@@ -883,6 +884,7 @@ router.put('/brands/:id', requirePermission('brands.update'), (req: Authenticate
   if (logoUrl !== undefined) brand.logoUrl = logoUrl;
   if (isActive !== undefined) brand.isActive = isActive;
 
+  db.persist('brands', brand);
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_UPDATED_BRAND', 'BRAND', brand.id, { name: brand.name });
   return res.json({ success: true, data: brand });
 });
@@ -896,7 +898,7 @@ router.delete('/brands/:id', requirePermission('brands.delete'), (req: Authentic
   }
 
   const removed = db.brands.splice(index, 1)[0];
-  db.deletePersisted('brands', { id: removed.id });
+  db.deletePersisted('brands', { id: removed.id, slug: removed.slug });
   db.logAudit({ id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role }, 'ADMIN_DELETED_BRAND', 'BRAND', id, { name: removed.name });
   return res.json({ success: true, message: `Brand "${removed.name}" deleted successfully` });
 });
@@ -1093,6 +1095,7 @@ router.put('/roles/:id', requirePermission('roles.update'), (req: AuthenticatedR
     role.permissions = role.code === 'SUPER_ADMIN' ? db.permissions.map(p => p.key) : permissions;
   }
   role.updatedAt = new Date().toISOString();
+  db.persist('roles', role);
 
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },

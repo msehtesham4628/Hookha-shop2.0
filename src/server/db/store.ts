@@ -29,6 +29,12 @@ import {
   INITIAL_REVIEWS
 } from './seedData.js';
 import { mongoService } from './mongodb.js';
+import {
+  StorePersistenceData,
+  getDefaultPersistenceData,
+  loadPersistenceData,
+  savePersistenceData
+} from './persistence.js';
 
 interface StoredOTP {
   identifier: string; // email or phone
@@ -188,8 +194,35 @@ export class DatabaseStore {
   public newsletterSubscribers: { email: string; createdAt: string }[] = [];
   public contactMessages: { id: string; name: string; email: string; phone?: string; subject: string; message: string; createdAt: string }[] = [];
   public mediaLibrary: { id: string; url: string; alt: string; category: string; size: string; createdAt: string }[] = [];
+  public persistenceData: StorePersistenceData = getDefaultPersistenceData();
 
   private isInitialized = false;
+
+  public loadPersistence() {
+    this.persistenceData = loadPersistenceData();
+  }
+
+  public savePersistence() {
+    savePersistenceData(this.persistenceData);
+  }
+
+  public isCategoryDeleted(slugOrId: string): boolean {
+    if (!slugOrId) return false;
+    const target = slugOrId.toLowerCase().trim();
+    const deletedSet = new Set(this.persistenceData.deletedCategoryIds.map(s => s.toLowerCase().trim()));
+    if (deletedSet.has(target)) return true;
+    if (deletedSet.has(`cat-${target}`)) return true;
+    return deletedSet.has(target.replace(/^cat-/, ''));
+  }
+
+  public isBrandDeleted(slugOrId: string): boolean {
+    if (!slugOrId) return false;
+    const target = slugOrId.toLowerCase().trim();
+    const deletedSet = new Set(this.persistenceData.deletedBrandIds.map(s => s.toLowerCase().trim()));
+    if (deletedSet.has(target)) return true;
+    if (deletedSet.has(`brand-${target}`)) return true;
+    return deletedSet.has(target.replace(/^brand-/, ''));
+  }
 
   constructor() {
     this.seedDefaultUsers();
@@ -412,14 +445,35 @@ export class DatabaseStore {
       console.warn('[Store] Could not load scrapedProducts.json:', e);
     }
 
+    // Load persisted store overrides before assembling the catalog
+    this.loadPersistence();
+
     // Use the imported catalog when available; demo products are only a fallback.
     const productMap = new Map<string, Product>();
     const productsToLoad = catalogProducts.length > 0 ? catalogProducts : INITIAL_PRODUCTS;
     for (const p of productsToLoad) {
       productMap.set(p.id, p);
     }
+
+    // Filter out deleted products
+    const deletedProductSet = new Set(this.persistenceData.deletedProductIds);
+    for (const deletedId of deletedProductSet) {
+      productMap.delete(deletedId);
+    }
+
+    // Apply product overrides (edits & newly created products)
+    for (const [id, override] of Object.entries(this.persistenceData.productOverrides)) {
+      if (deletedProductSet.has(id)) continue;
+      if (productMap.has(id)) {
+        const existing = productMap.get(id)!;
+        productMap.set(id, { ...existing, ...override });
+      } else {
+        productMap.set(id, override);
+      }
+    }
+
     this.products = Array.from(productMap.values());
-    console.log(`[Store] Master catalog initialized with ${this.products.length} products.`);
+    console.log(`[Store] Master catalog initialized with ${this.products.length} products (${deletedProductSet.size} deleted, ${Object.keys(this.persistenceData.productOverrides).length} overrides applied).`);
 
     // Sanitize image URLs (strip broken -916x916 WordPress thumbnails and deduplicate)
     this.products.forEach(p => {
@@ -448,6 +502,27 @@ export class DatabaseStore {
       }
     });
 
+    // Filter deleted categories and apply category overrides
+    const deletedCategorySet = new Set(this.persistenceData.deletedCategoryIds.map(s => s.toLowerCase()));
+    this.categories = this.categories.filter(c =>
+      !deletedCategorySet.has(c.id.toLowerCase()) &&
+      !deletedCategorySet.has(c.slug.toLowerCase()) &&
+      !deletedCategorySet.has(c.name.toLowerCase())
+    );
+    const catMap = new Map<string, Category>();
+    for (const c of this.categories) {
+      catMap.set(c.id, c);
+    }
+    for (const [id, override] of Object.entries(this.persistenceData.categoryOverrides)) {
+      if (deletedCategorySet.has(id.toLowerCase()) || (override.slug && deletedCategorySet.has(override.slug.toLowerCase()))) continue;
+      if (catMap.has(id)) {
+        catMap.set(id, { ...catMap.get(id)!, ...override });
+      } else {
+        catMap.set(id, override);
+      }
+    }
+    this.categories = Array.from(catMap.values());
+
     // Compute dynamic product counts for categories
     this.categories.forEach(cat => {
       cat.productCount = this.products.filter(p =>
@@ -458,8 +533,12 @@ export class DatabaseStore {
     // Populate and compute brand catalog with strict deduplication
     const brandsById = new Map<string, Brand>();
     const brandLookup = new Map<string, string>(); // alias / name / slug / root -> brand.id
+    const deletedBrandSet = new Set(this.persistenceData.deletedBrandIds.map(s => s.toLowerCase()));
 
     const registerLookup = (brand: Brand) => {
+      if (deletedBrandSet.has(brand.id.toLowerCase()) || deletedBrandSet.has(brand.slug.toLowerCase()) || deletedBrandSet.has(brand.name.toLowerCase())) {
+        return;
+      }
       brandsById.set(brand.id, brand);
       brandLookup.set(brand.id.toLowerCase(), brand.id);
       brandLookup.set(brand.name.toLowerCase(), brand.id);
@@ -493,6 +572,10 @@ export class DatabaseStore {
         .replace(/\s+(hookah|tobacco|bowls|bowl|vapes|vape|charcoal|crystal|accessories|coals)$/i, '')
         .trim();
 
+      if (deletedBrandSet.has(brandId.toLowerCase()) || deletedBrandSet.has(slug.toLowerCase()) || deletedBrandSet.has(searchKey)) {
+        return;
+      }
+
       // Find matching brand by name, slug, brandId, or stripped root
       const matchedId =
         brandLookup.get(searchKey) ||
@@ -521,11 +604,38 @@ export class DatabaseStore {
       }
     });
 
-    this.brands = Array.from(brandsById.values()).sort((a, b) => b.productCount - a.productCount);
+    // Apply brand overrides
+    for (const [id, override] of Object.entries(this.persistenceData.brandOverrides)) {
+      if (deletedBrandSet.has(id.toLowerCase()) || (override.slug && deletedBrandSet.has(override.slug.toLowerCase()))) continue;
+      if (brandsById.has(id)) {
+        brandsById.set(id, { ...brandsById.get(id)!, ...override });
+      } else {
+        registerLookup(override);
+      }
+    }
 
-    this.coupons = [...INITIAL_COUPONS];
+    this.brands = Array.from(brandsById.values())
+      .filter(b => !deletedBrandSet.has(b.id.toLowerCase()) && !deletedBrandSet.has(b.slug.toLowerCase()))
+      .sort((a, b) => b.productCount - a.productCount);
+
+    // Apply coupons with persistence
+    const deletedCouponSet = new Set(this.persistenceData.deletedCouponIds);
+    this.coupons = [...INITIAL_COUPONS].filter(c => !deletedCouponSet.has(c.id));
+    const couponMap = new Map<string, Coupon>();
+    for (const c of this.coupons) {
+      couponMap.set(c.id, c);
+    }
+    for (const [id, override] of Object.entries(this.persistenceData.couponOverrides)) {
+      if (deletedCouponSet.has(id)) continue;
+      couponMap.set(id, override);
+    }
+    this.coupons = Array.from(couponMap.values());
+
     this.reviews = [...INITIAL_REVIEWS];
     this.settings = { ...DEFAULT_SETTINGS };
+    if (this.persistenceData.settingsOverride) {
+      this.settings = { ...this.settings, ...this.persistenceData.settingsOverride };
+    }
 
     // Initialize media library with high res assets
     this.mediaLibrary = [
@@ -824,6 +934,55 @@ export class DatabaseStore {
       }
     ];
 
+    // Apply order overrides
+    for (const [id, override] of Object.entries(this.persistenceData.orderOverrides)) {
+      const idx = this.orders.findIndex(o => o.id === id || o.orderNumber === id);
+      if (idx !== -1) {
+        this.orders[idx] = { ...this.orders[idx], ...override };
+      } else {
+        this.orders.unshift(override);
+      }
+    }
+
+    // Apply user / staff overrides
+    const deletedUserSet = new Set(this.persistenceData.deletedUserIds);
+    this.users = this.users.filter(u => !deletedUserSet.has(u.id));
+    for (const [id, override] of Object.entries(this.persistenceData.userOverrides)) {
+      if (deletedUserSet.has(id)) continue;
+      const idx = this.users.findIndex(u => u.id === id);
+      if (idx !== -1) {
+        this.users[idx] = { ...this.users[idx], ...override };
+      } else {
+        this.users.push(override as any);
+      }
+    }
+
+    // Apply role overrides
+    for (const [id, override] of Object.entries(this.persistenceData.roleOverrides)) {
+      const idx = this.roles.findIndex(r => r.id === id || r.code === id);
+      if (idx !== -1) {
+        this.roles[idx] = { ...this.roles[idx], ...override };
+      } else {
+        this.roles.push(override);
+      }
+    }
+
+    // Apply review overrides
+    for (const [id, override] of Object.entries(this.persistenceData.reviewOverrides)) {
+      const idx = this.reviews.findIndex(r => r.id === id);
+      if (idx !== -1) {
+        this.reviews[idx] = { ...this.reviews[idx], ...override };
+      }
+    }
+
+    // Apply wholesale application overrides
+    for (const [id, override] of Object.entries(this.persistenceData.wholesaleOverrides)) {
+      const idx = this.wholesaleApplications.findIndex(w => w.id === id);
+      if (idx !== -1) {
+        this.wholesaleApplications[idx] = { ...this.wholesaleApplications[idx], ...override };
+      }
+    }
+
     this.isInitialized = true;
 
     // Asynchronously connect to MongoDB and sync all collections
@@ -832,14 +991,163 @@ export class DatabaseStore {
     }, 100);
   }
 
-  // MongoDB Write-Through Persistence
+  // Durable Storage Persistence (Disk + MongoDB Write-Through)
   public persist<T extends { id?: string }>(collection: string, doc: T) {
+    if (!doc) return;
+    const id = (doc as any).id || (doc as any).code || (doc as any).orderNumber;
+
+    if (collection === 'products' && id) {
+      const p = doc as any as Product;
+      this.persistenceData.deletedProductIds = this.persistenceData.deletedProductIds.filter(pid => pid !== id);
+      const existing = this.persistenceData.productOverrides[id] || {};
+      this.persistenceData.productOverrides[id] = { ...existing, ...p };
+      const idx = this.products.findIndex(item => item.id === id);
+      if (idx !== -1) {
+        this.products[idx] = { ...this.products[idx], ...p };
+      } else {
+        this.products.unshift(p);
+      }
+      this.savePersistence();
+    } else if (collection === 'categories' && id) {
+      const c = doc as any as Category;
+      this.persistenceData.deletedCategoryIds = this.persistenceData.deletedCategoryIds.filter(cid => cid !== id && (!c.slug || cid !== c.slug));
+      const existing = this.persistenceData.categoryOverrides[id] || {};
+      this.persistenceData.categoryOverrides[id] = { ...existing, ...c };
+      const idx = this.categories.findIndex(item => item.id === id || (c.slug && item.slug === c.slug));
+      if (idx !== -1) {
+        this.categories[idx] = { ...this.categories[idx], ...c };
+      } else {
+        this.categories.push(c);
+      }
+      this.savePersistence();
+    } else if (collection === 'brands' && id) {
+      const b = doc as any as Brand;
+      this.persistenceData.deletedBrandIds = this.persistenceData.deletedBrandIds.filter(bid => bid !== id && (!b.slug || bid !== b.slug));
+      const existing = this.persistenceData.brandOverrides[id] || {};
+      this.persistenceData.brandOverrides[id] = { ...existing, ...b };
+      const idx = this.brands.findIndex(item => item.id === id || (b.slug && item.slug === b.slug));
+      if (idx !== -1) {
+        this.brands[idx] = { ...this.brands[idx], ...b };
+      } else {
+        this.brands.push(b);
+      }
+      this.savePersistence();
+    } else if (collection === 'coupons' && id) {
+      const cpn = doc as any as Coupon;
+      this.persistenceData.deletedCouponIds = this.persistenceData.deletedCouponIds.filter(cid => cid !== id);
+      this.persistenceData.couponOverrides[id] = cpn;
+      const idx = this.coupons.findIndex(item => item.id === id);
+      if (idx !== -1) {
+        this.coupons[idx] = { ...this.coupons[idx], ...cpn };
+      } else {
+        this.coupons.unshift(cpn);
+      }
+      this.savePersistence();
+    } else if (collection === 'orders' && id) {
+      const o = doc as any as Order;
+      this.persistenceData.orderOverrides[id] = o;
+      const idx = this.orders.findIndex(item => item.id === id || (o.orderNumber && item.orderNumber === o.orderNumber));
+      if (idx !== -1) {
+        this.orders[idx] = { ...this.orders[idx], ...o };
+      } else {
+        this.orders.unshift(o);
+      }
+      this.savePersistence();
+    } else if (collection === 'settings') {
+      this.persistenceData.settingsOverride = { ...this.settings, ...(doc as any) };
+      this.settings = { ...this.settings, ...(doc as any) };
+      this.savePersistence();
+    } else if (collection === 'users' && id) {
+      const u = doc as any as User;
+      this.persistenceData.deletedUserIds = this.persistenceData.deletedUserIds.filter(uid => uid !== id);
+      this.persistenceData.userOverrides[id] = u;
+      const idx = this.users.findIndex(item => item.id === id);
+      if (idx !== -1) {
+        this.users[idx] = { ...this.users[idx], ...u };
+      } else {
+        this.users.push(u);
+      }
+      this.savePersistence();
+    } else if (collection === 'roles' && id) {
+      const r = doc as any as Role;
+      this.persistenceData.roleOverrides[id] = r;
+      const idx = this.roles.findIndex(item => item.id === id || item.code === r.code);
+      if (idx !== -1) {
+        this.roles[idx] = { ...this.roles[idx], ...r };
+      } else {
+        this.roles.push(r);
+      }
+      this.savePersistence();
+    } else if (collection === 'reviews' && id) {
+      const rev = doc as any as Review;
+      this.persistenceData.reviewOverrides[id] = rev;
+      const idx = this.reviews.findIndex(item => item.id === id);
+      if (idx !== -1) {
+        this.reviews[idx] = { ...this.reviews[idx], ...rev };
+      }
+      this.savePersistence();
+    } else if (collection === 'wholesale' && id) {
+      const whs = doc as any as WholesaleApplication;
+      this.persistenceData.wholesaleOverrides[id] = whs;
+      const idx = this.wholesaleApplications.findIndex(item => item.id === id);
+      if (idx !== -1) {
+        this.wholesaleApplications[idx] = { ...this.wholesaleApplications[idx], ...whs };
+      }
+      this.savePersistence();
+    }
+
     if (mongoService.getStatus().isConnected) {
       mongoService.saveDocument(collection, doc).catch(() => {});
     }
   }
 
   public deletePersisted(collection: string, filter: Record<string, any>) {
+    const id = filter?.id;
+    const slug = filter?.slug;
+
+    if (collection === 'products' && id) {
+      if (!this.persistenceData.deletedProductIds.includes(id)) {
+        this.persistenceData.deletedProductIds.push(id);
+      }
+      delete this.persistenceData.productOverrides[id];
+      this.products = this.products.filter(p => p.id !== id);
+      this.savePersistence();
+    } else if (collection === 'categories' && (id || slug)) {
+      if (id && !this.persistenceData.deletedCategoryIds.includes(id)) {
+        this.persistenceData.deletedCategoryIds.push(id);
+      }
+      if (slug && !this.persistenceData.deletedCategoryIds.includes(slug)) {
+        this.persistenceData.deletedCategoryIds.push(slug);
+      }
+      if (id) delete this.persistenceData.categoryOverrides[id];
+      this.categories = this.categories.filter(c => c.id !== id && (!slug || c.slug !== slug));
+      this.savePersistence();
+    } else if (collection === 'brands' && (id || slug)) {
+      if (id && !this.persistenceData.deletedBrandIds.includes(id)) {
+        this.persistenceData.deletedBrandIds.push(id);
+      }
+      if (slug && !this.persistenceData.deletedBrandIds.includes(slug)) {
+        this.persistenceData.deletedBrandIds.push(slug);
+      }
+      if (id) delete this.persistenceData.brandOverrides[id];
+      this.brands = this.brands.filter(b => b.id !== id && (!slug || b.slug !== slug));
+      this.savePersistence();
+    } else if (collection === 'coupons' && id) {
+      if (!this.persistenceData.deletedCouponIds.includes(id)) {
+        this.persistenceData.deletedCouponIds.push(id);
+      }
+      delete this.persistenceData.couponOverrides[id];
+      this.coupons = this.coupons.filter(c => c.id !== id);
+      this.savePersistence();
+    } else if (collection === 'users' && id) {
+      if (!this.persistenceData.deletedUserIds.includes(id)) {
+        this.persistenceData.deletedUserIds.push(id);
+      }
+      delete this.persistenceData.userOverrides[id];
+      this.users = this.users.filter(u => u.id !== id);
+      this.savePersistence();
+    }
+
     if (mongoService.getStatus().isConnected) {
       mongoService.deleteDocument(collection, filter).catch(() => {});
     }

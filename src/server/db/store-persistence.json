@@ -1,0 +1,37 @@
+{
+  "deletedProductIds": [],
+  "productOverrides": {},
+  "deletedCategoryIds": [
+    "test-temporary-category"
+  ],
+  "categoryOverrides": {},
+  "deletedBrandIds": [],
+  "brandOverrides": {},
+  "deletedCouponIds": [],
+  "couponOverrides": {},
+  "orderOverrides": {},
+  "settingsOverride": null,
+  "deletedUserIds": [],
+  "userOverrides": {
+    "usr-ehtesham-root": {
+      "id": "usr-ehtesham-root",
+      "email": "ehtesham4628@gmail.com",
+      "firstName": "Ehtesham",
+      "lastName": "Admin",
+      "phone": "+1 (800) 785-8260",
+      "role": "SUPER_ADMIN",
+      "status": "ACTIVE",
+      "isEmailVerified": true,
+      "isPhoneVerified": true,
+      "totalSpent": 0,
+      "orderCount": 0,
+      "passwordHash": "$2b$10$2PUvE/CGWWwBBQIZ8IX75.v77.uKyal1qiz6d9w3caxm6aeBXbsuC",
+      "createdAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-09-09T09:44:36.653Z",
+      "lastLoginAt": "2026-09-09T09:44:36.653Z"
+    }
+  },
+  "roleOverrides": {},
+  "reviewOverrides": {},
+  "wholesaleOverrides": {}
+}

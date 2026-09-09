@@ -444,3 +444,19 @@ export function getItemListSchema(title: string, items: Array<{ name: string; ur
     }))
   };
 }
+
+// Re-export dynamic Product SEO helpers
+export {
+  generateProductMeta,
+  generateProductMetaTitle,
+  generateProductMetaDescription,
+  generateProductMetaTitleRu,
+  generateProductMetaDescriptionRu,
+  generateProductKeywords,
+  extractProductAttributes,
+  truncateCleanly,
+  type ProductMetaInput,
+  type ProductMetaOptions,
+  type ProductMetaData
+} from './productSeoHelper.js';
+

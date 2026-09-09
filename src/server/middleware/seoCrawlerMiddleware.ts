@@ -10,7 +10,8 @@ import {
   getWebSiteSchema,
   getFAQSchema,
   getProductSchema,
-  getItemListSchema
+  getItemListSchema,
+  generateProductMeta
 } from '../../shared/seoConstants.js';
 
 export function createSeoMiddleware() {
@@ -69,17 +70,13 @@ export function createSeoMiddleware() {
       const slug = cleanPath.replace('/product/', '');
       const product = db.products.find(p => p.slug === slug || p.id === slug);
       if (product) {
-        pageTitle = isRussianQuery
-          ? `Купить ${product.name} | Оригинальный кальян/табак с доставкой в США и РФ | ${SITE_NAME}`
-          : `${product.name} | Buy Online USA & Russia | ${SITE_NAME}`;
-        
-        pageDesc = isRussianQuery
-          ? `Заказать оригинальный ${product.name} (${product.brand}). 100% заводская гарантия, быстрая доставка по США и РФ. Официальный мастер-дистрибьютор ${SITE_NAME}.`
-          : `Buy genuine ${product.name} by ${product.brand}. In-stock with fast USA shipping & worldwide delivery. 100% authentic with factory seal at ${SITE_NAME}.`;
+        const meta = generateProductMeta(product);
+        pageTitle = isRussianQuery ? meta.ruTitle : meta.title;
+        pageDesc = isRussianQuery ? meta.ruDescription : meta.description;
 
         const categoryKeywords = MARKET_KEYWORDS.categories[product.categorySlug as keyof typeof MARKET_KEYWORDS.categories];
         const localizedKeywords = isRussianQuery && categoryKeywords ? categoryKeywords.ru : (categoryKeywords?.en || []);
-        pageKeywords = [product.name, product.brand, product.category, ...localizedKeywords, ...MARKET_KEYWORDS.global].join(', ');
+        pageKeywords = Array.from(new Set([...meta.keywords, ...localizedKeywords, ...MARKET_KEYWORDS.global])).join(', ');
 
         if (product.images && product.images.length > 0) {
           pageImage = product.images[0].url;

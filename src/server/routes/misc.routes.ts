@@ -57,7 +57,7 @@ const getStorefrontCategories = (): Category[] => {
     discovered.set(slug, rawName || slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()));
   }
   for (const [slug, name] of discovered) {
-    if (existing.has(slug)) continue;
+    if (existing.has(slug) || db.isCategoryDeleted(slug)) continue;
     categories.push({
       id: `cat-${slug}`,
       name,

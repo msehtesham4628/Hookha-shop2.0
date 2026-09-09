@@ -6,7 +6,7 @@ import { ProductCard } from '../components/ProductCard.js';
 import { Product, Review } from '../../types/index.js';
 import { sanitizeImageUrl, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/imageFallback.js';
 import { SEOHead } from '../components/SEOHead.js';
-import { getProductSchema } from '../../shared/seoConstants.js';
+import { getProductSchema, generateProductMeta } from '../../shared/seoConstants.js';
 import {
   Star,
   ShoppingBag,
@@ -62,6 +62,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
     const valid = cleaned.filter(img => !failedImages[img.url]);
     return valid.length > 0 ? valid : cleaned;
   }, [product?.images, failedImages]);
+
+  // Dynamically generate unique meta titles, descriptions, and keywords based on product data
+  const productMeta = useMemo(() => {
+    if (!product) return null;
+    return generateProductMeta(product);
+  }, [product]);
 
   useEffect(() => {
     const loadProductData = async (silent = false) => {
@@ -186,21 +192,18 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
     <div className="w-full bg-stone-50/40 py-8">
       {/* Dynamic SEO Meta Tags & Schema.org Structured Data */}
       <SEOHead
-        title={product.seoTitle || `${product.name} | Buy Online USA & Russia`}
-        ruTitle={`Купить ${product.name} | Оригинальный кальян/табак с доставкой`}
-        description={product.seoDescription || `Buy genuine ${product.name} by ${product.brand}. In stock with fast USA express shipping & worldwide delivery. 100% authentic with factory seal.`}
-        ruDescription={`Заказать оригинальный ${product.name} от ${product.brand}. 100% оригинал с гарантией, быстрая доставка по США, России и СНГ.`}
-        keywords={[
+        title={productMeta?.title || product.seoTitle || `${product.name} | Buy Online USA & Russia`}
+        ruTitle={productMeta?.ruTitle || `Купить ${product.name} | Оригинальный кальян/табак с доставкой`}
+        description={productMeta?.description || product.seoDescription || `Buy genuine ${product.name} by ${product.brand}. In stock with fast USA express shipping & worldwide delivery.`}
+        ruDescription={productMeta?.ruDescription || `Заказать оригинальный ${product.name} от ${product.brand}. 100% оригинал с гарантией, быстрая доставка по США и РФ.`}
+        keywords={productMeta?.keywords || [
           product.name,
           product.brand,
           product.category,
           `buy ${product.name}`,
           `купить ${product.name}`,
           'купить кальян',
-          'табак для кальяна',
-          'Alpha Hookah USA',
-          'MustHave tobacco',
-          'DarkSide tobacco'
+          'табак для кальяна'
         ]}
         canonicalPath={`/product/${product.slug}`}
         ogImage={activeImages[0]?.url}

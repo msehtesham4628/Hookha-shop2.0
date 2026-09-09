@@ -363,8 +363,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         api.getAdminPermissions().catch(() => ({ success: false, data: [] })),
         api.getAdminAuditLogs().catch(() => ({ success: false, data: [] })),
         api.getSettings().catch(() => ({ success: false, data: null })),
-        api.getCategories().catch(() => ({ success: false, data: [] })),
-        api.getBrands().catch(() => ({ success: false, data: [] })),
+        api.getAdminCategories().catch(() => ({ success: false, data: [] })),
+        api.getAdminBrands().catch(() => ({ success: false, data: [] })),
         api.getAdminStaff().catch(() => ({ success: false, data: [] }))
       ]);
 
