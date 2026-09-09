@@ -13,6 +13,17 @@ const router = Router();
 // Apply authentication to all admin routes
 router.use(authenticateToken);
 
+// Disable ETags and bypass all Vercel/browser caches for administrative endpoints
+router.use((req, res, next) => {
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+    'Surrogate-Control': 'no-store'
+  });
+  next();
+});
+
 // ==========================================
 // 1. DASHBOARD & ANALYTICS
 // ==========================================
@@ -31,7 +42,6 @@ router.get('/dashboard', requirePermission('dashboard.view'), (req: Authenticate
   const pendingWholesale = db.wholesaleApplications.filter(w => w.status === 'PENDING').length;
   const refundsCount = db.orders.filter(o => o.orderStatus === 'REFUNDED').length;
 
-  // Monthly revenue breakdown (last 6 months simulation/calculation)
   const salesByMonth = [
     { month: 'Oct', revenue: 14200, orders: 42 },
     { month: 'Nov', revenue: 19800, orders: 58 },
@@ -41,7 +51,6 @@ router.get('/dashboard', requirePermission('dashboard.view'), (req: Authenticate
     { month: 'Mar', revenue: Math.round(totalRevenue), orders: totalOrders }
   ];
 
-  // Sales by Category
   const categorySales = db.categories.map(c => ({
     name: c.name,
     count: db.products.filter(p => p.categorySlug === c.slug).length,
@@ -166,7 +175,6 @@ router.post('/products', requirePermission('products.create'), (req: Authenticat
     return res.status(400).json({ success: false, error: { code: 'REQUIRED_FIELDS', message: 'Name, SKU, price, and category are mandatory' } });
   }
 
-  // Check unique SKU
   if (db.products.some(p => p.sku.toUpperCase() === body.sku.toUpperCase())) {
     return res.status(409).json({ success: false, error: { code: 'DUPLICATE_SKU', message: 'SKU must be unique across the catalog.' } });
   }
@@ -215,7 +223,6 @@ router.post('/products', requirePermission('products.create'), (req: Authenticat
   db.products.unshift(newProduct);
   db.persist('products', newProduct);
 
-  // Record audit log
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
     'ADMIN_CREATED_PRODUCT',
@@ -243,7 +250,6 @@ router.put('/products/:id', requirePermission('products.update'), (req: Authenti
   Object.assign(product, req.body, { updatedAt: new Date().toISOString() });
   db.persist('products', product);
 
-  // If stock adjusted, record inventory log
   if (req.body.stock !== undefined && parseInt(req.body.stock, 10) !== prevStock) {
     const newStock = parseInt(req.body.stock, 10);
     db.inventoryTransactions.push({
@@ -297,7 +303,7 @@ router.delete('/products/:id', requirePermission('products.delete'), (req: Authe
   return res.json({ success: true, message: 'Product deleted successfully' });
 });
 
-// POST /api/admin/products/import (CSV / JSON bulk importer)
+// POST /api/admin/products/import
 router.post('/products/import', requirePermission('products.import'), (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { products: importList } = req.body;
@@ -380,7 +386,7 @@ router.post('/products/import', requirePermission('products.import'), (req: Auth
   });
 });
 
-// POST /api/admin/products/bulk-update (CSV / JSON bulk inventory & pricing updater)
+// POST /api/admin/products/bulk-update
 router.post('/products/bulk-update', requirePermission('products.update'), (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { updates } = req.body;
@@ -409,7 +415,6 @@ router.post('/products/bulk-update', requirePermission('products.update'), (req:
         continue;
       }
 
-      // Find matching product
       const product = db.products.find(p =>
         (rawSku && p.sku && p.sku.toUpperCase() === rawSku.toUpperCase()) ||
         (rawId && p.id === rawId) ||
@@ -427,14 +432,12 @@ router.post('/products/bulk-update', requirePermission('products.update'), (req:
       const prevSalePrice = product.salePrice;
       let hasChanges = false;
 
-      // Update Stock if supplied
       if (item.stock !== undefined && item.stock !== null && item.stock !== '') {
         const parsedStock = parseInt(String(item.stock), 10);
         if (!isNaN(parsedStock) && parsedStock >= 0 && parsedStock !== prevStock) {
           product.stock = parsedStock;
           hasChanges = true;
 
-          // Record inventory transaction
           db.inventoryTransactions.unshift({
             id: `inv-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
             productId: product.id,
@@ -451,20 +454,17 @@ router.post('/products/bulk-update', requirePermission('products.update'), (req:
         }
       }
 
-      // Update Price if supplied
       if (item.price !== undefined && item.price !== null && item.price !== '') {
         const parsedPrice = parseFloat(String(item.price));
         if (!isNaN(parsedPrice) && parsedPrice >= 0 && parsedPrice !== prevPrice) {
           product.price = parsedPrice;
           hasChanges = true;
-          // Recalculate sale flag
           if (product.salePrice) {
             product.isOnSale = product.salePrice < product.price;
           }
         }
       }
 
-      // Update Sale Price if supplied
       if (item.salePrice !== undefined) {
         if (item.salePrice === null || item.salePrice === '' || String(item.salePrice).toLowerCase() === 'null') {
           if (product.salePrice !== undefined) {
@@ -482,7 +482,6 @@ router.post('/products/bulk-update', requirePermission('products.update'), (req:
         }
       }
 
-      // Update Low Stock Threshold if supplied
       if (item.lowStockThreshold !== undefined && item.lowStockThreshold !== null && item.lowStockThreshold !== '') {
         const parsedThreshold = parseInt(String(item.lowStockThreshold), 10);
         if (!isNaN(parsedThreshold) && parsedThreshold >= 0 && parsedThreshold !== product.lowStockThreshold) {
@@ -515,7 +514,6 @@ router.post('/products/bulk-update', requirePermission('products.update'), (req:
     }
   }
 
-  // Audit log
   db.logAudit(
     { id: user.id, name: `${user.firstName} ${user.lastName}`, role: user.role, ip: req.ip },
     'ADMIN_BULK_UPDATED_PRODUCTS',
@@ -1018,12 +1016,10 @@ router.post('/media', requirePermission('media.upload'), (req: AuthenticatedRequ
 // 10. STAFF, ROLES & PERMISSION MATRIX (RBAC)
 // ==========================================
 
-// GET /api/admin/permissions
 router.get('/permissions', requirePermission('roles.view'), (req, res) => {
   return res.json({ success: true, data: db.permissions });
 });
 
-// GET /api/admin/roles
 router.get('/roles', requirePermission('roles.view'), (req, res) => {
   const rolesWithUserCount = db.roles.map(r => ({
     ...r,
@@ -1032,7 +1028,6 @@ router.get('/roles', requirePermission('roles.view'), (req, res) => {
   return res.json({ success: true, data: rolesWithUserCount });
 });
 
-// POST /api/admin/roles
 router.post('/roles', requirePermission('roles.create'), (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { name, code, description, permissions } = req.body;
@@ -1072,7 +1067,6 @@ router.post('/roles', requirePermission('roles.create'), (req: AuthenticatedRequ
   return res.status(201).json({ success: true, message: 'Custom role created', data: newRole });
 });
 
-// PUT /api/admin/roles/:id
 router.put('/roles/:id', requirePermission('roles.update'), (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   const { id } = req.params;
@@ -1083,7 +1077,6 @@ router.put('/roles/:id', requirePermission('roles.update'), (req: AuthenticatedR
     return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Role not found' } });
   }
 
-  // Protect SUPER_ADMIN system integrity
   if (role.code === 'SUPER_ADMIN' && user.role !== 'SUPER_ADMIN') {
     return res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Only Super Admin can modify root privileges.' } });
   }
@@ -1091,7 +1084,6 @@ router.put('/roles/:id', requirePermission('roles.update'), (req: AuthenticatedR
   if (name) role.name = name;
   if (description !== undefined) role.description = description;
   if (Array.isArray(permissions)) {
-    // If super admin, keep all permissions
     role.permissions = role.code === 'SUPER_ADMIN' ? db.permissions.map(p => p.key) : permissions;
   }
   role.updatedAt = new Date().toISOString();
@@ -1108,7 +1100,6 @@ router.put('/roles/:id', requirePermission('roles.update'), (req: AuthenticatedR
   return res.json({ success: true, message: 'Role permissions updated', data: role });
 });
 
-// GET /api/admin/staff
 router.get('/staff', requirePermission('staff.view'), (req, res) => {
   const staff = db.users
     .filter(u => u.role !== 'CUSTOMER')
@@ -1119,7 +1110,6 @@ router.get('/staff', requirePermission('staff.view'), (req, res) => {
   return res.json({ success: true, data: staff });
 });
 
-// POST /api/admin/staff
 router.post('/staff', requirePermission('staff.create'), async (req: AuthenticatedRequest, res) => {
   const currentUser = req.user!;
   const { email, firstName, lastName, phone, role, password } = req.body;
@@ -1133,7 +1123,6 @@ router.post('/staff', requirePermission('staff.create'), async (req: Authenticat
     return res.status(409).json({ success: false, error: { code: 'USER_EXISTS', message: 'An account with this email already exists.' } });
   }
 
-  // Only SUPER_ADMIN can create another SUPER_ADMIN
   if (role === 'SUPER_ADMIN' && currentUser.role !== 'SUPER_ADMIN') {
     return res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'You cannot provision SUPER_ADMIN accounts.' } });
   }
@@ -1171,7 +1160,6 @@ router.post('/staff', requirePermission('staff.create'), async (req: Authenticat
   return res.status(201).json({ success: true, message: 'Staff member added', data: safeStaff });
 });
 
-// PUT /api/admin/staff/:id
 router.put('/staff/:id', requirePermission('staff.update'), async (req: AuthenticatedRequest, res) => {
   const currentUser = req.user!;
   const { id } = req.params;
@@ -1182,7 +1170,6 @@ router.put('/staff/:id', requirePermission('staff.update'), async (req: Authenti
     return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Staff member not found' } });
   }
 
-  // Prevent modifying Super Admin unless actor is Super Admin
   if (targetStaff.role === 'SUPER_ADMIN' && currentUser.role !== 'SUPER_ADMIN') {
     return res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Cannot modify Super Admin accounts.' } });
   }
@@ -1214,7 +1201,6 @@ router.put('/staff/:id', requirePermission('staff.update'), async (req: Authenti
   return res.json({ success: true, message: 'Staff profile updated', data: safe });
 });
 
-// DELETE /api/admin/staff/:id
 router.delete('/staff/:id', requirePermission('staff.delete'), async (req: AuthenticatedRequest, res) => {
   const currentUser = req.user!;
   const { id } = req.params;
@@ -1234,7 +1220,6 @@ router.delete('/staff/:id', requirePermission('staff.delete'), async (req: Authe
   }
 
   db.users.splice(targetStaffIndex, 1);
-  // Persist the deletion so the staff account is not recreated after a restart.
   db.deletePersisted('users', { id });
 
   db.logAudit(
@@ -1252,7 +1237,6 @@ router.delete('/staff/:id', requirePermission('staff.delete'), async (req: Authe
 // 11. AUDIT LOGS & SYSTEM SETTINGS
 // ==========================================
 
-// GET /api/admin/audit-logs
 router.get('/audit-logs', requirePermission('audit_logs.view'), (req, res) => {
   const { action, resource, userId } = req.query as Record<string, string>;
   let result = [...db.auditLogs];
@@ -1264,12 +1248,10 @@ router.get('/audit-logs', requirePermission('audit_logs.view'), (req, res) => {
   return res.json({ success: true, data: result });
 });
 
-// GET /api/admin/settings
 router.get('/settings', requirePermission('settings.view'), (req, res) => {
   return res.json({ success: true, data: db.settings });
 });
 
-// PUT /api/admin/settings
 router.put('/settings', requirePermission('settings.update'), (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   Object.assign(db.settings, req.body);
@@ -1286,7 +1268,6 @@ router.put('/settings', requirePermission('settings.update'), (req: Authenticate
   return res.json({ success: true, message: 'Store settings updated', data: db.settings });
 });
 
-// Notifications
 router.get('/notifications', (req, res) => {
   return res.json({ success: true, data: db.notifications });
 });
@@ -1302,13 +1283,11 @@ router.post('/notifications/:id/read', (req, res) => {
 // MONGODB STORAGE & CLOUD PERSISTENCE
 // ==========================================
 
-// GET /api/admin/mongodb/status
 router.get('/mongodb/status', (req, res) => {
   const status = mongoService.getStatus();
   return res.json({ success: true, data: status });
 });
 
-// POST /api/admin/mongodb/sync
 router.post('/mongodb/sync', async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   try {
@@ -1331,7 +1310,6 @@ router.post('/mongodb/sync', async (req: AuthenticatedRequest, res) => {
   }
 });
 
-// POST /api/admin/mongodb/reconnect
 router.post('/mongodb/reconnect', async (req: AuthenticatedRequest, res) => {
   const user = req.user!;
   try {
@@ -1353,10 +1331,9 @@ router.post('/mongodb/reconnect', async (req: AuthenticatedRequest, res) => {
 });
 
 // ==========================================
-// 10. EXCEL EXPORTS (CUSTOMERS & INVENTORY)
+// 12. EXCEL EXPORTS (CUSTOMERS & INVENTORY)
 // ==========================================
 
-// GET /api/admin/export/customers/excel
 router.get('/export/customers/excel', requirePermission('customers.view'), (req: AuthenticatedRequest, res) => {
   try {
     const customers = db.users.filter(u => u.role === 'CUSTOMER');
@@ -1390,7 +1367,6 @@ router.get('/export/customers/excel', requirePermission('customers.view'), (req:
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(rows);
 
-    // Auto column widths
     const colKeys = rows.length > 0 ? Object.keys(rows[0]) : [];
     ws['!cols'] = colKeys.map(key => {
       let maxLen = key.length;
@@ -1416,7 +1392,6 @@ router.get('/export/customers/excel', requirePermission('customers.view'), (req:
   }
 });
 
-// GET /api/admin/export/inventory/excel
 router.get('/export/inventory/excel', requirePermission('inventory.view'), (req: AuthenticatedRequest, res) => {
   try {
     const products = db.products;
@@ -1460,7 +1435,6 @@ router.get('/export/inventory/excel', requirePermission('inventory.view'), (req:
       };
     });
 
-    // Summary calculations
     const totalItems = products.length;
     const totalUnits = products.reduce((acc, p) => acc + (p.stock || 0), 0);
     const totalValuation = products.reduce((acc, p) => acc + ((p.price || 0) * (p.stock || 0)), 0);
