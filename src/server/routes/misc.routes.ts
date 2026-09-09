@@ -45,19 +45,15 @@ const productMatchesCategory = (product: any, category: Category) => {
 };
 
 const getStorefrontCategories = (): Category[] => {
-  const categories = db.categories.filter(c =>
-    !db.isCategoryDeleted(c.id) &&
-    !db.isCategoryDeleted(c.slug) &&
-    !db.isCategoryDeleted(c.name)
-  );
+  const categories = [...db.categories];
   const existing = new Set(categories.map(c => normalizeCatalogSlug(c.slug)));
   const discovered = new Map<string, string>();
   for (const product of db.products) {
-    if (!product?.isActive || db.isProductDeleted(product.id)) continue;
+    if (!product?.isActive) continue;
     const rawName = String(product.category || (product as any).categoryName || '').trim();
     const rawSlug = String(product.categorySlug || rawName).trim();
     const slug = normalizeCatalogSlug(rawSlug);
-    if (!slug || discovered.has(slug) || db.isCategoryDeleted(slug) || db.isCategoryDeleted(rawName)) continue;
+    if (!slug || discovered.has(slug)) continue;
     discovered.set(slug, rawName || slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()));
   }
   for (const [slug, name] of discovered) {
