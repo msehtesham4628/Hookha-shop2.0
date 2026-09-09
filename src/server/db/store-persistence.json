@@ -1,10 +1,182 @@
 {
   "deletedProductIds": [],
-  "productOverrides": {},
+  "productOverrides": {
+    "whm-al-fakher-harvest-moon-250gr": {
+      "_id": "6a9d9b85f0ee40c44ce58ad3",
+      "id": "whm-al-fakher-harvest-moon-250gr",
+      "ageRestricted": true,
+      "brand": "Al Fakher",
+      "brandSlug": "al-fakher",
+      "category": "Accessories",
+      "categorySlug": "accessories",
+      "createdAt": "2026-09-07T10:11:07.112Z",
+      "currency": "USD",
+      "description": "Harvest Moon – An intriquing and mesmerizing mix of green tea with a hint of lemon and lime.",
+      "images": [
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-1",
+          "url": "https://worldhookahmarket.com/wp-content/uploads/2022/11/api-v1.1-file-public_files-pim-assets-a1-a4-ca-62-62caa4a1b34a9a00089d9e7c-images-4c-95-63-63-6363954c5d340353752dfa6f-af-250-jar-harvestmoon.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/uploads/2022/11/api-v1.1-file-public_files-pim-assets-a1-a4-ca-62-62caa4a1b34a9a00089d9e7c-images-4c-95-63-63-6363954c5d340353752dfa6f-af-250-jar-harvestmoon.webp",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 1",
+          "isPrimary": true,
+          "sortOrder": 0
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-2",
+          "url": "https://worldhookahmarket.com/wp-content/uploads/2024/09/logo_black.svg",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/uploads/2024/09/logo_black.svg",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 2",
+          "isPrimary": false,
+          "sortOrder": 2
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-3",
+          "url": "https://worldhookahmarket.com/wp-content/themes/kaani-new/images/cart-svgrepo-com.svg",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/themes/kaani-new/images/cart-svgrepo-com.svg",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 3",
+          "isPrimary": false,
+          "sortOrder": 3
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-4",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/04/VANILLA_US-324x324.png.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/04/VANILLA_US-324x324.png.webp",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 4",
+          "isPrimary": false,
+          "sortOrder": 4
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-5",
+          "url": "https://worldhookahmarket.com/wp-content/uploads/2024/09/box.svg",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/uploads/2024/09/box.svg",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 5",
+          "isPrimary": false,
+          "sortOrder": 5
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-6",
+          "url": "https://worldhookahmarket.com/wp-content/themes/kaani-new/images/wait-time-svgrepo-com.svg",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/themes/kaani-new/images/wait-time-svgrepo-com.svg",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 6",
+          "isPrimary": false,
+          "sortOrder": 6
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-7",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/264.0x290-150x150.jpg.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/264.0x290-150x150.jpg.webp",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 7",
+          "isPrimary": false,
+          "sortOrder": 7
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-9",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/264.0x290.jpg.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/264.0x290.jpg.webp",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 9",
+          "isPrimary": false,
+          "sortOrder": 8
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-10",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/03/Tong-Vietnam-300x300.jpeg.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/03/Tong-Vietnam-300x300.jpeg.webp",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 10",
+          "isPrimary": false,
+          "sortOrder": 9
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-11",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/264.0x290-100x100.jpg.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/264.0x290-100x100.jpg.webp",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 11",
+          "isPrimary": false,
+          "sortOrder": 10
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-12",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/04/CAPPUCCINO_US-324x324.png.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/04/CAPPUCCINO_US-324x324.png.webp",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 12",
+          "isPrimary": false,
+          "sortOrder": 11
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-13",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/04/ROSE_US-324x324.png.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/04/ROSE_US-324x324.png.webp",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 13",
+          "isPrimary": false,
+          "sortOrder": 12
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-14",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/04/PEACH_US-324x324.png.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/04/PEACH_US-324x324.png.webp",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 14",
+          "isPrimary": false,
+          "sortOrder": 13
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-15",
+          "url": "https://worldhookahmarket.com/wp-content/themes/kaani-new/images/subscribe.svg",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/themes/kaani-new/images/subscribe.svg",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 15",
+          "isPrimary": false,
+          "sortOrder": 14
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-16",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/08/Al-Fakher-Gruava-Shisha-250g_600x600_crop_center-324x324.jpg.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/08/Al-Fakher-Gruava-Shisha-250g_600x600_crop_center-324x324.jpg.webp",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 16",
+          "isPrimary": false,
+          "sortOrder": 15
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-17",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/03/Tong-Vietnam-300x300-100x100.jpeg.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/03/Tong-Vietnam-300x300-100x100.jpeg.webp",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 17",
+          "isPrimary": false,
+          "sortOrder": 16
+        },
+        {
+          "id": "al-fakher-harvest-moon-250gr-image-18",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/08/IMG_9606-324x324.jpg.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/08/IMG_9606-324x324.jpg.webp",
+          "alt": "Al Fakher – Harvest Moon 250gr product image 18",
+          "isPrimary": false,
+          "sortOrder": 17
+        }
+      ],
+      "isActive": true,
+      "isBestSeller": false,
+      "isFeatured": false,
+      "isNewArrival": false,
+      "isOnSale": false,
+      "lowStockThreshold": 5,
+      "name": "Al Fakher – Harvest Moon 250gr",
+      "price": 14.9,
+      "rating": 0,
+      "reviewCount": 0,
+      "seoDescription": "Harvest Moon – An intriquing and mesmerizing mix of green tea with a hint of lemon and lime.",
+      "seoTitle": "Al Fakher – Harvest Moon 250gr | Fumare Hookah",
+      "shortDescription": "Harvest Moon – An intriquing and mesmerizing mix of green tea with a hint of lemon and lime.",
+      "sku": "WHM-al-fakher-harvest-moon-250gr",
+      "slug": "al-fakher-harvest-moon-250gr",
+      "sourceUrl": "https://worldhookahmarket.com/product/harvest-moon-250gr",
+      "specifications": [],
+      "stock": 100,
+      "tags": [
+        "Accessories",
+        "Al Fakher"
+      ],
+      "updatedAt": "2026-09-07T10:11:07.112Z"
+    }
+  },
   "deletedCategoryIds": [
     "test-temporary-category",
-    "cat-accessories",
-    "accessories",
     "cat-1788947086226",
     "Test Temporary Category",
     "test temporary category"
@@ -21,7 +193,9 @@
   "couponOverrides": {},
   "orderOverrides": {},
   "settingsOverride": null,
-  "deletedUserIds": [],
+  "deletedUserIds": [
+    "usr-super-admin-0"
+  ],
   "userOverrides": {
     "usr-ehtesham-root": {
       "_id": "6a9dbb20f0ee40c44ce5a9cc",

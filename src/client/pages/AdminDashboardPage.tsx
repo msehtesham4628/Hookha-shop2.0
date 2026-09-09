@@ -151,6 +151,16 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [brandDesc, setBrandDesc] = useState('');
   const [brandLogoUrl, setBrandLogoUrl] = useState('');
 
+  // Delete Confirmation Modal State (replaces blocked window.confirm)
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    itemName: string;
+    itemType: string;
+    description?: string;
+    onConfirm: () => Promise<void> | void;
+  } | null>(null);
+
   // Product Form Fields
   const [prodName, setProdName] = useState('');
   const [prodSku, setProdSku] = useState('');
@@ -828,18 +838,26 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
-  const handleDeleteProduct = async (id: string) => {
-    if (!confirm('Are you sure you wish to decommission this product?')) return;
-    try {
-      const res = await api.deleteProduct(id);
-      if (res.success) {
-        showToast('Product decommissioned', 'info');
-        broadcastSync('PRODUCT_UPDATED', { id, action: 'delete' });
-        loadAllAdminData();
+  const requestDeleteProduct = (id: string, name?: string) => {
+    setDeleteConfirmModal({
+      isOpen: true,
+      title: 'Decommission Product',
+      itemName: name || `Product #${id}`,
+      itemType: 'product',
+      description: 'This will remove the product from the storefront catalog and permanently persist the deletion across restarts.',
+      onConfirm: async () => {
+        try {
+          const res = await api.deleteProduct(id);
+          if (res.success) {
+            showToast('Product decommissioned successfully', 'info');
+            broadcastSync('PRODUCT_UPDATED', { id, action: 'delete' });
+            loadAllAdminData();
+          }
+        } catch (err: any) {
+          showToast(err.message || 'Failed to delete product', 'error');
+        }
       }
-    } catch (err: any) {
-      showToast(err.message || 'Failed to delete product', 'error');
-    }
+    });
   };
 
   // Handlers for Category Management
@@ -903,18 +921,26 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
-  const handleDeleteCategory = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you wish to delete category "${name}"?`)) return;
-    try {
-      const res = await api.deleteAdminCategory(id);
-      if (res.success) {
-        showToast(`Category "${name}" removed`, 'info');
-        broadcastSync('CATEGORY_UPDATED', { id, action: 'delete' });
-        loadAllAdminData();
+  const requestDeleteCategory = (id: string, name: string) => {
+    setDeleteConfirmModal({
+      isOpen: true,
+      title: 'Delete Category',
+      itemName: name,
+      itemType: 'category',
+      description: `Are you sure you wish to delete category "${name}"? This category will be removed and changes saved to cloud persistence.`,
+      onConfirm: async () => {
+        try {
+          const res = await api.deleteAdminCategory(id);
+          if (res.success) {
+            showToast(`Category "${name}" removed successfully`, 'info');
+            broadcastSync('CATEGORY_UPDATED', { id, action: 'delete' });
+            loadAllAdminData();
+          }
+        } catch (err: any) {
+          showToast(err.message || 'Failed to delete category', 'error');
+        }
       }
-    } catch (err: any) {
-      showToast(err.message || 'Failed to delete category', 'error');
-    }
+    });
   };
 
   // Handlers for Brand Management
@@ -970,18 +996,26 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     }
   };
 
-  const handleDeleteBrand = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you wish to delete brand "${name}"?`)) return;
-    try {
-      const res = await api.deleteAdminBrand(id);
-      if (res.success) {
-        showToast(`Brand "${name}" removed`, 'info');
-        broadcastSync('CATEGORY_UPDATED', { id, action: 'delete' });
-        loadAllAdminData();
+  const requestDeleteBrand = (id: string, name: string) => {
+    setDeleteConfirmModal({
+      isOpen: true,
+      title: 'Delete Brand',
+      itemName: name,
+      itemType: 'brand',
+      description: `Are you sure you wish to delete brand "${name}"? This brand will be removed and changes saved to cloud persistence.`,
+      onConfirm: async () => {
+        try {
+          const res = await api.deleteAdminBrand(id);
+          if (res.success) {
+            showToast(`Brand "${name}" removed successfully`, 'info');
+            broadcastSync('CATEGORY_UPDATED', { id, action: 'delete' });
+            loadAllAdminData();
+          }
+        } catch (err: any) {
+          showToast(err.message || 'Failed to delete brand', 'error');
+        }
       }
-    } catch (err: any) {
-      showToast(err.message || 'Failed to delete brand', 'error');
-    }
+    });
   };
 
   // Order status update
@@ -1169,21 +1203,28 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   // Bulk Delete
   const handleBulkDelete = async () => {
     if (selectedProductIds.length === 0) return;
-    if (!window.confirm(`Are you sure you want to delete ${selectedProductIds.length} selected products?`)) {
-      return;
-    }
-    try {
-      let count = 0;
-      for (const id of selectedProductIds) {
-        await api.deleteAdminProduct(id);
-        count++;
+    const count = selectedProductIds.length;
+    setDeleteConfirmModal({
+      isOpen: true,
+      title: 'Bulk Delete Products',
+      itemName: `${count} Selected Products`,
+      itemType: 'products',
+      description: `Are you sure you want to permanently delete ${count} selected products? This action will remove them from the catalog and cloud persistence.`,
+      onConfirm: async () => {
+        try {
+          let deleted = 0;
+          for (const id of selectedProductIds) {
+            await api.deleteAdminProduct(id);
+            deleted++;
+          }
+          showToast(`Successfully removed ${deleted} products from catalog`, 'success');
+          setSelectedProductIds([]);
+          loadAllAdminData();
+        } catch (err: any) {
+          showToast(err.message || 'Error deleting selected products', 'error');
+        }
       }
-      showToast(`Removed ${count} products from catalog`, 'success');
-      setSelectedProductIds([]);
-      loadAllAdminData();
-    } catch (err: any) {
-      showToast(err.message || 'Error deleting selected products', 'error');
-    }
+    });
   };
 
   // Bulk Edit Modal Submission
@@ -2174,7 +2215,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                                 <Edit2 className="w-3.5 h-3.5" />
                               </button>
                               <button
-                                onClick={() => handleDeleteProduct(prod.id)}
+                                onClick={() => requestDeleteProduct(prod.id, prod.name)}
                                 className="p-1.5 bg-stone-100 hover:bg-rose-600 hover:text-white text-stone-400 rounded-xs transition-colors cursor-pointer"
                                 title="Decommission Product"
                               >
@@ -2440,7 +2481,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                                   <Edit2 className="w-3.5 h-3.5" />
                                 </button>
                                 <button
-                                  onClick={() => handleDeleteCategory(cat.id, cat.name)}
+                                  onClick={() => requestDeleteCategory(cat.id, cat.name)}
                                   className="p-1.5 bg-white border border-stone-200 hover:bg-rose-50 hover:text-rose-700 text-stone-400 rounded-xs transition-colors cursor-pointer"
                                   title="Delete Category"
                                 >
@@ -2543,7 +2584,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                                   <Edit2 className="w-3.5 h-3.5" />
                                 </button>
                                 <button
-                                  onClick={() => handleDeleteBrand(brand.id, brand.name)}
+                                  onClick={() => requestDeleteBrand(brand.id, brand.name)}
                                   className="p-1.5 bg-white border border-stone-200 hover:bg-rose-50 hover:text-rose-700 text-stone-400 rounded-xs transition-colors cursor-pointer"
                                   title="Delete Brand"
                                 >
@@ -3766,6 +3807,59 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Revoke & Delete Staff</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* IN-APP CONFIRM DELETE MODAL (Replaces blocked window.confirm) */}
+      {deleteConfirmModal && (
+        <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center gap-3 border-b border-stone-100 pb-3">
+              <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5 text-rose-600" />
+              </div>
+              <div>
+                <h3 className="font-serif text-base font-bold text-stone-900">{deleteConfirmModal.title}</h3>
+                <p className="text-xs text-stone-500">Confirm permanent deletion</p>
+              </div>
+            </div>
+
+            <div className="bg-stone-50 border border-stone-200 rounded-xs p-3 space-y-2 text-xs">
+              <p className="text-stone-700">
+                Are you sure you want to delete <strong className="text-stone-900">{deleteConfirmModal.itemName}</strong>?
+              </p>
+              {deleteConfirmModal.description && (
+                <p className="text-stone-600 text-[11px] leading-relaxed">
+                  {deleteConfirmModal.description}
+                </p>
+              )}
+              <p className="text-rose-600 text-[11px] font-medium pt-1">
+                ⚠️ This will update cloud persistence and remove the item across all sessions.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmModal(null)}
+                className="bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold px-4 py-2 rounded-xs cursor-pointer transition-colors text-xs"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const action = deleteConfirmModal.onConfirm;
+                  setDeleteConfirmModal(null);
+                  await action();
+                }}
+                className="bg-rose-600 hover:bg-rose-700 text-white font-semibold px-4 py-2 rounded-xs cursor-pointer transition-colors text-xs flex items-center gap-1.5 shadow-xs"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Confirm Delete</span>
               </button>
             </div>
           </div>

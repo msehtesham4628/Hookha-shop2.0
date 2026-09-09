@@ -182,11 +182,13 @@ class MongoDatabaseService {
     try {
       const coll = this.db.collection(collectionName);
       const query = doc.id ? { id: doc.id } : { _id: (doc as any)._id };
-      await coll.updateOne(query, { $set: doc }, { upsert: true });
+      const docCopy = { ...(doc as any) };
+      delete docCopy._id;
+      await coll.updateOne(query, { $set: docCopy }, { upsert: true });
       await this.refreshCounts();
       return true;
     } catch (err: any) {
-      console.log(`[MongoDB] Notice: Could not save document to ${collectionName}. Local store active.`);
+      console.log(`[MongoDB] Notice: Could not save document to ${collectionName}. Local store active:`, err?.message);
       return false;
     }
   }
@@ -199,13 +201,17 @@ class MongoDatabaseService {
 
       for (let i = 0; i < docs.length; i += batchSize) {
         const batch = docs.slice(i, i + batchSize);
-        const ops = batch.map(item => ({
-          updateOne: {
-            filter: item.id ? { id: item.id } : { _id: (item as any)._id },
-            update: { $set: item },
-            upsert: true
-          }
-        }));
+        const ops = batch.map(item => {
+          const itemCopy = { ...(item as any) };
+          delete itemCopy._id;
+          return {
+            updateOne: {
+              filter: item.id ? { id: item.id } : { _id: (item as any)._id },
+              update: { $set: itemCopy },
+              upsert: true
+            }
+          };
+        });
         const res = await coll.bulkWrite(ops, { ordered: false });
         written += (res.upsertedCount + res.modifiedCount + res.matchedCount);
       }
@@ -213,7 +219,7 @@ class MongoDatabaseService {
       await this.refreshCounts();
       return written;
     } catch (err: any) {
-      console.log(`[MongoDB] Notice: Bulk write to ${collectionName} deferred.`);
+      console.log(`[MongoDB] Notice: Bulk write to ${collectionName} deferred:`, err?.message);
       return 0;
     }
   }
@@ -400,19 +406,33 @@ class MongoDatabaseService {
           store.users = Array.from(userMap.values());
         }
         if (mongoOrders.length > 0) store.orders = mongoOrders;
-        if (mongoCategories.length > 0) {
-          store.categories = mongoCategories.filter((c: any) =>
-            !store.isCategoryDeleted(c.id) &&
-            !store.isCategoryDeleted(c.slug) &&
-            !store.isCategoryDeleted(c.name)
-          );
+        if (mongoCategories.length > 0 || store.categories.length > 0) {
+          const catMap = new Map<string, any>();
+          for (const c of store.categories) {
+            if (!store.isCategoryDeleted(c.id) && !store.isCategoryDeleted(c.slug) && !store.isCategoryDeleted(c.name)) {
+              catMap.set(c.id, c);
+            }
+          }
+          for (const c of mongoCategories) {
+            if (!store.isCategoryDeleted(c.id) && !store.isCategoryDeleted(c.slug) && !store.isCategoryDeleted(c.name)) {
+              catMap.set(c.id, c);
+            }
+          }
+          store.categories = Array.from(catMap.values());
         }
-        if (mongoBrands.length > 0) {
-          store.brands = mongoBrands.filter((b: any) =>
-            !store.isBrandDeleted(b.id) &&
-            !store.isBrandDeleted(b.slug) &&
-            !store.isBrandDeleted(b.name)
-          );
+        if (mongoBrands.length > 0 || store.brands.length > 0) {
+          const brandMap = new Map<string, any>();
+          for (const b of store.brands) {
+            if (!store.isBrandDeleted(b.id) && !store.isBrandDeleted(b.slug) && !store.isBrandDeleted(b.name)) {
+              brandMap.set(b.id, b);
+            }
+          }
+          for (const b of mongoBrands) {
+            if (!store.isBrandDeleted(b.id) && !store.isBrandDeleted(b.slug) && !store.isBrandDeleted(b.name)) {
+              brandMap.set(b.id, b);
+            }
+          }
+          store.brands = Array.from(brandMap.values());
         }
         if (mongoReviews.length > 0) store.reviews = mongoReviews;
         if (mongoCoupons.length > 0) store.coupons = mongoCoupons;
