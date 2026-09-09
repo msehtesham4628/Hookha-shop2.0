@@ -20,6 +20,7 @@ import { AuthPage } from './pages/AuthPage.js';
 import { AboutPage } from './pages/AboutPage.js';
 import { ContactPage } from './pages/ContactPage.js';
 import { AdminDashboardPage } from './pages/AdminDashboardPage.js';
+import { ExcelProductSyncPage } from './pages/ExcelProductSyncPage.js';
 import { OrderTrackingPage } from './pages/OrderTrackingPage.js';
 
 export default function App() {
@@ -53,6 +54,7 @@ export default function App() {
     if (pathOnly === '/auth/otp') return <AuthPage initialMode="login" onNavigate={navigate} />;
     if (pathOnly === '/about') return <AboutPage onNavigate={navigate} />;
     if (pathOnly === '/contact') return <ContactPage onNavigate={navigate} />;
+    if (pathOnly === '/admin/excel-sync') return <ExcelProductSyncPage onNavigate={navigate} />;
     if (pathOnly === '/dashboard' || pathOnly === '/admin') return <AdminDashboardPage onNavigate={navigate} />;
     return <HomePage onNavigate={navigate} />;
   };
