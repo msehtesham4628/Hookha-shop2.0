@@ -62,7 +62,21 @@ jobs:
               if marker not in s:
                   raise SystemExit('MongoDB sync marker not found')
               s = s.replace(marker, method + marker, 1)
-              p.write_text(s)
+
+          # Purge deleted users from MongoDB before loading the users collection.
+          cleanup_marker = "        if (store.persistenceData.deletedProductIds?.length > 0) {\n          await this.db.collection('products').deleteMany({\n            id: { $in: store.persistenceData.deletedProductIds }\n          });\n        }"
+          cleanup_replacement = cleanup_marker + "\n        if (store.persistenceData.deletedUserIds?.length > 0) {\n          await this.db.collection('users').deleteMany({\n            id: { $in: store.persistenceData.deletedUserIds }\n          });\n        }"
+          if "this.db.collection('users').deleteMany({" not in s and cleanup_marker in s:
+              s = s.replace(cleanup_marker, cleanup_replacement, 1)
+
+          # Never merge a MongoDB user whose id is already tombstoned locally/cloud.
+          users_marker = "        if (mongoUsers.length > 0) {\n          const userMap = new Map<string, User & { passwordHash?: string }>();"
+          users_replacement = "        if (mongoUsers.length > 0) {\n          const deletedUserSet = new Set((store.persistenceData.deletedUserIds || []).map((id: string) => id.toLowerCase().trim()));\n          const activeMongoUsers = mongoUsers.filter((u: any) => !deletedUserSet.has(String(u.id || '').toLowerCase().trim()));\n          const userMap = new Map<string, User & { passwordHash?: string }>();"
+          if users_marker in s:
+              s = s.replace(users_marker, users_replacement, 1)
+              s = s.replace("          for (const u of mongoUsers) {\n            userMap.set(u.email.toLowerCase(), u);\n          }", "          for (const u of activeMongoUsers) {\n            userMap.set(u.email.toLowerCase(), u);\n          }", 1)
+
+          p.write_text(s)
           PY
 
       - name: Patch delete persistence to use atomic tombstones
