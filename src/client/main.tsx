@@ -5,38 +5,59 @@ import App from './App.js';
 import { api } from './services/api.js';
 import './index.css';
 
-// Keep the admin catalog refresh on the same page/search/filter view.
-// AdminDashboardPage performs a broad load after mutations with only
-// { page: 1, limit, sort }. Remember the most recent fully-qualified catalog
-// query so that mutation refreshes don't unexpectedly jump back to page 1.
+// Keep admin catalog refreshes on the same page/search/filter view.
+// Also deduplicate/collapse repeated product GETs. Several storefront/admin
+// effects can request the same catalog query during mount/navigation; without
+// this guard each one invokes a separate Vercel function.
 const originalGetProducts = api.getProducts.bind(api);
 const catalogQueryStorageKey = 'fumare_admin_catalog_query';
 const catalogQueryKeys = new Set(['page', 'limit', 'search', 'category', 'brand', 'stock', 'stockFilter', 'sort', 'sortBy']);
+const productRequestCache = new Map<string, { expiresAt: number; value: Promise<any> }>();
+const PRODUCT_CACHE_TTL_MS = 5000;
 
 api.getProducts = async (params: Record<string, any> = {}) => {
-  const hasCatalogViewState = Object.keys(params).some((key) =>
-    ['search', 'category', 'brand', 'stock', 'stockFilter'].includes(key) && params[key] !== undefined && params[key] !== null && params[key] !== ''
-  ) || (params.page !== undefined && Number(params.page) > 1);
+  let requestParams = { ...params };
+
+  const hasCatalogViewState = Object.keys(requestParams).some((key) =>
+    ['search', 'category', 'brand', 'stock', 'stockFilter'].includes(key) && requestParams[key] !== undefined && requestParams[key] !== null && requestParams[key] !== ''
+  ) || (requestParams.page !== undefined && Number(requestParams.page) > 1);
 
   if (hasCatalogViewState) {
     try {
       localStorage.setItem(catalogQueryStorageKey, JSON.stringify(
-        Object.fromEntries(Object.entries(params).filter(([key]) => catalogQueryKeys.has(key)))
+        Object.fromEntries(Object.entries(requestParams).filter(([key]) => catalogQueryKeys.has(key)))
       ));
     } catch {}
-  } else if (params.page === 1 && !params.search && !params.category && !params.brand && !params.stock && !params.stockFilter) {
+  } else if (requestParams.page === 1 && !requestParams.search && !requestParams.category && !requestParams.brand && !requestParams.stock && !requestParams.stockFilter) {
     try {
       const saved = localStorage.getItem(catalogQueryStorageKey);
       if (saved) {
         const remembered = JSON.parse(saved);
         if (remembered && typeof remembered === 'object') {
-          params = { ...remembered, ...params };
+          requestParams = { ...remembered, ...requestParams };
         }
       }
     } catch {}
   }
 
-  return originalGetProducts(params);
+  // Stable key so concurrent/repeated identical requests share one promise.
+  const cacheKey = Object.keys(requestParams)
+    .sort()
+    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(String(requestParams[key]))}`)
+    .join('&');
+  const now = Date.now();
+  const cached = productRequestCache.get(cacheKey);
+  if (cached && cached.expiresAt > now) {
+    return cached.value;
+  }
+
+  const value = originalGetProducts(requestParams);
+  productRequestCache.set(cacheKey, { expiresAt: now + PRODUCT_CACHE_TTL_MS, value });
+  void value.catch(() => {
+    const current = productRequestCache.get(cacheKey);
+    if (current?.value === value) productRequestCache.delete(cacheKey);
+  });
+  return value;
 };
 
 // Defensive fallback for the homepage vape-brand section. The build scripts
