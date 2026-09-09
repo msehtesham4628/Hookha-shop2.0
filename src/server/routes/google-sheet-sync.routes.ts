@@ -62,9 +62,34 @@ function product(row: Record<string, unknown>, existing?: Product): Product {
 }
 
 async function sync(rows: Record<string, unknown>[]) {
+  // Never allow a blank or accidentally truncated spreadsheet to delete the catalog.
+  if (!rows.length) throw new Error('Google Sheet contains no product rows; database was not changed');
+
   const existing = await mongoService.getDocuments<Product>('products');
+  const existingCount = existing.length;
+
+  // If a catalog already exists, a sudden drop to a tiny fraction is almost
+  // certainly an empty/truncated sheet or failed export. Refuse the destructive
+  // sync and keep MongoDB untouched. Normal intentional edits/deletions remain
+  // possible when the sheet still contains the majority of the catalog.
+  if (existingCount >= 100 && rows.length < Math.max(10, Math.floor(existingCount * 0.50))) {
+    throw new Error(`Google Sheet contains only ${rows.length} products while MongoDB contains ${existingCount}; sync blocked to prevent catalog deletion`);
+  }
+
+  const seenSkus = new Set<string>();
+  for (const [i, row] of rows.entries()) {
+    const sku = String(value(row, 'sku') ?? '').trim().toUpperCase();
+    const name = String(value(row, 'name') ?? '').trim();
+    if (!sku || !name || num(value(row, 'price')) === undefined) {
+      throw new Error(`Invalid row ${i + 2}: SKU, Name and Price are required`);
+    }
+    if (seenSkus.has(sku)) throw new Error(`Duplicate SKU ${sku} found in Google Sheet row ${i + 2}; sync blocked`);
+    seenSkus.add(sku);
+  }
+
   const bySku = new Map(existing.map(p => [String(p.sku).trim().toUpperCase(), p]));
   const imported = rows.map(r => product(r, bySku.get(String(value(r,'sku') ?? '').trim().toUpperCase())));
+
   await mongoService.saveManyDocuments('products', imported, 250);
   const keys = new Set(imported.map(p => p.sku.toUpperCase()));
   const removed = existing.filter(p => !keys.has(String(p.sku).trim().toUpperCase()));
@@ -85,7 +110,6 @@ router.get('/google-sheet-sync', async (req, res) => {
     const url=`https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/export?format=csv&gid=${encodeURIComponent(gid)}`;
     const upstream=await fetch(url,{redirect:'follow'}); if(!upstream.ok) throw new Error(`Google Sheet returned HTTP ${upstream.status}`);
     const rows=csvParse(await upstream.text()); if(!rows.length) throw new Error('Google Sheet contains no product rows');
-    for(const [i,r] of rows.entries()) { if(!String(value(r,'sku')??'').trim() || !String(value(r,'name')??'').trim() || num(value(r,'price'))===undefined) throw new Error(`Invalid row ${i+2}: SKU, Name and Price are required`); }
     const connected=await mongoService.connect(); if(!connected) return res.status(503).json({success:false,error:'MongoDB unavailable'});
     const data=await sync(rows); console.log(`[Google Sheet Sync] ${data.imported} products applied; ${data.removed} removed.`); return res.json({success:true,data});
   } catch(err:any) { console.error('[Google Sheet Sync]',err); return res.status(500).json({success:false,error:err?.message||'Google Sheet sync failed'}); }
