@@ -51,6 +51,16 @@ export function getDefaultPersistenceData(): StorePersistenceData {
   };
 }
 
+export function isServerless(): boolean {
+  return Boolean(
+    process.env.VERCEL ||
+    process.env.VERCEL_ENV ||
+    process.env.AWS_LAMBDA_FUNCTION_NAME ||
+    process.env.LAMBDA_TASK_ROOT ||
+    (process.env.NODE_ENV === 'production' && !process.env.LOCAL_DEV)
+  );
+}
+
 export function getPersistenceFilePath(): string {
   return path.join(process.cwd(), 'src/server/db', 'store-persistence.json');
 }
@@ -88,9 +98,8 @@ export function loadPersistenceData(): StorePersistenceData {
 }
 
 export function savePersistenceData(data: StorePersistenceData): void {
-  // Vercel serverless deployments have a read-only application filesystem.
-  // Persistence is stored in MongoDB by DatabaseStore.savePersistence().
-  if (process.env.VERCEL || process.env.VERCEL_ENV) {
+  // 1. Guard against write operations on read-only serverless runtimes
+  if (isServerless()) {
     return;
   }
 
@@ -101,11 +110,15 @@ export function savePersistenceData(data: StorePersistenceData): void {
       fs.mkdirSync(dir, { recursive: true });
     }
     const serialized = JSON.stringify(data, null, 2);
-    // Write atomically via temporary file to prevent corruption on sudden termination
     const tempPath = `${filePath}.tmp.${Date.now()}`;
     fs.writeFileSync(tempPath, serialized, 'utf8');
     fs.renameSync(tempPath, filePath);
-  } catch (err) {
+  } catch (err: any) {
+    // 2. Catch and suppress EROFS errors so requests do not crash on unexpected read-only mounts
+    if (err?.code === 'EROFS') {
+      console.warn('[Persistence] Skipping local disk persistence: environment file system is read-only.');
+      return;
+    }
     console.error('[Persistence] Error saving store-persistence.json:', err);
   }
 }
