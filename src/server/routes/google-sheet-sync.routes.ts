@@ -6,22 +6,13 @@ import { Product } from '../../types/index.js';
 const router = Router();
 
 function csvParse(text: string): Record<string, string>[] {
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let cell = '';
-  let quoted = false;
+  const rows: string[][] = []; let row: string[] = []; let cell = ''; let quoted = false;
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
-    if (ch === '"') {
-      if (quoted && text[i + 1] === '"') { cell += '"'; i++; }
-      else quoted = !quoted;
-    } else if (ch === ',' && !quoted) { row.push(cell); cell = ''; }
-    else if ((ch === '\n' || ch === '\r') && !quoted) {
-      if (ch === '\r' && text[i + 1] === '\n') i++;
-      row.push(cell); cell = '';
-      if (row.some(v => v.trim() !== '')) rows.push(row);
-      row = [];
-    } else cell += ch;
+    if (ch === '"') { if (quoted && text[i + 1] === '"') { cell += '"'; i++; } else quoted = !quoted; }
+    else if (ch === ',' && !quoted) { row.push(cell); cell = ''; }
+    else if ((ch === '\n' || ch === '\r') && !quoted) { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cell); cell = ''; if (row.some(v => v.trim() !== '')) rows.push(row); row = []; }
+    else cell += ch;
   }
   if (cell.length || row.length) { row.push(cell); rows.push(row); }
   const headers = (rows.shift() || []).map(h => h.trim());
@@ -39,18 +30,24 @@ const aliases: Record<string, string[]> = {
   isBestSeller: ['best seller', 'bestseller', 'is bestseller', 'is best seller'], isNewArrival: ['new arrival', 'newarrival', 'is new arrival']
 };
 const norm = (v: unknown) => String(v ?? '').trim().toLowerCase().replace(/[_.-]+/g, ' ').replace(/\s+/g, ' ');
-function value(row: Record<string, unknown>, field: string) {
-  const map = new Map(Object.entries(row).map(([k, v]) => [norm(k), v]));
-  for (const a of aliases[field] || []) { const v = map.get(norm(a)); if (v !== undefined && String(v).trim() !== '') return v; }
-  return undefined;
-}
+function value(row: Record<string, unknown>, field: string) { const map = new Map(Object.entries(row).map(([k, v]) => [norm(k), v])); for (const a of aliases[field] || []) { const v = map.get(norm(a)); if (v !== undefined && String(v).trim() !== '') return v; } return undefined; }
 function num(v: unknown, fallback?: number) { if (v === undefined || v === null || String(v).trim() === '') return fallback; const n = Number(String(v).replace(/[$,]/g, '').trim()); return Number.isFinite(n) ? n : fallback; }
 function bool(v: unknown, fallback?: boolean) { if (v === undefined || v === null || String(v).trim() === '') return fallback; const s = String(v).trim().toLowerCase(); if (['true','yes','y','1','active','enabled'].includes(s)) return true; if (['false','no','n','0','inactive','disabled'].includes(s)) return false; return fallback; }
 function slug(v: string) { return v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
+function autoSku(name: string, brand: string, category: string) {
+  const seed = `${norm(name)}|${norm(brand)}|${norm(category)}`; let hash = 0;
+  for (let i = 0; i < seed.length; i++) hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+  return `AUTO-${slug(name).slice(0, 32) || 'PRODUCT'}-${Math.abs(hash).toString(36).toUpperCase()}`;
+}
 function product(row: Record<string, unknown>, existing?: Product): Product {
-  const now = new Date().toISOString(); const name = String(value(row,'name') ?? existing?.name ?? '').trim(); const sku = String(value(row,'sku') ?? existing?.sku ?? '').trim().toUpperCase();
-  const brand = String(value(row,'brand') ?? existing?.brand ?? 'Imported Brand').trim(); const category = String(value(row,'category') ?? existing?.category ?? 'Accessories').trim();
-  const price = num(value(row,'price'), existing?.price ?? 0) ?? 0; const sale = num(value(row,'salePrice'), existing?.salePrice); const stock = Math.max(0, Math.trunc(num(value(row,'stock'), existing?.stock ?? 0) ?? 0));
+  const now = new Date().toISOString();
+  const name = String(value(row,'name') ?? existing?.name ?? '').trim();
+  const brand = String(value(row,'brand') ?? existing?.brand ?? 'Imported Brand').trim();
+  const category = String(value(row,'category') ?? existing?.category ?? 'Accessories').trim();
+  const rawSku = String(value(row,'sku') ?? '').trim().toUpperCase();
+  const sku = rawSku || existing?.sku || autoSku(name, brand, category);
+  const price = num(value(row,'price'), existing?.price ?? 0) ?? 0; const sale = num(value(row,'salePrice'), existing?.salePrice);
+  const stock = Math.max(0, Math.trunc(num(value(row,'stock'), existing?.stock ?? 0) ?? 0));
   const p: Product = existing ? { ...existing } : { id:`prod-${Date.now()}-${Math.random().toString(36).slice(2,8)}`, name, slug:`${slug(name)}-${Math.floor(100+Math.random()*900)}`, sku, description:'', shortDescription:'', price, currency:'USD', brand, brandSlug:slug(brand), category, categorySlug:slug(category), images:[], stock, lowStockThreshold:5, tags:[], specifications:[], rating:5, reviewCount:0, isFeatured:false, isNewArrival:false, isBestSeller:false, isOnSale:false, isActive:true, ageRestricted:true, seoTitle:`${name} | Fumare Hookah`, seoDescription:'', createdAt:now, updatedAt:now };
   p.name=name; p.sku=sku; p.price=price; p.salePrice=sale; p.isOnSale=sale !== undefined && sale < price; p.brand=brand; p.brandSlug=slug(brand); p.category=category; p.categorySlug=slug(category); p.stock=stock;
   for (const [f, key] of [['description','description'],['shortDescription','shortDescription'],['flavor','flavor'],['material','material'],['color','color']] as const) { const v=value(row,key); if(v!==undefined) (p as any)[f]=String(v); }
@@ -62,50 +59,39 @@ function product(row: Record<string, unknown>, existing?: Product): Product {
 }
 
 async function sync(rows: Record<string, unknown>[]) {
-  // Never allow a blank or accidentally truncated spreadsheet to delete the catalog.
   if (!rows.length) throw new Error('Google Sheet contains no product rows; database was not changed');
+  const existing = await mongoService.getDocuments<Product>('products'); const existingCount = existing.length;
+  if (existingCount >= 100 && rows.length < Math.max(10, Math.floor(existingCount * 0.50))) throw new Error(`Google Sheet contains only ${rows.length} products while MongoDB contains ${existingCount}; sync blocked to prevent catalog deletion`);
 
-  const existing = await mongoService.getDocuments<Product>('products');
-  const existingCount = existing.length;
-
-  // If a catalog already exists, a sudden drop to a tiny fraction is almost
-  // certainly an empty/truncated sheet or failed export. Refuse the destructive
-  // sync and keep MongoDB untouched. Normal intentional edits/deletions remain
-  // possible when the sheet still contains the majority of the catalog.
-  if (existingCount >= 100 && rows.length < Math.max(10, Math.floor(existingCount * 0.50))) {
-    throw new Error(`Google Sheet contains only ${rows.length} products while MongoDB contains ${existingCount}; sync blocked to prevent catalog deletion`);
-  }
-
-  const seenSkus = new Set<string>();
+  const seenKeys = new Set<string>();
   for (const [i, row] of rows.entries()) {
-    const sku = String(value(row, 'sku') ?? '').trim().toUpperCase();
-    const name = String(value(row, 'name') ?? '').trim();
-    if (!sku || !name || num(value(row, 'price')) === undefined) {
-      throw new Error(`Invalid row ${i + 2}: SKU, Name and Price are required`);
-    }
-    if (seenSkus.has(sku)) throw new Error(`Duplicate SKU ${sku} found in Google Sheet row ${i + 2}; sync blocked`);
-    seenSkus.add(sku);
+    const sku = String(value(row, 'sku') ?? '').trim().toUpperCase(); const name = String(value(row, 'name') ?? '').trim();
+    const brand = String(value(row, 'brand') ?? 'Imported Brand').trim(); const category = String(value(row, 'category') ?? 'Accessories').trim();
+    if (!name || num(value(row, 'price')) === undefined) throw new Error(`Invalid row ${i + 2}: Name and Price are required`);
+    const key = sku || autoSku(name, brand, category); if (seenKeys.has(key)) throw new Error(`Duplicate product key ${key} found in Google Sheet row ${i + 2}; sync blocked`); seenKeys.add(key);
   }
 
-  const bySku = new Map(existing.map(p => [String(p.sku).trim().toUpperCase(), p]));
-  const imported = rows.map(r => product(r, bySku.get(String(value(r,'sku') ?? '').trim().toUpperCase())));
+  const bySku = new Map(existing.map(p => [String(p.sku).trim().toUpperCase(), p])); const byIdentity = new Map<string, Product>();
+  for (const p of existing) byIdentity.set(`${norm(p.name)}|${norm(p.brand)}|${norm(p.category)}`, p);
+  const imported = rows.map(r => {
+    const rawSku = String(value(r,'sku') ?? '').trim().toUpperCase(); const name = String(value(r,'name') ?? '').trim();
+    const brand = String(value(r,'brand') ?? 'Imported Brand').trim(); const category = String(value(r,'category') ?? 'Accessories').trim();
+    const existingProduct = rawSku ? bySku.get(rawSku) : byIdentity.get(`${norm(name)}|${norm(brand)}|${norm(category)}`);
+    return product(r, existingProduct);
+  });
 
   await mongoService.saveManyDocuments('products', imported, 250);
-  const keys = new Set(imported.map(p => p.sku.toUpperCase()));
-  const removed = existing.filter(p => !keys.has(String(p.sku).trim().toUpperCase()));
+  const keys = new Set(imported.map(p => p.sku.toUpperCase())); const removed = existing.filter(p => !keys.has(String(p.sku).trim().toUpperCase()));
   for (const p of removed) await mongoService.deleteDocument('products', { id:p.id });
-  db.products=imported; db.persistenceData.productOverrides={};
-  db.persistenceData.deletedProductIds=db.persistenceData.deletedProductIds.filter(id=>!new Set(imported.map(p=>p.id)).has(id));
+  db.products=imported; db.persistenceData.productOverrides={}; db.persistenceData.deletedProductIds=db.persistenceData.deletedProductIds.filter(id=>!new Set(imported.map(p=>p.id)).has(id));
   await mongoService.saveDocument('persistence',{id:'store_persistence',...db.persistenceData}); await mongoService.refreshCounts();
-  return { imported:imported.length, updated:imported.filter(p=>bySku.has(p.sku.toUpperCase())).length, created:imported.filter(p=>!bySku.has(p.sku.toUpperCase())).length, removed:removed.length, total:imported.length };
+  return { imported:imported.length, updated:imported.filter(p=>existing.some(e => e.id === p.id)).length, created:imported.filter(p=>!existing.some(e => e.id === p.id)).length, removed:removed.length, total:imported.length };
 }
 
-// Called by Vercel Cron. The Google Sheet must be shared so its CSV export is readable.
 router.get('/google-sheet-sync', async (req, res) => {
   const cronSecret = process.env.CRON_SECRET;
   if (cronSecret && req.headers.authorization !== `Bearer ${cronSecret}`) return res.status(401).json({success:false,error:'Unauthorized'});
-  const sheetId = process.env.GOOGLE_SHEET_ID || '1HA0qAPe8xB3wqhotJeju_vbKnK0Cahtu82PKAdAznqY';
-  const gid = process.env.GOOGLE_SHEET_GID || '0';
+  const sheetId = process.env.GOOGLE_SHEET_ID || '1HA0qAPe8xB3wqhotJeju_vbKnK0Cahtu82PKAdAznqY'; const gid = process.env.GOOGLE_SHEET_GID || '0';
   try {
     const url=`https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/export?format=csv&gid=${encodeURIComponent(gid)}`;
     const upstream=await fetch(url,{redirect:'follow'}); if(!upstream.ok) throw new Error(`Google Sheet returned HTTP ${upstream.status}`);
