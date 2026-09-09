@@ -12,7 +12,6 @@ import miscRoutes from './routes/misc.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import seoRoutes from './routes/seo.routes.js';
 import { createSeoMiddleware } from './middleware/seoCrawlerMiddleware.js';
-import { db } from './db/store.js';
 
 export const app = express();
 
@@ -34,17 +33,11 @@ app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Wait for the database store to finish cloud hydration before serving API requests.
-// This prevents Vercel cold starts from returning seed-only data before MongoDB
-// tombstones and persisted overrides have been merged into memory.
-app.use('/api', async (_req, _res, next) => {
-  try {
-    await db.ready;
-    next();
-  } catch (err) {
-    next(err);
-  }
-});
+// IMPORTANT FOR VERCEL SERVERLESS:
+// Do NOT globally await db.ready here. MongoDB hydration can take longer than
+// the Vercel function timeout and would make login, registration, products,
+// cart, wishlist and other public APIs return 504 on cold starts.
+// Administrative MongoDB synchronization is handled explicitly in api/index.ts.
 
 // API Health & Info
 app.get('/api/health', (req, res) => {
