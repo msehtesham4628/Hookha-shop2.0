@@ -259,6 +259,7 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   resendEnabled: true,
   smsProvider: 'twilio',
   bannerAnnouncement: 'Fumare Hookah · Fast Worldwide & US Express Shipping · Official Master Distributor for MustHave, DarkSide, Alpha Hookah, Oblako & Kong',
+  fontVibe: 'avant-garde',
   maintenanceMode: false
 };
 

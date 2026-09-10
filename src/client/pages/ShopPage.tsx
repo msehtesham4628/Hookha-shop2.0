@@ -6,8 +6,8 @@ import { CategoryBrandBadges } from '../components/CategoryBrandBadges.js';
 import { CategoryHeroBanner } from '../components/CategoryHeroBanner.js';
 import { Product, Category, Brand } from '../../types/index.js';
 import { useTranslation } from '../i18n/LanguageContext.js';
-import { SEOHead } from '../components/SEOHead.js';
-import { getItemListSchema, MARKET_KEYWORDS } from '../../shared/seoConstants.js';
+import { useCategoryHeadMetadata } from '../hooks/useDocumentMetadata.js';
+import { getBrandUrl } from '../utils/routeHelpers.js';
 import {
   SlidersHorizontal,
   X,
@@ -302,29 +302,20 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     { label: t('category.sort_price_high', 'Expensive'), value: 'price-high-low' }
   ];
 
-  // Calculate dynamic SEO parameters
-  const seoTitle = currentCategoryObj?.seoTitle || (currentCategoryObj ? `${currentCategoryObj.name} | Buy Online USA & Russia` : currentBrandObj?.seoTitle || (currentBrandObj ? `${currentBrandObj.name} Store | Official Master Distributor` : searchQuery ? `Search Results for "${searchQuery}"` : 'Shop Premier Hookahs, Shisha Tobacco, Bowls & Accessories'));
-  const seoRuTitle = currentCategoryObj ? `Купить ${currentCategoryObj.name} | Кальяны и табак с доставкой в США и РФ` : currentBrandObj ? `${currentBrandObj.name} купить в США и РФ | Официальный каталог` : searchQuery ? `Результаты поиска "${searchQuery}" | Fumare Hookah` : 'Каталог кальянов, табака для кальяна и аксессуаров';
-  const seoDesc = currentCategoryObj?.seoDescription || (currentCategoryObj ? `Shop authentic ${currentCategoryObj.name} featuring Alpha Hookah, MustHave, DarkSide, Oblako and Kong. Fast USA & international delivery.` : currentBrandObj?.seoDescription || (currentBrandObj ? `Official ${currentBrandObj.name} store at Fumare Hookah. Factory direct master distribution, 100% genuine with fast shipping.` : 'Browse over 5,000+ authentic Russian hookahs, dark leaf shisha tobacco, bowls, and coal. Express shipping across USA and worldwide.'));
-  const seoRuDesc = currentCategoryObj ? `Большой выбор в категории ${currentCategoryObj.name}. Официальная продукция с гарантией качества и быстрой доставкой по США и РФ.` : currentBrandObj ? `Оригинальная продукция ${currentBrandObj.name} от официального дистрибьютора. Доставка по США, РФ и СНГ.` : 'Каталог премиальных кальянов, табака для кальяна MustHave, DarkSide, чаш Oblako, Kong и аксессуаров.';
-  const seoPath = selectedCategory ? (isCategoryRoute ? (currentPage > 1 ? `/${selectedCategory}/page/${currentPage}` : `/${selectedCategory}`) : `/shop?category=${selectedCategory}`) : selectedBrand ? `/shop?brand=${selectedBrand}` : searchQuery ? `/shop?search=${encodeURIComponent(searchQuery)}` : '/shop';
-  const categoryKeywords = selectedCategory && MARKET_KEYWORDS.categories[selectedCategory as keyof typeof MARKET_KEYWORDS.categories]
-    ? MARKET_KEYWORDS.categories[selectedCategory as keyof typeof MARKET_KEYWORDS.categories].en
-    : [];
+  // Automatically generate, localize, and update document head metadata (canonical, og:image, title, schema.org)
+  useCategoryHeadMetadata({
+    categorySlug: selectedCategory || (selectedBrand ? 'shop' : 'shop'),
+    categoryName: currentCategoryObj?.name,
+    brandSlug: selectedBrand,
+    subcategory: selectedSubcategory,
+    page: currentPage,
+    products,
+    searchQuery,
+    bannerImage: currentCategoryObj?.bannerUrl
+  });
 
   return (
     <div className="w-full bg-stone-50/50 min-h-screen py-6 sm:py-8">
-      {/* Dynamic SEO Meta & Structured Data */}
-      <SEOHead
-        title={seoTitle}
-        ruTitle={seoRuTitle}
-        description={seoDesc}
-        ruDescription={seoRuDesc}
-        keywords={[...categoryKeywords, currentCategoryObj?.name || '', currentBrandObj?.name || '', 'Fumare Hookah', 'buy hookah online'].filter(Boolean)}
-        canonicalPath={seoPath}
-        jsonLd={getItemListSchema(currentCategoryObj?.name || currentBrandObj?.name || 'Catalog', products.map(p => ({ name: p.name, url: `/product/${p.slug}`, image: p.images?.[0]?.url })))}
-      />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Category Hero Banner with Rich Photography & Specs */}
@@ -353,6 +344,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           categoryName={currentCategoryObj?.name || 'Category'}
           selectedBrand={selectedBrand}
           onSelectBrand={(brandSlug) => setSelectedBrand(brandSlug)}
+          onNavigate={onNavigate}
         />
 
         {/* Sorting & Filter Trigger Bar - Matching Authentic World Hookah Market */}
@@ -545,24 +537,43 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
             {/* Brand Filter */}
             <div className="border-t border-stone-200 pt-5">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-2.5">
-                {t('category.filter_brand', 'Brand House')}
-              </h4>
+              <div className="flex items-center justify-between mb-2.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900">
+                  {t('category.filter_brand', 'Brand House')}
+                </h4>
+                <button
+                  type="button"
+                  onClick={() => onNavigate('/brands')}
+                  className="text-[10px] text-amber-900 hover:underline font-bold uppercase tracking-wider cursor-pointer"
+                >
+                  All Brands →
+                </button>
+              </div>
               <div className="space-y-1.5 text-xs text-stone-700 max-h-52 overflow-y-auto pr-1">
                 {brands.map((b, bIdx) => (
-                  <label
+                  <div
                     key={`${b.id}-${b.slug || bIdx}`}
-                    className="flex items-center gap-2 cursor-pointer py-1 px-1 rounded-xs hover:bg-stone-50"
+                    className="flex items-center gap-2 py-1 px-1 rounded-xs hover:bg-stone-50 group"
                   >
-                    <input
-                      type="checkbox"
-                      checked={selectedBrand === b.slug}
-                      onChange={() => setSelectedBrand(selectedBrand === b.slug ? '' : b.slug)}
-                      className="rounded-xs text-amber-900 focus:ring-amber-800"
-                    />
-                    <span className="font-medium text-stone-800">{b.name}</span>
-                    <span className="text-[10px] text-stone-400 ml-auto">{b.origin?.split(',')[0]}</span>
-                  </label>
+                    <label className="flex items-center gap-2 cursor-pointer flex-1 min-w-0">
+                      <input
+                        type="checkbox"
+                        checked={selectedBrand === b.slug}
+                        onChange={() => setSelectedBrand(selectedBrand === b.slug ? '' : b.slug)}
+                        className="rounded-xs text-amber-900 focus:ring-amber-800 shrink-0"
+                      />
+                      <span className="font-medium text-stone-800 truncate">{b.name}</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => onNavigate(getBrandUrl(b.slug, selectedCategory))}
+                      title={`Visit ${b.name} Brand Page`}
+                      className="opacity-0 group-hover:opacity-100 text-[10px] text-amber-800 hover:text-amber-950 font-semibold px-1 py-0.5 rounded cursor-pointer transition-opacity shrink-0"
+                    >
+                      page ↗
+                    </button>
+                    <span className="text-[10px] text-stone-400 shrink-0">{b.origin?.split(',')[0]}</span>
+                  </div>
                 ))}
               </div>
             </div>

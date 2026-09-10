@@ -5,8 +5,8 @@ import { useStore } from '../store/useStore.js';
 import { ProductCard } from '../components/ProductCard.js';
 import { Product, Review } from '../../types/index.js';
 import { sanitizeImageUrl, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/imageFallback.js';
-import { SEOHead } from '../components/SEOHead.js';
-import { getProductSchema, generateProductMeta } from '../../shared/seoConstants.js';
+import { useProductHeadMetadata } from '../hooks/useDocumentMetadata.js';
+import { getBrandUrl, getCategoryUrl } from '../utils/routeHelpers.js';
 import {
   Star,
   ShoppingBag,
@@ -64,11 +64,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, cate
     return valid.length > 0 ? valid : cleaned;
   }, [product?.images, failedImages]);
 
-  // Dynamically generate unique meta titles, descriptions, and keywords based on product data
-  const productMeta = useMemo(() => {
-    if (!product) return null;
-    return generateProductMeta(product);
-  }, [product]);
+  // Automatically generate, localize, and update document head metadata (canonical, og:image, title, schema.org)
+  useProductHeadMetadata(product, categorySlug);
 
   useEffect(() => {
     const loadProductData = async (silent = false) => {
@@ -191,36 +188,26 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, cate
 
   return (
     <div className="w-full bg-stone-50/40 py-8">
-      {/* Dynamic SEO Meta Tags & Schema.org Structured Data */}
-      <SEOHead
-        title={productMeta?.title || product.seoTitle || `${product.name} | Buy Online USA & Russia`}
-        ruTitle={productMeta?.ruTitle || `Купить ${product.name} | Оригинальный кальян/табак с доставкой`}
-        description={productMeta?.description || product.seoDescription || `Buy genuine ${product.name} by ${product.brand}. In stock with fast USA express shipping & worldwide delivery.`}
-        ruDescription={productMeta?.ruDescription || `Заказать оригинальный ${product.name} от ${product.brand}. 100% оригинал с гарантией, быстрая доставка по США и РФ.`}
-        keywords={productMeta?.keywords || [
-          product.name,
-          product.brand,
-          product.category,
-          `buy ${product.name}`,
-          `купить ${product.name}`,
-          'купить кальян',
-          'табак для кальяна'
-        ]}
-        canonicalPath={`/${product.categorySlug || categorySlug || 'product'}/${product.slug}`}
-        ogImage={activeImages[0]?.url}
-        ogType="product"
-        jsonLd={getProductSchema(product)}
-      />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-xs text-stone-500 mb-6 uppercase tracking-wider">
-          <button onClick={() => onNavigate('/')} className="hover:text-amber-900">Home</button>
+        <nav className="flex items-center gap-2 text-xs text-stone-500 mb-6 uppercase tracking-wider overflow-x-auto whitespace-nowrap pb-1">
+          <button onClick={() => onNavigate('/')} className="hover:text-amber-900 cursor-pointer">Home</button>
           <span>/</span>
-          <button onClick={() => onNavigate('/shop')} className="hover:text-amber-900">Shop</button>
-          <span>/</span>
-          <button onClick={() => onNavigate(`/${product.categorySlug || categorySlug || 'shop'}`)} className="hover:text-amber-900">{product.category}</button>
+          <button onClick={() => onNavigate(getCategoryUrl(product.categorySlug || categorySlug || 'shop'))} className="hover:text-amber-900 cursor-pointer">
+            {product.category}
+          </button>
+          {product.brand && (
+            <>
+              <span>/</span>
+              <button
+                onClick={() => onNavigate(getBrandUrl(product.brandSlug || product.brand, product.categorySlug || categorySlug))}
+                className="hover:text-amber-900 cursor-pointer font-medium text-stone-700"
+              >
+                {product.brand}
+              </button>
+            </>
+          )}
           <span>/</span>
           <span className="text-stone-900 font-semibold truncate max-w-xs">{product.name}</span>
         </nav>
@@ -280,7 +267,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, cate
           <div className="lg:col-span-6 flex flex-col justify-between space-y-6">
             <div>
               <div className="flex items-center justify-between text-xs uppercase tracking-widest text-stone-500 mb-1">
-                <span className="font-bold text-amber-900">{product.brand}</span>
+                <button
+                  onClick={() => onNavigate(getBrandUrl(product.brandSlug || product.brand, product.categorySlug || categorySlug))}
+                  className="font-bold text-amber-900 hover:text-amber-700 hover:underline cursor-pointer flex items-center gap-1"
+                >
+                  <span>{product.brand}</span>
+                  <span className="text-[10px] text-stone-400">↗</span>
+                </button>
                 <span>SKU: {product.sku}</span>
               </div>
 

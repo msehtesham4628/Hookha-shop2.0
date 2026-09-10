@@ -66,6 +66,7 @@ interface AppState {
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
   removeToast: (id: string) => void;
   loadSettings: () => Promise<void>;
+  updateFontVibe: (vibe: 'avant-garde' | 'imperial' | 'cyber' | 'haute') => Promise<void>;
 }
 
 const emptyCart: Cart = {
@@ -429,9 +430,40 @@ export const useStore = create<AppState>((set, get) => {
         const res = await api.getSettings();
         if (res.success && res.data) {
           set({ settings: res.data });
+          const vibe = res.data.fontVibe || 'avant-garde';
+          if (typeof document !== 'undefined') {
+            document.documentElement.setAttribute('data-font-vibe', vibe);
+            try {
+              localStorage.setItem('fumare_font_vibe', vibe);
+            } catch {}
+          }
         }
       } catch (err) {
         console.error('Error loading settings:', err);
+      }
+    },
+
+    updateFontVibe: async (vibe) => {
+      // Optimistic update
+      if (typeof document !== 'undefined') {
+        document.documentElement.setAttribute('data-font-vibe', vibe);
+        try {
+          localStorage.setItem('fumare_font_vibe', vibe);
+        } catch {}
+      }
+      set((state) => ({
+        settings: state.settings ? { ...state.settings, fontVibe: vibe } : null
+      }));
+
+      // Call Admin API to persist globally across all visitors
+      try {
+        const res = await api.updateAdminSettings({ fontVibe: vibe });
+        if (res.success) {
+          get().showToast(`Global typography updated to "${vibe}" for all visitors`, 'success');
+        }
+      } catch (err: any) {
+        console.error('Failed to update font settings globally:', err);
+        get().showToast('Font changed locally (sign in as Admin to save globally)', 'info');
       }
     }
   };

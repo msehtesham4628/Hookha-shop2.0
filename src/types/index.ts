@@ -348,6 +348,7 @@ export interface StoreSettings {
   smsProvider?: 'twilio' | 'msg91' | 'mock';
   bannerAnnouncement?: string;
   announcement?: string;
+  fontVibe?: 'avant-garde' | 'imperial' | 'cyber' | 'haute';
   maintenanceMode?: boolean;
   [key: string]: any;
 }

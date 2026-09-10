@@ -16,7 +16,8 @@ import {
   Settings,
   Sparkles,
   Globe,
-  Truck
+  Truck,
+  Layers
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -150,6 +151,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
         { name: 'Nasty Juice', slug: 'nasty-juice' },
         { name: 'SMOK', slug: 'smok' }
       ]
+    },
+    {
+      label: t('nav.brands', 'Brands'),
+      path: '/brands'
     },
     {
       label: t('nav.wholesale', 'Wholesale B2B'),
@@ -434,7 +439,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
                     <div className={`absolute top-full ${isEarly ? 'left-0' : isLate ? 'right-0' : 'left-1/2 -translate-x-1/2'} mt-1.5 w-60 bg-white border border-stone-200 shadow-2xl rounded-sm p-3 z-50 animate-in fade-in slide-in-from-top-1 duration-150`}>
                       <div className="flex items-center justify-between pb-2 mb-2 border-b border-stone-100">
                         <span className="text-[10px] font-bold tracking-wider text-amber-900 uppercase">
-                          {link.label} Brands
+                          {link.label} Sub-Categories & Brands
                         </span>
                         <button
                           onClick={() => { setHoveredCategory(null); onNavigate(link.path); }}
@@ -449,7 +454,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
                             key={`${link.categorySlug}-${brand.slug}-${bIdx}`}
                             onClick={() => {
                               setHoveredCategory(null);
-                              onNavigate(`/${link.categorySlug}?brand=${brand.slug}`);
+                              onNavigate(`/${link.categorySlug}/${brand.slug}`);
                             }}
                             className="w-full text-left px-2.5 py-1.5 text-xs normal-case font-normal text-stone-700 hover:text-amber-950 hover:bg-amber-50/80 rounded-xs transition-colors flex items-center justify-between group/item cursor-pointer"
                           >
@@ -459,6 +464,14 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
                             </span>
                           </button>
                         ))}
+                      </div>
+                      <div className="mt-2 pt-2 border-t border-stone-100 text-center">
+                        <button
+                          onClick={() => { setHoveredCategory(null); onNavigate('/brands'); }}
+                          className="text-[10px] font-bold tracking-wider uppercase text-amber-900 hover:text-amber-700 hover:underline cursor-pointer inline-flex items-center gap-1"
+                        >
+                          Browse All Brands Directory →
+                        </button>
                       </div>
                     </div>
                   )}
@@ -583,7 +596,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
                             <button
                               key={`mob-${link.categorySlug}-${brand.slug}-${bIdx}`}
                               onClick={() => {
-                                onNavigate(`/${link.categorySlug}?brand=${brand.slug}`);
+                                onNavigate(`/${link.categorySlug}/${brand.slug}`);
                                 setMobileMenuOpen(false);
                               }}
                               className="w-full text-left text-[11px] text-stone-300 hover:text-white py-1 flex items-center justify-between"

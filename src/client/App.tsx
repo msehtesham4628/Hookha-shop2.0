@@ -11,11 +11,13 @@ import { CartDrawer } from './components/CartDrawer.js';
 import { ToastContainer } from './components/ToastContainer.js';
 import { FontThemeSelector } from './components/FontThemeSelector.js';
 import { HomePage } from './pages/HomePage.js';
-import { getCanonicalCategory } from './utils/routeHelpers.js';
+import { getCanonicalCategory, isBrandSlug } from './utils/routeHelpers.js';
 
 // Lazy-loaded routes for instant initial storefront loading and smaller JS bundle
 const ShopPage = lazy(() => import('./pages/ShopPage.js').then(m => ({ default: m.ShopPage })));
 const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage.js').then(m => ({ default: m.ProductDetailPage })));
+const BrandPage = lazy(() => import('./pages/BrandPage.js').then(m => ({ default: m.BrandPage })));
+const BrandsDirectoryPage = lazy(() => import('./pages/BrandsDirectoryPage.js').then(m => ({ default: m.BrandsDirectoryPage })));
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage.js').then(m => ({ default: m.CheckoutPage })));
 const OrderSuccessPage = lazy(() => import('./pages/OrderSuccessPage.js').then(m => ({ default: m.OrderSuccessPage })));
 const AccountPage = lazy(() => import('./pages/AccountPage.js').then(m => ({ default: m.AccountPage })));
@@ -61,12 +63,36 @@ export default function App() {
     if (pathOnly === '/admin/excel-sync') return <ExcelProductSyncPage onNavigate={navigate} />;
     if (pathOnly === '/dashboard' || pathOnly === '/admin') return <AdminDashboardPage onNavigate={navigate} />;
 
+    // Brands Directory Route: /brands or /brand
+    if (pathOnly === '/brands' || pathOnly === '/brand') {
+      return <BrandsDirectoryPage onNavigate={navigate} />;
+    }
+
     // Clean Path-Based Dynamic Routing:
-    // 1. /<category> (e.g. /hookahs, /tobacco)
-    // 2. /<category>/page/<pageNum> (e.g. /hookahs/page/2)
-    // 3. /<category>/<pageNum>/<product-slug> (e.g. /hookahs/1/alpha-hookah-model-x)
-    // 4. /<category>/<product-slug-or-id> (e.g. /hookahs/alpha-hookah-model-x or /hookahs/1)
+    // 1. /brands/<brand-slug> or /brand/<brand-slug> (e.g. /brand/alpha-hookah, /brands/musthave-tobacco)
+    // 2. /<category> (e.g. /hookahs, /tobacco)
+    // 3. /<category>/<brand-slug> (Brand as Sub-Category! e.g. /hookahs/alpha-hookah)
+    // 4. /<category>/page/<pageNum> (e.g. /hookahs/page/2)
+    // 5. /<category>/<pageNum>/<product-slug> (e.g. /hookahs/1/alpha-hookah-model-x)
+    // 6. /<category>/<product-slug-or-id> (e.g. /hookahs/alpha-hookah-model-x or /hookahs/1)
     const segments = pathOnly.split('/').filter(Boolean);
+
+    // Dedicated Brand direct route: /brand/:brandSlug or /brands/:brandSlug
+    if (segments.length >= 2 && (segments[0].toLowerCase() === 'brand' || segments[0].toLowerCase() === 'brands')) {
+      const brandSlug = segments[1];
+      const page = segments.length >= 4 && (segments[2].toLowerCase() === 'page' || segments[2].toLowerCase() === 'p')
+        ? Math.max(1, parseInt(segments[3], 10) || 1)
+        : Math.max(1, parseInt(queryParams.get('page') || '1', 10) || 1);
+      return (
+        <BrandPage
+          key={`brand-${brandSlug}-p-${page}`}
+          brandSlug={brandSlug}
+          initialPage={page}
+          onNavigate={navigate}
+        />
+      );
+    }
+
     if (segments.length > 0) {
       const canonicalCategory = getCanonicalCategory(segments[0]);
       if (canonicalCategory) {
@@ -105,6 +131,25 @@ export default function App() {
               initialNewArrival={queryParams.get('newArrival') === 'true'}
               initialPage={page}
               isCategoryRoute={true}
+              onNavigate={navigate}
+            />
+          );
+        }
+
+        // Brand as Sub-Category under Category:
+        // /<category>/<brand-slug> (e.g. /hookahs/alpha-hookah, /tobacco/musthave-tobacco)
+        // or /<category>/<brand-slug>/page/:page (e.g. /hookahs/alpha-hookah/page/2)
+        if (isBrandSlug(segments[1])) {
+          const brandSlug = segments[1];
+          const page = segments.length >= 4 && (segments[2].toLowerCase() === 'page' || segments[2].toLowerCase() === 'p')
+            ? Math.max(1, parseInt(segments[3], 10) || 1)
+            : Math.max(1, parseInt(queryParams.get('page') || '1', 10) || 1);
+          return (
+            <BrandPage
+              key={`cat-${canonicalCategory}-brand-${brandSlug}-p-${page}`}
+              brandSlug={brandSlug}
+              categorySlug={canonicalCategory}
+              initialPage={page}
               onNavigate={navigate}
             />
           );

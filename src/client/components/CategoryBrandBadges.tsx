@@ -1,19 +1,22 @@
 import React, { useRef } from 'react';
 import { CATEGORY_BRAND_MAP, ALL_BRAND_BADGES, BrandAvatar } from '../data/brandsData.js';
-import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { getBrandUrl } from '../utils/routeHelpers.js';
+import { ChevronLeft, ChevronRight, Check, ExternalLink } from 'lucide-react';
 
 interface CategoryBrandBadgesProps {
   categorySlug?: string;
   categoryName?: string;
   selectedBrand?: string;
   onSelectBrand: (brandSlug: string) => void;
+  onNavigate?: (path: string) => void;
 }
 
 export const CategoryBrandBadges: React.FC<CategoryBrandBadgesProps> = ({
   categorySlug = '',
   categoryName = 'Category',
   selectedBrand = '',
-  onSelectBrand
+  onSelectBrand,
+  onNavigate
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -32,7 +35,7 @@ export const CategoryBrandBadges: React.FC<CategoryBrandBadgesProps> = ({
 
   return (
     <div className="mb-6 bg-white border border-stone-200/90 rounded-xl p-4 sm:p-5 shadow-2xs">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-cyan-600" />
           <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-stone-900">
@@ -41,16 +44,35 @@ export const CategoryBrandBadges: React.FC<CategoryBrandBadgesProps> = ({
           <span className="text-[11px] font-semibold text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full">
             {brands.length} Verified
           </span>
+          {onNavigate && (
+            <button
+              onClick={() => onNavigate('/brands')}
+              className="text-[11px] font-semibold text-stone-500 hover:text-amber-900 hover:underline cursor-pointer ml-2"
+            >
+              Directory →
+            </button>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
           {selectedBrand && (
-            <button
-              onClick={() => onSelectBrand('')}
-              className="text-[11px] font-bold text-cyan-700 hover:text-cyan-900 bg-cyan-50 hover:bg-cyan-100 px-2.5 py-1 rounded-md transition-colors cursor-pointer mr-1"
-            >
-              Reset Brand Filter
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => onSelectBrand('')}
+                className="text-[11px] font-bold text-cyan-700 hover:text-cyan-900 bg-cyan-50 hover:bg-cyan-100 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
+              >
+                Reset Filter
+              </button>
+              {onNavigate && (
+                <button
+                  onClick={() => onNavigate(getBrandUrl(selectedBrand, categorySlug))}
+                  className="text-[11px] font-bold text-amber-900 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200/80 px-2.5 py-1 rounded-md transition-colors cursor-pointer flex items-center gap-1"
+                >
+                  <span>Brand Page</span>
+                  <ExternalLink className="w-3 h-3" />
+                </button>
+              )}
+            </div>
           )}
 
           <div className="hidden sm:flex items-center gap-1">

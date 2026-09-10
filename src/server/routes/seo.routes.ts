@@ -10,6 +10,15 @@ import {
   getProductSchema,
   getItemListSchema
 } from '../../shared/seoConstants.js';
+import {
+  generateUnifiedSitemapXml,
+  generateProductsSitemapXml,
+  generateBrandsSitemapXml,
+  generateCategoriesSitemapXml,
+  generateMainPagesSitemapXml,
+  generateSitemapIndexXml,
+  invalidateSitemapCache
+} from '../services/sitemap.service.js';
 
 const router = Router();
 
@@ -61,8 +70,10 @@ Disallow: /account
 Clean-param: ref&source&utm_source&utm_medium&utm_campaign&utm_content&utm_term&gclid&fbclid&yclid /
 Host: https://fumarehookah.com
 
-# XML Sitemaps
+# XML Sitemaps for Google, Bing, Yandex & Baidu
 Sitemap: ${SITE_DOMAIN}/sitemap.xml
+Sitemap: ${SITE_DOMAIN}/sitemap-all.xml
+Sitemap: ${SITE_DOMAIN}/sitemap-index.xml
 Sitemap: ${SITE_DOMAIN}/sitemap-products.xml
 Sitemap: ${SITE_DOMAIN}/sitemap-categories.xml
 Sitemap: ${SITE_DOMAIN}/sitemap-brands.xml
@@ -74,179 +85,110 @@ Sitemap: ${SITE_DOMAIN}/sitemap-main.xml
   return res.send(robotsTxt);
 });
 
-// 2. GET /sitemap.xml (Sitemap Index)
-router.get('/sitemap.xml', (req, res) => {
-  const now = new Date().toISOString();
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <sitemap>
-    <loc>${SITE_DOMAIN}/sitemap-main.xml</loc>
-    <lastmod>${now}</lastmod>
-  </sitemap>
-  <sitemap>
-    <loc>${SITE_DOMAIN}/sitemap-categories.xml</loc>
-    <lastmod>${now}</lastmod>
-  </sitemap>
-  <sitemap>
-    <loc>${SITE_DOMAIN}/sitemap-products.xml</loc>
-    <lastmod>${now}</lastmod>
-  </sitemap>
-  <sitemap>
-    <loc>${SITE_DOMAIN}/sitemap-brands.xml</loc>
-    <lastmod>${now}</lastmod>
-  </sitemap>
-</sitemapindex>`;
+// 2. GET /sitemap.xml & /sitemap-all.xml & /api/sitemap.xml
+// Primary server-side route that generates an XML sitemap of all existing products, brands, and categories
+const handleUnifiedSitemap = (req: any, res: any) => {
+  // Support format=index if a crawler specifically requests sitemap index
+  if (req.query.format === 'index' || req.query.type === 'index') {
+    const xml = generateSitemapIndexXml(SITE_DOMAIN);
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    return res.send(xml);
+  }
 
+  const forceFresh = req.query.refresh === '1' || req.query.refresh === 'true';
+  const { xml, count } = generateUnifiedSitemapXml(SITE_DOMAIN, forceFresh);
+
+  res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400');
+  res.setHeader('X-Total-Urls', String(count));
+  return res.send(xml);
+};
+
+router.get('/sitemap.xml', handleUnifiedSitemap);
+router.get('/sitemap-all.xml', handleUnifiedSitemap);
+router.get('/api/sitemap.xml', handleUnifiedSitemap);
+
+// 3. GET /sitemap-index.xml (Sitemap Index)
+router.get('/sitemap-index.xml', (req, res) => {
+  const xml = generateSitemapIndexXml(SITE_DOMAIN);
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=3600');
   return res.send(xml);
 });
 
-// 3. GET /sitemap-main.xml (Main & Static Pages)
+// 4. GET /sitemap-main.xml (Main & Static Pages)
 router.get('/sitemap-main.xml', (req, res) => {
-  const now = new Date().toISOString();
-  const staticRoutes = [
-    { path: '', changefreq: 'daily', priority: '1.0' },
-    { path: 'shop', changefreq: 'daily', priority: '0.95' },
-    { path: 'wholesale', changefreq: 'weekly', priority: '0.85' },
-    { path: 'about', changefreq: 'monthly', priority: '0.70' },
-    { path: 'contact', changefreq: 'monthly', priority: '0.70' }
-  ];
-
-  const urlsXml = staticRoutes
-    .map(route => {
-      const fullUrl = route.path ? `${SITE_DOMAIN}/${route.path}` : `${SITE_DOMAIN}/`;
-      const ruUrl = route.path ? `${SITE_DOMAIN}/${route.path}?lang=ru` : `${SITE_DOMAIN}/?lang=ru`;
-      return `  <url>
-    <loc>${fullUrl}</loc>
-    <lastmod>${now}</lastmod>
-    <changefreq>${route.changefreq}</changefreq>
-    <priority>${route.priority}</priority>
-    <xhtml:link rel="alternate" hreflang="en-US" href="${fullUrl}" xmlns:xhtml="http://www.w3.org/1999/xhtml" />
-    <xhtml:link rel="alternate" hreflang="ru-RU" href="${ruUrl}" xmlns:xhtml="http://www.w3.org/1999/xhtml" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${fullUrl}" xmlns:xhtml="http://www.w3.org/1999/xhtml" />
-  </url>`;
-    })
-    .join('\n');
-
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${urlsXml}
-</urlset>`;
-
+  const forceFresh = req.query.refresh === '1' || req.query.refresh === 'true';
+  const { xml, count } = generateMainPagesSitemapXml(SITE_DOMAIN, forceFresh);
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.setHeader('X-Total-Urls', String(count));
   return res.send(xml);
 });
 
-// 4. GET /sitemap-products.xml (Every Product with Images & Multi-Region Alternates)
+// 5. GET /sitemap-products.xml (Every Product with Images & Multi-Region Alternates)
 router.get('/sitemap-products.xml', (req, res) => {
-  const activeProducts = db.products.filter(p => p.isActive);
-  
-  const urlsXml = activeProducts
-    .map(product => {
-      const fullUrl = `${SITE_DOMAIN}/product/${product.slug}`;
-      const ruUrl = `${SITE_DOMAIN}/product/${product.slug}?lang=ru`;
-      const lastMod = product.updatedAt ? new Date(product.updatedAt).toISOString() : new Date().toISOString();
-      const primaryImage = product.images?.[0]?.url;
-
-      let imageXml = '';
-      if (primaryImage) {
-        imageXml = `
-    <image:image xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-      <image:loc>${escapeXml(primaryImage)}</image:loc>
-      <image:title>${escapeXml(product.name)}</image:title>
-      <image:caption>${escapeXml(product.shortDescription || `${product.name} - official distributor item at Fumare Hookah`)}</image:caption>
-    </image:image>`;
-      }
-
-      return `  <url>
-    <loc>${fullUrl}</loc>
-    <lastmod>${lastMod}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.90</priority>
-    <xhtml:link rel="alternate" hreflang="en-US" href="${fullUrl}" xmlns:xhtml="http://www.w3.org/1999/xhtml" />
-    <xhtml:link rel="alternate" hreflang="ru-RU" href="${ruUrl}" xmlns:xhtml="http://www.w3.org/1999/xhtml" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${fullUrl}" xmlns:xhtml="http://www.w3.org/1999/xhtml" />${imageXml}
-  </url>`;
-    })
-    .join('\n');
-
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-${urlsXml}
-</urlset>`;
-
+  const forceFresh = req.query.refresh === '1' || req.query.refresh === 'true';
+  const { xml, count } = generateProductsSitemapXml(SITE_DOMAIN, forceFresh);
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.setHeader('X-Total-Urls', String(count));
   return res.send(xml);
 });
 
-// 5. GET /sitemap-categories.xml (Every Category)
+// 6. GET /sitemap-categories.xml (Every Category: Clean & Shop routes)
 router.get('/sitemap-categories.xml', (req, res) => {
-  const activeCategories = db.categories.filter(c => c.isActive);
-  const now = new Date().toISOString();
-
-  const urlsXml = activeCategories
-    .map(category => {
-      const fullUrl = `${SITE_DOMAIN}/shop?category=${category.slug}`;
-      const ruUrl = `${SITE_DOMAIN}/shop?category=${category.slug}&amp;lang=ru`;
-      return `  <url>
-    <loc>${fullUrl}</loc>
-    <lastmod>${now}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.85</priority>
-    <xhtml:link rel="alternate" hreflang="en-US" href="${fullUrl}" xmlns:xhtml="http://www.w3.org/1999/xhtml" />
-    <xhtml:link rel="alternate" hreflang="ru-RU" href="${ruUrl}" xmlns:xhtml="http://www.w3.org/1999/xhtml" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${fullUrl}" xmlns:xhtml="http://www.w3.org/1999/xhtml" />
-  </url>`;
-    })
-    .join('\n');
-
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${urlsXml}
-</urlset>`;
-
+  const forceFresh = req.query.refresh === '1' || req.query.refresh === 'true';
+  const { xml, count } = generateCategoriesSitemapXml(SITE_DOMAIN, forceFresh);
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.setHeader('X-Total-Urls', String(count));
   return res.send(xml);
 });
 
-// 6. GET /sitemap-brands.xml (Every Brand)
+// 7. GET /sitemap-brands.xml (Every Brand: Hub, Category-Nested & Shop routes)
 router.get('/sitemap-brands.xml', (req, res) => {
-  const activeBrands = db.brands.filter(b => b.isActive);
-  const now = new Date().toISOString();
-
-  const urlsXml = activeBrands
-    .map(brand => {
-      const fullUrl = `${SITE_DOMAIN}/shop?brand=${brand.slug}`;
-      const ruUrl = `${SITE_DOMAIN}/shop?brand=${brand.slug}&amp;lang=ru`;
-      return `  <url>
-    <loc>${fullUrl}</loc>
-    <lastmod>${now}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-    <xhtml:link rel="alternate" hreflang="en-US" href="${fullUrl}" xmlns:xhtml="http://www.w3.org/1999/xhtml" />
-    <xhtml:link rel="alternate" hreflang="ru-RU" href="${ruUrl}" xmlns:xhtml="http://www.w3.org/1999/xhtml" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${fullUrl}" xmlns:xhtml="http://www.w3.org/1999/xhtml" />
-  </url>`;
-    })
-    .join('\n');
-
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${urlsXml}
-</urlset>`;
-
+  const forceFresh = req.query.refresh === '1' || req.query.refresh === 'true';
+  const { xml, count } = generateBrandsSitemapXml(SITE_DOMAIN, forceFresh);
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.setHeader('X-Total-Urls', String(count));
   return res.send(xml);
+});
+
+// 8. GET /api/seo/sitemap-stats (Inspect sitemap metrics and trigger fresh regeneration)
+router.get('/api/seo/sitemap-stats', (req, res) => {
+  if (req.query.refresh === '1' || req.query.refresh === 'true') {
+    invalidateSitemapCache();
+  }
+
+  const { count: totalUrls } = generateUnifiedSitemapXml(SITE_DOMAIN, false);
+  const activeProducts = db.products.filter(p => p.isActive !== false && !db.isProductDeleted(p.id));
+  const activeCategories = db.categories.filter(c => c.isActive !== false && !db.isCategoryDeleted(c.id || c.slug));
+  const activeBrands = db.brands.filter(b => b.isActive !== false && !db.isBrandDeleted(b.id || b.slug));
+
+  return res.json({
+    success: true,
+    data: {
+      siteDomain: SITE_DOMAIN,
+      totalSitemapUrls: totalUrls,
+      metrics: {
+        activeProducts: activeProducts.length,
+        activeCategories: activeCategories.length,
+        activeBrands: activeBrands.length
+      },
+      sitemapEndpoints: {
+        all: `${SITE_DOMAIN}/sitemap.xml`,
+        unifiedDirect: `${SITE_DOMAIN}/sitemap-all.xml`,
+        index: `${SITE_DOMAIN}/sitemap-index.xml`,
+        products: `${SITE_DOMAIN}/sitemap-products.xml`,
+        categories: `${SITE_DOMAIN}/sitemap-categories.xml`,
+        brands: `${SITE_DOMAIN}/sitemap-brands.xml`,
+        mainPages: `${SITE_DOMAIN}/sitemap-main.xml`
+      }
+    }
+  });
 });
 
 // 7. GET /opensearch.xml (Browser & Search Engine OpenSearch Integration)

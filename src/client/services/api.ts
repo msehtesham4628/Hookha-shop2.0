@@ -309,6 +309,10 @@ class ApiClient {
     return this.request<{ success: boolean; data: Brand[] }>('/brands');
   }
 
+  public async getBrand(slug: string) {
+    return this.request<{ success: boolean; data: { brand: Brand; products: Product[] } }>(`/brands/${slug}`);
+  }
+
   public async getCart(coupon?: string) {
     const qs = coupon ? `?coupon=${encodeURIComponent(coupon)}` : '';
     return this.request<{ success: boolean; data: Cart }>(`/cart${qs}`);

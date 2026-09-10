@@ -9,6 +9,7 @@ export interface BrandAvatar {
   origin?: string;
   imageUrl?: string;
   logoUrl?: string;
+  description?: string;
 }
 
 // Brand directory aligned with the brands currently exposed by World Hookah Market.
@@ -101,8 +102,17 @@ export const CATEGORY_BRAND_MAP: Record<string, BrandAvatar[]> = {
     make('Vessel Base', 'vessel-base', 'bases'),
     make('WOOKAH Bases', 'wookah-bases', 'bases')
   ],
-  coal: [],
+  coal: [
+    make('Coco Loco', 'coco-loco', 'coal'),
+    make('One Nation', 'one-nation-coal', 'coal'),
+    make('Oasis Charcoal', 'oasis-charcoal', 'coal'),
+    make('Shaman Coal', 'shaman-coal', 'coal'),
+    make('Crown Coal', 'crown-coal', 'coal')
+  ],
   accessories: [
+    make('Kaloud', 'kaloud', 'accessories'),
+    make('Na Grani', 'na-grani', 'accessories'),
+    make('Blade Hookah', 'blade-hookah', 'accessories'),
     make('Steamulation Accessories', 'steamulation-accessories', 'accessories'),
     make('Hookah Boards', 'hookah-boards', 'accessories'),
     make('Heat Management', 'heat-management', 'accessories'),
@@ -111,14 +121,69 @@ export const CATEGORY_BRAND_MAP: Record<string, BrandAvatar[]> = {
     make('Hookah Tongs', 'hookah-tongs', 'accessories'),
     make('Other', 'other-accessories', 'accessories')
   ],
-  'e-hookah': [],
-  vapes: []
+  'e-hookah': [
+    make('Ooka', 'ooka', 'e-hookah'),
+    make('Aspire Proteus', 'aspire-proteus', 'e-hookah'),
+    make('Kangerm', 'kangerm', 'e-hookah'),
+    make('Starbuzz E-Hose', 'starbuzz-ehose', 'e-hookah')
+  ],
+  vapes: [
+    make('Al Fakher Vapes', 'al-fakher-vapes', 'vapes'),
+    make('Geek Bar', 'geek-bar', 'vapes'),
+    make('Lost Mary', 'lost-mary', 'vapes'),
+    make('Vaporesso', 'vaporesso', 'vapes'),
+    make('GeekVape', 'geekvape', 'vapes'),
+    make('Elf Bar', 'elf-bar', 'vapes')
+  ]
 };
 
-export const ALL_BRAND_BADGES: BrandAvatar[] = [
-  ...CATEGORY_BRAND_MAP.tobacco.slice(0, 6),
-  ...CATEGORY_BRAND_MAP.hookahs.slice(0, 6),
-  ...CATEGORY_BRAND_MAP.bowls.slice(0, 6),
-  ...CATEGORY_BRAND_MAP.bases.slice(0, 5),
-  ...CATEGORY_BRAND_MAP.accessories.slice(0, 5)
-];
+// Distinct master list of all brands across all categories
+export const ALL_BRAND_BADGES: BrandAvatar[] = (() => {
+  const seen = new Set<string>();
+  const list: BrandAvatar[] = [];
+  for (const brands of Object.values(CATEGORY_BRAND_MAP)) {
+    for (const b of brands) {
+      if (!seen.has(b.slug)) {
+        seen.add(b.slug);
+        list.push(b);
+      }
+    }
+  }
+  return list;
+})();
+
+// Helper to look up a brand by slug (case-insensitive, hyphen-tolerant)
+export const getBrandBySlug = (slug: string): BrandAvatar | undefined => {
+  if (!slug) return undefined;
+  const clean = slug.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return ALL_BRAND_BADGES.find(b => {
+    const bSlug = b.slug.toLowerCase().trim();
+    return bSlug === clean || bSlug.replace(/-/g, '') === clean.replace(/-/g, '');
+  });
+};
+
+// Helper to check if a slug is a known brand
+export const isBrandSlug = (slug?: string | null): boolean => {
+  if (!slug) return false;
+  const clean = slug.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return ALL_BRAND_BADGES.some(b => {
+    const bSlug = b.slug.toLowerCase().trim();
+    return bSlug === clean || bSlug.replace(/-/g, '') === clean.replace(/-/g, '');
+  });
+};
+
+// Helper to get brands for a specific category
+export const getBrandsForCategory = (categorySlug: string): BrandAvatar[] => {
+  if (!categorySlug) return ALL_BRAND_BADGES;
+  const clean = categorySlug.toLowerCase().trim();
+  const canonical = clean === 'coal' || clean === 'coals' || clean === 'charcoal' ? 'coal'
+    : clean === 'hookah' || clean === 'hookahs' ? 'hookahs'
+    : clean === 'tobacco' || clean === 'shisha' ? 'tobacco'
+    : clean === 'bowl' || clean === 'bowls' ? 'bowls'
+    : clean === 'base' || clean === 'bases' || clean === 'vases' ? 'bases'
+    : clean === 'accessories' || clean === 'accessory' ? 'accessories'
+    : clean === 'e-hookah' || clean === 'ehookah' ? 'e-hookah'
+    : clean === 'vape' || clean === 'vapes' ? 'vapes'
+    : clean;
+  return CATEGORY_BRAND_MAP[canonical] || [];
+};

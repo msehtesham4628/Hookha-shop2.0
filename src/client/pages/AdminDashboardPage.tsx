@@ -60,10 +60,12 @@ import {
   Square,
   ChevronLeft,
   ChevronRight,
-  Filter
+  Filter,
+  Type
 } from 'lucide-react';
 import { BulkProductUpdateModal } from '../components/BulkProductUpdateModal.js';
 import { exportCustomersToExcel, exportInventoryToExcel } from '../utils/excelExport.js';
+import { FONT_OPTIONS, FontVibe } from '../components/FontThemeSelector.js';
 
 function getCatalogPageNumbers(current: number, total: number): (number | string)[] {
   if (total <= 7) {
@@ -220,6 +222,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [settingTaxRate, setSettingTaxRate] = useState('8.25');
   const [settingFreeShipping, setSettingFreeShipping] = useState('150');
   const [settingAnnouncement, setSettingAnnouncement] = useState('Free shipping on luxury orders above $150 • Authentic Russian & European Hookahs');
+  const [settingFontVibe, setSettingFontVibe] = useState<FontVibe>('avant-garde');
   const [settingsSaving, setSettingsSaving] = useState(false);
 
   const playOrderChime = () => {
@@ -405,6 +408,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         if (settingsRes.data.taxRate !== undefined) setSettingTaxRate(((settingsRes.data.taxRate || 0) * 100).toFixed(2));
         if (settingsRes.data.freeShippingThreshold !== undefined) setSettingFreeShipping(settingsRes.data.freeShippingThreshold.toString());
         if (settingsRes.data.announcement) setSettingAnnouncement(settingsRes.data.announcement);
+        if (settingsRes.data.fontVibe) setSettingFontVibe(settingsRes.data.fontVibe as FontVibe);
       }
       if (catsRes.success && catsRes.data) {
         setCategories(Array.isArray(catsRes.data) ? catsRes.data : (catsRes.data as any)?.categories || []);
@@ -436,8 +440,15 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         storeName: settingStoreName.trim() || 'World Hookah Market',
         taxRate: parsedTax,
         freeShippingThreshold: parsedFreeShip,
-        announcement: settingAnnouncement.trim()
+        announcement: settingAnnouncement.trim(),
+        fontVibe: settingFontVibe
       };
+      if (typeof document !== 'undefined') {
+        document.documentElement.setAttribute('data-font-vibe', settingFontVibe);
+        try {
+          localStorage.setItem('fumare_font_vibe', settingFontVibe);
+        } catch {}
+      }
       const res = await api.updateAdminSettings(payload);
       if (res.success && res.data) {
         setSettings(res.data);
@@ -3076,6 +3087,80 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                           onChange={(e) => setSettingTaxRate(e.target.value)}
                           className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono focus:ring-1 focus:ring-amber-800 focus:outline-none"
                         />
+                      </div>
+                    </div>
+
+                    <div className="border-t border-stone-200 pt-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Type className="w-4 h-4 text-amber-800" />
+                          <label className="block font-bold text-stone-900 uppercase tracking-wider text-[11px]">
+                            Global Storefront Typography & Font Aesthetic
+                          </label>
+                        </div>
+                        <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full border border-amber-300 uppercase tracking-wider">
+                          Admin Exclusive
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-stone-500 leading-relaxed">
+                        Control the typography theme across the entire storefront for all visitors and customers. Only administrators can alter this design system.
+                      </p>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                        {FONT_OPTIONS.map((opt) => {
+                          const isSelected = settingFontVibe === opt.id;
+                          return (
+                            <div
+                              key={opt.id}
+                              onClick={() => {
+                                setSettingFontVibe(opt.id);
+                                if (typeof document !== 'undefined') {
+                                  document.documentElement.setAttribute('data-font-vibe', opt.id);
+                                }
+                              }}
+                              className={`p-3 rounded-xs border transition-all cursor-pointer flex flex-col justify-between gap-2 text-left ${
+                                isSelected
+                                  ? 'bg-amber-950 text-white border-amber-600 shadow-md ring-1 ring-amber-500/40'
+                                  : 'bg-stone-50 hover:bg-stone-100 border-stone-300 text-stone-900'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="font-bold text-xs flex items-center gap-1.5">
+                                  {opt.name}
+                                  {isSelected && <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
+                                </span>
+                                <span className={`text-[9px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded-xs ${
+                                  isSelected ? 'bg-amber-800/80 text-amber-100' : 'bg-stone-200 text-stone-700'
+                                }`}>
+                                  {opt.accentBadge}
+                                </span>
+                              </div>
+
+                              <p className={`text-[10px] line-clamp-1 ${isSelected ? 'text-amber-200/80' : 'text-stone-500'}`}>
+                                {opt.tagline}
+                              </p>
+
+                              <div className={`flex items-center justify-between pt-1 border-t text-[10px] ${
+                                isSelected ? 'border-amber-800/80 text-amber-300' : 'border-stone-200 text-stone-600'
+                              }`}>
+                                <span className="truncate max-w-[130px]">{opt.displayFont}</span>
+                                <span
+                                  className={`text-xs font-bold tracking-widest ${
+                                    opt.id === 'avant-garde'
+                                      ? 'font-syne'
+                                      : opt.id === 'imperial'
+                                      ? 'font-cinzel-dec'
+                                      : opt.id === 'haute'
+                                      ? 'font-playfair'
+                                      : 'font-outfit'
+                                  } ${isSelected ? 'text-amber-300' : 'text-stone-900'}`}
+                                >
+                                  FUMARE
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
 

@@ -125,13 +125,54 @@ router.get('/brands', (req, res) => {
 // GET /api/brands/:slug
 router.get('/brands/:slug', (req, res) => {
   const { slug } = req.params;
-  const brand = db.brands.find(b => b.slug === slug || b.id === slug);
+  const normalizedSlug = normalizeCatalogSlug(slug);
+  let brand = db.brands.find(b =>
+    normalizeCatalogSlug(b.slug) === normalizedSlug ||
+    normalizeCatalogSlug(b.id) === normalizedSlug ||
+    normalizeCatalogSlug(b.name) === normalizedSlug
+  );
+
+  // Fallback: If brand not explicitly registered in store, locate from catalog products
+  if (!brand) {
+    const sample = db.products.find(p =>
+      p.isActive &&
+      (normalizeCatalogSlug(p.brandSlug) === normalizedSlug || normalizeCatalogSlug(p.brand) === normalizedSlug)
+    );
+    if (sample) {
+      const bName = sample.brand || slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      brand = {
+        id: `brand-${normalizedSlug}`,
+        name: bName,
+        slug: normalizedSlug,
+        origin: 'Global Artisan',
+        description: `Certified authentic ${bName} merchandise, flavors, and luxury hookah accessories.`,
+        logoUrl: sample.images[0]?.url || 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400',
+        productCount: 0,
+        isActive: true
+      };
+    }
+  }
+
   if (!brand) {
     return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Brand not found' } });
   }
 
-  const products = db.products.filter(p => p.brandSlug === brand.slug && p.isActive);
-  return res.json({ success: true, data: { brand, products } });
+  const brandClean = brand.name ? brand.name.toLowerCase() : '';
+  const products = db.products.filter(p =>
+    p.isActive &&
+    (
+      normalizeCatalogSlug(p.brandSlug) === normalizedSlug ||
+      normalizeCatalogSlug(p.brand) === normalizedSlug ||
+      (brandClean && p.brand.toLowerCase() === brandClean)
+    )
+  );
+  return res.json({
+    success: true,
+    data: {
+      brand: { ...brand, productCount: products.length },
+      products
+    }
+  });
 });
 
 // GET /api/products/:id/reviews
@@ -325,7 +366,8 @@ router.get('/settings', (req, res) => {
       standardShippingFee: db.settings.standardShippingFee,
       ageVerificationRequired: db.settings.ageVerificationRequired,
       minimumPurchaseAge: db.settings.minimumPurchaseAge,
-      bannerAnnouncement: db.settings.bannerAnnouncement
+      bannerAnnouncement: db.settings.bannerAnnouncement,
+      fontVibe: db.settings.fontVibe || 'avant-garde'
     }
   });
 });
