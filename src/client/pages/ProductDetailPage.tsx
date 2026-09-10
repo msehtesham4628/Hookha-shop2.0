@@ -27,10 +27,11 @@ import {
 
 interface ProductDetailPageProps {
   slug: string;
+  categorySlug?: string;
   onNavigate: (path: string) => void;
 }
 
-export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNavigate }) => {
+export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, categorySlug, onNavigate }) => {
   const { user, addToCart, wishlistIds, toggleWishlist, showToast } = useStore();
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -205,7 +206,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
           'купить кальян',
           'табак для кальяна'
         ]}
-        canonicalPath={`/product/${product.slug}`}
+        canonicalPath={`/${product.categorySlug || categorySlug || 'product'}/${product.slug}`}
         ogImage={activeImages[0]?.url}
         ogType="product"
         jsonLd={getProductSchema(product)}
@@ -219,7 +220,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
           <span>/</span>
           <button onClick={() => onNavigate('/shop')} className="hover:text-amber-900">Shop</button>
           <span>/</span>
-          <button onClick={() => onNavigate(`/shop?category=${product.categorySlug}`)} className="hover:text-amber-900">{product.category}</button>
+          <button onClick={() => onNavigate(`/${product.categorySlug || categorySlug || 'shop'}`)} className="hover:text-amber-900">{product.category}</button>
           <span>/</span>
           <span className="text-stone-900 font-semibold truncate max-w-xs">{product.name}</span>
         </nav>
@@ -765,7 +766,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
                 <ProductCard
                   key={p.id}
                   product={p}
-                  onNavigate={(s) => onNavigate(`/product/${s}`)}
+                  onNavigate={(s) => onNavigate(`/${p.categorySlug || product.categorySlug || categorySlug || 'product'}/${s}`)}
                 />
               ))}
             </div>

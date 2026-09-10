@@ -302,7 +302,7 @@ const CategorySliderSection: React.FC<CategorySliderProps> = ({ config, products
           </div>
 
           <button
-            onClick={() => onNavigate(`/shop?category=${config.apiCategory}`)}
+            onClick={() => onNavigate(`/${config.apiCategory}`)}
             className="text-xs font-bold text-stone-600 hover:opacity-80 transition-opacity uppercase tracking-wider"
             style={{ color: config.accentColor }}
           >
@@ -348,7 +348,7 @@ const CategorySliderSection: React.FC<CategorySliderProps> = ({ config, products
               </p>
               <div className="mt-4 flex items-center gap-3">
                 <button
-                  onClick={() => onNavigate(`/shop?category=${config.apiCategory}`)}
+                  onClick={() => onNavigate(`/${config.apiCategory}`)}
                   className="bg-white hover:bg-stone-200 text-stone-950 text-xs font-outfit font-bold uppercase tracking-wider px-4 py-2.5 rounded-lg shadow-sm transition-colors inline-flex items-center gap-1.5 cursor-pointer"
                 >
                   Shop {config.title} <ArrowRight className="w-3.5 h-3.5" />
@@ -411,7 +411,7 @@ const CategorySliderSection: React.FC<CategorySliderProps> = ({ config, products
             <ProductCard
               product={product}
               showBulkDiscount={config.key === 'tobacco'}
-              onNavigate={(slug) => onNavigate(`/product/${slug}`)}
+              onNavigate={(slug) => onNavigate(`/${product.categorySlug || config.apiCategory || 'product'}/${slug}`)}
             />
           </div>
         ))}
@@ -427,7 +427,7 @@ const CategorySliderSection: React.FC<CategorySliderProps> = ({ config, products
             {config.brands.map((brand, bIdx) => (
               <div
                 key={`${config.key}-${brand.slug}-${bIdx}`}
-                onClick={() => onNavigate(`/shop?brand=${brand.slug}`)}
+                onClick={() => onNavigate(`/${config.apiCategory}?brand=${brand.slug}`)}
                 className="flex flex-col items-center gap-2 cursor-pointer group select-none shrink-0"
               >
                 <BrandAvatarBadge brand={brand} fallback={config.fallbackImage} />
@@ -643,7 +643,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               key={product.id}
               product={product}
               showBulkDiscount={true}
-              onNavigate={(slug) => onNavigate(`/product/${slug}`)}
+              onNavigate={(slug) => onNavigate(`/${product.categorySlug || 'product'}/${slug}`)}
             />
           ))}
         </div>
@@ -661,7 +661,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               key={product.id}
               product={product}
               showBulkDiscount={true}
-              onNavigate={(slug) => onNavigate(`/product/${slug}`)}
+              onNavigate={(slug) => onNavigate(`/${product.categorySlug || 'product'}/${slug}`)}
             />
           ))}
         </div>

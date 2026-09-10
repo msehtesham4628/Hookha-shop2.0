@@ -67,14 +67,15 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onNavigate }) => {
 
   if (!isSearchOpen) return null;
 
-  const handleSelectProduct = (slug: string) => {
+  const handleSelectProduct = (product: Product) => {
     setSearchOpen(false);
-    onNavigate(`/product/${slug}`);
+    const cat = product.categorySlug || 'product';
+    onNavigate(`/${cat}/${product.slug}`);
   };
 
   const handleSelectCategory = (slug: string) => {
     setSearchOpen(false);
-    onNavigate(`/shop?category=${slug}`);
+    onNavigate(`/${slug}`);
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -157,7 +158,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onNavigate }) => {
                 {results.map((product) => (
                   <div
                     key={product.id}
-                    onClick={() => handleSelectProduct(product.slug)}
+                    onClick={() => handleSelectProduct(product)}
                     className="flex items-center gap-3 p-2 rounded-xs hover:bg-stone-50 cursor-pointer transition-colors group"
                   >
                     <div className="w-12 h-12 bg-stone-100 rounded-xs overflow-hidden shrink-0 flex items-center justify-center p-1 border border-stone-200">

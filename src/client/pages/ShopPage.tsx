@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../services/api.js';
 import { onSync } from '../services/sync.js';
 import { ProductCard } from '../components/ProductCard.js';
@@ -44,6 +44,8 @@ interface ShopPageProps {
   initialSearch?: string;
   initialOnSale?: boolean;
   initialNewArrival?: boolean;
+  initialPage?: number;
+  isCategoryRoute?: boolean;
   onNavigate: (path: string) => void;
 }
 
@@ -53,6 +55,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   initialSearch,
   initialOnSale,
   initialNewArrival,
+  initialPage = 1,
+  isCategoryRoute = false,
   onNavigate
 }) => {
   const { t } = useTranslation();
@@ -78,8 +82,19 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   const [newArrivalOnly, setNewArrivalOnly] = useState(initialNewArrival || false);
   const [sortBy, setSortBy] = useState<string>('popularity');
   const [gridColumns, setGridColumns] = useState<3 | 4>(4);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPage > 0 ? initialPage : 1);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const isInitialMount = useRef(true);
+
+  const goToPage = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setCurrentPage(newPage);
+    if (isCategoryRoute && selectedCategory) {
+      const targetPath = newPage > 1 ? `/${selectedCategory}/page/${newPage}` : `/${selectedCategory}`;
+      window.history.pushState({}, '', targetPath);
+    }
+    window.scrollTo({ top: 350, behavior: 'smooth' });
+  };
 
   // Load Categories and Brands metadata with retry resilience
   useEffect(() => {
@@ -119,11 +134,15 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     setOnSaleOnly(initialOnSale || false);
     setNewArrivalOnly(initialNewArrival || false);
     setSelectedSubcategory('');
-    setCurrentPage(1);
-  }, [initialCategory, initialBrand, initialSearch, initialOnSale, initialNewArrival]);
+    setCurrentPage(initialPage && initialPage > 0 ? initialPage : 1);
+  }, [initialCategory, initialBrand, initialSearch, initialOnSale, initialNewArrival, initialPage]);
 
-  // Reset to page 1 whenever filters change
+  // Reset to page 1 whenever filters change (after mount)
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     setCurrentPage(1);
   }, [
     selectedCategory,
@@ -288,7 +307,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   const seoRuTitle = currentCategoryObj ? `Купить ${currentCategoryObj.name} | Кальяны и табак с доставкой в США и РФ` : currentBrandObj ? `${currentBrandObj.name} купить в США и РФ | Официальный каталог` : searchQuery ? `Результаты поиска "${searchQuery}" | Fumare Hookah` : 'Каталог кальянов, табака для кальяна и аксессуаров';
   const seoDesc = currentCategoryObj?.seoDescription || (currentCategoryObj ? `Shop authentic ${currentCategoryObj.name} featuring Alpha Hookah, MustHave, DarkSide, Oblako and Kong. Fast USA & international delivery.` : currentBrandObj?.seoDescription || (currentBrandObj ? `Official ${currentBrandObj.name} store at Fumare Hookah. Factory direct master distribution, 100% genuine with fast shipping.` : 'Browse over 5,000+ authentic Russian hookahs, dark leaf shisha tobacco, bowls, and coal. Express shipping across USA and worldwide.'));
   const seoRuDesc = currentCategoryObj ? `Большой выбор в категории ${currentCategoryObj.name}. Официальная продукция с гарантией качества и быстрой доставкой по США и РФ.` : currentBrandObj ? `Оригинальная продукция ${currentBrandObj.name} от официального дистрибьютора. Доставка по США, РФ и СНГ.` : 'Каталог премиальных кальянов, табака для кальяна MustHave, DarkSide, чаш Oblako, Kong и аксессуаров.';
-  const seoPath = selectedCategory ? `/shop?category=${selectedCategory}` : selectedBrand ? `/shop?brand=${selectedBrand}` : searchQuery ? `/shop?search=${encodeURIComponent(searchQuery)}` : '/shop';
+  const seoPath = selectedCategory ? (isCategoryRoute ? (currentPage > 1 ? `/${selectedCategory}/page/${currentPage}` : `/${selectedCategory}`) : `/shop?category=${selectedCategory}`) : selectedBrand ? `/shop?brand=${selectedBrand}` : searchQuery ? `/shop?search=${encodeURIComponent(searchQuery)}` : '/shop';
   const categoryKeywords = selectedCategory && MARKET_KEYWORDS.categories[selectedCategory as keyof typeof MARKET_KEYWORDS.categories]
     ? MARKET_KEYWORDS.categories[selectedCategory as keyof typeof MARKET_KEYWORDS.categories].en
     : [];
@@ -695,7 +714,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                     <ProductCard
                       key={product.id}
                       product={product}
-                      onNavigate={(slug) => onNavigate(`/product/${slug}`)}
+                      onNavigate={(slug) => onNavigate(`/${product.categorySlug || selectedCategory || 'product'}/${slug}`)}
                     />
                   ))}
                 </div>
@@ -711,8 +730,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                       <button
                         onClick={() => {
                           if (currentPage > 1) {
-                            setCurrentPage(p => p - 1);
-                            window.scrollTo({ top: 350, behavior: 'smooth' });
+                            goToPage(currentPage - 1);
                           }
                         }}
                         disabled={currentPage === 1}
@@ -740,10 +758,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                         return (
                           <button
                             key={pNum}
-                            onClick={() => {
-                              setCurrentPage(pNum);
-                              window.scrollTo({ top: 350, behavior: 'smooth' });
-                            }}
+                            onClick={() => goToPage(pNum)}
                             className={`min-w-[34px] h-8.5 px-2 rounded-xs font-mono font-bold flex items-center justify-center transition-all cursor-pointer ${
                               isCurrent
                                 ? 'border border-amber-800 bg-amber-900 text-white shadow-xs'
@@ -758,8 +773,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                       <button
                         onClick={() => {
                           if (currentPage < totalPages) {
-                            setCurrentPage(p => p + 1);
-                            window.scrollTo({ top: 350, behavior: 'smooth' });
+                            goToPage(currentPage + 1);
                           }
                         }}
                         disabled={currentPage >= totalPages}

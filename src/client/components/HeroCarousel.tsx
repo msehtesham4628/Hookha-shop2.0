@@ -84,14 +84,14 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onNavigate }) => {
 
   const navLinks = useMemo(
     () => [
-      { label: t('nav.hookahs', 'Hookahs'), path: '/shop?category=hookahs' },
-      { label: t('nav.tobacco', 'Tobacco'), path: '/shop?category=tobacco' },
-      { label: t('nav.bowls', 'Bowls'), path: '/shop?category=bowls' },
-      { label: t('nav.bases', 'Bases'), path: '/shop?category=bases' },
-      { label: t('nav.charcoal', 'Coal'), path: '/shop?category=coal' },
-      { label: t('nav.accessories', 'Accessories'), path: '/shop?category=accessories' },
-      { label: t('nav.ehookah', 'E-Hookah'), path: '/shop?category=e-hookah' },
-      { label: t('nav.vapes', 'Vapes'), path: '/shop?category=vapes' },
+      { label: t('nav.hookahs', 'Hookahs'), path: '/hookahs' },
+      { label: t('nav.tobacco', 'Tobacco'), path: '/tobacco' },
+      { label: t('nav.bowls', 'Bowls'), path: '/bowls' },
+      { label: t('nav.bases', 'Bases'), path: '/bases' },
+      { label: t('nav.charcoal', 'Coal'), path: '/coal' },
+      { label: t('nav.accessories', 'Accessories'), path: '/accessories' },
+      { label: t('nav.ehookah', 'E-Hookah'), path: '/e-hookah' },
+      { label: t('nav.vapes', 'Vapes'), path: '/vapes' },
       { label: t('nav.wholesale', 'Wholesale B2B'), path: '/wholesale' }
     ],
     [t]

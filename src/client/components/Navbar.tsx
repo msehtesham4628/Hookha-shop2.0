@@ -52,7 +52,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
   const navLinks: CategoryNavItem[] = [
     {
       label: t('nav.hookahs', 'Hookahs'),
-      path: '/shop?category=hookahs',
+      path: '/hookahs',
       categorySlug: 'hookahs',
       brands: [
         { name: 'Alpha Hookah', slug: 'alpha-hookah' },
@@ -66,7 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
     },
     {
       label: t('nav.tobacco', 'Tobacco'),
-      path: '/shop?category=tobacco',
+      path: '/tobacco',
       categorySlug: 'tobacco',
       brands: [
         { name: 'MustHave Tobacco', slug: 'musthave-tobacco' },
@@ -82,7 +82,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
     },
     {
       label: t('nav.bowls', 'Bowls'),
-      path: '/shop?category=bowls',
+      path: '/bowls',
       categorySlug: 'bowls',
       brands: [
         { name: 'Oblako Bowls', slug: 'oblako-bowls' },
@@ -94,7 +94,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
     },
     {
       label: t('nav.bases', 'Bases'),
-      path: '/shop?category=bases',
+      path: '/bases',
       categorySlug: 'bases',
       brands: [
         { name: 'Caesar Crystal', slug: 'caesar-crystal' },
@@ -104,7 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
     },
     {
       label: t('nav.charcoal', 'Coal'),
-      path: '/shop?category=coal',
+      path: '/coal',
       categorySlug: 'coal',
       brands: [
         { name: 'Coco Loco', slug: 'coco-loco' },
@@ -114,7 +114,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
     },
     {
       label: t('nav.accessories', 'Accessories'),
-      path: '/shop?category=accessories',
+      path: '/accessories',
       categorySlug: 'accessories',
       brands: [
         { name: 'Kaloud', slug: 'kaloud' },
@@ -125,7 +125,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
     },
     {
       label: t('nav.ehookah', 'E-Hookah'),
-      path: '/shop?category=e-hookah',
+      path: '/e-hookah',
       categorySlug: 'e-hookah',
       brands: [
         { name: 'Ooka', slug: 'ooka' },
@@ -138,7 +138,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
     },
     {
       label: t('nav.vapes', 'Vapes'),
-      path: '/shop?category=vapes',
+      path: '/vapes',
       categorySlug: 'vapes',
       brands: [
         { name: 'Al Fakher Vapes', slug: 'al-fakher-vapes' },
@@ -449,7 +449,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
                             key={`${link.categorySlug}-${brand.slug}-${bIdx}`}
                             onClick={() => {
                               setHoveredCategory(null);
-                              onNavigate(`/shop?category=${link.categorySlug}&brand=${brand.slug}`);
+                              onNavigate(`/${link.categorySlug}?brand=${brand.slug}`);
                             }}
                             className="w-full text-left px-2.5 py-1.5 text-xs normal-case font-normal text-stone-700 hover:text-amber-950 hover:bg-amber-50/80 rounded-xs transition-colors flex items-center justify-between group/item cursor-pointer"
                           >
@@ -583,7 +583,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
                             <button
                               key={`mob-${link.categorySlug}-${brand.slug}-${bIdx}`}
                               onClick={() => {
-                                onNavigate(`/shop?category=${link.categorySlug}&brand=${brand.slug}`);
+                                onNavigate(`/${link.categorySlug}?brand=${brand.slug}`);
                                 setMobileMenuOpen(false);
                               }}
                               className="w-full text-left text-[11px] text-stone-300 hover:text-white py-1 flex items-center justify-between"

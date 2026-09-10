@@ -42,8 +42,9 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ onNavigate }) =>
 
   const handleViewFullDetails = () => {
     const slug = quickViewProduct.slug;
+    const cat = quickViewProduct.categorySlug || 'product';
     setQuickViewProduct(null);
-    onNavigate(`/product/${slug}`);
+    onNavigate(`/${cat}/${slug}`);
   };
 
   return (

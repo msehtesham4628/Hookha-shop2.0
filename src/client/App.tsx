@@ -11,6 +11,7 @@ import { CartDrawer } from './components/CartDrawer.js';
 import { ToastContainer } from './components/ToastContainer.js';
 import { FontThemeSelector } from './components/FontThemeSelector.js';
 import { HomePage } from './pages/HomePage.js';
+import { getCanonicalCategory } from './utils/routeHelpers.js';
 
 // Lazy-loaded routes for instant initial storefront loading and smaller JS bundle
 const ShopPage = lazy(() => import('./pages/ShopPage.js').then(m => ({ default: m.ShopPage })));
@@ -59,6 +60,83 @@ export default function App() {
     if (pathOnly === '/contact') return <ContactPage onNavigate={navigate} />;
     if (pathOnly === '/admin/excel-sync') return <ExcelProductSyncPage onNavigate={navigate} />;
     if (pathOnly === '/dashboard' || pathOnly === '/admin') return <AdminDashboardPage onNavigate={navigate} />;
+
+    // Clean Path-Based Dynamic Routing:
+    // 1. /<category> (e.g. /hookahs, /tobacco)
+    // 2. /<category>/page/<pageNum> (e.g. /hookahs/page/2)
+    // 3. /<category>/<pageNum>/<product-slug> (e.g. /hookahs/1/alpha-hookah-model-x)
+    // 4. /<category>/<product-slug-or-id> (e.g. /hookahs/alpha-hookah-model-x or /hookahs/1)
+    const segments = pathOnly.split('/').filter(Boolean);
+    if (segments.length > 0) {
+      const canonicalCategory = getCanonicalCategory(segments[0]);
+      if (canonicalCategory) {
+        // Category root: /<category>
+        if (segments.length === 1) {
+          const page = Math.max(1, parseInt(queryParams.get('page') || '1', 10) || 1);
+          return (
+            <ShopPage
+              key={`cat-${canonicalCategory}-p-${page}-${queryString}`}
+              initialCategory={canonicalCategory}
+              initialBrand={queryParams.get('brand') || undefined}
+              initialSearch={queryParams.get('search') || queryParams.get('q') || undefined}
+              initialOnSale={queryParams.get('onSale') === 'true'}
+              initialNewArrival={queryParams.get('newArrival') === 'true'}
+              initialPage={page}
+              isCategoryRoute={true}
+              onNavigate={navigate}
+            />
+          );
+        }
+
+        // Category pagination: /<category>/page/:page or /<category>/page-:page
+        if (
+          (segments.length === 3 && (segments[1].toLowerCase() === 'page' || segments[1].toLowerCase() === 'p')) ||
+          (segments.length === 2 && segments[1].toLowerCase().startsWith('page-'))
+        ) {
+          const pageStr = segments.length === 3 ? segments[2] : segments[1].replace(/^page-?/i, '');
+          const page = Math.max(1, parseInt(pageStr, 10) || 1);
+          return (
+            <ShopPage
+              key={`cat-${canonicalCategory}-p-${page}-${queryString}`}
+              initialCategory={canonicalCategory}
+              initialBrand={queryParams.get('brand') || undefined}
+              initialSearch={queryParams.get('search') || queryParams.get('q') || undefined}
+              initialOnSale={queryParams.get('onSale') === 'true'}
+              initialNewArrival={queryParams.get('newArrival') === 'true'}
+              initialPage={page}
+              isCategoryRoute={true}
+              onNavigate={navigate}
+            />
+          );
+        }
+
+        // Product with page prefix: /<category>/<pageNum>/<product-slug> (e.g. /hookahs/1/alpha-hookah-model-x)
+        if (segments.length === 3 && !isNaN(Number(segments[1]))) {
+          const productSlug = segments[2];
+          return (
+            <ProductDetailPage
+              key={`prod-${productSlug}`}
+              slug={productSlug}
+              categorySlug={canonicalCategory}
+              onNavigate={navigate}
+            />
+          );
+        }
+
+        // Product in category: /<category>/<product-slug-or-id> (e.g. /hookahs/alpha-hookah-model-x or /hookahs/1)
+        if (segments.length === 2) {
+          const productSlug = segments[1];
+          return (
+            <ProductDetailPage
+              key={`prod-${productSlug}`}
+              slug={productSlug}
+              categorySlug={canonicalCategory}
+              onNavigate={navigate}
+            />
+          );
+        }
+      }
+    }
     return <HomePage onNavigate={navigate} />;
   };
   const isAdminRoute = currentPath.startsWith('/dashboard') || currentPath.startsWith('/admin');
