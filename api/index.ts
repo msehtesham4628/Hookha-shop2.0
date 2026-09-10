@@ -7,9 +7,6 @@ import fs from 'fs';
 const originalReadFileSync = fs.readFileSync.bind(fs);
 (fs as any).readFileSync = (filePath: any, ...args: any[]) => {
   const normalized = String(filePath || '').replace(/\\/g, '/');
-  // resolveDbFilePath() can return either an absolute path (/.../src/...) or
-  // a relative path (src/...). Match both forms so the large source catalogs
-  // are never parsed during a Vercel serverless cold start.
   if (/(?:^|\/)src\/server\/db\/products-[1-6]\.json$/i.test(normalized) ||
       /(?:^|\/)src\/server\/db\/scrapedProducts\.json$/i.test(normalized)) {
     return typeof args[0] === 'string' || (args[0] && typeof args[0] === 'object' && args[0].encoding)
@@ -46,11 +43,9 @@ async function ensureAdminDatabaseReady(): Promise<boolean> {
     adminDbSyncPromise = (async () => {
       const connected = await mongoService.connect();
       if (!connected) return false;
-
       const summary = await mongoService.syncWithStore(db);
       const status = mongoService.getStatus();
       if (!status.isConnected) return false;
-
       console.log('[Vercel Serverless] Admin MongoDB hydration complete:', summary.summary);
       return true;
     })().catch((err: any) => {
@@ -95,16 +90,23 @@ export default async function vercelApiHandler(req: any, res: any) {
     normalizedRequestPath = req.url?.split('?')[0] || '';
   }
 
-  // Only admin APIs attempt MongoDB hydration. If MongoDB is temporarily
-  // unavailable, keep the request alive in the resilient local-cache mode
-  // instead of returning a blanket 503. Product mutations are mirrored to
-  // Google Sheets by app.ts, so the admin UI remains usable while MongoDB
-  // reconnects.
   if (normalizedRequestPath.startsWith('/api/admin')) {
-    const mongoReady = await ensureAdminDatabaseReady();
+    // Do not make every admin request wait for Atlas. A cold Lambda can have
+    // slow/intermittent Mongo TLS handshakes. Race hydration against a short
+    // gateway budget; the in-memory/persistence cache remains usable while a
+    // single shared hydration promise continues in the background.
+    const hydration = ensureAdminDatabaseReady();
+    const mongoReady = await Promise.race([
+      hydration,
+      new Promise<boolean>(resolve => setTimeout(() => resolve(false), 1500))
+    ]);
+
     if (!mongoReady) {
       res.setHeader('X-MongoDB-Mode', 'local-cache');
-      console.warn('[Vercel Serverless] MongoDB unavailable; continuing admin request in local-cache mode.');
+      console.warn('[Vercel Serverless] MongoDB hydration exceeded gateway budget; serving resilient local cache.');
+      void hydration.catch(() => undefined);
+    } else {
+      res.setHeader('X-MongoDB-Mode', 'mongodb');
     }
   }
 
