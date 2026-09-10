@@ -16,6 +16,7 @@ import { createSeoMiddleware } from './middleware/seoCrawlerMiddleware.js';
 import { db } from './db/store.js';
 import { pushProductToGoogleSheet } from './services/google-sheet.service.js';
 export const app = express();
+app.set('query parser', 'extended');
 app.use(helmet({contentSecurityPolicy:false,crossOriginEmbedderPolicy:false,crossOriginResourcePolicy:false}));
 app.use(cors({origin:true,credentials:true,methods:['GET','POST','PUT','DELETE','PATCH','OPTIONS']}));
 app.options('*',cors({origin:true,credentials:true})); app.use(cookieParser());
@@ -25,7 +26,6 @@ app.post('/api/translate',async(req,res)=>{const apiKey=process.env.GOOGLE_TRANS
 app.get('/api/image-proxy',async(req,res)=>{const imageUrl=req.query.url as string;if(!imageUrl||(!imageUrl.startsWith('http://')&&!imageUrl.startsWith('https://')))return res.status(400).send('Invalid URL');try{const parsed=new URL(imageUrl);const r=await fetch(imageUrl,{headers:{'User-Agent':'Mozilla/5.0','Referer':`${parsed.origin}/`,'Accept':'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'}});if(!r.ok)return res.status(r.status).send('Upstream image error');res.setHeader('Content-Type',r.headers.get('content-type')||'image/jpeg');res.setHeader('Cache-Control','public, max-age=86400, immutable');return res.send(Buffer.from(await r.arrayBuffer()));}catch{return res.status(502).send('Failed to fetch image');}});
 app.use('/',seoRoutes); app.use(createSeoMiddleware());
 app.use('/api/auth',authRoutes);app.use('/api/products',productRoutes);app.use('/api/cart',cartRoutes);app.use('/api/wishlist',wishlistRoutes);app.use('/api/orders',orderRoutes);app.use('/api/payments',orderRoutes);app.use('/api/admin',excelSyncRoutes);app.use('/api/admin',googleSheetSyncRoutes);
-// Keep the admin dashboard and Google Sheet in sync. Product mutations are written to MongoDB by the existing route first, then mirrored to the Sheet before the response is sent.
 app.use('/api/admin',async(req,res,next)=>{
   const isProductMutation = /^\/products(?:\/[^/]+)?$/.test(req.path) && ['POST','PUT','DELETE'].includes(req.method);
   if (!isProductMutation) return next();
