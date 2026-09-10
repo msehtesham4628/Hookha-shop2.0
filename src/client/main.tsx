@@ -40,7 +40,6 @@ api.getProducts = async (params: Record<string, any> = {}) => {
     } catch {}
   }
 
-  // Stable key so concurrent/repeated identical requests share one promise.
   const cacheKey = Object.keys(requestParams)
     .sort()
     .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(String(requestParams[key]))}`)
@@ -58,6 +57,35 @@ api.getProducts = async (params: Record<string, any> = {}) => {
     if (current?.value === value) productRequestCache.delete(cacheKey);
   });
   return value;
+};
+
+// Admin order polling guard. AdminDashboardPage historically polled every 4s,
+// which created a request storm against MongoDB. Keep the dashboard behaviour
+// intact but collapse repeated reads to one request per 30s and never poll while
+// the tab is hidden.
+const originalGetAdminOrders = api.getAdminOrders.bind(api);
+let lastAdminOrdersAt = 0;
+let lastAdminOrdersResult: Promise<any> | null = null;
+const ADMIN_ORDERS_MIN_INTERVAL_MS = 30000;
+
+api.getAdminOrders = async (params?: any) => {
+  if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+    return { success: false, data: [] } as any;
+  }
+
+  const now = Date.now();
+  if (lastAdminOrdersResult && now - lastAdminOrdersAt < ADMIN_ORDERS_MIN_INTERVAL_MS) {
+    return lastAdminOrdersResult;
+  }
+
+  lastAdminOrdersAt = now;
+  lastAdminOrdersResult = originalGetAdminOrders(params);
+  try {
+    return await lastAdminOrdersResult;
+  } catch (error) {
+    lastAdminOrdersResult = null;
+    throw error;
+  }
 };
 
 // Defensive fallback for the homepage vape-brand section. The build scripts
