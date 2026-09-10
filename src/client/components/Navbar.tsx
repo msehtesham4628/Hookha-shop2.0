@@ -206,11 +206,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
             className="cursor-pointer flex flex-col items-center select-none group shrink-0"
           >
             <div className="flex items-center gap-1">
-              <span className="font-serif text-base sm:text-xl lg:text-2xl font-bold tracking-[0.08em] sm:tracking-[0.12em] text-stone-900 group-hover:text-amber-900 transition-colors uppercase whitespace-nowrap">
+              <span className="font-cinzel-dec text-base sm:text-xl lg:text-2xl font-bold tracking-[0.09em] sm:tracking-[0.14em] text-stone-900 group-hover:text-amber-900 transition-colors uppercase whitespace-nowrap">
                 FUMARE HOOKAH
               </span>
             </div>
-            <span className="text-[7.5px] sm:text-[9px] uppercase tracking-[0.35em] text-amber-800/90 font-sans font-bold -mt-1">
+            <span className="text-[7.5px] sm:text-[9px] uppercase tracking-[0.35em] text-amber-800/90 font-outfit font-bold -mt-1">
               EST. 2018
             </span>
           </div>
@@ -400,7 +400,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
       {/* Desktop Navigation Links */}
       <nav className="hidden lg:block bg-white border-b border-stone-200/90 shadow-2xs relative w-full max-w-full z-20 overflow-visible">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 overflow-visible">
-          <ul className="flex items-center justify-center gap-2.5 lg:gap-3.5 xl:gap-5 2xl:gap-7 py-2.5 text-[11px] xl:text-xs uppercase font-medium tracking-wider xl:tracking-widest text-stone-700 whitespace-nowrap">
+          <ul className="flex items-center justify-center gap-2.5 lg:gap-3.5 xl:gap-5 2xl:gap-7 py-2.5 font-outfit text-[11px] xl:text-xs uppercase font-semibold tracking-wider xl:tracking-widest text-stone-700 whitespace-nowrap">
             {navLinks.map((link, idx) => {
               const isActive = currentPath === link.path || (link.categorySlug && currentPath.includes(`category=${link.categorySlug}`));
               const hasBrands = link.brands && link.brands.length > 0;

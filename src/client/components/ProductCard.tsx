@@ -184,20 +184,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, s
             }`}
             referrerPolicy="no-referrer"
             loading="lazy"
+            decoding="async"
             onError={(e) => {
               e.currentTarget.onerror = null;
               e.currentTarget.src = DEFAULT_PRODUCT_PLACEHOLDER;
             }}
           />
-          {secondaryImage && (
+          {secondaryImage && isHovered && (
             <img
               src={secondaryImage.url}
               alt={`${product.name} lifestyle`}
-              className={`absolute inset-0 w-full h-full object-contain object-center transition-all duration-500 ${
-                isHovered ? 'opacity-100 scale-108' : 'opacity-0 scale-95'
-              }`}
+              className="absolute inset-0 w-full h-full object-contain object-center transition-all duration-500 opacity-100 scale-108"
               referrerPolicy="no-referrer"
               loading="lazy"
+              decoding="async"
               onError={(e) => {
                 e.currentTarget.onerror = null;
                 e.currentTarget.src = DEFAULT_PRODUCT_PLACEHOLDER;
@@ -224,10 +224,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, s
         <div>
           {/* Brand & Star Rating Header */}
           <div className="flex items-center justify-between gap-2 mb-1.5">
-            <span className="text-[10.5px] font-extrabold uppercase tracking-wider text-cyan-700/90 group-hover:text-cyan-600 transition-colors line-clamp-1">
+            <span className="font-outfit text-[10.5px] font-extrabold uppercase tracking-wider text-cyan-700/90 group-hover:text-cyan-600 transition-colors line-clamp-1">
               {product.brand}
             </span>
-            <div className="flex items-center gap-1 text-[11px] font-bold text-stone-700 shrink-0">
+            <div className="flex items-center gap-1 font-outfit text-[11px] font-bold text-stone-700 shrink-0">
               <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
               <span>{ratingValue.toFixed(1)}</span>
               <span className="text-stone-400 font-normal text-[10px]">({reviewCount})</span>
@@ -235,13 +235,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, s
           </div>
 
           {/* Product Title */}
-          <h3 className="font-sans text-xs sm:text-sm font-bold text-stone-900 leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-cyan-700 transition-colors">
+          <h3 className="font-heading text-xs sm:text-sm font-semibold text-stone-900 leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-cyan-700 transition-colors">
             {product.name}
           </h3>
 
           {/* Key Characteristic / Flavor Pill */}
           {productPill && (
-            <div className="mt-2 flex items-center gap-1.5">
+            <div className="mt-2 flex items-center gap-1.5 font-outfit">
               <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold border px-2 py-0.5 rounded-md line-clamp-1 max-w-full ${productPill.color}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${productPill.dot}`} />
                 <span className="truncate">{productPill.label}</span>
@@ -250,7 +250,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, s
           )}
 
           {/* Stock Status Indicator */}
-          <div className="mt-2 flex items-center gap-1.5 text-[10px]">
+          <div className="mt-2 flex items-center gap-1.5 font-outfit text-[10px]">
             {isOutOfStock ? (
               <span className="text-rose-600 font-semibold flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
@@ -271,10 +271,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, s
 
           {/* Pricing Row */}
           <div className="mt-2.5 flex items-baseline justify-between gap-2">
-            <div className="flex items-baseline gap-2">
+            <div className="flex items-baseline gap-2 font-outfit">
               {product.salePrice ? (
                 <>
-                  <span className="text-base sm:text-lg font-black text-stone-900">
+                  <span className="text-base sm:text-lg font-bold tracking-tight text-stone-900">
                     ${product.salePrice.toFixed(2)}
                   </span>
                   <span className="text-xs text-stone-400 line-through font-medium">
@@ -282,14 +282,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, s
                   </span>
                 </>
               ) : (
-                <span className="text-base sm:text-lg font-black text-stone-900">
+                <span className="text-base sm:text-lg font-bold tracking-tight text-stone-900">
                   ${product.price.toFixed(2)}
                 </span>
               )}
             </div>
 
             {savingsAmount && (
-              <span className="text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200/60 px-1.5 py-0.5 rounded">
+              <span className="font-outfit text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200/60 px-1.5 py-0.5 rounded">
                 Save ${savingsAmount}
               </span>
             )}

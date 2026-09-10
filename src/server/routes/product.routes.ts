@@ -253,6 +253,102 @@ router.get('/', (req, res) => {
   }
 });
 
+// GET /api/products/homepage-sections (Consolidated batch endpoint for high-speed homepage loading)
+router.get('/homepage-sections', (req, res) => {
+  try {
+    const deletedProductIds = new Set(
+      db.persistenceData.deletedProductIds.map(id => id.toLowerCase().trim())
+    );
+    const activeProducts = db.products.filter(p => p.isActive && !deletedProductIds.has(p.id.toLowerCase().trim()));
+
+    const categoryAliases: Record<string, string[]> = {
+      'tobacco': ['tobacco', 'shisha-tobacco', 'hookah-tobacco'],
+      'hookahs': ['hookahs', 'hookah', 'shisha-pipe', 'shisha-pipes'],
+      'bowls': ['bowls', 'bowl', 'hookah-bowls'],
+      'bases': ['bases', 'base', 'glass-bases', 'hookah-bases', 'vases'],
+      'coal': ['coal', 'coals', 'charcoal', 'coconut-coal', 'hookah-coal'],
+      'accessories': ['accessories', 'accessory', 'hookah-accessories', 'supplies'],
+      'e-hookah': ['e-hookah', 'e hookah', 'e-hookah & electronic', 'e hookah electronic', 'electronic hookah', 'electronic hookah heads'],
+      'vapes': ['vapes', 'vape', 'vapes & pod systems', 'vape & pod systems', 'pod systems', 'disposable vapes']
+    };
+
+    const matchesCategory = (p: any, targetCategory: string) => {
+      const pSlug = (p.categorySlug || '').toLowerCase().trim();
+      const pCategory = (p.category || '').toLowerCase().trim();
+      const aliases = categoryAliases[targetCategory] || [targetCategory];
+      return aliases.some(alias => {
+        const a = alias.toLowerCase().trim();
+        return pSlug === a || pCategory === a || pSlug.replace(/-/g, ' ') === a.replace(/-/g, ' ') || pCategory.replace(/\s+/g, '-') === a.replace(/\s+/g, '-');
+      });
+    };
+
+    const tobacco: any[] = [];
+    const hookahs: any[] = [];
+    const bowls: any[] = [];
+    const bases: any[] = [];
+    const coal: any[] = [];
+    const accessories: any[] = [];
+    const ehookah: any[] = [];
+    const vapes: any[] = [];
+    const newArrivals: any[] = [];
+    const bestSellers: any[] = [];
+
+    for (const p of activeProducts) {
+      if (tobacco.length < 12 && matchesCategory(p, 'tobacco')) tobacco.push(p);
+      if (hookahs.length < 12 && matchesCategory(p, 'hookahs')) hookahs.push(p);
+      if (bowls.length < 12 && matchesCategory(p, 'bowls')) bowls.push(p);
+      if (bases.length < 12 && matchesCategory(p, 'bases')) bases.push(p);
+      if (coal.length < 12 && matchesCategory(p, 'coal')) coal.push(p);
+      if (accessories.length < 12 && matchesCategory(p, 'accessories')) accessories.push(p);
+      if (ehookah.length < 12 && matchesCategory(p, 'e-hookah')) ehookah.push(p);
+      if (vapes.length < 12 && matchesCategory(p, 'vapes')) vapes.push(p);
+      if (newArrivals.length < 8 && (p.isNewArrival || p.tags?.includes('new'))) newArrivals.push(p);
+      if (bestSellers.length < 8 && (p.isBestSeller || p.reviewCount > 10 || p.rating >= 4.5)) bestSellers.push(p);
+    }
+
+    // Fallbacks if newArrivals or bestSellers didn't hit 8 items
+    if (newArrivals.length < 8) {
+      for (const p of activeProducts) {
+        if (!newArrivals.includes(p)) {
+          newArrivals.push(p);
+          if (newArrivals.length >= 8) break;
+        }
+      }
+    }
+    if (bestSellers.length < 8) {
+      for (const p of activeProducts) {
+        if (!bestSellers.includes(p)) {
+          bestSellers.push(p);
+          if (bestSellers.length >= 8) break;
+        }
+      }
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        categories: {
+          tobacco,
+          hookahs,
+          bowls,
+          bases,
+          coal,
+          accessories,
+          ehookah,
+          vapes
+        },
+        newArrivals,
+        bestSellers
+      }
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: err.message || 'Failed to fetch homepage sections' }
+    });
+  }
+});
+
 // GET /api/products/search?q=
 router.get('/search', (req, res) => {
   const term = (req.query.q as string || '').toLowerCase().trim();

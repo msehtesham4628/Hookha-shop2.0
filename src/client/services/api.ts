@@ -273,6 +273,26 @@ class ApiClient {
     return this.request<{ success: boolean; data: { products: Product[]; pagination: any } }>(`/products?${qs.toString()}`);
   }
 
+  public async getHomepageSections() {
+    return this.request<{
+      success: boolean;
+      data: {
+        categories: {
+          tobacco: Product[];
+          hookahs: Product[];
+          bowls: Product[];
+          bases: Product[];
+          coal: Product[];
+          accessories: Product[];
+          ehookah: Product[];
+          vapes: Product[];
+        };
+        newArrivals: Product[];
+        bestSellers: Product[];
+      };
+    }>('/products/homepage-sections');
+  }
+
   public async searchProducts(query: string) {
     return this.request<{ success: boolean; data: { results: Product[]; suggestions: any[] } }>(`/products/search?q=${encodeURIComponent(query)}`);
   }

@@ -274,7 +274,7 @@ const CategorySliderSection: React.FC<CategorySliderProps> = ({ config, products
     <section id={config.id} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div className="flex items-center justify-between pb-3 border-b border-stone-300 relative mb-6">
         <div className="relative">
-          <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-wider text-stone-900">
+          <h2 className="font-heading text-lg sm:text-xl md:text-2xl font-bold uppercase tracking-wider text-stone-900">
             {config.title}
           </h2>
           <div
@@ -283,7 +283,7 @@ const CategorySliderSection: React.FC<CategorySliderProps> = ({ config, products
           />
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 font-outfit">
           <div className="hidden sm:flex items-center gap-1.5">
             <button
               onClick={() => handleScroll('left')}
@@ -337,19 +337,19 @@ const CategorySliderSection: React.FC<CategorySliderProps> = ({ config, products
 
             {/* Hero content & CTA */}
             <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-10 lg:px-12 max-w-2xl z-10 text-left">
-              <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-black uppercase tracking-widest text-amber-400 mb-1.5">
+              <span className="inline-flex items-center gap-1.5 font-outfit text-[10px] sm:text-xs font-bold uppercase tracking-widest text-amber-400 mb-1.5">
                 <Sparkles className="w-3.5 h-3.5" /> Session Essentials
               </span>
-              <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white leading-tight drop-shadow-sm">
+              <h3 className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-white leading-tight drop-shadow-sm">
                 {config.headline || `${config.title} Collection`}
               </h3>
-              <p className="mt-2 text-xs sm:text-sm text-stone-300 line-clamp-2 leading-relaxed">
+              <p className="mt-2 font-outfit text-xs sm:text-sm text-stone-300 line-clamp-2 leading-relaxed">
                 {config.description || 'Premium accessories, heat management devices & professional gear.'}
               </p>
               <div className="mt-4 flex items-center gap-3">
                 <button
                   onClick={() => onNavigate(`/shop?category=${config.apiCategory}`)}
-                  className="bg-white hover:bg-stone-200 text-stone-950 text-xs font-black uppercase tracking-wider px-4 py-2.5 rounded-lg shadow-sm transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                  className="bg-white hover:bg-stone-200 text-stone-950 text-xs font-outfit font-bold uppercase tracking-wider px-4 py-2.5 rounded-lg shadow-sm transition-colors inline-flex items-center gap-1.5 cursor-pointer"
                 >
                   Shop {config.title} <ArrowRight className="w-3.5 h-3.5" />
                 </button>
@@ -470,6 +470,25 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
   const loadHomeData = useCallback(async () => {
     try {
+      // 1. Fast path: single batch request for all homepage sections
+      const res = await api.getHomepageSections().catch(() => null);
+      if (res?.success && res.data) {
+        setCategoryData({
+          tobacco: res.data.categories?.tobacco || [],
+          hookahs: res.data.categories?.hookahs || [],
+          bowls: res.data.categories?.bowls || [],
+          bases: res.data.categories?.bases || [],
+          coal: res.data.categories?.coal || [],
+          accessories: res.data.categories?.accessories || [],
+          ehookah: res.data.categories?.ehookah || [],
+          vapes: res.data.categories?.vapes || []
+        });
+        if (res.data.newArrivals) setNewInProducts(res.data.newArrivals);
+        if (res.data.bestSellers) setBestSellers(res.data.bestSellers);
+        return;
+      }
+
+      // 2. Fallback: individual queries if batch is unavailable
       const [
         tobaccoRes,
         hookahsRes,
@@ -517,6 +536,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   useEffect(() => {
     loadHomeData();
 
+    // Listen to real-time sync events instead of hammering the server on window focus
     const unsub = onSync('*', (event) => {
       if (
         ['PRODUCT_UPDATED', 'INVENTORY_UPDATED', 'ORDER_PLACED', 'CATEGORY_UPDATED', 'REFRESH_ALL'].includes(event.type)
@@ -525,10 +545,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       }
     });
 
-    window.addEventListener('focus', loadHomeData);
     return () => {
       unsub();
-      window.removeEventListener('focus', loadHomeData);
     };
   }, [loadHomeData]);
 
@@ -586,8 +604,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <Clock className="w-6 h-6 text-[#0088cc]" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-stone-900 leading-tight">Same Day Shipping</h4>
-              <p className="text-xs text-stone-500 mt-0.5">USA (1–4 days) · International (3–30 days)</p>
+              <h4 className="font-heading text-sm font-bold text-stone-900 leading-tight">Same Day Shipping</h4>
+              <p className="font-outfit text-xs text-stone-500 mt-0.5">USA (1–4 days) · International (3–30 days)</p>
             </div>
           </div>
 
@@ -596,8 +614,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <Package className="w-6 h-6 text-emerald-600" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-stone-900 leading-tight">Free Shipping</h4>
-              <p className="text-xs text-stone-500 mt-0.5">On orders over $89</p>
+              <h4 className="font-heading text-sm font-bold text-stone-900 leading-tight">Free Shipping</h4>
+              <p className="font-outfit text-xs text-stone-500 mt-0.5">On orders over $89</p>
             </div>
           </div>
 
@@ -606,8 +624,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <Tag className="w-6 h-6 text-rose-600" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-stone-900 leading-tight">Save up to 50%</h4>
-              <p className="text-xs text-stone-500 mt-0.5">With Fumare Hookah Direct</p>
+              <h4 className="font-heading text-sm font-bold text-stone-900 leading-tight">Save up to 50%</h4>
+              <p className="font-outfit text-xs text-stone-500 mt-0.5">With Fumare Hookah Direct</p>
             </div>
           </div>
         </div>
@@ -616,7 +634,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       {/* New In */}
       <section id="section-new-in" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         <div className="text-center mb-8">
-          <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wider text-stone-900">NEW IN</h2>
+          <h2 className="font-heading text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wider text-stone-900">NEW ARRIVALS</h2>
           <div className="w-12 h-[3px] bg-[#0088cc] mx-auto mt-2" />
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -634,7 +652,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       {/* Best Sellers */}
       <section id="section-best-sellers" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
         <div className="text-center mb-8">
-          <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wider text-stone-900">OUR BEST SELLERS</h2>
+          <h2 className="font-heading text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wider text-stone-900">OUR BEST SELLERS</h2>
           <div className="w-12 h-[3px] bg-[#0088cc] mx-auto mt-2" />
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -652,7 +670,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       {/* Posts */}
       <section id="section-posts" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
         <div className="text-center mb-8">
-          <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wider text-stone-900">POSTS</h2>
+          <h2 className="font-heading text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wider text-stone-900">GUIDES & ARTICLES</h2>
           <div className="w-12 h-[3px] bg-[#0088cc] mx-auto mt-2" />
         </div>
         <div

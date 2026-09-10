@@ -1,9 +1,82 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Cinzel', Georgia, serif;
+  --font-display: 'Syne', 'Cinzel', sans-serif;
+  --font-syne: 'Syne', sans-serif;
+  --font-cinzel: 'Cinzel', serif;
+  --font-cinzel-dec: 'Cinzel Decorative', 'Cinzel', serif;
+  --font-outfit: 'Outfit', sans-serif;
+  --font-heading: 'Syne', 'Cinzel', sans-serif;
+}
+
+:root {
+  --font-hero-family: 'Syne', sans-serif;
+  --font-title-family: 'Syne', 'Cinzel', sans-serif;
+  --font-accent-family: 'Cinzel Decorative', 'Cinzel', serif;
+  --font-body-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+}
+
+[data-font-vibe="imperial"] {
+  --font-hero-family: 'Cinzel Decorative', 'Cinzel', serif;
+  --font-title-family: 'Cinzel', serif;
+  --font-accent-family: 'Cinzel Decorative', serif;
+  --font-body-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+[data-font-vibe="haute"] {
+  --font-hero-family: 'Playfair Display', serif;
+  --font-title-family: 'Playfair Display', serif;
+  --font-accent-family: 'Playfair Display', serif;
+  --font-body-family: 'Outfit', sans-serif;
+}
+
+[data-font-vibe="cyber"] {
+  --font-hero-family: 'Outfit', sans-serif;
+  --font-title-family: 'Outfit', sans-serif;
+  --font-accent-family: 'Syne', sans-serif;
+  --font-body-family: 'Outfit', sans-serif;
+}
+
 html, body {
   overflow-x: hidden;
   max-width: 100vw;
   width: 100%;
+  font-family: var(--font-body-family);
+}
+
+/* Custom typography classes */
+.font-display {
+  font-family: var(--font-hero-family) !important;
+}
+
+.font-heading {
+  font-family: var(--font-title-family) !important;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', Georgia, serif !important;
+}
+
+.font-cinzel-dec {
+  font-family: 'Cinzel Decorative', 'Cinzel', Georgia, serif !important;
+}
+
+.font-syne {
+  font-family: 'Syne', sans-serif !important;
+}
+
+.font-outfit {
+  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif !important;
+}
+
+.font-playfair {
+  font-family: 'Playfair Display', Georgia, serif !important;
+}
+
+.font-serif {
+  font-family: 'Cinzel', Georgia, serif !important;
 }
 
 .no-scrollbar::-webkit-scrollbar {

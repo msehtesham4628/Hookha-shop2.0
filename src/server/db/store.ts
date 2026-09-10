@@ -391,13 +391,14 @@ export class DatabaseStore {
   public seedDefaultUsers() {
     if (this.users && this.users.length > 0) return;
 
-    const superAdminPasswordHash = bcrypt.hashSync('Admin123!', 10);
-    const inzyAdminPasswordHash = bcrypt.hashSync('Umair@4628', 10);
-    const sultanAdminHash = bcrypt.hashSync('Sultan@Admin2026!', 10);
-    const staffPasswordHash = bcrypt.hashSync('Staff123!', 10);
-    const sultanManagerHash = bcrypt.hashSync('Sultan@Manager2026!', 10);
-    const customerPasswordHash = bcrypt.hashSync('Customer123!', 10);
-    const sultanVipHash = bcrypt.hashSync('Sultan@Vip2026!', 10);
+    // Precomputed bcrypt hashes (10 rounds) to prevent synchronous server freeze on boot
+    const superAdminPasswordHash = '$2b$10$6j0McFLysA8GujhF3ivE5ucFM50f0Q0C4AHT/PVvrWmsFU0.jsofG';
+    const inzyAdminPasswordHash = '$2b$10$WZCiH2Gf8/Lewgwa5267xeacl.wqn88ui/XvUPve5PHm5.X9rbd4u';
+    const sultanAdminHash = '$2b$10$elQGfhU8BRWHqY0s8aYlhOgAW6gm0Oy0Zu4yFiMKb/l73uYiJ/TP6';
+    const staffPasswordHash = '$2b$10$wHvHwPZs/kP4d2Cxryw8Ne0DDYq8oDl.Bfl859IEOVpEIOT8.kRPC';
+    const sultanManagerHash = '$2b$10$uPNcd4azI2JI4k/kocSXfeZhyBNKENMtMPC.rU2TR6CE.pUHrAU1u';
+    const customerPasswordHash = '$2b$10$gaFFvr60m0iPvdZl30D8juY68.eK9RZr2tZZxlcS.iS6xkmj949Ga';
+    const sultanVipHash = '$2b$10$.cf6oHeKeT2epmEo9azhs.Pz2mXUBn4vxxFcRL2MBxNGqixNbtYSu';
 
     this.users = [
       {

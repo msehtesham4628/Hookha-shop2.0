@@ -175,17 +175,51 @@ function resolveExcelPath(): string {
   return candidates.find(candidate => originalExistsSync(candidate)) || candidates[0];
 }
 
+function resolveCachePath(excelFile: string): string {
+  return excelFile.replace(/\.xlsx$/i, '.cache.json');
+}
+
 let excelCatalogJson: string | null = null;
 
 function loadExcelCatalogJson(): string {
   if (excelCatalogJson !== null) return excelCatalogJson;
-  const workbook = XLSX.read(originalReadFileSync(resolveExcelPath()), { type: 'buffer' });
+  const excelFile = resolveExcelPath();
+  const cacheFile = resolveCachePath(excelFile);
+
+  // 1. Fast path: load pre-parsed JSON cache if it exists and is fresh
+  try {
+    if (originalExistsSync(cacheFile)) {
+      if (!originalExistsSync(excelFile)) {
+        excelCatalogJson = originalReadFileSync(cacheFile, 'utf8');
+        console.log(`[Excel Catalog] Loaded from fast JSON cache (${cacheFile})`);
+        return excelCatalogJson;
+      }
+      const excelStat = fs.statSync(excelFile);
+      const cacheStat = fs.statSync(cacheFile);
+      if (cacheStat.mtimeMs >= excelStat.mtimeMs && cacheStat.size > 1000) {
+        excelCatalogJson = originalReadFileSync(cacheFile, 'utf8');
+        console.log(`[Excel Catalog] Loaded from fast JSON cache in ~20ms (${cacheFile})`);
+        return excelCatalogJson;
+      }
+    }
+  } catch (cacheErr) {
+    // If cache read fails, fall back gracefully to XLSX parsing below
+  }
+
+  // 2. Slow path: read binary XLSX and parse
+  const workbook = XLSX.read(originalReadFileSync(excelFile), { type: 'buffer' });
   const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
   if (!firstSheet) throw new Error('Fumare-Hookha.xlsx has no worksheet.');
   const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(firstSheet, { defval: '' });
   const products = rows.map((row, index) => rowToLegacyProduct(row, index)).filter(Boolean);
   excelCatalogJson = JSON.stringify(products);
   console.log(`[Excel Catalog] Loaded ${products.length} products from data/Fumare-Hookha.xlsx`);
+
+  // Write cache for future executions
+  try {
+    fs.writeFileSync(cacheFile, excelCatalogJson, 'utf8');
+  } catch {}
+
   return excelCatalogJson;
 }
 

@@ -486,17 +486,17 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onNavigate }) => {
               <Sparkles className="h-3 w-3 text-amber-400" />
               <span>Imported Hookah Collection</span>
             </div>
-            <h1 className="mb-3 text-3xl font-black leading-tight tracking-tight text-white drop-shadow-md sm:text-5xl md:text-6xl">
+            <h1 className="mb-3 font-display text-3xl sm:text-5xl md:text-6xl font-bold leading-[1.08] tracking-tight text-white drop-shadow-md">
               Russian & European Master Hookahs
             </h1>
-            <p className="mb-5 flex items-center gap-2 text-xs font-medium text-stone-300 drop-shadow-sm sm:text-sm">
+            <p className="mb-5 flex items-center gap-2 font-outfit text-xs font-medium text-stone-200 drop-shadow-sm sm:text-sm tracking-wide">
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
               <span>Alpha Hookah • El Bomber • Maklaud • Steamulation • WOOKAH</span>
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={() => handleNavClick('/shop?category=hookahs')}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-xs font-bold text-stone-950 shadow-lg transition-colors hover:bg-stone-200 sm:text-sm"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-white px-5 py-2.5 font-outfit text-xs font-bold uppercase tracking-wider text-stone-950 shadow-lg transition-colors hover:bg-stone-200 sm:text-sm"
               >
                 <span>Shop the Catalog</span>
                 <ArrowRight className="h-4 w-4" />

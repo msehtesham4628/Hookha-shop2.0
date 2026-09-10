@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useStore } from './store/useStore.js';
 import { onSync } from './services/sync.js';
 import { LanguageProvider } from './i18n/LanguageContext.js';
@@ -9,19 +9,22 @@ import { SearchModal } from './components/SearchModal.js';
 import { QuickViewModal } from './components/QuickViewModal.js';
 import { CartDrawer } from './components/CartDrawer.js';
 import { ToastContainer } from './components/ToastContainer.js';
+import { FontThemeSelector } from './components/FontThemeSelector.js';
 import { HomePage } from './pages/HomePage.js';
-import { ShopPage } from './pages/ShopPage.js';
-import { ProductDetailPage } from './pages/ProductDetailPage.js';
-import { CheckoutPage } from './pages/CheckoutPage.js';
-import { OrderSuccessPage } from './pages/OrderSuccessPage.js';
-import { AccountPage } from './pages/AccountPage.js';
-import { WholesalePage } from './pages/WholesalePage.js';
-import { AuthPage } from './pages/AuthPage.js';
-import { AboutPage } from './pages/AboutPage.js';
-import { ContactPage } from './pages/ContactPage.js';
-import { AdminDashboardPage } from './pages/AdminDashboardPage.js';
-import { ExcelProductSyncPage } from './pages/ExcelProductSyncPage.js';
-import { OrderTrackingPage } from './pages/OrderTrackingPage.js';
+
+// Lazy-loaded routes for instant initial storefront loading and smaller JS bundle
+const ShopPage = lazy(() => import('./pages/ShopPage.js').then(m => ({ default: m.ShopPage })));
+const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage.js').then(m => ({ default: m.ProductDetailPage })));
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage.js').then(m => ({ default: m.CheckoutPage })));
+const OrderSuccessPage = lazy(() => import('./pages/OrderSuccessPage.js').then(m => ({ default: m.OrderSuccessPage })));
+const AccountPage = lazy(() => import('./pages/AccountPage.js').then(m => ({ default: m.AccountPage })));
+const WholesalePage = lazy(() => import('./pages/WholesalePage.js').then(m => ({ default: m.WholesalePage })));
+const AuthPage = lazy(() => import('./pages/AuthPage.js').then(m => ({ default: m.AuthPage })));
+const AboutPage = lazy(() => import('./pages/AboutPage.js').then(m => ({ default: m.AboutPage })));
+const ContactPage = lazy(() => import('./pages/ContactPage.js').then(m => ({ default: m.ContactPage })));
+const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage.js').then(m => ({ default: m.AdminDashboardPage })));
+const ExcelProductSyncPage = lazy(() => import('./pages/ExcelProductSyncPage.js').then(m => ({ default: m.ExcelProductSyncPage })));
+const OrderTrackingPage = lazy(() => import('./pages/OrderTrackingPage.js').then(m => ({ default: m.OrderTrackingPage })));
 
 export default function App() {
   const { loadCurrentUser, loadCart, loadWishlist, loadSettings } = useStore();
@@ -60,5 +63,27 @@ export default function App() {
   };
   const isAdminRoute = currentPath.startsWith('/dashboard') || currentPath.startsWith('/admin');
   const isImmersiveStorefrontRoute = !isAdminRoute && currentPath === '/';
-  return <LanguageProvider><div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-white text-stone-900 selection:bg-amber-100 selection:text-amber-900"><AgeGateModal /><SearchModal onNavigate={navigate} /><QuickViewModal onNavigate={navigate} /><CartDrawer onNavigate={navigate} /><ToastContainer />{!isAdminRoute && !isImmersiveStorefrontRoute && <Navbar currentPath={currentPath} onNavigate={navigate} />}<div className="flex-1 w-full max-w-full overflow-x-hidden">{renderRoute()}</div>{!isAdminRoute && <Footer onNavigate={navigate} />}</div></LanguageProvider>;
+  return (
+    <LanguageProvider>
+      <div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-white text-stone-900 selection:bg-amber-100 selection:text-amber-900">
+        <AgeGateModal />
+        <SearchModal onNavigate={navigate} />
+        <QuickViewModal onNavigate={navigate} />
+        <CartDrawer onNavigate={navigate} />
+        <ToastContainer />
+        <FontThemeSelector />
+        {!isAdminRoute && !isImmersiveStorefrontRoute && <Navbar currentPath={currentPath} onNavigate={navigate} />}
+        <div className="flex-1 w-full max-w-full overflow-x-hidden">
+          <Suspense fallback={
+            <div className="min-h-[50vh] flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-stone-200 border-t-amber-500 rounded-full animate-spin" />
+            </div>
+          }>
+            {renderRoute()}
+          </Suspense>
+        </div>
+        {!isAdminRoute && <Footer onNavigate={navigate} />}
+      </div>
+    </LanguageProvider>
+  );
 }

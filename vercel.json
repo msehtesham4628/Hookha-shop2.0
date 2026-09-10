@@ -1,13 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build:client",
+  "buildCommand": "node scripts/generate-catalog-cache.cjs && npm run build:client",
   "outputDirectory": "dist",
   "env": {
     "NODE_OPTIONS": "--no-deprecation"
   },
   "functions": {
     "api/index.ts": {
-      "includeFiles": "data/Fumare-Hookha.xlsx",
+      "includeFiles": "data/**",
       "maxDuration": 30
     }
   },
@@ -19,11 +19,20 @@
   ],
   "headers": [
     {
+      "source": "/api/products/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=60, stale-while-revalidate=300"
+        }
+      ]
+    },
+    {
       "source": "/api/products",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, s-maxage=30, stale-while-revalidate=120"
+          "value": "public, s-maxage=60, stale-while-revalidate=300"
         }
       ]
     }
