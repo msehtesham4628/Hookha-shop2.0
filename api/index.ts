@@ -91,14 +91,15 @@ export default async function vercelApiHandler(req: any, res: any) {
   }
 
   if (normalizedRequestPath.startsWith('/api/admin')) {
-    // Do not make every admin request wait for Atlas. A cold Lambda can have
-    // slow/intermittent Mongo TLS handshakes. Race hydration against a short
-    // gateway budget; the in-memory/persistence cache remains usable while a
-    // single shared hydration promise continues in the background.
+    // Deduplicate hydration within a warm serverless instance. Give MongoDB
+    // enough time to complete TLS/server selection and full store hydration
+    // before falling back to the local cache. The previous 1500ms budget was
+    // shorter than the observed MongoDB handshake/query latency and caused
+    // stale local state to be served even when MongoDB was healthy.
     const hydration = ensureAdminDatabaseReady();
     const mongoReady = await Promise.race([
       hydration,
-      new Promise<boolean>(resolve => setTimeout(() => resolve(false), 1500))
+      new Promise<boolean>(resolve => setTimeout(() => resolve(false), 10000))
     ]);
 
     if (!mongoReady) {
