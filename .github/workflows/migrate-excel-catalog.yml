@@ -1,0 +1,250 @@
+name: Migrate catalog to Excel
+
+on:
+  push:
+    paths-ignore:
+      - .github/workflows/migrate-excel-catalog.yml
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: ${{ !contains(github.event.head_commit.message, '[excel-catalog-migration]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Replace JSON catalog loader with Excel loader
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('src/server/db/store.ts')
+          s = p.read_text()
+
+          if "import * as XLSX from 'xlsx';" not in s:
+              s = s.replace("import path from 'path';\n", "import path from 'path';\nimport * as XLSX from 'xlsx';\n", 1)
+
+          start = s.index('function loadSplitCatalog(): Product[] {')
+          end = s.index('\n}\n\nexport class DatabaseStore', start) + 2
+
+          loader = r'''function resolveExcelCatalogPath(): string {
+            const candidates = [
+              path.join(process.cwd(), 'data', 'Fumare-Hookha.xlsx'),
+              path.join('/var/task', 'data', 'Fumare-Hookha.xlsx'),
+              path.join(process.cwd(), 'src', 'server', 'db', 'Fumare-Hookha.xlsx')
+            ];
+            try {
+              const dir = typeof __dirname !== 'undefined' ? __dirname : path.dirname(new URL(import.meta.url).pathname);
+              candidates.push(path.join(dir, '..', '..', '..', 'data', 'Fumare-Hookha.xlsx'));
+            } catch {}
+            return candidates.find(candidate => fs.existsSync(candidate)) || candidates[0];
+          }
+
+          const excelText = (value: unknown) => String(value ?? '').replace(/\s+/g, ' ').trim();
+          const excelNorm = (value: unknown) => excelText(value).toLowerCase().replace(/[_.-]+/g, ' ').replace(/\s+/g, ' ');
+          const excelSlug = (value: unknown) => excelText(value).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'product';
+
+          const excelAliases: Record<string, string[]> = {
+            sku: ['sku', 'product sku', 'item sku', 'code'],
+            name: ['name', 'product name', 'product_name', 'title'],
+            price: ['price', 'regular price', 'selling price', 'unit price'],
+            salePrice: ['sale price', 'saleprice', 'discount price', 'offer price'],
+            stock: ['stock', 'quantity', 'qty', 'inventory'],
+            brand: ['brand', 'brand name'],
+            category: ['category', 'category name'],
+            description: ['description', 'long description'],
+            shortDescription: ['short description', 'shortdescription'],
+            imageUrl: ['image url', 'imageurl', 'image', 'primary image', 'primary image url'],
+            images: ['images', 'image urls', 'image_urls'],
+            sourceUrl: ['source url', 'product url', 'product_url', 'url'],
+            tags: ['tags', 'tag'],
+            flavor: ['flavor', 'flavour'],
+            material: ['material'],
+            color: ['color', 'colour'],
+            weight: ['weight'],
+            isActive: ['active', 'is active', 'isactive', 'status'],
+            isFeatured: ['featured', 'is featured', 'isfeatured'],
+            isBestSeller: ['best seller', 'bestseller', 'is bestseller', 'is best seller'],
+            isNewArrival: ['new arrival', 'newarrival', 'is new arrival']
+          };
+
+          function excelValue(row: Record<string, unknown>, field: string): unknown {
+            const map = new Map(Object.entries(row).map(([key, value]) => [excelNorm(key), value]));
+            for (const alias of excelAliases[field] || []) {
+              const value = map.get(excelNorm(alias));
+              if (value !== undefined && excelText(value) !== '') return value;
+            }
+            return undefined;
+          }
+
+          function excelNumber(value: unknown, fallback = 0): number {
+            if (value === undefined || value === null || excelText(value) === '') return fallback;
+            const n = Number(String(value).replace(/[$,₹€£]/g, '').trim());
+            return Number.isFinite(n) ? n : fallback;
+          }
+
+          function excelBoolean(value: unknown, fallback = false): boolean {
+            if (value === undefined || value === null || excelText(value) === '') return fallback;
+            const v = excelNorm(value);
+            if (['true', 'yes', 'y', '1', 'active', 'enabled'].includes(v)) return true;
+            if (['false', 'no', 'n', '0', 'inactive', 'disabled'].includes(v)) return false;
+            return fallback;
+          }
+
+          function excelImages(row: Record<string, unknown>, name: string) {
+            const primary = excelText(excelValue(row, 'imageUrl'));
+            const raw = excelText(excelValue(row, 'images'));
+            const urls = [primary, ...raw.split(/[|,\n]+/).map(value => value.trim())]
+              .filter(url => /^https?:\/\//i.test(url))
+              .filter((url, index, all) => all.indexOf(url) === index);
+            return urls.slice(0, 20).map((url, index) => ({
+              id: `${excelSlug(name)}-image-${index + 1}`,
+              url,
+              thumbnailUrl: url,
+              alt: `${name} product image ${index + 1}`,
+              isPrimary: index === 0,
+              sortOrder: index + 1
+            }));
+          }
+
+          function loadExcelCatalog(): Product[] {
+            const catalogPath = resolveExcelCatalogPath();
+            if (!fs.existsSync(catalogPath)) {
+              console.warn(`[Store] Excel catalog not found: ${catalogPath}`);
+              return [];
+            }
+
+            try {
+              const workbook = XLSX.readFile(catalogPath, { cellDates: false });
+              const products: Product[] = [];
+              const seen = new Set<string>();
+
+              for (const sheetName of workbook.SheetNames) {
+                const sheet = workbook.Sheets[sheetName];
+                if (!sheet) continue;
+                const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: '' });
+
+                for (const row of rows) {
+                  const name = excelText(excelValue(row, 'name'));
+                  if (!name) continue;
+                  const description = excelText(excelValue(row, 'description'));
+                  const sourceUrl = excelText(excelValue(row, 'sourceUrl'));
+                  const explicitCategory = excelText(excelValue(row, 'category'));
+                  const brand = excelText(excelValue(row, 'brand')) || 'Fumare Hookah';
+                  const productText = `${name} ${description} ${sourceUrl}`.toLowerCase();
+                  const category = explicitCategory ||
+                    (/e-?hookah|electronic hookah|smart head|hookah pod/.test(productText) ? 'E-Hookah' :
+                    /vape|puff|nicotine|pod system|disposable/.test(productText) ? 'Vapes' :
+                    /charcoal|coconut coal|quick light|hookah coal|hookah charcoal/.test(productText) ? 'Coal' :
+                    /tobacco|shisha tobacco|hookah tobacco|molasses|dark leaf|blonde leaf|cigar leaf/.test(productText) ? 'Tobacco' :
+                    /\bbowls?\b|phunnel|killer bowl|hookah bowl|clay bowl/.test(productText) ? 'Bowls' :
+                    /\bbases?\b|glass vase|vase for hookah|crystal base|hookah base/.test(productText) ? 'Bases' :
+                    /\bhookahs?\b|shisha pipe|nargile|hookah stem|hookah set/.test(productText) ? 'Hookahs' : 'Accessories');
+
+                  const sku = excelText(excelValue(row, 'sku')).toUpperCase();
+                  const identity = `${excelNorm(sku || name)}|${excelNorm(brand)}|${excelNorm(category)}`;
+                  if (seen.has(identity)) continue;
+                  seen.add(identity);
+
+                  const slug = excelSlug(name);
+                  const price = excelNumber(excelValue(row, 'price'));
+                  const salePriceValue = excelValue(row, 'salePrice');
+                  const salePrice = salePriceValue !== undefined && excelText(salePriceValue) !== '' ? excelNumber(salePriceValue) : undefined;
+                  const now = new Date().toISOString();
+                  const images = excelImages(row, name);
+                  const tags = excelText(excelValue(row, 'tags')).split(/[|,]+/).map(value => value.trim()).filter(Boolean);
+
+                  products.push({
+                    id: `whm-${slug}${sku ? `-${excelSlug(sku)}` : ''}`,
+                    name,
+                    slug,
+                    sku: sku || `AUTO-${excelSlug(name).slice(0, 32).toUpperCase()}`,
+                    description,
+                    shortDescription: excelText(excelValue(row, 'shortDescription')) || description.slice(0, 240),
+                    price,
+                    salePrice,
+                    currency: 'USD',
+                    brand,
+                    brandSlug: excelSlug(brand),
+                    category,
+                    categorySlug: excelSlug(category),
+                    images,
+                    stock: Math.max(0, Math.trunc(excelNumber(excelValue(row, 'stock'), 100))),
+                    lowStockThreshold: 5,
+                    tags: tags.length ? tags : [category, brand].filter(Boolean),
+                    specifications: [],
+                    rating: 0,
+                    reviewCount: 0,
+                    isFeatured: excelBoolean(excelValue(row, 'isFeatured')),
+                    isNewArrival: excelBoolean(excelValue(row, 'isNewArrival')),
+                    isBestSeller: excelBoolean(excelValue(row, 'isBestSeller')),
+                    isOnSale: salePrice !== undefined && salePrice < price,
+                    isActive: excelBoolean(excelValue(row, 'isActive'), true),
+                    ageRestricted: true,
+                    seoTitle: `${name} | Fumare Hookah`,
+                    seoDescription: description.slice(0, 155),
+                    sourceUrl,
+                    createdAt: now,
+                    updatedAt: now
+                  });
+                }
+              }
+
+              console.log(`[Store] Loaded ${products.length} products from Excel catalog: ${path.basename(catalogPath)}`);
+              return products;
+            } catch (error) {
+              console.error('[Store] Could not load Excel catalog:', error);
+              return [];
+            }
+          }'''
+
+          s = s[:start] + loader + s[end:]
+
+          old = """    let catalogProducts: Product[] = loadSplitCatalog();\n    if (catalogProducts.length > 0) {\n      console.log(`[Store] Loaded ${catalogProducts.length} products from split catalogs.`);\n    }\n    try {\n      const catalogPath = resolveDbFilePath('scrapedProducts.json');\n      if (fs.existsSync(catalogPath)) {\n        const fileData = fs.readFileSync(catalogPath, 'utf8');\n        const scrapedProducts: Product[] = JSON.parse(fileData);\n        catalogProducts = [...catalogProducts, ...scrapedProducts];\n      }\n    } catch (e) {\n      console.warn('[Store] Could not load scrapedProducts.json:', e);\n    }\n\n"""
+          new = """    const catalogProducts: Product[] = loadExcelCatalog();\n    if (catalogProducts.length === 0) {\n      console.warn('[Store] Excel catalog is empty; keeping built-in products disabled rather than falling back to JSON catalogs.');\n    }\n\n"""
+          if old not in s:
+              raise SystemExit('Expected old catalog initialization block was not found')
+          s = s.replace(old, new, 1)
+
+          p.write_text(s)
+          PY
+
+      - name: Remove legacy product JSON catalogs
+        run: |
+          rm -f src/server/db/products-1.json src/server/db/products-2.json src/server/db/products-3.json src/server/db/products-4.json src/server/db/products-5.json src/server/db/products-6.json src/server/db/scrapedProducts.json
+
+      - name: Ensure Excel catalog is included in Vercel Functions
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import json
+          p = Path('vercel.json')
+          data = json.loads(p.read_text())
+          data.setdefault('functions', {}).setdefault('api/index.ts', {})['includeFiles'] = [
+              'src/server/db/**',
+              'data/Fumare-Hookha.xlsx'
+          ]
+          p.write_text(json.dumps(data, indent=2) + '\n')
+          PY
+
+      - name: Typecheck
+        run: npm run lint
+
+      - name: Commit migration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/server/db/store.ts src/server/db/products-*.json src/server/db/scrapedProducts.json vercel.json .github/workflows/migrate-excel-catalog.yml
+          git diff --cached --quiet || git commit -m "Migrate product catalog from JSON to Excel [excel-catalog-migration]"
+          git push
