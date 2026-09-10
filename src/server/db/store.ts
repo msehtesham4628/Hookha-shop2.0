@@ -1029,10 +1029,19 @@ export class DatabaseStore {
       this.users = this.users.filter(u => u.id !== id);
     }
 
+    // Keep the local persistence snapshot for non-Mongo environments, but also
+    // atomically append the tombstone in MongoDB. A whole-document save can race
+    // with another Vercel Lambda and otherwise resurrect a deletion.
     await this.savePersistence();
 
     try {
       if (mongoService.getStatus().isConnected) {
+        const tombstoneIds = collection === 'categories' || collection === 'brands'
+          ? [id, slug, name].filter(Boolean) as string[]
+          : id ? [id] : [];
+        if (tombstoneIds.length > 0) {
+          await mongoService.persistDeletion(collection, tombstoneIds);
+        }
         await mongoService.deleteDocument(collection, filter);
       }
     } catch (err) {

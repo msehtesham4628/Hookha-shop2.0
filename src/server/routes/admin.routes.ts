@@ -260,7 +260,7 @@ router.put('/products/:id', requirePermission('products.update'), async (req: Au
       previousStock: prevStock,
       newStock,
       adjustment: newStock - prevStock,
-      reason: 'MANUAL_ADJUSTMENT',
+      reason: 'MANUAL_ADJUSTMENT' as const,
       actor: `${user.firstName} ${user.lastName}`,
       notes: 'Admin updated stock directly in product editor',
       createdAt: new Date().toISOString()
@@ -448,7 +448,7 @@ router.post('/products/bulk-update', requirePermission('products.update'), async
             previousStock: prevStock,
             newStock: product.stock,
             adjustment: product.stock - prevStock,
-            reason: 'BULK_CSV_UPDATE',
+            reason: 'BULK_CSV_UPDATE' as const,
             actor: `${user.firstName} ${user.lastName}`,
             notes: `Bulk updated via CSV/JSON import (${prevStock} -> ${product.stock})`,
             createdAt: new Date().toISOString()

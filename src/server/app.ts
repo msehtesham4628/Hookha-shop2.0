@@ -33,7 +33,7 @@ app.use('/api/admin',async(req,res,next)=>{
   (res as any).json = async (body:any) => {
     try {
       if (body?.success) {
-        const id = req.params?.id || body?.data?.id;
+        const id = (req.params as any)?.id || body?.data?.id;
         if (req.method === 'DELETE') {
           await pushProductToGoogleSheet('delete', { id });
         } else {
