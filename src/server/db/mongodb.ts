@@ -1,4 +1,4 @@
-import { MongoClient, Db, Collection } from 'mongodb';
+import { MongoClient, Db } from 'mongodb';
 import {
   Product,
   Category,
@@ -7,12 +7,7 @@ import {
   Order,
   Review,
   Coupon,
-  WholesaleApplication,
-  InventoryTransaction,
-  AuditLog,
-  StoreSettings,
-  AdminNotification,
-  Address
+  WholesaleApplication
 } from '../../types/index.js';
 
 export interface MongoStatus {
@@ -29,7 +24,7 @@ export interface MongoStatus {
 class MongoDatabaseService {
   private client: MongoClient | null = null;
   private db: Db | null = null;
-  private isConnecting = false;
+  private connectPromise: Promise<boolean> | null = null;
   private isConnected = false;
   private dbName = 'fumare_hookah';
   private lastSyncAt: string | null = null;
@@ -40,7 +35,7 @@ class MongoDatabaseService {
     const mongoUri = process.env.MONGODB_URI || '';
     return {
       isConnected: this.isConnected,
-      isConnecting: this.isConnecting,
+      isConnecting: this.connectPromise !== null,
       uriConfigured: !!mongoUri.trim(),
       dbName: this.dbName,
       collectionCounts: { ...this.cachedCounts },
@@ -51,8 +46,7 @@ class MongoDatabaseService {
 
   public async connect(): Promise<boolean> {
     const mongoUri = process.env.MONGODB_URI;
-    if (!mongoUri || !mongoUri.trim()) {
-      console.log('[MongoDB] Notice: MONGODB_URI not set. Running in resilient local cache mode. Data will persist in memory and sync as soon as MONGODB_URI is provided.');
+    if (!mongoUri?.trim()) {
       return false;
     }
 
@@ -60,62 +54,47 @@ class MongoDatabaseService {
       return true;
     }
 
-    if (this.isConnecting) {
-      return false;
+    // Coalesce concurrent connection attempts into the same promise
+    if (this.connectPromise) {
+      return this.connectPromise;
     }
 
-    this.isConnecting = true;
-    this.lastError = null;
+    this.connectPromise = (async () => {
+      this.lastError = null;
+      try {
+        const client = new MongoClient(mongoUri.trim(), {
+          serverSelectionTimeoutMS: 6000,
+          connectTimeoutMS: 6000,
+          maxPoolSize: 15,
+          retryWrites: true
+        });
 
-    try {
-      console.log('[MongoDB] Connecting to cluster with retry policy...');
-      const client = new MongoClient(mongoUri.trim(), {
-        serverSelectionTimeoutMS: 6000,
-        connectTimeoutMS: 6000,
-        maxPoolSize: 15,
-        retryWrites: true
-      });
+        await client.connect();
+        this.client = client;
 
-      await client.connect();
-      this.client = client;
-      
-      // Determine database name from URI or fallback
-      const urlParsed = new URL(mongoUri.trim().replace(/^mongodb(\+srv)?:\/\//, 'http://'));
-      const pathDb = urlParsed.pathname.replace(/^\//, '').split('?')[0];
-      this.dbName = pathDb && pathDb.length > 0 ? pathDb : 'fumare_hookah';
+        // Native driver database resolution
+        const defaultDb = client.options.dbName;
+        this.dbName = defaultDb && defaultDb !== 'test' ? defaultDb : 'fumare_hookah';
+        this.db = this.client.db(this.dbName);
 
-      this.db = this.client.db(this.dbName);
-      this.isConnected = true;
-      this.isConnecting = false;
-      this.lastSyncAt = new Date().toISOString();
-      console.log(`[MongoDB] Successfully connected to database: ${this.dbName}`);
+        this.isConnected = true;
+        this.lastSyncAt = new Date().toISOString();
 
-      // Ensure indexes for performance & integrity
-      await this.ensureIndexes();
+        await this.ensureIndexes();
+        await this.refreshCounts();
 
-      // Refresh collection counts
-      await this.refreshCounts();
-
-      return true;
-    } catch (err: any) {
-      this.isConnecting = false;
-      this.isConnected = false;
-      const rawMsg = err?.message || String(err);
-      const isAtlasIpRestriction =
-        rawMsg.includes('SSL alert number 80') ||
-        rawMsg.includes('tlsv1 alert internal error') ||
-        rawMsg.includes('ECONNREFUSED') ||
-        rawMsg.includes('SSL routines');
-
-      if (isAtlasIpRestriction) {
-        this.lastError = 'MongoDB Atlas requires Network Access authorization. Add 0.0.0.0/0 in MongoDB Atlas -> Network Access. Resilient local cache is active.';
-        console.log('[MongoDB] Notice: Remote Atlas cluster requires Network Access IP Whitelist (0.0.0.0/0 in MongoDB Atlas). Application running smoothly in resilient in-memory cache mode.');
-      } else {
+        return true;
+      } catch (err: any) {
+        this.isConnected = false;
+        const rawMsg = err?.message || String(err);
         this.lastError = rawMsg.replace(/:\s*\.\.\/deps\/.*$/, '');
-        console.log('[MongoDB] Connection notice (resilient cache active):', this.lastError);
+        return false;
+      } finally {
+        this.connectPromise = null;
       }
-      return false;
-    }
+    })();
+
+    return this.connectPromise;
   }
 
   private async ensureIndexes(): Promise<void> {
@@ -133,13 +112,14 @@ class MongoDatabaseService {
         this.db.collection('categories').createIndex({ id: 1 }, { unique: true }),
         this.db.collection('brands').createIndex({ id: 1 }, { unique: true }),
         this.db.collection('cartItems').createIndex({ userId: 1 }),
+        this.db.collection('cartItems').createIndex({ sessionId: 1 }),
         this.db.collection('wishlists').createIndex({ userId: 1 }, { unique: true }),
         this.db.collection('coupons').createIndex({ code: 1 }, { unique: true }),
         this.db.collection('wholesaleApplications').createIndex({ id: 1 }, { unique: true }),
         this.db.collection('auditLogs').createIndex({ createdAt: -1 })
       ]);
     } catch (e) {
-      console.warn('[MongoDB] Index creation note:', e);
+      console.warn('[MongoDB] Index creation error:', e);
     }
   }
 
@@ -147,48 +127,51 @@ class MongoDatabaseService {
     if (!this.db || !this.isConnected) return this.cachedCounts;
     try {
       const collections = [
-        'products',
-        'categories',
-        'brands',
-        'users',
-        'orders',
-        'reviews',
-        'coupons',
-        'wholesaleApplications',
-        'inventoryTransactions',
-        'auditLogs',
-        'settings',
-        'notifications',
-        'cartItems',
-        'wishlists',
-        'contactMessages',
-        'newsletterSubscribers'
+        'products', 'categories', 'brands', 'users', 'orders',
+        'reviews', 'coupons', 'wholesaleApplications', 'inventoryTransactions',
+        'auditLogs', 'settings', 'notifications', 'cartItems', 'wishlists'
       ];
 
-      const counts: Record<string, number> = {};
-      for (const collName of collections) {
-        counts[collName] = await this.db.collection(collName).countDocuments();
-      }
-      this.cachedCounts = counts;
-      return counts;
+      const entries = await Promise.all(
+        collections.map(async (coll) => {
+          const count = await this.db!.collection(coll).estimatedDocumentCount();
+          return [coll, count] as const;
+        })
+      );
+
+      this.cachedCounts = Object.fromEntries(entries);
+      return this.cachedCounts;
     } catch (err) {
-      console.warn('[MongoDB] Failed to refresh counts:', err);
       return this.cachedCounts;
     }
   }
 
-  public async saveDocument<T extends { id?: string }>(collectionName: string, doc: T): Promise<boolean> {
+  public async deleteDocument(collectionName: string, filter: Record<string, any>): Promise<boolean> {
     if (!this.db || !this.isConnected) return false;
+    
+    // Prevent accidental full collection wipes on empty objects
+    if (!filter || Object.keys(filter).length === 0) {
+      console.error(`[MongoDB] Rejected empty filter query on ${collectionName}`);
+      return false;
+    }
+
     try {
       const coll = this.db.collection(collectionName);
-      const query = doc.id ? { id: doc.id } : { _id: (doc as any)._id };
-      const docCopy = { ...(doc as any) };
-      delete docCopy._id;
-      await coll.updateOne(query, { $set: docCopy }, { upsert: true });
+      const queryParts: any[] = [];
+      
+      if (filter.id) {
+        queryParts.push({ id: filter.id });
+        queryParts.push({ _id: filter.id });
+      }
+      if (filter.slug) queryParts.push({ slug: filter.slug });
+      if (filter.name) queryParts.push({ name: filter.name });
+      if (filter.sku) queryParts.push({ sku: filter.sku });
+
+      const finalQuery = queryParts.length > 0 ? { $or: queryParts } : filter;
+      await coll.deleteMany(finalQuery);
       await this.refreshCounts();
       return true;
     } catch (err: any) {
-      console.log(`[MongoDB] Notice: Could not save document to ${collectionName}. Local store active:`, err?.message);
       return false;
     }
   }
@@ -201,7 +184,7 @@ class MongoDatabaseService {
 
       for (let i = 0; i < docs.length; i += batchSize) {
         const batch = docs.slice(i, i + batchSize);
-        const ops = batch.map(item => {
+        const ops = batch.map((item) => {
           const itemCopy = { ...(item as any) };
           delete itemCopy._id;
           return {
@@ -219,293 +202,93 @@ class MongoDatabaseService {
       await this.refreshCounts();
       return written;
     } catch (err: any) {
-      console.log(`[MongoDB] Notice: Bulk write to ${collectionName} deferred:`, err?.message);
       return 0;
-    }
-  }
-
-  public async deleteDocument(collectionName: string, filter: Record<string, any>): Promise<boolean> {
-    if (!this.db || !this.isConnected) return false;
-    try {
-      const coll = this.db.collection(collectionName);
-      const queryParts: any[] = [];
-      if (filter.id) {
-        queryParts.push({ id: filter.id });
-        queryParts.push({ _id: filter.id });
-      }
-      if (filter.slug) {
-        queryParts.push({ slug: filter.slug });
-      }
-      if (filter.name) {
-        queryParts.push({ name: filter.name });
-      }
-      if (filter.sku) {
-        queryParts.push({ sku: filter.sku });
-      }
-      const finalQuery = queryParts.length > 0 ? { $or: queryParts } : filter;
-      const res = await coll.deleteMany(finalQuery);
-      console.log(`[MongoDB] Deleted ${res.deletedCount} documents from ${collectionName} matching:`, filter);
-      await this.refreshCounts();
-      return true;
-    } catch (err: any) {
-      console.log(`[MongoDB] Notice: Delete operation on ${collectionName} deferred.`);
-      return false;
     }
   }
 
   public async getDocuments<T>(collectionName: string, filter: Record<string, any> = {}): Promise<T[]> {
     if (!this.db || !this.isConnected) return [];
     try {
-      const coll = this.db.collection(collectionName);
-      const docs = await coll.find(filter).toArray();
-      return docs as unknown as T[];
-    } catch (err: any) {
-      console.log(`[MongoDB] Notice: Read operation on ${collectionName} deferred.`);
+      return (await this.db.collection(collectionName).find(filter).toArray()) as unknown as T[];
+    } catch {
       return [];
     }
   }
 
-  public async syncWithStore(store: any): Promise<{ seeded: boolean; loaded: boolean; summary: Record<string, number> }> {
-    const isConnected = await this.connect();
-    if (!isConnected || !this.db) {
-      return { seeded: false, loaded: false, summary: this.cachedCounts };
-    }
-
+  public async saveDocument<T extends { id?: string }>(collectionName: string, doc: T): Promise<boolean> {
+    if (!this.db || !this.isConnected) return false;
     try {
-      // 1. First, restore and merge cloud persistence overrides
-      try {
-        const mongoPersDocs = await this.getDocuments<any>('persistence', { id: 'store_persistence' });
-        if (mongoPersDocs && mongoPersDocs.length > 0) {
-          store.mergePersistenceData(mongoPersDocs[0]);
-          console.log('[MongoDB] Restored cloud persistence state:', {
-            deletedProducts: store.persistenceData.deletedProductIds.length,
-            deletedCategories: store.persistenceData.deletedCategoryIds.length,
-            deletedBrands: store.persistenceData.deletedBrandIds.length,
-          });
-        }
-      } catch (err) {
-        console.warn('[MongoDB] Notice: Could not read persistence collection:', err);
-      }
-
-      // 2. Clean up any deleted items from MongoDB itself so they never linger
-      try {
-        if (store.persistenceData.deletedCategoryIds?.length > 0) {
-          const catOrs = store.persistenceData.deletedCategoryIds.flatMap((idOrSlug: string) => [
-            { id: idOrSlug },
-            { slug: idOrSlug },
-            { name: idOrSlug }
-          ]);
-          await this.db.collection('categories').deleteMany({ $or: catOrs });
-        }
-        if (store.persistenceData.deletedBrandIds?.length > 0) {
-          const brandOrs = store.persistenceData.deletedBrandIds.flatMap((idOrSlug: string) => [
-            { id: idOrSlug },
-            { slug: idOrSlug },
-            { name: idOrSlug }
-          ]);
-          await this.db.collection('brands').deleteMany({ $or: brandOrs });
-        }
-        if (store.persistenceData.deletedProductIds?.length > 0) {
-          await this.db.collection('products').deleteMany({
-            id: { $in: store.persistenceData.deletedProductIds }
-          });
-        }
-      } catch (e) {
-        console.warn('[MongoDB] Notice: Purging deleted entities deferred:', e);
-      }
-
-      const productCount = await this.db.collection('products').countDocuments();
-      let seeded = false;
-      let loaded = false;
-
-      if (productCount === 0 && store.products.length > 0) {
-        console.log(`[MongoDB] Database is empty. Seeding ${store.products.length} products and master collections to MongoDB...`);
-        await this.saveManyDocuments('products', store.products, 500);
-        await this.saveManyDocuments('categories', store.categories);
-        await this.saveManyDocuments('brands', store.brands);
-        await this.saveManyDocuments('users', store.users);
-        await this.saveManyDocuments('orders', store.orders);
-        await this.saveManyDocuments('coupons', store.coupons);
-        await this.saveManyDocuments('reviews', store.reviews);
-        await this.saveManyDocuments('wholesaleApplications', store.wholesaleApplications);
-        await this.saveManyDocuments('roles', store.roles);
-        await this.saveManyDocuments('permissions', store.permissions);
-        if (store.settings) {
-          await this.saveDocument('settings', { id: 'store_settings', ...store.settings });
-        }
-        await this.saveDocument('persistence', { id: 'store_persistence', ...store.persistenceData });
-        seeded = true;
-        console.log('[MongoDB] Master collections successfully seeded into MongoDB!');
-      } else if (productCount > 0) {
-        console.log(`[MongoDB] Discovered ${productCount} existing products in MongoDB. Loading documents into memory...`);
-        // Load MongoDB records into store memory. Products are included here so
-        // the public storefront, which reads from db.products, uses MongoDB data.
-        const [
-          mongoProducts,
-          mongoUsers,
-          mongoOrders,
-          mongoCategories,
-          mongoBrands,
-          mongoReviews,
-          mongoCoupons,
-          mongoWholesale,
-          mongoSettings
-        ] = await Promise.all([
-          this.getDocuments<Product>('products'),
-          this.getDocuments<User & { passwordHash?: string }>('users'),
-          this.getDocuments<Order>('orders'),
-          this.getDocuments<Category>('categories'),
-          this.getDocuments<Brand>('brands'),
-          this.getDocuments<Review>('reviews'),
-          this.getDocuments<Coupon>('coupons'),
-          this.getDocuments<WholesaleApplication>('wholesaleApplications'),
-          this.getDocuments<any>('settings', { id: 'store_settings' })
-        ]);
-
-        if (mongoProducts.length > 0) {
-          // MongoDB is authoritative for persisted catalog records. Merge by id
-          // so any local seed-only products are retained if MongoDB is incomplete.
-          const productMap = new Map<string, Product>();
-          for (const p of store.products) {
-            if (!store.isProductDeleted(p.id)) {
-              productMap.set(p.id, p);
-            }
-          }
-          for (const p of mongoProducts) {
-            if (!store.isProductDeleted(p.id)) {
-              productMap.set(p.id, p);
-            }
-          }
-          store.products = Array.from(productMap.values());
-          console.log(`[MongoDB] Loaded ${mongoProducts.length} products into storefront memory.`);
-        }
-
-        if (mongoUsers.length > 0) {
-          const userMap = new Map<string, User & { passwordHash?: string }>();
-          for (const u of store.users) {
-            userMap.set(u.email.toLowerCase(), u);
-          }
-          for (const u of mongoUsers) {
-            userMap.set(u.email.toLowerCase(), u);
-          }
-          for (const u of store.users) {
-            const isPrivileged = u.email === 'admin@worldhookahmarket.com' || u.email === 'ehtesham4628@gmail.com' || u.email === 'customer@example.com' || u.role === 'SUPER_ADMIN';
-            if (isPrivileged) {
-              const existing = userMap.get(u.email.toLowerCase());
-              if (!existing) {
-                userMap.set(u.email.toLowerCase(), u);
-              } else {
-                existing.status = 'ACTIVE';
-                existing.role = u.role;
-                if (u.passwordHash) {
-                  existing.passwordHash = u.passwordHash;
-                }
-              }
-            }
-          }
-          store.users = Array.from(userMap.values());
-        }
-        if (mongoOrders.length > 0) store.orders = mongoOrders;
-        if (mongoCategories.length > 0 || store.categories.length > 0) {
-          const catMap = new Map<string, any>();
-          for (const c of store.categories) {
-            if (!store.isCategoryDeleted(c.id) && !store.isCategoryDeleted(c.slug) && !store.isCategoryDeleted(c.name)) {
-              catMap.set(c.id, c);
-            }
-          }
-          for (const c of mongoCategories) {
-            if (!store.isCategoryDeleted(c.id) && !store.isCategoryDeleted(c.slug) && !store.isCategoryDeleted(c.name)) {
-              catMap.set(c.id, c);
-            }
-          }
-          store.categories = Array.from(catMap.values());
-        }
-        if (mongoBrands.length > 0 || store.brands.length > 0) {
-          const brandMap = new Map<string, any>();
-          for (const b of store.brands) {
-            if (!store.isBrandDeleted(b.id) && !store.isBrandDeleted(b.slug) && !store.isBrandDeleted(b.name)) {
-              brandMap.set(b.id, b);
-            }
-          }
-          for (const b of mongoBrands) {
-            if (!store.isBrandDeleted(b.id) && !store.isBrandDeleted(b.slug) && !store.isBrandDeleted(b.name)) {
-              brandMap.set(b.id, b);
-            }
-          }
-          store.brands = Array.from(brandMap.values());
-        }
-        if (mongoReviews.length > 0) store.reviews = mongoReviews;
-        if (mongoCoupons.length > 0) store.coupons = mongoCoupons;
-        if (mongoWholesale.length > 0) store.wholesaleApplications = mongoWholesale;
-        if (mongoSettings.length > 0) store.settings = mongoSettings[0];
-
-        // Apply all overrides and persistence filters
-        store.applyPersistence();
-
-        // Save current persistence document back to MongoDB to ensure it stays synchronized
-        await this.saveDocument('persistence', { id: 'store_persistence', ...store.persistenceData });
-
-        loaded = true;
-      }
-
+      const coll = this.db.collection(collectionName);
+      const query = doc.id ? { id: doc.id } : { _id: (doc as any)._id };
+      const docCopy = { ...(doc as any) };
+      delete docCopy._id;
+      await coll.updateOne(query, { $set: docCopy }, { upsert: true });
       await this.refreshCounts();
-      this.lastSyncAt = new Date().toISOString();
-      return { seeded, loaded, summary: this.cachedCounts };
-    } catch (err: any) {
-      const msg = err?.message || String(err);
-      this.lastError = msg.includes('SSL alert') ? 'Atlas IP Whitelist required (Network Access)' : 'Sync deferred';
-      console.log('[MongoDB] Sync note:', this.lastError);
-      return { seeded: false, loaded: false, summary: this.cachedCounts };
+      return true;
+    } catch {
+      return false;
     }
   }
 
-  private async replaceCollection(collectionName: string, docs: any[]): Promise<void> {
-    if (!this.db || !this.isConnected) return;
+  // Safe differential push without dropping target collections
+  private async safeSyncCollection(collectionName: string, docs: any[]): Promise<void> {
+    if (!this.db || !this.isConnected || !docs.length) return;
     const coll = this.db.collection(collectionName);
-    await coll.deleteMany({});
-    if (!docs.length) return;
-    const cleanDocs = docs.map((doc: any) => { const copy = { ...doc }; delete copy._id; return copy; });
-    await coll.insertMany(cleanDocs, { ordered: false });
+    
+    // Bulk upsert documents to avoid downtime/data drop windows
+    const ops = docs.map((doc: any) => {
+      const copy = { ...doc };
+      delete copy._id;
+      const filter = doc.id ? { id: doc.id } : { _id: (doc as any)._id };
+      return {
+        updateOne: {
+          filter,
+          update: { $set: copy },
+          upsert: true
+        }
+      };
+    });
+
+    await coll.bulkWrite(ops, { ordered: false });
+    
+    // Clean up orphan entries not in current memory state
+    const currentIds = docs.map(d => d.id).filter(Boolean);
+    if (currentIds.length > 0) {
+      await coll.deleteMany({ id: { $nin: currentIds } });
+    }
   }
 
   public async pushAllToMongo(store: any): Promise<boolean> {
-    if (!this.isConnected || !this.db) {
-      const connected = await this.connect();
-      if (!connected || !this.db) return false;
-    }
+    if (!this.isConnected && !(await this.connect())) return false;
 
     try {
-      console.log('[MongoDB] Pushing all in-memory store records to MongoDB...');
       await Promise.all([
-        this.replaceCollection('products', store.products),
-        this.replaceCollection('categories', store.categories),
-        this.replaceCollection('brands', store.brands),
-        this.replaceCollection('users', store.users),
-        this.replaceCollection('orders', store.orders),
-        this.replaceCollection('coupons', store.coupons),
-        this.replaceCollection('reviews', store.reviews),
-        this.replaceCollection('wholesaleApplications', store.wholesaleApplications),
-        this.replaceCollection('roles', store.roles),
-        this.replaceCollection('permissions', store.permissions),
-        this.replaceCollection('inventoryTransactions', store.inventoryTransactions),
-        this.replaceCollection('auditLogs', store.auditLogs),
-        this.replaceCollection('notifications', store.notifications),
-        this.replaceCollection('mediaLibrary', store.mediaLibrary),
-        this.replaceCollection('addresses', store.addresses),
-        this.replaceCollection('cartItems', store.cartItems),
-        this.replaceCollection('wishlists', store.wishlists),
-        this.replaceCollection('contactMessages', store.contactMessages),
-        this.replaceCollection('newsletterSubscribers', store.newsletterSubscribers),
-        this.replaceCollection('settings', [{ id: 'store_settings', ...store.settings }])
+        this.safeSyncCollection('products', store.products),
+        this.safeSyncCollection('categories', store.categories),
+        this.safeSyncCollection('brands', store.brands),
+        this.safeSyncCollection('users', store.users),
+        this.safeSyncCollection('orders', store.orders),
+        this.safeSyncCollection('coupons', store.coupons),
+        this.safeSyncCollection('reviews', store.reviews),
+        this.safeSyncCollection('wholesaleApplications', store.wholesaleApplications),
+        this.safeSyncCollection('roles', store.roles),
+        this.safeSyncCollection('permissions', store.permissions),
+        this.safeSyncCollection('inventoryTransactions', store.inventoryTransactions),
+        this.safeSyncCollection('auditLogs', store.auditLogs),
+        this.safeSyncCollection('notifications', store.notifications),
+        this.safeSyncCollection('mediaLibrary', store.mediaLibrary),
+        this.safeSyncCollection('addresses', store.addresses),
+        this.safeSyncCollection('cartItems', store.cartItems),
+        this.safeSyncCollection('wishlists', store.wishlists),
+        this.safeSyncCollection('contactMessages', store.contactMessages),
+        this.safeSyncCollection('newsletterSubscribers', store.newsletterSubscribers),
+        this.saveDocument('settings', { id: 'store_settings', ...store.settings })
       ]);
       await this.refreshCounts();
       this.lastSyncAt = new Date().toISOString();
-      console.log('[MongoDB] Push completed successfully.');
       return true;
     } catch (err: any) {
-      const msg = err?.message || String(err);
-      this.lastError = msg.includes('SSL alert') ? 'Atlas IP Whitelist required (Network Access)' : 'Push deferred';
-      console.log('[MongoDB] Push note:', this.lastError);
+      this.lastError = err?.message || 'Sync operation failed';
       return false;
     }
   }
