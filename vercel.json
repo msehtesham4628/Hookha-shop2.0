@@ -7,7 +7,7 @@
   },
   "functions": {
     "api/index.ts": {
-      "includeFiles": "src/server/db/**",
+      "includeFiles": ["src/server/db/**", "data/**"],
       "maxDuration": 30
     }
   },
