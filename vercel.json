@@ -7,7 +7,7 @@
   },
   "functions": {
     "api/index.ts": {
-      "includeFiles": ["src/server/db/**", "data/**"],
+      "includeFiles": "data/Fumare-Hookha.xlsx",
       "maxDuration": 30
     }
   },
