@@ -193,6 +193,24 @@ export async function updateUserProfile(userId: string, data: Partial<User>): Pr
   }
 }
 
+export async function deleteUserProfile(userId: string): Promise<void> {
+  if (!auth.currentUser || (auth.currentUser.uid !== userId && auth.currentUser.email !== 'ehtesham4628@gmail.com')) {
+    return;
+  }
+  const path = `users/${userId}`;
+  try {
+    await deleteDoc(doc(db, 'users', userId));
+    await deleteDoc(doc(db, 'wishlists', userId)).catch(() => {});
+    if (auth.currentUser && auth.currentUser.uid === userId) {
+      await auth.currentUser.delete().catch((err) => {
+        console.warn('Firebase Auth user deletion notice:', err);
+      });
+    }
+  } catch (err) {
+    console.warn('Firebase user deletion notice:', err);
+  }
+}
+
 // ==========================================
 // Wishlist Services (Cloud Synchronized)
 // ==========================================

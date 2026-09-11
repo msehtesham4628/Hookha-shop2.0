@@ -17,7 +17,8 @@ import {
   Sparkles,
   Globe,
   Truck,
-  Layers
+  Layers,
+  LayoutDashboard
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -298,6 +299,14 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
                           </span>
                         )}
                       </div>
+
+                      <button
+                        onClick={() => { setUserDropdownOpen(false); onNavigate('/dashboard'); }}
+                        className="w-full text-left px-4 py-2 text-xs text-stone-700 hover:bg-stone-50 hover:text-amber-900 flex items-center gap-2 cursor-pointer font-medium"
+                      >
+                        <LayoutDashboard className="w-3.5 h-3.5 text-amber-800" />
+                        <span>Member Dashboard</span>
+                      </button>
 
                       <button
                         onClick={() => { setUserDropdownOpen(false); onNavigate('/account'); }}
@@ -664,6 +673,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, overlay
                       </button>
                     )}
                   </div>
+                  <button
+                    onClick={() => { onNavigate('/dashboard'); setMobileMenuOpen(false); }}
+                    className="w-full text-xs text-amber-300 hover:text-white bg-stone-800 hover:bg-stone-700 py-2 px-3 rounded-xs flex items-center gap-2 transition-colors cursor-pointer font-medium"
+                  >
+                    <LayoutDashboard className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Member Dashboard</span>
+                  </button>
                   <button
                     onClick={() => { onNavigate('/account'); setMobileMenuOpen(false); }}
                     className="w-full text-xs text-stone-200 hover:text-white bg-stone-800 hover:bg-stone-700 py-2 px-3 rounded-xs flex items-center gap-2 transition-colors cursor-pointer"

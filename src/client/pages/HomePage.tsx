@@ -444,7 +444,7 @@ const CategorySliderSection: React.FC<CategorySliderProps> = ({ config, products
 };
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
-  const { cart, setCartOpen, showToast } = useStore();
+  const { cart, setCartOpen, showToast, settings } = useStore();
 
   const [categoryData, setCategoryData] = useState<Record<CategoryKey, Product[]>>({
     tobacco: [],
@@ -604,8 +604,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <Clock className="w-6 h-6 text-[#0088cc]" />
             </div>
             <div>
-              <h4 className="font-heading text-sm font-bold text-stone-900 leading-tight">Same Day Shipping</h4>
-              <p className="font-outfit text-xs text-stone-500 mt-0.5">USA (1–4 days) · International (3–30 days)</p>
+              <h4 className="font-heading text-sm font-bold text-stone-900 leading-tight">
+                {settings?.shippingPropTitle || 'Same Day Shipping'}
+              </h4>
+              <p className="font-outfit text-xs text-stone-500 mt-0.5">
+                {settings?.shippingPropSubtitle || 'USA (1–4 days) · International (3–30 days)'}
+              </p>
             </div>
           </div>
 
@@ -614,8 +618,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <Package className="w-6 h-6 text-emerald-600" />
             </div>
             <div>
-              <h4 className="font-heading text-sm font-bold text-stone-900 leading-tight">Free Shipping</h4>
-              <p className="font-outfit text-xs text-stone-500 mt-0.5">On orders over $89</p>
+              <h4 className="font-heading text-sm font-bold text-stone-900 leading-tight">
+                {settings?.discountPropTitle || 'Free Shipping'}
+              </h4>
+              <p className="font-outfit text-xs text-stone-500 mt-0.5">
+                {settings?.discountPropSubtitle || `On orders over $${settings?.freeShippingThreshold || 89}`}
+              </p>
             </div>
           </div>
 
@@ -624,8 +632,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <Tag className="w-6 h-6 text-rose-600" />
             </div>
             <div>
-              <h4 className="font-heading text-sm font-bold text-stone-900 leading-tight">Save up to 50%</h4>
-              <p className="font-outfit text-xs text-stone-500 mt-0.5">With Fumare Hookah Direct</p>
+              <h4 className="font-heading text-sm font-bold text-stone-900 leading-tight">
+                {settings?.supportPropTitle || 'Save up to 50%'}
+              </h4>
+              <p className="font-outfit text-xs text-stone-500 mt-0.5">
+                {settings?.supportPropSubtitle || 'With Fumare Hookah Direct'}
+              </p>
             </div>
           </div>
         </div>
@@ -634,7 +646,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       {/* New In */}
       <section id="section-new-in" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         <div className="text-center mb-8">
-          <h2 className="font-heading text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wider text-stone-900">NEW ARRIVALS</h2>
+          <h2 className="font-heading text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wider text-stone-900">
+            {settings?.newArrivalsTitle || 'NEW ARRIVALS'}
+          </h2>
           <div className="w-12 h-[3px] bg-[#0088cc] mx-auto mt-2" />
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -652,7 +666,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       {/* Best Sellers */}
       <section id="section-best-sellers" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
         <div className="text-center mb-8">
-          <h2 className="font-heading text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wider text-stone-900">OUR BEST SELLERS</h2>
+          <h2 className="font-heading text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wider text-stone-900">
+            {settings?.bestSellersTitle || 'OUR BEST SELLERS'}
+          </h2>
           <div className="w-12 h-[3px] bg-[#0088cc] mx-auto mt-2" />
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -700,20 +716,28 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       {/* About Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-stone-200 text-stone-700">
         <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-stone-900 mb-3">
-          FUMARE HOOKAH IS AN ONLINE HOOKAH AND SHISHA STORE WITH WORLDWIDE SHIPPING.
+          {settings?.aboutStoryTitle || 'FUMARE HOOKAH IS AN ONLINE HOOKAH AND SHISHA STORE WITH WORLDWIDE SHIPPING.'}
         </h2>
         <div className="space-y-3 text-xs sm:text-sm text-stone-600 leading-relaxed max-w-5xl">
-          <p>
-            Fumare Hookah offers an extensive selection of premium hookah products, including stems, bowls, flasks,
-            accessories, charcoal, and world-renowned shisha tobacco brands such as MustHave, DarkSide, BlackBurn,
-            Tangiers, and Adalya. We work directly with master manufacturers across Russia, Germany, Poland, and the USA
-            to guarantee 100% authenticity and fresh factory packaging.
-          </p>
-          <p>
-            Whether you are a seasoned connoisseur seeking heavy dark leaf blends, artisan Bohemian crystal vases, or
-            commercial hookah lounges requiring reliable bulk wholesale distribution, our dedicated fulfillment center
-            provides same-day dispatch, secure break-free packaging, and insured global delivery.
-          </p>
+          {settings?.aboutStoryText ? (
+            settings.aboutStoryText.split('\n\n').map((paragraph: string, pIdx: number) => (
+              <p key={pIdx}>{paragraph}</p>
+            ))
+          ) : (
+            <>
+              <p>
+                Fumare Hookah offers an extensive selection of premium hookah products, including stems, bowls, flasks,
+                accessories, charcoal, and world-renowned shisha tobacco brands such as MustHave, DarkSide, BlackBurn,
+                Tangiers, and Adalya. We work directly with master manufacturers across Russia, Germany, Poland, and the USA
+                to guarantee 100% authenticity and fresh factory packaging.
+              </p>
+              <p>
+                Whether you are a seasoned connoisseur seeking heavy dark leaf blends, artisan Bohemian crystal vases, or
+                commercial hookah lounges requiring reliable bulk wholesale distribution, our dedicated fulfillment center
+                provides same-day dispatch, secure break-free packaging, and insured global delivery.
+              </p>
+            </>
+          )}
         </div>
       </section>
 
@@ -726,10 +750,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             </div>
             <div>
               <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-stone-900">
-                SUBSCRIBE TO OUR NEWSLETTER TO RECEIVE THE BEST NEW DEALS!
+                {settings?.newsletterTitle || 'SUBSCRIBE TO OUR NEWSLETTER TO RECEIVE THE BEST NEW DEALS!'}
               </h3>
               <p className="text-xs text-stone-500 mt-0.5">
-                Get first notice on exclusive flavor restocks and special discounts.
+                {settings?.newsletterSubtitle || 'Get first notice on exclusive flavor restocks and special discounts.'}
               </p>
             </div>
           </div>

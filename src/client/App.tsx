@@ -28,6 +28,8 @@ const ContactPage = lazy(() => import('./pages/ContactPage.js').then(m => ({ def
 const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage.js').then(m => ({ default: m.AdminDashboardPage })));
 const ExcelProductSyncPage = lazy(() => import('./pages/ExcelProductSyncPage.js').then(m => ({ default: m.ExcelProductSyncPage })));
 const OrderTrackingPage = lazy(() => import('./pages/OrderTrackingPage.js').then(m => ({ default: m.OrderTrackingPage })));
+const TermsPrivacyPage = lazy(() => import('./pages/TermsPrivacyPage.js').then(m => ({ default: m.TermsPrivacyPage })));
+const DashboardPage = lazy(() => import('./pages/DashboardPage.js').then(m => ({ default: m.DashboardPage })));
 
 export default function App() {
   const { loadCurrentUser, loadCart, loadWishlist, loadSettings } = useStore();
@@ -52,6 +54,7 @@ export default function App() {
     if (pathOnly === '/checkout') return <CheckoutPage onNavigate={navigate} />;
     if (pathOnly === '/order-success') return <OrderSuccessPage orderId={queryParams.get('orderId') || undefined} onNavigate={navigate} />;
     if (pathOnly === '/track-order' || pathOnly === '/order-tracking' || pathOnly === '/track' || pathOnly.startsWith('/track/')) { const orderId = queryParams.get('orderId') || queryParams.get('id') || queryParams.get('query') || (pathOnly.startsWith('/track/') ? pathOnly.replace('/track/', '') : undefined); return <OrderTrackingPage initialOrderId={orderId} onNavigate={navigate} />; }
+    if (pathOnly === '/dashboard') return <DashboardPage onNavigate={navigate} />;
     if (pathOnly === '/account') return <AccountPage initialTab={queryParams.get('tab') || 'orders'} onNavigate={navigate} />;
     if (pathOnly === '/wholesale') return <WholesalePage onNavigate={navigate} />;
     if (pathOnly === '/auth/login') return <AuthPage initialMode="login" onNavigate={navigate} />;
@@ -60,8 +63,10 @@ export default function App() {
     if (pathOnly === '/auth/otp') return <AuthPage initialMode="login" onNavigate={navigate} />;
     if (pathOnly === '/about') return <AboutPage onNavigate={navigate} />;
     if (pathOnly === '/contact') return <ContactPage onNavigate={navigate} />;
+    if (pathOnly === '/terms' || pathOnly === '/terms-of-service') return <TermsPrivacyPage initialTab="terms" onNavigate={navigate} />;
+    if (pathOnly === '/privacy' || pathOnly === '/privacy-policy' || pathOnly === '/policy') return <TermsPrivacyPage initialTab="privacy" onNavigate={navigate} />;
     if (pathOnly === '/admin/excel-sync') return <ExcelProductSyncPage onNavigate={navigate} />;
-    if (pathOnly === '/dashboard' || pathOnly === '/admin') return <AdminDashboardPage onNavigate={navigate} />;
+    if (pathOnly === '/admin' || pathOnly.startsWith('/admin/')) return <AdminDashboardPage onNavigate={navigate} />;
 
     // Brands Directory Route: /brands or /brand
     if (pathOnly === '/brands' || pathOnly === '/brand') {
@@ -184,7 +189,7 @@ export default function App() {
     }
     return <HomePage onNavigate={navigate} />;
   };
-  const isAdminRoute = currentPath.startsWith('/dashboard') || currentPath.startsWith('/admin');
+  const isAdminRoute = currentPath.startsWith('/admin');
   const isImmersiveStorefrontRoute = !isAdminRoute && currentPath === '/';
   return (
     <LanguageProvider>

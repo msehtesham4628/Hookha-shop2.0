@@ -357,17 +357,7 @@ router.get('/settings', (req, res) => {
   return res.json({
     success: true,
     data: {
-      storeName: db.settings.storeName,
-      supportEmail: db.settings.supportEmail,
-      supportPhone: db.settings.supportPhone,
-      currency: db.settings.currency,
-      currencySymbol: db.settings.currencySymbol,
-      freeShippingThreshold: db.settings.freeShippingThreshold,
-      standardShippingFee: db.settings.standardShippingFee,
-      ageVerificationRequired: db.settings.ageVerificationRequired,
-      minimumPurchaseAge: db.settings.minimumPurchaseAge,
-      bannerAnnouncement: db.settings.bannerAnnouncement,
-      fontVibe: db.settings.fontVibe || 'avant-garde'
+      ...db.settings
     }
   });
 });

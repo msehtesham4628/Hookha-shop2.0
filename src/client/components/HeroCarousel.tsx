@@ -38,17 +38,29 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onNavigate }) => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   const userDropdownRef = useRef<HTMLDivElement>(null);
-  const { user, cart, wishlistIds, setCartOpen, setSearchOpen, logout } = useStore();
+  const { user, cart, wishlistIds, setCartOpen, setSearchOpen, logout, settings } = useStore();
   const { t } = useTranslation();
+
+  const currentSlides = useMemo(() => {
+    if (Array.isArray(settings?.heroSlides) && settings.heroSlides.length > 0) {
+      return settings.heroSlides;
+    }
+    if (typeof settings?.heroSlides === 'string' && settings.heroSlides.trim()) {
+      const parsed = settings.heroSlides.split('\n').map((s: string) => s.trim()).filter(Boolean);
+      if (parsed.length > 0) return parsed;
+    }
+    return HERO_SLIDES;
+  }, [settings?.heroSlides]);
 
   // Slide transition timer
   useEffect(() => {
+    if (currentSlides.length <= 1) return;
     const intervalId = window.setInterval(() => {
-      setActiveSlide((current) => (current + 1) % HERO_SLIDES.length);
+      setActiveSlide((current) => (current + 1) % currentSlides.length);
     }, 5000);
 
     return () => window.clearInterval(intervalId);
-  }, []);
+  }, [currentSlides.length]);
 
   // Passive scroll listener
   useEffect(() => {
@@ -115,11 +127,11 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onNavigate }) => {
     <section id="hero-carousel" className="relative w-full overflow-hidden bg-[#0d0f12] text-white select-none">
       <div className="relative min-h-[620px] w-full overflow-hidden sm:min-h-[680px] lg:min-h-[740px]">
         {/* Slides */}
-        {HERO_SLIDES.map((image, index) => (
+        {currentSlides.map((image: string, index: number) => (
           <img
-            key={image}
+            key={`${image}-${index}`}
             src={image}
-            alt={index === activeSlide ? 'Premium hookah collection' : 'Hookah lifestyle background'}
+            alt={index === activeSlide ? (settings?.heroTitle || 'Premium hookah collection') : 'Hookah lifestyle background'}
             className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-1000 ${
               index === activeSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
@@ -484,26 +496,26 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onNavigate }) => {
           <div className="max-w-2xl">
             <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/45 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-200 shadow-sm backdrop-blur-md sm:text-xs">
               <Sparkles className="h-3 w-3 text-amber-400" />
-              <span>Imported Hookah Collection</span>
+              <span>{settings?.heroBadge || 'Imported Hookah Collection'}</span>
             </div>
             <h1 className="mb-3 font-display text-3xl sm:text-5xl md:text-6xl font-bold leading-[1.08] tracking-tight text-white drop-shadow-md">
-              Russian & European Master Hookahs
+              {settings?.heroTitle || 'Russian & European Master Hookahs'}
             </h1>
             <p className="mb-5 flex items-center gap-2 font-outfit text-xs font-medium text-stone-200 drop-shadow-sm sm:text-sm tracking-wide">
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
-              <span>Alpha Hookah • El Bomber • Maklaud • Steamulation • WOOKAH</span>
+              <span>{settings?.heroSubtitle || 'Alpha Hookah • El Bomber • Maklaud • Steamulation • WOOKAH'}</span>
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <button
-                onClick={() => handleNavClick('/shop?category=hookahs')}
+                onClick={() => handleNavClick(settings?.heroCtaLink || '/shop?category=hookahs')}
                 className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-white px-5 py-2.5 font-outfit text-xs font-bold uppercase tracking-wider text-stone-950 shadow-lg transition-colors hover:bg-stone-200 sm:text-sm"
               >
-                <span>Shop the Catalog</span>
+                <span>{settings?.heroCtaText || 'Shop the Catalog'}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
               <span className="hidden items-center gap-1.5 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs font-medium text-stone-300 backdrop-blur-md sm:inline-flex">
                 <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-                <span>Imported Product Catalog</span>
+                <span>{settings?.heroSecondaryBadge || 'Imported Product Catalog'}</span>
               </span>
             </div>
           </div>
@@ -511,7 +523,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onNavigate }) => {
 
         {/* Slide Pagination Bullets */}
         <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 sm:bottom-6 sm:right-8">
-          {HERO_SLIDES.map((_, idx) => (
+          {currentSlides.map((_: string, idx: number) => (
             <button
               key={idx}
               onClick={() => setActiveSlide(idx)}

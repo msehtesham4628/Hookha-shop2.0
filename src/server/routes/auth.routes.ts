@@ -883,4 +883,143 @@ router.put('/address', authenticateToken, async (req: AuthenticatedRequest, res)
   }
 });
 
+// PUT /api/auth/profile
+router.put('/profile', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  try {
+    const user = req.user!;
+    const { firstName, lastName, phone, preferences } = req.body;
+
+    if (firstName && typeof firstName === 'string') user.firstName = firstName.trim();
+    if (lastName && typeof lastName === 'string') user.lastName = lastName.trim();
+    if (phone && typeof phone === 'string') user.phone = phone.trim();
+    if (preferences && typeof preferences === 'object') {
+      (user as any).preferences = { ...(user as any).preferences, ...preferences };
+    }
+    user.updatedAt = new Date().toISOString();
+
+    db.persist('users', user);
+
+    const { passwordHash: _, ...safeUser } = user as any;
+    return res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: { user: safeUser }
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: err.message || 'Failed to update profile' }
+    });
+  }
+});
+
+// PUT /api/auth/change-password
+router.put('/change-password', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  try {
+    const user = req.user!;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'MISSING_FIELDS', message: 'Current password and new password are required' }
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'PASSWORD_TOO_SHORT', message: 'New password must be at least 6 characters long' }
+      });
+    }
+
+    // Find full user in store to get passwordHash
+    const fullUser = db.users.find(u => u.id === user.id) as any;
+    if (!fullUser || !fullUser.passwordHash) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'USER_NOT_FOUND', message: 'User not found or password not set' }
+      });
+    }
+
+    const isMatch = await authService.comparePassword(currentPassword, fullUser.passwordHash);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_CREDENTIALS', message: 'Current password does not match' }
+      });
+    }
+
+    fullUser.passwordHash = await authService.hashPassword(newPassword);
+    fullUser.updatedAt = new Date().toISOString();
+    db.persist('users', fullUser);
+
+    return res.json({
+      success: true,
+      message: 'Password updated successfully'
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: err.message || 'Failed to update password' }
+    });
+  }
+});
+
+// DELETE /api/auth/account (Permanently delete user account and associated records)
+router.delete('/account', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  try {
+    const user = req.user;
+    if (!user || !user.id) {
+      return res.status(401).json({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' }
+      });
+    }
+
+    // Safety guard: prevent deleting root super admin account
+    if (user.id === 'usr-ehtesham-root' || user.email === 'ehtesham4628@gmail.com') {
+      return res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: 'Primary system administrator account cannot be deleted.' }
+      });
+    }
+
+    const { password } = req.body || {};
+    // If password provided, verify it
+    if (password) {
+      const fullUser = db.users.find(u => u.id === user.id) as any;
+      if (fullUser && fullUser.passwordHash) {
+        const isMatch = await authService.comparePassword(password, fullUser.passwordHash);
+        if (!isMatch) {
+          return res.status(400).json({
+            success: false,
+            error: { code: 'INVALID_CREDENTIALS', message: 'Password confirmation failed.' }
+          });
+        }
+      }
+    }
+
+    const userId = user.id;
+
+    // Permanently remove from DB store
+    await db.deletePersisted('users', { id: userId });
+
+    // Clean up user's cart, wishlist, and saved addresses
+    db.cartItems = db.cartItems.filter(c => c.userId !== userId);
+    db.wishlists = db.wishlists.filter(w => w.userId !== userId);
+    db.addresses = db.addresses.filter(a => a.userId !== userId);
+
+    return res.json({
+      success: true,
+      message: 'Your account and personal data have been permanently removed.'
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: err.message || 'Failed to delete account' }
+    });
+  }
+});
+
 export default router;

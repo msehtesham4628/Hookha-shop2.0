@@ -333,8 +333,11 @@ export interface AuditLog {
 
 export interface StoreSettings {
   storeName: string;
+  storeTagline?: string;
   supportEmail: string;
   supportPhone: string;
+  supportHours?: string;
+  storeAddress?: string;
   currency: string;
   currencySymbol: string;
   freeShippingThreshold: number;
@@ -350,6 +353,34 @@ export interface StoreSettings {
   announcement?: string;
   fontVibe?: 'avant-garde' | 'imperial' | 'cyber' | 'haute';
   maintenanceMode?: boolean;
+
+  // Storefront Hero & CMS fields
+  heroSlides?: string[] | string;
+  heroBadge?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  heroCtaText?: string;
+  heroCtaLink?: string;
+  heroSecondaryBadge?: string;
+
+  // Homepage sections & copywriting
+  newArrivalsTitle?: string;
+  bestSellersTitle?: string;
+  shippingPropTitle?: string;
+  shippingPropSubtitle?: string;
+  discountPropTitle?: string;
+  discountPropSubtitle?: string;
+  supportPropTitle?: string;
+  supportPropSubtitle?: string;
+  aboutStoryTitle?: string;
+  aboutStoryText?: string;
+  newsletterTitle?: string;
+  newsletterSubtitle?: string;
+
+  // Regulatory & Compliance
+  prop65Warning?: string;
+  ageComplianceNotice?: string;
+
   [key: string]: any;
 }
 

@@ -101,18 +101,23 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </h5>
             <ul className="space-y-2 text-stone-400">
               <li>
-                <button onClick={() => onNavigate('/wholesale')} className="hover:text-cyan-400 transition-colors cursor-pointer">
-                  {t('nav.wholesale', 'Wholesale & Lounge B2B')}
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('/track-order')} className="hover:text-cyan-400 transition-colors cursor-pointer text-amber-300/90 font-medium">
-                  {t('nav.track_order', 'Track My Order')}
+                <button onClick={() => onNavigate('/dashboard')} className="hover:text-cyan-400 transition-colors cursor-pointer text-amber-300/90 font-medium">
+                  Member Dashboard
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('/account')} className="hover:text-cyan-400 transition-colors cursor-pointer">
                   {t('nav.my_account', 'My Account & Orders')}
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('/track-order')} className="hover:text-cyan-400 transition-colors cursor-pointer">
+                  {t('nav.track_order', 'Track My Order')}
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('/wholesale')} className="hover:text-cyan-400 transition-colors cursor-pointer">
+                  {t('nav.wholesale', 'Wholesale & Lounge B2B')}
                 </button>
               </li>
               <li>
@@ -131,12 +136,26 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <p className="text-stone-400 leading-relaxed text-[11px] mb-3">
               {t('footer.age_disclaimer', 'All buyers must be 21+ years of age. Adult signature and identity verification required upon delivery.')}
             </p>
-            <button
-              onClick={() => onNavigate('/contact')}
-              className="text-cyan-400 hover:underline text-xs cursor-pointer"
-            >
-              {t('footer.accessibility_statement', 'Accessibility Statement')}
-            </button>
+            <div className="flex flex-col space-y-2 text-xs">
+              <button
+                onClick={() => onNavigate('/terms')}
+                className="text-stone-400 hover:text-cyan-400 text-left transition-colors cursor-pointer"
+              >
+                Terms of Service
+              </button>
+              <button
+                onClick={() => onNavigate('/privacy')}
+                className="text-stone-400 hover:text-cyan-400 text-left transition-colors cursor-pointer"
+              >
+                Privacy & Data Policy
+              </button>
+              <button
+                onClick={() => onNavigate('/contact')}
+                className="text-cyan-400 hover:underline text-left cursor-pointer"
+              >
+                {t('footer.accessibility_statement', 'Accessibility Statement')}
+              </button>
+            </div>
           </div>
 
         </div>
@@ -152,6 +171,19 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         {/* Bottom Sub-bar */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-400">
           <p>© {new Date().getFullYear()} Fumare Hookah. All rights reserved.</p>
+          <div className="flex items-center gap-4 text-stone-500">
+            <button onClick={() => onNavigate('/terms')} className="hover:text-stone-300 transition-colors cursor-pointer">
+              Terms
+            </button>
+            <span>•</span>
+            <button onClick={() => onNavigate('/privacy')} className="hover:text-stone-300 transition-colors cursor-pointer">
+              Privacy
+            </button>
+            <span>•</span>
+            <button onClick={() => onNavigate('/account?tab=settings')} className="hover:text-stone-300 transition-colors cursor-pointer">
+              Settings & Account Deletion
+            </button>
+          </div>
         </div>
 
       </div>

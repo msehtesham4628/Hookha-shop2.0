@@ -61,11 +61,17 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
-  Type
+  Type,
+  Sparkles,
+  Sun,
+  Moon,
+  Palette,
+  Layout
 } from 'lucide-react';
 import { BulkProductUpdateModal } from '../components/BulkProductUpdateModal.js';
 import { exportCustomersToExcel, exportInventoryToExcel } from '../utils/excelExport.js';
 import { FONT_OPTIONS, FontVibe } from '../components/FontThemeSelector.js';
+import { StorefrontCmsPanel } from '../components/StorefrontCmsPanel.js';
 
 function getCatalogPageNumbers(current: number, total: number): (number | string)[] {
   if (total <= 7) {
@@ -88,7 +94,24 @@ interface AdminDashboardProps {
 
 export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const { user, userPermissions, logout, showToast, isAdmin, isAuthLoading, setUser } = useStore();
-  const [activeTab, setActiveTab] = useState<'analytics' | 'products' | 'categories' | 'brands' | 'orders' | 'customers' | 'wholesale' | 'rbac' | 'audit' | 'settings'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'products' | 'categories' | 'brands' | 'orders' | 'cms' | 'customers' | 'wholesale' | 'rbac' | 'audit' | 'settings'>('analytics');
+
+  // Admin Dashboard Theme state: 'obsidian' (sleek luxury dark), 'slate' (titanium tech), or 'ivory' (clean gallery light)
+  const [adminTheme, setAdminTheme] = useState<'obsidian' | 'slate' | 'ivory'>(() => {
+    try {
+      const saved = localStorage.getItem('admin_dashboard_theme');
+      if (saved === 'obsidian' || saved === 'slate' || saved === 'ivory') return saved;
+    } catch {}
+    return 'obsidian';
+  });
+
+  const handleSetAdminTheme = (newTheme: 'obsidian' | 'slate' | 'ivory') => {
+    setAdminTheme(newTheme);
+    try {
+      localStorage.setItem('admin_dashboard_theme', newTheme);
+    } catch {}
+    showToast(`Admin dashboard theme set to ${newTheme.toUpperCase()}`, 'info');
+  };
 
   const [adminLoginEmail, setAdminLoginEmail] = useState('');
   const [adminLoginPassword, setAdminLoginPassword] = useState('');
@@ -460,6 +483,31 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       }
     } catch (err: any) {
       showToast(err.message || 'Failed to save store settings', 'error');
+    } finally {
+      setSettingsSaving(false);
+    }
+  };
+
+  const handleSaveStoreSettingsFromCms = async (updated: Partial<StoreSettings>) => {
+    setSettingsSaving(true);
+    try {
+      const res = await api.updateAdminSettings(updated);
+      if (res.success && res.data) {
+        setSettings(res.data);
+        if (res.data.storeName) setSettingStoreName(res.data.storeName);
+        if (res.data.announcement || res.data.bannerAnnouncement) {
+          setSettingAnnouncement(res.data.announcement || res.data.bannerAnnouncement || '');
+        }
+        showToast('Storefront content and visual layout published live!', 'success');
+        broadcastSync('SETTINGS_UPDATED', { settings: res.data });
+      } else {
+        const merged = { ...settings, ...updated } as StoreSettings;
+        setSettings(merged);
+        showToast('Storefront content updated', 'success');
+        broadcastSync('SETTINGS_UPDATED', { settings: merged });
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to publish storefront CMS changes', 'error');
     } finally {
       setSettingsSaving(false);
     }
@@ -1421,25 +1469,129 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     );
   }
 
+  // Unified theme styling system
+  const themeStyles = {
+    obsidian: {
+      wrapper: 'bg-[#0a0c10] text-stone-100',
+      header: 'bg-[#101318]/95 border-b border-stone-800/80 backdrop-blur-md shadow-lg',
+      brandBadge: 'bg-amber-600 text-stone-950 font-bold',
+      headerTitle: 'text-stone-100',
+      headerSubtitle: 'text-amber-400',
+      statusPill: 'bg-stone-900/90 border-stone-700/80 text-stone-200',
+      mobileBar: 'bg-[#101318] border-b border-stone-800/80',
+      mobileTabActive: 'bg-amber-500/20 text-amber-300 border border-amber-500/40',
+      mobileTabInactive: 'bg-stone-900/80 text-stone-400 hover:text-stone-200',
+      sidebar: 'bg-[#0d1015] border-r border-stone-800/80',
+      sidebarCategory: 'text-stone-400 font-semibold tracking-wider',
+      tabActive: 'bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-xs font-semibold',
+      tabInactive: 'text-stone-300 hover:bg-stone-800/60 hover:text-white',
+      badgeActive: 'bg-amber-500/25 text-amber-200',
+      badgeInactive: 'bg-stone-800/90 text-stone-400',
+      mainArea: 'bg-[#0a0c10]',
+    },
+    slate: {
+      wrapper: 'bg-[#090e17] text-slate-100',
+      header: 'bg-[#0f172a]/95 border-b border-slate-800 backdrop-blur-md shadow-lg',
+      brandBadge: 'bg-cyan-500 text-slate-950 font-bold',
+      headerTitle: 'text-slate-100',
+      headerSubtitle: 'text-cyan-400',
+      statusPill: 'bg-slate-900/90 border-slate-700/80 text-slate-200',
+      mobileBar: 'bg-[#0f172a] border-b border-slate-800',
+      mobileTabActive: 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40',
+      mobileTabInactive: 'bg-slate-900/80 text-slate-400 hover:text-slate-200',
+      sidebar: 'bg-[#0d1424] border-r border-slate-800/80',
+      sidebarCategory: 'text-slate-400 font-semibold tracking-wider',
+      tabActive: 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shadow-xs font-semibold',
+      tabInactive: 'text-slate-300 hover:bg-slate-800/60 hover:text-white',
+      badgeActive: 'bg-cyan-500/25 text-cyan-200',
+      badgeInactive: 'bg-slate-800 text-slate-400',
+      mainArea: 'bg-[#090e17]',
+    },
+    ivory: {
+      wrapper: 'bg-[#f6f5f0] text-stone-900',
+      header: 'bg-white/95 border-b border-stone-200/90 backdrop-blur-md shadow-xs',
+      brandBadge: 'bg-stone-900 text-amber-200 font-bold',
+      headerTitle: 'text-stone-900',
+      headerSubtitle: 'text-amber-800',
+      statusPill: 'bg-stone-100 border-stone-300 text-stone-800',
+      mobileBar: 'bg-white border-b border-stone-200',
+      mobileTabActive: 'bg-amber-900 text-white',
+      mobileTabInactive: 'bg-stone-100 text-stone-700 hover:bg-stone-200',
+      sidebar: 'bg-white border-r border-stone-200/90',
+      sidebarCategory: 'text-stone-500 font-semibold tracking-wider',
+      tabActive: 'bg-amber-100/90 text-amber-950 border border-amber-300/80 shadow-xs font-semibold',
+      tabInactive: 'text-stone-700 hover:bg-stone-100 hover:text-stone-950',
+      badgeActive: 'bg-amber-200/90 text-amber-900',
+      badgeInactive: 'bg-stone-100 text-stone-600',
+      mainArea: 'bg-[#f6f5f0]',
+    }
+  };
+  const th = themeStyles[adminTheme];
+
   return (
-    <div className="w-full bg-stone-100 min-h-screen text-stone-900 flex flex-col">
-      <header className="bg-stone-900 text-stone-100 border-b border-stone-800 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-md">
+    <div className={`w-full min-h-screen flex flex-col transition-colors ${th.wrapper}`}>
+      <header className={`px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 ${th.header}`}>
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xs bg-amber-800 flex items-center justify-center font-bold text-amber-100 font-serif text-sm">
+          <div className={`w-8 h-8 rounded-xs flex items-center justify-center font-serif text-sm ${th.brandBadge}`}>
             F
           </div>
           <div>
-            <h1 className="font-serif text-sm font-bold tracking-wider text-white uppercase">FUMARE HOOKAH CONTROL CENTER</h1>
-            <p className="text-[10px] text-amber-400 uppercase tracking-widest font-semibold">
+            <h1 className={`font-serif text-sm font-bold tracking-wider uppercase ${th.headerTitle}`}>
+              FUMARE HOOKAH CONTROL CENTER
+            </h1>
+            <p className={`text-[10px] uppercase tracking-widest font-semibold ${th.headerSubtitle}`}>
               Live Storefront Engine • {user?.role || 'SUPER_ADMIN'}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 text-xs">
-          <div className="flex items-center gap-2 bg-stone-800/90 border border-stone-700 px-2.5 py-1.5 rounded-xs">
+        <div className="flex items-center gap-2 sm:gap-3 text-xs">
+          {/* Admin Dashboard Theme Switcher */}
+          <div className="flex items-center gap-1 p-0.5 rounded-xs border border-white/10 bg-black/20">
+            <button
+              type="button"
+              onClick={() => handleSetAdminTheme('obsidian')}
+              title="Obsidian Onyx Theme (Luxury Dark)"
+              className={`px-2 py-1 rounded-xs text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                adminTheme === 'obsidian'
+                  ? 'bg-amber-500 text-stone-950 shadow-xs font-bold'
+                  : 'text-stone-400 hover:text-stone-200'
+              }`}
+            >
+              <Moon className="w-3 h-3" />
+              <span className="hidden lg:inline">Obsidian</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSetAdminTheme('slate')}
+              title="Titanium Slate Theme (Modern Tech)"
+              className={`px-2 py-1 rounded-xs text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                adminTheme === 'slate'
+                  ? 'bg-cyan-500 text-slate-950 shadow-xs font-bold'
+                  : 'text-stone-400 hover:text-stone-200'
+              }`}
+            >
+              <Palette className="w-3 h-3" />
+              <span className="hidden lg:inline">Slate</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSetAdminTheme('ivory')}
+              title="Ivory Atelier Theme (Refined Light)"
+              className={`px-2 py-1 rounded-xs text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                adminTheme === 'ivory'
+                  ? 'bg-stone-200 text-stone-900 shadow-xs font-bold'
+                  : 'text-stone-400 hover:text-stone-200'
+              }`}
+            >
+              <Sun className="w-3 h-3" />
+              <span className="hidden lg:inline">Ivory</span>
+            </button>
+          </div>
+
+          <div className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xs border ${th.statusPill}`}>
             <Database className={`w-3.5 h-3.5 ${mongoStatus?.isConnected ? 'text-emerald-400' : 'text-amber-400'}`} />
-            <span className="text-[11px] text-stone-200 font-medium font-mono hidden sm:inline">
+            <span className="text-[11px] font-medium font-mono hidden sm:inline">
               {mongoStatus?.isConnected ? `MongoDB (${mongoStatus.dbName})` : 'MongoDB: Active'}
             </span>
             <button
@@ -1448,18 +1600,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
               title="Synchronize all data to MongoDB"
               className="text-[10px] uppercase font-bold text-amber-300 hover:text-amber-100 bg-amber-950/80 hover:bg-amber-900 border border-amber-800 px-2 py-0.5 rounded-xs cursor-pointer transition-colors"
             >
-              {mongoSyncing ? 'Syncing...' : 'Sync to MongoDB'}
+              {mongoSyncing ? 'Syncing...' : 'Sync'}
             </button>
-          </div>
-
-          <div className="hidden lg:flex items-center gap-2 bg-stone-800 px-3 py-1.5 rounded-xs border border-stone-700">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-stone-300">API: Operational</span>
           </div>
 
           <button
             onClick={() => onNavigate('/')}
-            className="bg-stone-800 hover:bg-stone-700 text-stone-200 px-3 py-1.5 rounded-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+            className="bg-stone-800/80 hover:bg-stone-700 text-stone-200 px-3 py-1.5 rounded-xs transition-colors flex items-center gap-1.5 border border-stone-700/60 cursor-pointer"
           >
             <ExternalLink className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Storefront</span>
@@ -1475,79 +1622,88 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         </div>
       </header>
 
-      <div className="md:hidden bg-white border-b border-stone-200 px-2 py-2 flex gap-1 overflow-x-auto">
+      {/* Mobile Horizontal Navigation Tabs */}
+      <div className={`md:hidden px-2 py-2 flex gap-1.5 overflow-x-auto ${th.mobileBar}`}>
         <button
           onClick={() => setActiveTab('analytics')}
-          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'analytics' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
+          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'analytics' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Analytics
         </button>
         <button
+          onClick={() => setActiveTab('cms')}
+          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap flex items-center gap-1 ${activeTab === 'cms' ? th.mobileTabActive : th.mobileTabInactive}`}
+        >
+          <Sparkles className="w-3 h-3 text-amber-400" />
+          <span>CMS Studio</span>
+        </button>
+        <button
           onClick={() => setActiveTab('products')}
-          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'products' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
+          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'products' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Products ({totalProductsCount.toLocaleString()})
         </button>
         <button
           onClick={() => setActiveTab('categories')}
-          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'categories' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
+          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'categories' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Categories ({categories.length})
         </button>
         <button
           onClick={() => setActiveTab('brands')}
-          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'brands' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
+          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'brands' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Brands ({brands.length})
         </button>
         <button
           onClick={() => setActiveTab('orders')}
-          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'orders' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
+          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'orders' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Orders ({orders.length})
         </button>
         <button
           onClick={() => setActiveTab('customers')}
-          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'customers' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
+          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'customers' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Customers ({customers.length})
         </button>
         <button
           onClick={() => setActiveTab('wholesale')}
-          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'wholesale' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
+          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'wholesale' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           B2B ({wholesaleApps.length})
         </button>
         <button
           onClick={() => setActiveTab('rbac')}
-          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'rbac' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
+          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'rbac' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           RBAC
         </button>
         <button
           onClick={() => setActiveTab('audit')}
-          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'audit' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
+          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'audit' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Audit
         </button>
         <button
           onClick={() => setActiveTab('settings')}
-          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'settings' ? 'bg-amber-900 text-white' : 'bg-stone-100 text-stone-700'}`}
+          className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'settings' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Settings
         </button>
       </div>
 
       <div className="flex-1 flex overflow-hidden">
-        <aside className="w-64 bg-white border-r border-stone-200 p-4 space-y-1 shrink-0 hidden md:block">
-          <div className="text-[10px] uppercase font-bold tracking-widest text-stone-400 px-3 mb-2">
+        {/* Desktop Sidebar */}
+        <aside className={`w-64 p-4 space-y-1 shrink-0 hidden md:block overflow-y-auto ${th.sidebar}`}>
+          <div className={`text-[10px] uppercase font-bold tracking-widest px-3 mb-2 ${th.sidebarCategory}`}>
             Operations & Metrics
           </div>
 
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
-              activeTab === 'analytics' ? 'bg-amber-900 text-white shadow-xs' : 'text-stone-700 hover:bg-stone-100'
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
+              activeTab === 'analytics' ? th.tabActive : th.tabInactive
             }`}
           >
             <BarChart3 className="w-4 h-4" />
@@ -1556,131 +1712,153 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
 
           <button
             onClick={() => setActiveTab('products')}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
-              activeTab === 'products' ? 'bg-amber-900 text-white shadow-xs' : 'text-stone-700 hover:bg-stone-100'
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
+              activeTab === 'products' ? th.tabActive : th.tabInactive
             }`}
           >
             <div className="flex items-center gap-2.5">
               <Package className="w-4 h-4" />
               <span>Catalog Management</span>
             </div>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'products' ? 'bg-amber-800 text-amber-100' : 'bg-stone-100 text-stone-600'}`}>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'products' ? th.badgeActive : th.badgeInactive}`}>
               {totalProductsCount.toLocaleString()}
             </span>
           </button>
 
           <button
             onClick={() => setActiveTab('categories')}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
-              activeTab === 'categories' ? 'bg-amber-900 text-white shadow-xs' : 'text-stone-700 hover:bg-stone-100'
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
+              activeTab === 'categories' ? th.tabActive : th.tabInactive
             }`}
           >
             <div className="flex items-center gap-2.5">
               <Layers className="w-4 h-4" />
               <span>Categories & Hierarchy</span>
             </div>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'categories' ? 'bg-amber-800 text-amber-100' : 'bg-stone-100 text-stone-600'}`}>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'categories' ? th.badgeActive : th.badgeInactive}`}>
               {categories.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveTab('brands')}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
-              activeTab === 'brands' ? 'bg-amber-900 text-white shadow-xs' : 'text-stone-700 hover:bg-stone-100'
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
+              activeTab === 'brands' ? th.tabActive : th.tabInactive
             }`}
           >
             <div className="flex items-center gap-2.5">
               <Tag className="w-4 h-4" />
-              <span>Brands & Manufacturers</span>
+              <span>Brands & Makers</span>
             </div>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'brands' ? 'bg-amber-800 text-amber-100' : 'bg-stone-100 text-stone-600'}`}>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'brands' ? th.badgeActive : th.badgeInactive}`}>
               {brands.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveTab('orders')}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
-              activeTab === 'orders' ? 'bg-amber-900 text-white shadow-xs' : 'text-stone-700 hover:bg-stone-100'
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
+              activeTab === 'orders' ? th.tabActive : th.tabInactive
             }`}
           >
             <div className="flex items-center gap-2.5">
               <ShoppingBag className="w-4 h-4" />
               <span>Orders & Dispatch</span>
             </div>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'orders' ? 'bg-amber-800 text-amber-100' : 'bg-stone-100 text-stone-600'}`}>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'orders' ? th.badgeActive : th.badgeInactive}`}>
               {orders.length}
             </span>
           </button>
 
-          <div className="text-[10px] uppercase font-bold tracking-widest text-stone-400 px-3 pt-4 mb-2">
+          {/* STOREFRONT & CMS TAB */}
+          <div className={`text-[10px] uppercase font-bold tracking-widest px-3 pt-4 mb-2 ${th.sidebarCategory}`}>
+            Storefront & Brand CMS
+          </div>
+
+          <button
+            onClick={() => setActiveTab('cms')}
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
+              activeTab === 'cms' ? th.tabActive : th.tabInactive
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span>Storefront CMS & Content</span>
+            </div>
+            <span className={`text-[9px] px-1.5 py-0.5 rounded-xs font-mono font-bold uppercase tracking-wider ${
+              activeTab === 'cms' ? th.badgeActive : 'bg-amber-500/20 text-amber-300'
+            }`}>
+              LIVE
+            </span>
+          </button>
+
+          <div className={`text-[10px] uppercase font-bold tracking-widest px-3 pt-4 mb-2 ${th.sidebarCategory}`}>
             Accounts & Access
           </div>
 
           <button
             onClick={() => setActiveTab('customers')}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
-              activeTab === 'customers' ? 'bg-amber-900 text-white shadow-xs' : 'text-stone-700 hover:bg-stone-100'
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
+              activeTab === 'customers' ? th.tabActive : th.tabInactive
             }`}
           >
             <div className="flex items-center gap-2.5">
               <Users className="w-4 h-4" />
               <span>Customer Registry</span>
             </div>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'customers' ? 'bg-amber-800 text-amber-100' : 'bg-stone-100 text-stone-600'}`}>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'customers' ? th.badgeActive : th.badgeInactive}`}>
               {customers.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveTab('wholesale')}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
-              activeTab === 'wholesale' ? 'bg-amber-900 text-white shadow-xs' : 'text-stone-700 hover:bg-stone-100'
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
+              activeTab === 'wholesale' ? th.tabActive : th.tabInactive
             }`}
           >
             <div className="flex items-center gap-2.5">
               <Building2 className="w-4 h-4" />
               <span>B2B Lounge Apps</span>
             </div>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'wholesale' ? 'bg-amber-800 text-amber-100' : 'bg-stone-100 text-stone-600'}`}>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'wholesale' ? th.badgeActive : th.badgeInactive}`}>
               {wholesaleApps.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveTab('rbac')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
-              activeTab === 'rbac' ? 'bg-amber-900 text-white shadow-xs' : 'text-stone-700 hover:bg-stone-100'
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
+              activeTab === 'rbac' ? th.tabActive : th.tabInactive
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
             <span>RBAC & Staff Roster</span>
           </button>
 
-          <div className="text-[10px] uppercase font-bold tracking-widest text-stone-400 px-3 pt-4 mb-2">
-            Governance & Settings
+          <div className={`text-[10px] uppercase font-bold tracking-widest px-3 pt-4 mb-2 ${th.sidebarCategory}`}>
+            Governance & System
           </div>
 
           <button
             onClick={() => setActiveTab('audit')}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
-              activeTab === 'audit' ? 'bg-amber-900 text-white shadow-xs' : 'text-stone-700 hover:bg-stone-100'
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
+              activeTab === 'audit' ? th.tabActive : th.tabInactive
             }`}
           >
             <div className="flex items-center gap-2.5">
               <FileText className="w-4 h-4" />
               <span>Audit Trail</span>
             </div>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'audit' ? 'bg-amber-800 text-amber-100' : 'bg-stone-100 text-stone-600'}`}>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'audit' ? th.badgeActive : th.badgeInactive}`}>
               {auditLogs.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveTab('settings')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
-              activeTab === 'settings' ? 'bg-amber-900 text-white shadow-xs' : 'text-stone-700 hover:bg-stone-100'
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
+              activeTab === 'settings' ? th.tabActive : th.tabInactive
             }`}
           >
             <Settings className="w-4 h-4" />
@@ -1688,7 +1866,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           </button>
         </aside>
 
-        <main className="flex-1 p-4 sm:p-6 overflow-y-auto max-w-7xl">
+        <main className={`flex-1 p-4 sm:p-6 overflow-y-auto max-w-7xl ${th.mainArea}`}>
           {loading ? (
             <div className="w-full h-96 flex flex-col items-center justify-center text-stone-500">
               <div className="w-8 h-8 border-2 border-amber-900/30 border-t-amber-900 rounded-full animate-spin mb-3" />
@@ -1831,6 +2009,15 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     </div>
                   </div>
                 </div>
+              )}
+
+              {activeTab === 'cms' && (
+                <StorefrontCmsPanel
+                  currentSettings={settings}
+                  onSave={handleSaveStoreSettingsFromCms}
+                  saving={settingsSaving}
+                  adminTheme={adminTheme}
+                />
               )}
 
               {activeTab === 'products' && (

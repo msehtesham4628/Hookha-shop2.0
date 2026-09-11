@@ -175,6 +175,35 @@ class ApiClient {
     });
   }
 
+  public async updateProfile(payload: {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    preferences?: any;
+  }) {
+    return this.request<{ success: boolean; data: { user: User }; message: string }>('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  public async changePassword(payload: {
+    currentPassword: string;
+    newPassword: string;
+  }) {
+    return this.request<{ success: boolean; message: string }>('/auth/change-password', {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  public async deleteAccount(payload?: { password?: string; reason?: string }) {
+    return this.request<{ success: boolean; message: string }>('/auth/account', {
+      method: 'DELETE',
+      body: payload ? JSON.stringify(payload) : undefined
+    });
+  }
+
   public async login(credentials: { user?: string; email?: string; password: string }) {
     return this.request<{ success: boolean; data: { user: User; token: string } }>('/auth/login', {
       method: 'POST',
