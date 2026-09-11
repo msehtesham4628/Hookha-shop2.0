@@ -13,6 +13,7 @@ import {
   AuditLog,
   StoreSettings
 } from '../../types/index.js';
+import { registerDynamicBrands } from '../data/brandsData.js';
 
 export const getApiBaseUrl = (): string => {
   const metaEnv = typeof import.meta !== 'undefined' ? (import.meta as any).env : undefined;
@@ -125,11 +126,17 @@ class ApiClient {
       }
 
       const isAuthEndpoint = endpoint.startsWith('/auth/login') || endpoint.startsWith('/auth/admin-login') || endpoint.startsWith('/auth/otp');
+      const isNotFound = err?.message?.toLowerCase().includes('not be located') ||
+        err?.message?.toLowerCase().includes('not found') ||
+        err?.code === 'PRODUCT_NOT_FOUND' ||
+        err?.status === 404;
 
       if (isAuthEndpoint) {
         console.warn(`[Auth Notice] ${options.method || 'GET'} ${endpoint}:`, err.message);
       } else if (isNetworkDrop) {
         console.warn(`[Network Deferred] ${options.method || 'GET'} ${endpoint} temporarily unavailable.`);
+      } else if (isNotFound) {
+        console.warn(`[API Notice] ${options.method || 'GET'} ${endpoint}:`, err.message || 'Resource not located.');
       } else {
         console.error(`[API Error] ${options.method || 'GET'} ${endpoint}:`, err);
       }
@@ -335,7 +342,11 @@ class ApiClient {
   }
 
   public async getBrands() {
-    return this.request<{ success: boolean; data: Brand[] }>('/brands');
+    const res = await this.request<{ success: boolean; data: Brand[] }>('/brands');
+    if (res && res.success && Array.isArray(res.data)) {
+      registerDynamicBrands(res.data);
+    }
+    return res;
   }
 
   public async getBrand(slug: string) {
@@ -817,6 +828,49 @@ class ApiClient {
 
   public async createProduct(product: any) {
     return this.createAdminProduct(product);
+  }
+
+  public async generateProductDescription(payload: {
+    name: string;
+    brand?: string;
+    category?: string;
+    subcategory?: string;
+    flavor?: string;
+    material?: string;
+    price?: number;
+    currentDescription?: string;
+    tone?: string;
+  }) {
+    return this.request<{
+      success: boolean;
+      data?: {
+        description: string;
+        shortDescription: string;
+        highlights: string[];
+        source: 'gemini' | 'fallback';
+      };
+      message?: string;
+      error?: { code: string; message: string };
+    }>('/admin/products/generate-description', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  public async generateProductSku(payload: {
+    name: string;
+    brand: string;
+    productId?: string;
+  }) {
+    return this.request<{
+      success: boolean;
+      data?: { sku: string };
+      message?: string;
+      error?: { code: string; message: string };
+    }>('/admin/products/generate-sku', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
   }
 
   public async updateProduct(id: string, product: any) {

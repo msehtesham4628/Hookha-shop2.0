@@ -387,6 +387,65 @@ router.get('/:slug', (req, res) => {
   const product = db.products.find(p => p.slug === slug || p.id === slug);
 
   if (!product || !product.isActive) {
+    // Check if the requested slug is actually a known brand (e.g. "nash", "musthave", "starbuzz")
+    const cleanTarget = (slug || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const strippedTarget = cleanTarget.replace(/-(tobacco|hookahs?|bowls?|bases?|coals?|accessories|vapes?)$/i, '');
+
+    const matchedBrand = db.brands.find(b => {
+      if (!b.isActive) return false;
+      const bSlug = (b.slug || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+      const bStripped = bSlug.replace(/-(tobacco|hookahs?|bowls?|bases?|coals?|accessories|vapes?)$/i, '');
+      const bName = (b.name || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+      return (
+        bSlug === cleanTarget ||
+        bStripped === cleanTarget ||
+        bSlug === strippedTarget ||
+        bStripped === strippedTarget ||
+        bName === cleanTarget ||
+        bName === strippedTarget ||
+        b.id === `brand-${cleanTarget}` ||
+        b.id === `brand-${strippedTarget}`
+      );
+    });
+
+    if (matchedBrand) {
+      // Find products associated with this brand
+      const brandProducts = db.products.filter(p => {
+        if (!p.isActive || db.isProductDeleted(p.id)) return false;
+        const pBrandSlug = (p.brandSlug || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+        const pBrandName = (p.brand || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+        const mBrandSlug = matchedBrand.slug.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+        return (
+          pBrandSlug === mBrandSlug ||
+          pBrandSlug === cleanTarget ||
+          pBrandSlug === strippedTarget ||
+          pBrandName === cleanTarget ||
+          pBrandName === strippedTarget
+        );
+      });
+
+      if (brandProducts.length > 0) {
+        const topProduct = brandProducts[0];
+        const relatedProducts = brandProducts.slice(1, 5);
+        const frequentlyBoughtTogether = db.products
+          .filter(p => p.isActive && !db.isProductDeleted(p.id) && p.categorySlug !== topProduct.categorySlug)
+          .slice(0, 2);
+        const reviews = db.reviews.filter(r => r.productId === topProduct.id && r.status === 'APPROVED');
+
+        return res.json({
+          success: true,
+          data: {
+            product: topProduct,
+            relatedProducts,
+            frequentlyBoughtTogether,
+            reviews,
+            isBrandFallback: true,
+            brand: matchedBrand
+          }
+        });
+      }
+    }
+
     return res.status(404).json({
       success: false,
       error: { code: 'PRODUCT_NOT_FOUND', message: 'The requested product could not be located.' }

@@ -63,6 +63,7 @@ import {
   Filter,
   Type,
   Sparkles,
+  Hash,
   Sun,
   Moon,
   Palette,
@@ -72,6 +73,7 @@ import { BulkProductUpdateModal } from '../components/BulkProductUpdateModal.js'
 import { exportCustomersToExcel, exportInventoryToExcel } from '../utils/excelExport.js';
 import { FONT_OPTIONS, FontVibe } from '../components/FontThemeSelector.js';
 import { StorefrontCmsPanel } from '../components/StorefrontCmsPanel.js';
+import { generateUniqueSku } from '../utils/skuGenerator.js';
 
 function getCatalogPageNumbers(current: number, total: number): (number | string)[] {
   if (total <= 7) {
@@ -88,13 +90,65 @@ function getCatalogPageNumbers(current: number, total: number): (number | string
   return pages;
 }
 
+type AdminTabType = 'analytics' | 'products' | 'categories' | 'brands' | 'orders' | 'cms' | 'customers' | 'wholesale' | 'rbac' | 'audit' | 'settings';
+
+const getInitialAdminTab = (): AdminTabType => {
+  if (typeof window === 'undefined') return 'analytics';
+  const path = window.location.pathname.toLowerCase();
+  if (path.includes('/admin/catalog') || path.includes('/admin/caralog') || path.includes('/admin/products')) {
+    return 'products';
+  }
+  if (path.includes('/admin/categories')) return 'categories';
+  if (path.includes('/admin/brands')) return 'brands';
+  if (path.includes('/admin/orders')) return 'orders';
+  if (path.includes('/admin/cms')) return 'cms';
+  if (path.includes('/admin/customers')) return 'customers';
+  if (path.includes('/admin/wholesale')) return 'wholesale';
+  if (path.includes('/admin/rbac') || path.includes('/admin/staff')) return 'rbac';
+  if (path.includes('/admin/audit')) return 'audit';
+  if (path.includes('/admin/settings')) return 'settings';
+  if (path.includes('/admin/analytics')) return 'analytics';
+  return 'analytics';
+};
+
 interface AdminDashboardProps {
   onNavigate: (path: string) => void;
 }
 
 export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const { user, userPermissions, logout, showToast, isAdmin, isAuthLoading, setUser } = useStore();
-  const [activeTab, setActiveTab] = useState<'analytics' | 'products' | 'categories' | 'brands' | 'orders' | 'cms' | 'customers' | 'wholesale' | 'rbac' | 'audit' | 'settings'>('analytics');
+  const [activeTab, setActiveTab] = useState<AdminTabType>(getInitialAdminTab);
+
+  const switchTab = (tab: AdminTabType) => {
+    setActiveTab(tab);
+    if (typeof window !== 'undefined') {
+      let targetPath = '/admin';
+      if (tab === 'products') targetPath = '/admin/catalog';
+      else if (tab === 'analytics') targetPath = '/admin/analytics';
+      else if (tab === 'categories') targetPath = '/admin/categories';
+      else if (tab === 'brands') targetPath = '/admin/brands';
+      else if (tab === 'orders') targetPath = '/admin/orders';
+      else if (tab === 'cms') targetPath = '/admin/cms';
+      else if (tab === 'customers') targetPath = '/admin/customers';
+      else if (tab === 'wholesale') targetPath = '/admin/wholesale';
+      else if (tab === 'rbac') targetPath = '/admin/rbac';
+      else if (tab === 'audit') targetPath = '/admin/audit';
+      else if (tab === 'settings') targetPath = '/admin/settings';
+
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({ tab }, '', targetPath);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const tab = getInitialAdminTab();
+      setActiveTab(tab);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Admin Dashboard Theme state: 'obsidian' (sleek luxury dark), 'slate' (titanium tech), or 'ivory' (clean gallery light)
   const [adminTheme, setAdminTheme] = useState<'obsidian' | 'slate' | 'ivory'>(() => {
@@ -196,6 +250,16 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [prodIsNewArrival, setProdIsNewArrival] = useState(false);
   const [prodIsActive, setProdIsActive] = useState(true);
   const [prodRating, setProdRating] = useState('5.0');
+
+  // AI Luxury Description Generator State (Gemini API)
+  const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
+  const [aiTone, setAiTone] = useState<'luxury-editorial' | 'connoisseur-sommelier' | 'concise-luxury'>('luxury-editorial');
+  const [aiGeneratedResult, setAiGeneratedResult] = useState<{
+    description: string;
+    shortDescription: string;
+    highlights: string[];
+    source: 'gemini' | 'fallback';
+  } | null>(null);
 
   const [staffEmail, setStaffEmail] = useState('');
   const [staffPassword, setStaffPassword] = useState('');
@@ -766,10 +830,72 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
     { flavor: 'Tangiers Noir Cane Mint', units: 68 }
   ];
 
+  const handleGenerateAiDescription = async () => {
+    if (!prodName.trim()) {
+      showToast('Please enter a Product Title first so Gemini can craft bespoke luxury specifications', 'info');
+      return;
+    }
+
+    setIsGeneratingDesc(true);
+    try {
+      const res = await api.generateProductDescription({
+        name: prodName.trim(),
+        brand: prodBrand.trim() || undefined,
+        category: prodCategory.trim() || undefined,
+        subcategory: prodSubcategory.trim() || undefined,
+        flavor: prodFlavor.trim() || undefined,
+        material: prodMaterial.trim() || undefined,
+        price: parseFloat(prodPrice) || undefined,
+        currentDescription: prodDesc.trim() || undefined,
+        tone: aiTone
+      });
+
+      if (res.success && res.data) {
+        const result = res.data;
+        setAiGeneratedResult(result);
+        setProdDesc(result.description);
+        if (!prodShortDesc.trim() && result.shortDescription) {
+          setProdShortDesc(result.shortDescription);
+        }
+        if (result.source === 'gemini') {
+          showToast('✨ Gemini AI crafted a luxury product description and specifications!', 'success');
+        } else {
+          showToast('✨ Luxury product description generated successfully!', 'success');
+        }
+      } else {
+        showToast(res.error?.message || 'Failed to generate product description', 'error');
+      }
+    } catch (err: any) {
+      console.error('Error generating description:', err);
+      showToast(err.message || 'Failed to generate luxury description', 'error');
+    } finally {
+      setIsGeneratingDesc(false);
+    }
+  };
+
+  const handleAutoGenerateSku = () => {
+    if (!prodName.trim()) {
+      showToast('Please enter a Product Title first so the SKU can be generated from the title and brand', 'info');
+      return;
+    }
+
+    const uniqueSku = generateUniqueSku(
+      prodName.trim(),
+      prodBrand.trim() || 'Alpha Hookah',
+      products,
+      editingProduct?.id
+    );
+
+    setProdSku(uniqueSku);
+    showToast(`✨ Generated unique SKU: ${uniqueSku}`, 'success');
+  };
+
   const handleOpenCreateProduct = () => {
     setEditingProduct(null);
+    setAiGeneratedResult(null);
+    setIsGeneratingDesc(false);
     setProdName('');
-    setProdSku(`SKU-${Date.now().toString(36).toUpperCase()}`);
+    setProdSku('');
     setProdBrand('Alpha Hookah');
     setProdCategory('Hookahs');
     setProdSubcategory('');
@@ -791,6 +917,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
 
   const handleOpenEditProduct = (prod: Product) => {
     setEditingProduct(prod);
+    setAiGeneratedResult(null);
+    setIsGeneratingDesc(false);
     setProdName(prod.name);
     setProdSku(prod.sku || '');
     setProdBrand(prod.brand);
@@ -839,10 +967,11 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
 
       const parsedPrice = parseFloat(prodPrice) || 0;
       const parsedSalePrice = prodSalePrice ? parseFloat(prodSalePrice) : undefined;
+      const finalSku = prodSku.trim() || generateUniqueSku(prodName.trim(), prodBrand.trim() || 'Alpha Hookah', products, editingProduct?.id);
 
       const payload: any = {
         name: prodName.trim(),
-        sku: prodSku.trim() || undefined,
+        sku: finalSku,
         brand: prodBrand.trim(),
         category: prodCategory.trim(),
         subcategory: prodSubcategory.trim() || undefined,
@@ -1625,68 +1754,68 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       {/* Mobile Horizontal Navigation Tabs */}
       <div className={`md:hidden px-2 py-2 flex gap-1.5 overflow-x-auto ${th.mobileBar}`}>
         <button
-          onClick={() => setActiveTab('analytics')}
+          onClick={() => switchTab('analytics')}
           className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'analytics' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Analytics
         </button>
         <button
-          onClick={() => setActiveTab('cms')}
+          onClick={() => switchTab('cms')}
           className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap flex items-center gap-1 ${activeTab === 'cms' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           <Sparkles className="w-3 h-3 text-amber-400" />
           <span>CMS Studio</span>
         </button>
         <button
-          onClick={() => setActiveTab('products')}
+          onClick={() => switchTab('products')}
           className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'products' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
-          Products ({totalProductsCount.toLocaleString()})
+          Catalog ({totalProductsCount.toLocaleString()})
         </button>
         <button
-          onClick={() => setActiveTab('categories')}
+          onClick={() => switchTab('categories')}
           className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'categories' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Categories ({categories.length})
         </button>
         <button
-          onClick={() => setActiveTab('brands')}
+          onClick={() => switchTab('brands')}
           className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'brands' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Brands ({brands.length})
         </button>
         <button
-          onClick={() => setActiveTab('orders')}
+          onClick={() => switchTab('orders')}
           className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'orders' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Orders ({orders.length})
         </button>
         <button
-          onClick={() => setActiveTab('customers')}
+          onClick={() => switchTab('customers')}
           className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'customers' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Customers ({customers.length})
         </button>
         <button
-          onClick={() => setActiveTab('wholesale')}
+          onClick={() => switchTab('wholesale')}
           className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'wholesale' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           B2B ({wholesaleApps.length})
         </button>
         <button
-          onClick={() => setActiveTab('rbac')}
+          onClick={() => switchTab('rbac')}
           className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'rbac' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           RBAC
         </button>
         <button
-          onClick={() => setActiveTab('audit')}
+          onClick={() => switchTab('audit')}
           className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'audit' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Audit
         </button>
         <button
-          onClick={() => setActiveTab('settings')}
+          onClick={() => switchTab('settings')}
           className={`px-3 py-1.5 rounded-xs text-xs font-semibold whitespace-nowrap ${activeTab === 'settings' ? th.mobileTabActive : th.mobileTabInactive}`}
         >
           Settings
@@ -1701,7 +1830,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           </div>
 
           <button
-            onClick={() => setActiveTab('analytics')}
+            onClick={() => switchTab('analytics')}
             className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
               activeTab === 'analytics' ? th.tabActive : th.tabInactive
             }`}
@@ -1711,14 +1840,14 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           </button>
 
           <button
-            onClick={() => setActiveTab('products')}
+            onClick={() => switchTab('products')}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
               activeTab === 'products' ? th.tabActive : th.tabInactive
             }`}
           >
             <div className="flex items-center gap-2.5">
               <Package className="w-4 h-4" />
-              <span>Catalog Management</span>
+              <span>Product Catalog</span>
             </div>
             <span className={`text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold ${activeTab === 'products' ? th.badgeActive : th.badgeInactive}`}>
               {totalProductsCount.toLocaleString()}
@@ -1726,7 +1855,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           </button>
 
           <button
-            onClick={() => setActiveTab('categories')}
+            onClick={() => switchTab('categories')}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
               activeTab === 'categories' ? th.tabActive : th.tabInactive
             }`}
@@ -1741,7 +1870,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           </button>
 
           <button
-            onClick={() => setActiveTab('brands')}
+            onClick={() => switchTab('brands')}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
               activeTab === 'brands' ? th.tabActive : th.tabInactive
             }`}
@@ -1756,7 +1885,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           </button>
 
           <button
-            onClick={() => setActiveTab('orders')}
+            onClick={() => switchTab('orders')}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
               activeTab === 'orders' ? th.tabActive : th.tabInactive
             }`}
@@ -1776,7 +1905,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           </div>
 
           <button
-            onClick={() => setActiveTab('cms')}
+            onClick={() => switchTab('cms')}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
               activeTab === 'cms' ? th.tabActive : th.tabInactive
             }`}
@@ -1797,7 +1926,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           </div>
 
           <button
-            onClick={() => setActiveTab('customers')}
+            onClick={() => switchTab('customers')}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
               activeTab === 'customers' ? th.tabActive : th.tabInactive
             }`}
@@ -1812,7 +1941,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           </button>
 
           <button
-            onClick={() => setActiveTab('wholesale')}
+            onClick={() => switchTab('wholesale')}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
               activeTab === 'wholesale' ? th.tabActive : th.tabInactive
             }`}
@@ -1827,7 +1956,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           </button>
 
           <button
-            onClick={() => setActiveTab('rbac')}
+            onClick={() => switchTab('rbac')}
             className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
               activeTab === 'rbac' ? th.tabActive : th.tabInactive
             }`}
@@ -1841,7 +1970,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           </div>
 
           <button
-            onClick={() => setActiveTab('audit')}
+            onClick={() => switchTab('audit')}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
               activeTab === 'audit' ? th.tabActive : th.tabInactive
             }`}
@@ -1856,7 +1985,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
           </button>
 
           <button
-            onClick={() => setActiveTab('settings')}
+            onClick={() => switchTab('settings')}
             className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xs text-xs font-semibold transition-colors cursor-pointer ${
               activeTab === 'settings' ? th.tabActive : th.tabInactive
             }`}
@@ -1952,7 +2081,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                             <span className="text-stone-300">•</span>
                             <button
                               onClick={() => {
-                                setActiveTab('products');
+                                switchTab('products');
                                 setIsBulkUpdateModalOpen(true);
                               }}
                               className="text-[10px] text-amber-800 hover:text-amber-900 font-bold underline cursor-pointer"
@@ -1989,7 +2118,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                     <div className="bg-white border border-stone-200 p-6 rounded-xs shadow-xs">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="font-serif text-base font-bold text-stone-900">Low Stock Warning Matrix</h3>
-                        <button onClick={() => setActiveTab('products')} className="text-xs text-amber-900 font-semibold hover:underline">
+                        <button onClick={() => switchTab('products')} className="text-xs text-amber-900 font-semibold hover:underline">
                           View All ({totalProductsCount.toLocaleString()})
                         </button>
                       </div>
@@ -3558,14 +3687,30 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-stone-700 mb-1">SKU / Item Code</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-semibold text-stone-700">SKU / Item Code *</label>
+                    <button
+                      type="button"
+                      id="btn-auto-generate-sku"
+                      onClick={handleAutoGenerateSku}
+                      className="text-[11px] font-semibold text-amber-900 hover:text-amber-800 bg-amber-50 hover:bg-amber-100/90 border border-amber-300/80 px-2 py-0.5 rounded-xs flex items-center gap-1 cursor-pointer transition-all shadow-2xs active:scale-95"
+                      title="Auto-generate a unique slug-based SKU (e.g., AH-MODELX-001) based on product name and brand"
+                    >
+                      <Hash className="w-3 h-3 text-amber-700" />
+                      <span>Auto-Generate SKU</span>
+                    </button>
+                  </div>
                   <input
                     type="text"
+                    required
                     value={prodSku}
-                    onChange={(e) => setProdSku(e.target.value)}
-                    placeholder="e.g. ALP-MODX-BLK"
-                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono"
+                    onChange={(e) => setProdSku(e.target.value.toUpperCase())}
+                    placeholder="e.g. AH-MODELX-001"
+                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs font-mono text-xs uppercase focus:ring-1 focus:ring-amber-800 focus:outline-none"
                   />
+                  <p className="text-[10px] text-stone-500 mt-1">
+                    Slug format: <span className="font-mono text-stone-700 font-semibold">[BRAND]-[MODEL]-[SEQ]</span> (e.g. AH-MODELX-001)
+                  </p>
                 </div>
 
                 <div>
@@ -3639,7 +3784,22 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block font-semibold text-stone-700 mb-1">Short Tagline Summary</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-semibold text-stone-700">Short Tagline Summary</label>
+                    {aiGeneratedResult?.shortDescription && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProdShortDesc(aiGeneratedResult.shortDescription);
+                          showToast('Applied AI luxury tagline', 'info');
+                        }}
+                        className="text-[11px] text-amber-900 hover:text-amber-700 font-medium cursor-pointer flex items-center gap-1"
+                      >
+                        <Sparkles className="w-3 h-3 text-amber-600" />
+                        Use AI Tagline
+                      </button>
+                    )}
+                  </div>
                   <input
                     type="text"
                     value={prodShortDesc}
@@ -3711,14 +3871,86 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block font-semibold text-stone-700 mb-1">Full Description & Specifications</label>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2">
+                      <label className="block font-semibold text-stone-700">Full Description & Specifications *</label>
+                      {aiGeneratedResult && (
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold flex items-center gap-1 ${
+                          aiGeneratedResult.source === 'gemini'
+                            ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                            : 'bg-stone-100 text-stone-700 border border-stone-300'
+                        }`}>
+                          <Sparkles className="w-3 h-3 text-amber-600" />
+                          {aiGeneratedResult.source === 'gemini' ? 'Gemini AI Verified' : 'Luxury Engine'}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <select
+                        value={aiTone}
+                        onChange={(e: any) => setAiTone(e.target.value)}
+                        disabled={isGeneratingDesc}
+                        className="text-[11px] bg-stone-100 border border-stone-300 rounded px-2 py-1 text-stone-700 focus:outline-none focus:ring-1 focus:ring-amber-800"
+                        title="Select luxury copywriting voice"
+                      >
+                        <option value="luxury-editorial">Haute Luxury Editorial</option>
+                        <option value="connoisseur-sommelier">Connoisseur Sommelier</option>
+                        <option value="concise-luxury">Concise European Luxury</option>
+                      </select>
+
+                      <button
+                        type="button"
+                        id="btn-gemini-generate-description"
+                        onClick={handleGenerateAiDescription}
+                        disabled={isGeneratingDesc || !prodName.trim()}
+                        className="bg-stone-900 hover:bg-amber-900 disabled:opacity-50 text-amber-100 font-semibold px-3 py-1 rounded-xs text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer border border-amber-600/30"
+                        title="Generate luxury-focused, professional product description using Gemini AI"
+                      >
+                        <Sparkles className={`w-3.5 h-3.5 text-amber-300 ${isGeneratingDesc ? 'animate-spin' : ''}`} />
+                        <span>{isGeneratingDesc ? 'Crafting Luxury Copy...' : 'Generate Description'}</span>
+                      </button>
+                    </div>
+                  </div>
+
                   <textarea
-                    rows={3}
+                    rows={6}
                     required
                     value={prodDesc}
                     onChange={(e) => setProdDesc(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-300 p-2 rounded-xs"
+                    placeholder="Evocative luxury description, materials, specifications, and connoisseur pack recommendations..."
+                    className="w-full bg-stone-50 border border-stone-300 p-2.5 rounded-xs font-sans text-xs leading-relaxed focus:ring-1 focus:ring-amber-800 focus:outline-none"
                   />
+
+                  {aiGeneratedResult?.highlights && aiGeneratedResult.highlights.length > 0 && (
+                    <div className="mt-2 p-2.5 bg-amber-50/70 border border-amber-200/80 rounded-xs text-[11px] space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-amber-950 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 text-amber-700" />
+                          Generated Luxury Highlights:
+                        </span>
+                        {aiGeneratedResult.shortDescription && !prodShortDesc && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setProdShortDesc(aiGeneratedResult.shortDescription);
+                              showToast('Applied luxury tagline to product hook', 'info');
+                            }}
+                            className="text-[10px] text-amber-900 hover:text-amber-700 underline font-medium cursor-pointer"
+                          >
+                            Apply Tagline to Summary
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {aiGeneratedResult.highlights.map((h, i) => (
+                          <span key={i} className="bg-white text-stone-800 px-2 py-0.5 rounded border border-amber-200/60 shadow-2xs">
+                            • {h}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

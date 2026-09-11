@@ -7,6 +7,9 @@ import { requirePermission, requireRole } from '../middleware/rbac.middleware.js
 import { paymentService } from '../services/payment.service.js';
 import { Product, Role, OrderStatus, Category, Brand, Coupon } from '../../types/index.js';
 import { mongoService } from '../db/mongodb.js';
+import { generateLuxuryProductDescription } from '../services/gemini.service.js';
+import { checkUserPermission } from '../middleware/rbac.middleware.js';
+import { generateUniqueSku } from '../../shared/skuGenerator.js';
 
 const router = Router();
 
@@ -385,6 +388,95 @@ router.post('/products/import', requirePermission('products.import'), async (req
     success: true,
     message: `Import complete: ${successful} added, ${failed} failed.`,
     data: { successful, failed, errors }
+  });
+});
+
+// POST /api/admin/products/generate-description & POST /api/admin/generate-description
+// Uses Gemini API to generate luxury-focused, professional product descriptions
+const handleGenerateProductDescription = async (req: AuthenticatedRequest, res: any) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({
+      success: false,
+      error: { code: 'UNAUTHORIZED', message: 'Authentication required' }
+    });
+  }
+
+  // Allow users with product management permissions
+  const hasProductAccess =
+    checkUserPermission(user, 'products.update') ||
+    checkUserPermission(user, 'products.create') ||
+    checkUserPermission(user, 'products.view') ||
+    user.role === 'SUPER_ADMIN' ||
+    user.role === 'ADMIN';
+
+  if (!hasProductAccess) {
+    return res.status(403).json({
+      success: false,
+      error: { code: 'FORBIDDEN', message: 'Access denied: Requires product management permissions' }
+    });
+  }
+
+  try {
+    const { name, brand, category, subcategory, flavor, material, price, currentDescription, tone } = req.body;
+
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_TITLE', message: 'Product title is required to generate a description' }
+      });
+    }
+
+    const result = await generateLuxuryProductDescription({
+      name: name.trim(),
+      brand: brand ? String(brand).trim() : undefined,
+      category: category ? String(category).trim() : undefined,
+      subcategory: subcategory ? String(subcategory).trim() : undefined,
+      flavor: flavor ? String(flavor).trim() : undefined,
+      material: material ? String(material).trim() : undefined,
+      price: price !== undefined && price !== '' ? Number(price) : undefined,
+      currentDescription: currentDescription ? String(currentDescription).trim() : undefined,
+      tone
+    });
+
+    return res.json({
+      success: true,
+      message: 'Luxury product description generated successfully',
+      data: result
+    });
+  } catch (err: any) {
+    console.error('[AdminRoutes] Error generating product description:', err);
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: 'AI_GENERATION_FAILED',
+        message: err.message || 'Failed to generate luxury product description'
+      }
+    });
+  }
+};
+
+router.post('/products/generate-description', handleGenerateProductDescription);
+router.post('/generate-description', handleGenerateProductDescription);
+
+// POST /api/admin/products/generate-sku
+// Creates a unique, slug-based SKU (e.g., AH-MODELX-001) based on product title and brand
+router.post('/products/generate-sku', (req: AuthenticatedRequest, res) => {
+  const { name, brand, productId } = req.body || {};
+  const sku = generateUniqueSku(name || '', brand || '', db.products, productId);
+  return res.json({
+    success: true,
+    data: { sku },
+    message: `Generated unique SKU: ${sku}`
+  });
+});
+router.post('/generate-sku', (req: AuthenticatedRequest, res) => {
+  const { name, brand, productId } = req.body || {};
+  const sku = generateUniqueSku(name || '', brand || '', db.products, productId);
+  return res.json({
+    success: true,
+    data: { sku },
+    message: `Generated unique SKU: ${sku}`
   });
 });
 

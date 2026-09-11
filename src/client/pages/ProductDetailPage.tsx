@@ -7,6 +7,7 @@ import { Product, Review } from '../../types/index.js';
 import { sanitizeImageUrl, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/imageFallback.js';
 import { useProductHeadMetadata } from '../hooks/useDocumentMetadata.js';
 import { getBrandUrl, getCategoryUrl } from '../utils/routeHelpers.js';
+import { isBrandSlug } from '../data/brandsData.js';
 import {
   Star,
   ShoppingBag,
@@ -71,8 +72,22 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, cate
     const loadProductData = async (silent = false) => {
       try {
         if (!silent) setLoading(true);
+
+        // If the slug is actually a brand slug (e.g. "nash"), immediately navigate to the brand page
+        if (isBrandSlug(slug)) {
+          onNavigate(getBrandUrl(slug, categorySlug));
+          return;
+        }
+
         const res = await api.getProductBySlug(slug);
         if (res.success && res.data) {
+          // If server responded with a brand fallback, navigate to the brand page
+          if ((res.data as any).isBrandFallback) {
+            const brandSlug = (res.data as any).brand?.slug || slug;
+            onNavigate(getBrandUrl(brandSlug, categorySlug));
+            return;
+          }
+
           setProduct(res.data.product);
           setRelatedProducts(res.data.relatedProducts || []);
           setFrequentlyBoughtTogether(res.data.frequentlyBoughtTogether || []);
@@ -80,8 +95,18 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, cate
           setSelectedImageIdx(0);
           if (res.data.product.flavor) setSelectedFlavor(res.data.product.flavor);
         }
-      } catch (err) {
-        console.error('Failed to load product:', err);
+      } catch (err: any) {
+        // If product was not located, check if it was a brand before giving up
+        try {
+          const brandRes = await api.getBrand(slug);
+          if (brandRes?.success && brandRes.data?.brand) {
+            onNavigate(getBrandUrl(slug, categorySlug));
+            return;
+          }
+        } catch {
+          // brand check failed, continue
+        }
+        console.warn(`Product lookup for "${slug}" was not located:`, err?.message || err);
       } finally {
         if (!silent) setLoading(false);
       }

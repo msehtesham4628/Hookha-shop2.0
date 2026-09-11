@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useStore } from './store/useStore.js';
+import { api } from './services/api.js';
 import { onSync } from './services/sync.js';
 import { LanguageProvider } from './i18n/LanguageContext.js';
 import { Navbar } from './components/Navbar.js';
@@ -36,6 +37,7 @@ export default function App() {
   const [currentPath, setCurrentPath] = useState<string>(window.location.pathname + window.location.search);
   useEffect(() => {
     loadCurrentUser(); loadCart(); loadWishlist(); loadSettings();
+    api.getBrands().catch(() => {});
     const unsubSync = onSync('*', (event) => {
       if (event.type === 'SETTINGS_UPDATED') loadSettings();
       else if (event.type === 'ORDER_PLACED' || event.type === 'INVENTORY_UPDATED') loadCart();
@@ -50,7 +52,13 @@ export default function App() {
     const queryParams = new URLSearchParams(queryString || '');
     if (pathOnly === '/' || pathOnly === '') return <HomePage onNavigate={navigate} />;
     if (pathOnly === '/shop') return <ShopPage key={currentPath} initialCategory={queryParams.get('category') || undefined} initialBrand={queryParams.get('brand') || undefined} initialSearch={queryParams.get('search') || queryParams.get('q') || undefined} initialOnSale={queryParams.get('onSale') === 'true'} initialNewArrival={queryParams.get('newArrival') === 'true'} onNavigate={navigate} />;
-    if (pathOnly.startsWith('/product/')) return <ProductDetailPage slug={pathOnly.replace('/product/', '')} onNavigate={navigate} />;
+    if (pathOnly.startsWith('/product/') || pathOnly.startsWith('/products/')) {
+      const candidateSlug = pathOnly.replace(/^\/products?\//, '');
+      if (isBrandSlug(candidateSlug)) {
+        return <BrandPage brandSlug={candidateSlug} onNavigate={navigate} />;
+      }
+      return <ProductDetailPage slug={candidateSlug} onNavigate={navigate} />;
+    }
     if (pathOnly === '/checkout') return <CheckoutPage onNavigate={navigate} />;
     if (pathOnly === '/order-success') return <OrderSuccessPage orderId={queryParams.get('orderId') || undefined} onNavigate={navigate} />;
     if (pathOnly === '/track-order' || pathOnly === '/order-tracking' || pathOnly === '/track' || pathOnly.startsWith('/track/')) { const orderId = queryParams.get('orderId') || queryParams.get('id') || queryParams.get('query') || (pathOnly.startsWith('/track/') ? pathOnly.replace('/track/', '') : undefined); return <OrderTrackingPage initialOrderId={orderId} onNavigate={navigate} />; }
@@ -187,6 +195,21 @@ export default function App() {
         }
       }
     }
+
+    // Direct brand route: /:brandSlug (e.g. /nash, /tangiers, /alpha-hookah)
+    if (segments.length === 1 && isBrandSlug(segments[0])) {
+      const brandSlug = segments[0];
+      const page = Math.max(1, parseInt(queryParams.get('page') || '1', 10) || 1);
+      return (
+        <BrandPage
+          key={`brand-direct-${brandSlug}-p-${page}`}
+          brandSlug={brandSlug}
+          initialPage={page}
+          onNavigate={navigate}
+        />
+      );
+    }
+
     return <HomePage onNavigate={navigate} />;
   };
   const isAdminRoute = currentPath.startsWith('/admin');
