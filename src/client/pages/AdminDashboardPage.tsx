@@ -278,6 +278,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   const [editStaffStatus, setEditStaffStatus] = useState<'ACTIVE' | 'SUSPENDED'>('ACTIVE');
   const [editStaffPassword, setEditStaffPassword] = useState('');
   const [staffToDelete, setStaffToDelete] = useState<User | null>(null);
+  const [customerToDelete, setCustomerToDelete] = useState<User | null>(null);
 
   const [catalogPage, setCatalogPage] = useState<number>(1);
   const [catalogLimit, setCatalogLimit] = useState<number>(50);
@@ -1215,15 +1216,20 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
   };
 
   const handleUpdateOrderStatus = async (orderId: string, status: any) => {
+    // Optimistically update order in state immediately
+    setOrders(prev => prev.map(o => (o.id === orderId || o.orderNumber === orderId) ? { ...o, status, orderStatus: status } : o));
     try {
       const res = await api.updateOrderStatus(orderId, status);
       if (res.success) {
         showToast(`Order status updated to ${status}`, 'success');
         broadcastSync('ORDER_UPDATED', { orderId, status });
-        loadAllAdminData();
+        if (res.data) {
+          setOrders(prev => prev.map(o => (o.id === orderId || o.orderNumber === orderId) ? { ...o, ...res.data, status: res.data.orderStatus || res.data.status || status, orderStatus: res.data.orderStatus || status } : o));
+        }
       }
     } catch (err: any) {
       showToast(err.message || 'Failed to update order status', 'error');
+      loadAllAdminData();
     }
   };
 
@@ -1236,6 +1242,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
         showToast(`Tracking number ${newTrackingNumber} assigned!`, 'success');
         broadcastSync('ORDER_UPDATED', { orderId: selectedOrderForTracking.id, status: 'SHIPPED', trackingNumber: newTrackingNumber });
         setIsTrackingModalOpen(false);
+        setOrders(prev => prev.map(o => (o.id === selectedOrderForTracking.id || o.orderNumber === selectedOrderForTracking.id) ? { ...o, status: 'SHIPPED', orderStatus: 'SHIPPED', trackingNumber: newTrackingNumber } : o));
         loadAllAdminData();
       }
     } catch (err: any) {
@@ -1358,6 +1365,39 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
       }
     } catch (err: any) {
       showToast(err.message || 'Failed to update staff status', 'error');
+    }
+  };
+
+  const handleToggleCustomerStatus = async (customer: User) => {
+    try {
+      const nextStatus = customer.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
+      setCustomers(prev => prev.map(c => c.id === customer.id ? { ...c, status: nextStatus } : c));
+      const res = await api.toggleSuspendCustomer(customer.id);
+      if (res.success) {
+        showToast(res.message || `Customer status changed to ${nextStatus}`, 'success');
+        loadAllAdminData();
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to update customer status', 'error');
+      loadAllAdminData();
+    }
+  };
+
+  const handleConfirmDeleteCustomer = async () => {
+    if (!customerToDelete) return;
+    const deletedId = customerToDelete.id;
+    const deletedEmail = customerToDelete.email;
+    setCustomers(prev => prev.filter(c => c.id !== deletedId && c.email?.toLowerCase() !== deletedEmail.toLowerCase()));
+    try {
+      const res = await api.deleteAdminCustomer(deletedId);
+      if (res.success) {
+        showToast(`Customer account "${deletedEmail}" deleted permanently`, 'success');
+        setCustomerToDelete(null);
+        loadAllAdminData();
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to delete customer', 'error');
+      loadAllAdminData();
     }
   };
 
@@ -2954,15 +2994,19 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                             <td className="py-3 px-4 font-mono font-bold text-stone-900">${(ord.grandTotal || ord.total || 0).toFixed(2)}</td>
                             <td className="py-3 px-4">
                               <select
-                                value={ord.status || ord.orderStatus}
+                                value={ord.orderStatus || ord.status || 'PLACED'}
                                 onChange={(e) => handleUpdateOrderStatus(ord.id, e.target.value)}
                                 className="bg-stone-50 border border-stone-300 text-xs font-semibold text-amber-900 px-2 py-1 rounded-xs"
                               >
+                                <option value="PLACED">PLACED</option>
+                                <option value="PAYMENT_CONFIRMED">PAYMENT CONFIRMED</option>
                                 <option value="PAID">PAID</option>
                                 <option value="PROCESSING">PROCESSING</option>
+                                <option value="PACKED">PACKED</option>
                                 <option value="SHIPPED">SHIPPED</option>
                                 <option value="DELIVERED">DELIVERED</option>
                                 <option value="CANCELLED">CANCELLED</option>
+                                <option value="REFUNDED">REFUNDED</option>
                               </select>
                             </td>
                             <td className="py-3 px-4 font-mono text-[11px] text-stone-600">
@@ -3023,7 +3067,9 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                           <th className="py-3 px-4">Delivery Address</th>
                           <th className="py-3 px-4">Activity</th>
                           <th className="py-3 px-4">Age Status</th>
+                          <th className="py-3 px-4">Status</th>
                           <th className="py-3 px-4">Joined</th>
+                          <th className="py-3 px-4 text-right">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-stone-100">
@@ -3068,7 +3114,32 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
                                 <ShieldCheck className="w-3.5 h-3.5" /> 21+ Verified
                               </span>
                             </td>
+                            <td className="py-3 px-4">
+                              <button
+                                type="button"
+                                onClick={() => handleToggleCustomerStatus(c)}
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition-colors ${
+                                  c.status === 'SUSPENDED'
+                                    ? 'bg-rose-100 text-rose-800 hover:bg-rose-200'
+                                    : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                                }`}
+                                title="Click to toggle status"
+                              >
+                                {c.status || 'ACTIVE'}
+                              </button>
+                            </td>
                             <td className="py-3 px-4 text-stone-400 text-[11px]">{new Date(c.createdAt).toLocaleDateString()}</td>
+                            <td className="py-3 px-4 text-right">
+                              <button
+                                type="button"
+                                onClick={() => setCustomerToDelete(c)}
+                                className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-xs transition-colors cursor-pointer inline-flex items-center gap-1 text-[11px] font-semibold"
+                                title="Delete customer permanently"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">Delete</span>
+                              </button>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -4255,6 +4326,55 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ onNavigate }
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Revoke & Delete Staff</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {customerToDelete && (
+        <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-300 rounded-sm shadow-2xl max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center gap-3 border-b border-stone-100 pb-3">
+              <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5 text-rose-600" />
+              </div>
+              <div>
+                <h3 className="font-serif text-base font-bold text-stone-900">Delete User / Customer</h3>
+                <p className="text-xs text-stone-500">Permanent account removal</p>
+              </div>
+            </div>
+
+            <div className="bg-stone-50 border border-stone-200 rounded-xs p-3 space-y-1.5 text-xs">
+              <p className="text-stone-700">
+                Are you sure you want to permanently delete customer{' '}
+                <strong className="text-stone-900">{customerToDelete.firstName} {customerToDelete.lastName}</strong>?
+              </p>
+              <div className="font-mono text-[11px] text-stone-600 bg-white p-2 rounded border border-stone-200 space-y-0.5">
+                <div>Email: <span className="font-bold text-stone-800">{customerToDelete.email}</span></div>
+                <div>ID: <span className="text-stone-500">{customerToDelete.id}</span></div>
+                {customerToDelete.phone && <div>Phone: <span className="font-bold text-stone-800">{customerToDelete.phone}</span></div>}
+              </div>
+              <p className="text-rose-600 text-[11px] font-medium pt-1">
+                ⚠️ This will permanently remove the user, blacklist their email from reviving or signing back in, and revoke all active sessions.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setCustomerToDelete(null)}
+                className="bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold px-4 py-2 rounded-xs cursor-pointer transition-colors text-xs"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteCustomer}
+                className="bg-rose-600 hover:bg-rose-700 text-white font-semibold px-4 py-2 rounded-xs cursor-pointer transition-colors text-xs flex items-center gap-1.5 shadow-xs"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete Permanently</span>
               </button>
             </div>
           </div>

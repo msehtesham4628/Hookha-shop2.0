@@ -35,11 +35,7 @@ const checkoutSchema = z.object({
   paymentMethod: z.enum([
     'STRIPE',
     'STRIPE_CREDIT_CARD',
-    'CREDIT_CARD',
-    'CASH_ON_DELIVERY',
-    'BANK_TRANSFER',
-    'ZELLE_CRYPTO',
-    'TEST_INSTANT'
+    'CREDIT_CARD'
   ]).default('STRIPE_CREDIT_CARD'),
   cardDetails: z.object({
     cardNumber: z.string().optional(),
@@ -213,19 +209,9 @@ router.post('/create-payment', optionalAuthenticateToken, async (req: Authentica
       phone: billingAddress.phone || customerPhone || fullShipping.phone
     } : { ...fullShipping, id: `addr-b-${Date.now()}` };
 
-    const isInstantPaid = paymentMethod === 'TEST_INSTANT';
-    const isCod = paymentMethod === 'CASH_ON_DELIVERY';
-    const isBank = paymentMethod === 'BANK_TRANSFER';
-    const isZelle = paymentMethod === 'ZELLE_CRYPTO';
-
-    const initialPaymentStatus = isInstantPaid ? 'PAID' : 'PENDING';
-    const initialOrderStatus = isInstantPaid ? 'PROCESSING' : 'PLACED';
-
-    let initialTimelineNote = 'Customer initiated checkout with verified stock reservation';
-    if (isInstantPaid) initialTimelineNote = 'Instant Sandbox test payment successfully cleared & verified';
-    if (isCod) initialTimelineNote = 'Cash on Delivery (COD) selected - Payment to be collected by parcel courier';
-    if (isBank) initialTimelineNote = 'Direct Bank Wire / ACH selected - Wire routing instructions sent';
-    if (isZelle) initialTimelineNote = 'Zelle / Crypto Instant Pay selected';
+    const initialPaymentStatus = 'PENDING';
+    const initialOrderStatus = 'PLACED';
+    const initialTimelineNote = 'Customer initiated checkout with Stripe payment gateway';
 
     const newOrder: Order = {
       id: orderId,
@@ -243,9 +229,10 @@ router.post('/create-payment', optionalAuthenticateToken, async (req: Authentica
       tax: cart.estimatedTax,
       total: cart.grandTotal,
       couponCode: cart.couponCode,
-      paymentMethod,
+      paymentMethod: 'STRIPE_CREDIT_CARD',
       paymentStatus: initialPaymentStatus,
       orderStatus: initialOrderStatus,
+      status: initialOrderStatus,
       timeline: [
         {
           status: initialOrderStatus,
@@ -283,10 +270,6 @@ router.post('/create-payment', optionalAuthenticateToken, async (req: Authentica
     const { clientSecret, paymentIntentId } = await paymentService.createPaymentIntent(orderId, amountInCents);
 
     newOrder.paymentIntentId = paymentIntentId;
-
-    if (isInstantPaid) {
-      await paymentService.processOrderPaymentSuccess(orderId, paymentIntentId, 'Instant Sandbox');
-    }
 
     return res.status(201).json({
       success: true,

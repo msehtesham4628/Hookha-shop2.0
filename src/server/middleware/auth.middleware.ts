@@ -39,13 +39,23 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
     });
   }
 
-  let user = db.users.find(u => u.id === payload.userId);
-  if (!user && payload.email) {
-    user = db.users.find(u => u.email.toLowerCase() === payload.email.toLowerCase());
+  if (db.isUserDeleted(payload.userId) || (payload.email && db.isUserDeleted(payload.email))) {
+    return res.status(401).json({
+      success: false,
+      error: {
+        code: 'ACCOUNT_DELETED',
+        message: 'This account has been deleted or deactivated.'
+      }
+    });
   }
 
-  // If memory store restarted but client holds a cryptographically valid token, restore session
+  let user = db.users.find(u => u.id === payload.userId && !db.isUserDeleted(u.id) && !db.isUserDeleted(u.email));
   if (!user && payload.email) {
+    user = db.users.find(u => u.email.toLowerCase() === payload.email.toLowerCase() && !db.isUserDeleted(u.id) && !db.isUserDeleted(u.email));
+  }
+
+  // If memory store restarted but client holds a cryptographically valid token, restore session (ONLY IF NOT DELETED)
+  if (!user && payload.email && !db.isUserDeleted(payload.userId) && !db.isUserDeleted(payload.email)) {
     const parts = (payload.name || '').split(' ');
     const firstName = parts[0] || 'VIP';
     const lastName = parts.slice(1).join(' ') || 'Member';

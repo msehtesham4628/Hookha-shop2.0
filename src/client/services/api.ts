@@ -596,6 +596,18 @@ class ApiClient {
     });
   }
 
+  public async deleteAdminCustomer(id: string) {
+    return this.request<{ success: boolean; message: string }>(`/admin/customers/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
+  public async deleteAdminUser(id: string) {
+    return this.request<{ success: boolean; message: string }>(`/admin/users/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
   public async getAdminInventory() {
     return this.request<{ success: boolean; data: any }>('/admin/inventory');
   }

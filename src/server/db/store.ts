@@ -305,6 +305,13 @@ export class DatabaseStore {
     return deletedSet.has(target.replace(/^brand-/, ''));
   }
 
+  public isUserDeleted(idOrEmail?: string): boolean {
+    if (!idOrEmail) return false;
+    const clean = String(idOrEmail).toLowerCase().trim();
+    const deletedSet = new Set((this.persistenceData.deletedUserIds || []).map(s => s.toLowerCase().trim()));
+    return deletedSet.has(clean);
+  }
+
   public applyPersistence() {
     const deletedCouponSet = new Set(this.persistenceData.deletedCouponIds);
     const deletedUserSet = new Set(this.persistenceData.deletedUserIds);
@@ -365,9 +372,9 @@ export class DatabaseStore {
     }
     this.coupons = Array.from(couponMap.values());
 
-    this.users = this.users.filter(u => !deletedUserSet.has(u.id));
+    this.users = this.users.filter(u => !this.isUserDeleted(u.id) && !this.isUserDeleted(u.email));
     for (const [id, override] of Object.entries(this.persistenceData.userOverrides)) {
-      if (deletedUserSet.has(id)) continue;
+      if (this.isUserDeleted(id) || this.isUserDeleted(override.email)) continue;
       const idx = this.users.findIndex(u => u.id === id);
       if (idx !== -1) {
         this.users[idx] = { ...this.users[idx], ...override };
@@ -580,8 +587,7 @@ export class DatabaseStore {
     ];
 
     // Never resurrect a user whose deletion is recorded in durable persistence.
-    const deletedUserSet = new Set((this.persistenceData.deletedUserIds || []).map(id => id.toLowerCase().trim()));
-    this.users = this.users.filter(u => !deletedUserSet.has(u.id.toLowerCase().trim()));
+    this.users = this.users.filter(u => !this.isUserDeleted(u.id) && !this.isUserDeleted(u.email));
   }
 
   public async init() {
@@ -942,7 +948,8 @@ export class DatabaseStore {
       this.settings = { ...this.settings, ...(doc as any) };
     } else if (collection === 'users' && id) {
       const u = doc as any as User;
-      this.persistenceData.deletedUserIds = this.persistenceData.deletedUserIds.filter(uid => uid !== id);
+      const lowerEmail = u.email ? u.email.toLowerCase().trim() : '';
+      this.persistenceData.deletedUserIds = this.persistenceData.deletedUserIds.filter(uid => uid !== id && (!lowerEmail || uid.toLowerCase().trim() !== lowerEmail));
       this.persistenceData.userOverrides[id] = u;
       const idx = this.users.findIndex(item => item.id === id);
       if (idx !== -1) {
@@ -1022,12 +1029,28 @@ export class DatabaseStore {
       }
       delete this.persistenceData.couponOverrides[id];
       this.coupons = this.coupons.filter(c => c.id !== id);
-    } else if (collection === 'users' && id) {
-      if (!this.persistenceData.deletedUserIds.includes(id)) {
-        this.persistenceData.deletedUserIds.push(id);
+    } else if (collection === 'users' && (id || filter?.email)) {
+      const keysToAdd = [id, filter?.email].filter(Boolean) as string[];
+      for (const k of keysToAdd) {
+        const trimmed = k.trim();
+        const lower = trimmed.toLowerCase();
+        if (!this.persistenceData.deletedUserIds.includes(trimmed)) {
+          this.persistenceData.deletedUserIds.push(trimmed);
+        }
+        if (!this.persistenceData.deletedUserIds.includes(lower)) {
+          this.persistenceData.deletedUserIds.push(lower);
+        }
       }
-      delete this.persistenceData.userOverrides[id];
-      this.users = this.users.filter(u => u.id !== id);
+      if (id) delete this.persistenceData.userOverrides[id];
+      if (filter?.email) {
+        const lowerEmail = filter.email.toLowerCase().trim();
+        for (const [k, u] of Object.entries(this.persistenceData.userOverrides)) {
+          if (u.email && u.email.toLowerCase().trim() === lowerEmail) {
+            delete this.persistenceData.userOverrides[k];
+          }
+        }
+      }
+      this.users = this.users.filter(u => !this.isUserDeleted(u.id) && !this.isUserDeleted(u.email));
     }
 
     // Keep the local persistence snapshot for non-Mongo environments, but also

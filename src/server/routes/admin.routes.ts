@@ -694,8 +694,11 @@ router.put('/orders/:id/status', requirePermission('orders.update'), async (req:
     return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Order not found' } });
   }
 
-  const prevStatus = order.orderStatus;
-  if (status) order.orderStatus = status as OrderStatus;
+  const prevStatus = order.orderStatus || order.status;
+  if (status) {
+    order.orderStatus = status as OrderStatus;
+    order.status = status;
+  }
   if (trackingNumber) order.trackingNumber = trackingNumber;
   if (carrier) order.carrier = carrier;
 
@@ -788,6 +791,39 @@ router.post('/customers/:id/suspend', requirePermission('customers.suspend'), as
     message: `Customer account is now ${customer.status}`,
     data: { id: customer.id, status: customer.status }
   });
+});
+
+// DELETE /api/admin/customers/:id
+router.delete('/customers/:id', requirePermission('customers.delete'), async (req: AuthenticatedRequest, res) => {
+  const currentUser = req.user!;
+  const { id } = req.params;
+
+  const targetIndex = db.users.findIndex(u => u.id === id || u.email.toLowerCase() === id.toLowerCase());
+  if (targetIndex === -1) {
+    return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Customer account not found' } });
+  }
+
+  const targetCustomer = db.users[targetIndex];
+  if (targetCustomer.role === 'SUPER_ADMIN' || targetCustomer.id === 'usr-ehtesham-root' || targetCustomer.email.toLowerCase() === 'ehtesham4628@gmail.com') {
+    return res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Root administrator account cannot be deleted.' } });
+  }
+
+  if (targetCustomer.id === currentUser.id) {
+    return res.status(400).json({ success: false, error: { code: 'SELF_DELETE', message: 'You cannot delete your own account.' } });
+  }
+
+  db.users.splice(targetIndex, 1);
+  await db.deletePersisted('users', { id: targetCustomer.id, email: targetCustomer.email });
+
+  db.logAudit(
+    { id: currentUser.id, name: `${currentUser.firstName} ${currentUser.lastName}`, role: currentUser.role, ip: req.ip },
+    'ADMIN_DELETED_CUSTOMER',
+    'USER',
+    targetCustomer.id,
+    { email: targetCustomer.email, name: `${targetCustomer.firstName} ${targetCustomer.lastName}` }
+  );
+
+  return res.json({ success: true, message: 'Customer account deleted permanently' });
 });
 
 // ==========================================
@@ -1324,7 +1360,7 @@ router.delete('/staff/:id', requirePermission('staff.delete'), async (req: Authe
   }
 
   db.users.splice(targetStaffIndex, 1);
-  await db.deletePersisted('users', { id });
+  await db.deletePersisted('users', { id: targetStaff.id, email: targetStaff.email });
 
   db.logAudit(
     { id: currentUser.id, name: `${currentUser.firstName} ${currentUser.lastName}`, role: currentUser.role, ip: req.ip },
@@ -1335,6 +1371,39 @@ router.delete('/staff/:id', requirePermission('staff.delete'), async (req: Authe
   );
 
   return res.json({ success: true, message: 'Staff member removed successfully' });
+});
+
+// DELETE /api/admin/users/:id
+router.delete('/users/:id', async (req: AuthenticatedRequest, res) => {
+  const currentUser = req.user!;
+  const { id } = req.params;
+
+  const targetIndex = db.users.findIndex(u => u.id === id || u.email.toLowerCase() === id.toLowerCase());
+  if (targetIndex === -1) {
+    return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'User not found' } });
+  }
+
+  const targetUser = db.users[targetIndex];
+  if (targetUser.role === 'SUPER_ADMIN' || targetUser.id === 'usr-ehtesham-root' || targetUser.email.toLowerCase() === 'ehtesham4628@gmail.com') {
+    return res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Root Super Admin account cannot be deleted.' } });
+  }
+
+  if (targetUser.id === currentUser.id) {
+    return res.status(400).json({ success: false, error: { code: 'SELF_DELETE', message: 'You cannot delete your own account.' } });
+  }
+
+  db.users.splice(targetIndex, 1);
+  await db.deletePersisted('users', { id: targetUser.id, email: targetUser.email });
+
+  db.logAudit(
+    { id: currentUser.id, name: `${currentUser.firstName} ${currentUser.lastName}`, role: currentUser.role, ip: req.ip },
+    'ADMIN_DELETED_USER',
+    'USER',
+    targetUser.id,
+    { email: targetUser.email, role: targetUser.role }
+  );
+
+  return res.json({ success: true, message: 'User account deleted successfully' });
 });
 
 // ==========================================

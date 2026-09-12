@@ -56,8 +56,7 @@ export function isServerless(): boolean {
     process.env.VERCEL ||
     process.env.VERCEL_ENV ||
     process.env.AWS_LAMBDA_FUNCTION_NAME ||
-    process.env.LAMBDA_TASK_ROOT ||
-    (process.env.NODE_ENV === 'production' && !process.env.LOCAL_DEV)
+    process.env.LAMBDA_TASK_ROOT
   );
 }
 

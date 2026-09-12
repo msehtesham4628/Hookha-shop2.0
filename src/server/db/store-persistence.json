@@ -175,6 +175,51 @@
         "Al Fakher"
       ],
       "updatedAt": "2026-09-07T10:11:07.112Z"
+    },
+    "whm-wto-passionfruit-20gr": {
+      "_id": "6aa1588e8d145f5a07e11f39",
+      "id": "whm-wto-passionfruit-20gr",
+      "name": "WTO Passionfruit 20gr",
+      "slug": "wto-passionfruit-20gr",
+      "sku": "",
+      "description": "Description WTO Hookah Tobacco – Buy Online in the USA WTO (World Tobacco Original) is a premium Russian hookah tobacco brand known for its natural ingredients, bold taste, and authentic approach to blending. Created for experienced smokers, WTO offers strong, rich flavors with excellent heat resistance and long-lasting sessions. It’s a top choice for those who value quality and depth in every puff. Popular WTO Flavors The WTO lineup includes unique and complex blends. Some of the most popular flavors are: WTO Black Currant – a signature black currant blend WTO Cola – refreshing cola flavor WTO Guava – oriental guava flavor WTO Lychee – Strawberry – sweet mix of ripe strawberry and tasty lychee fruits Why Choose WTO? Premium Russian production with focus on natural quality. Rich, strong flavors crafted for seasoned smokers. Excellent heat resistance for long-lasting sessions. Unique and complex blends unlike mass-market tobaccos. WTO vs. Other Hookah Brands Compared to brands like MUSTHAVE or Darkside , WTO stands out with its strength, natural approach, and flavor complexity, making it the perfect choice for experienced hookah enthusiasts.",
+      "shortDescription": "Description WTO Hookah Tobacco – Buy Online in the USA WTO (World Tobacco Original) is a premium Russian hookah tobacco brand known for its natural ingredients, bold taste, and authentic approach to blending. Created for experienced smokers",
+      "price": 15,
+      "currency": "USD",
+      "brand": "WTO",
+      "brandSlug": "wto",
+      "category": "Vapes",
+      "categorySlug": "vapes",
+      "images": [
+        {
+          "id": "wto-passionfruit-20gr-image-1",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/11/passionfruit-900x600-1.jpeg.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2023/11/passionfruit-900x600-1.jpeg.webp",
+          "alt": "WTO Passionfruit 20gr product image 1",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ],
+      "stock": 101,
+      "lowStockThreshold": 5,
+      "tags": [
+        "Vapes",
+        "WTO"
+      ],
+      "specifications": [],
+      "rating": 0,
+      "reviewCount": 0,
+      "isFeatured": false,
+      "isNewArrival": false,
+      "isBestSeller": false,
+      "isOnSale": false,
+      "isActive": true,
+      "ageRestricted": true,
+      "seoTitle": "WTO Passionfruit 20gr | Fumare Hookah",
+      "seoDescription": "Description WTO Hookah Tobacco – Buy Online in the USA WTO (World Tobacco Original) is a premium Russian hookah tobacco brand known for its natural ingredi",
+      "sourceUrl": "https://worldhookahmarket.com/product/wto-passionfruit-20gr",
+      "createdAt": "2026-09-09T12:26:49.648Z",
+      "updatedAt": "2026-09-12T01:56:38.045Z"
     }
   },
   "deletedCategoryIds": [
@@ -256,7 +301,7 @@
       "paymentMethod": "STRIPE",
       "paymentStatus": "PAID",
       "paymentIntentId": "pi_test_983719283719",
-      "orderStatus": "PAID",
+      "orderStatus": "DELIVERED",
       "trackingNumber": "9400111899223397612345",
       "carrier": "FedEx Priority Overnight",
       "timeline": [
@@ -289,10 +334,114 @@
           "timestamp": "2026-09-11T08:22:56.074Z",
           "note": "Status modified from SHIPPED to PAID",
           "actor": "Ehtesham Admin"
+        },
+        {
+          "status": "DELIVERED",
+          "timestamp": "2026-09-12T01:52:45.203Z",
+          "note": "Status modified from PAID to DELIVERED",
+          "actor": "Ehtesham Admin"
         }
       ],
       "createdAt": "2026-03-01T09:20:00Z",
-      "updatedAt": "2026-09-11T08:22:56.074Z"
+      "updatedAt": "2026-09-12T01:52:45.203Z"
+    },
+    "ord-1002": {
+      "_id": "6aa1588d8d145f5a07e10897",
+      "id": "ord-1002",
+      "orderNumber": "SLT-2026-1002",
+      "userId": "usr-customer-1",
+      "customerName": "Julian Vance",
+      "customerEmail": "customer@example.com",
+      "customerPhone": "+1 (555) 219-4402",
+      "items": [
+        {
+          "productId": "prod-kaloud-lotus-plus",
+          "productName": "Kaloud Lotus I+ Heat Management Device (Silver Nectar)",
+          "productSku": "KLD-LOT-SLV",
+          "productImage": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=400&auto=format&fit=crop",
+          "price": 54.95,
+          "quantity": 1,
+          "subtotal": 54.95
+        },
+        {
+          "productId": "prod-alpaca-symphony",
+          "productName": "Alpaca Symphony Hand-Thrown Clay Phunnel Bowl",
+          "productSku": "ALP-BOWL-SYM",
+          "productImage": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=400&auto=format&fit=crop",
+          "price": 29.99,
+          "quantity": 1,
+          "subtotal": 29.99
+        },
+        {
+          "productId": "prod-cocourth-cubes-26mm",
+          "productName": "CocoUrth 100% Organic Coconut Charcoal (26mm Cubes - 1kg)",
+          "productSku": "COCO-26MM-1KG",
+          "productImage": "https://images.unsplash.com/photo-1543083477-4f785aeafaa9?q=80&w=400&auto=format&fit=crop",
+          "price": 14.5,
+          "quantity": 2,
+          "subtotal": 29
+        }
+      ],
+      "shippingAddress": {
+        "id": "addr-1",
+        "userId": "usr-customer-1",
+        "fullName": "Julian Vance",
+        "addressLine1": "742 Evergreen Terrace",
+        "addressLine2": "Apt 4B",
+        "city": "Beverly Hills",
+        "state": "CA",
+        "postalCode": "90210",
+        "country": "United States",
+        "phone": "+1 (555) 219-4402",
+        "isDefault": true
+      },
+      "billingAddress": {
+        "id": "addr-1",
+        "userId": "usr-customer-1",
+        "fullName": "Julian Vance",
+        "addressLine1": "742 Evergreen Terrace",
+        "addressLine2": "Apt 4B",
+        "city": "Beverly Hills",
+        "state": "CA",
+        "postalCode": "90210",
+        "country": "United States",
+        "phone": "+1 (555) 219-4402",
+        "isDefault": true
+      },
+      "subtotal": 113.94,
+      "discount": 17.09,
+      "couponCode": "WELCOME15",
+      "shippingFee": 0,
+      "tax": 8.23,
+      "total": 105.08,
+      "paymentMethod": "STRIPE",
+      "paymentStatus": "PAID",
+      "orderStatus": "DELIVERED",
+      "timeline": [
+        {
+          "status": "PLACED",
+          "timestamp": "2026-02-26T10:15:00Z",
+          "note": "Customer applied coupon WELCOME15"
+        },
+        {
+          "status": "PAYMENT_CONFIRMED",
+          "timestamp": "2026-02-26T10:16:00Z",
+          "note": "Stripe charge verified"
+        },
+        {
+          "status": "PROCESSING",
+          "timestamp": "2026-02-26T11:00:00Z",
+          "note": "Fragile packing in progress"
+        },
+        {
+          "status": "DELIVERED",
+          "timestamp": "2026-09-12T01:52:53.922Z",
+          "note": "Status modified from PROCESSING to DELIVERED",
+          "actor": "Ehtesham Admin"
+        }
+      ],
+      "createdAt": "2026-02-26T10:15:00Z",
+      "updatedAt": "2026-09-12T01:52:53.922Z"
     }
   },
   "settingsOverride": null,
@@ -303,7 +452,8 @@
     "usr-super-admin-2",
     "usr-product-manager-1",
     "usr-manager-2",
-    "usr-support-1"
+    "usr-support-1",
+    "usr-inzy-admin"
   ],
   "userOverrides": {
     "usr-ehtesham-root": {

@@ -328,16 +328,17 @@ class MongoDatabaseService {
         // Hydrate users
         const mongoUsers = await this.getDocuments<User & { passwordHash?: string }>('users');
         if (mongoUsers.length > 0) {
-          const deletedUserSet = new Set((store.persistenceData?.deletedUserIds || []).map((id: string) => id.toLowerCase().trim()));
-          const activeMongoUsers = mongoUsers.filter((u: any) => !deletedUserSet.has(String(u.id || '').toLowerCase().trim()));
+          const activeMongoUsers = mongoUsers.filter((u: any) => !store.isUserDeleted(u.id) && !store.isUserDeleted(u.email));
           const userMap = new Map<string, User & { passwordHash?: string }>();
           for (const u of store.users) {
-            userMap.set(u.email.toLowerCase(), u);
+            if (!store.isUserDeleted(u.id) && !store.isUserDeleted(u.email)) {
+              userMap.set(u.email.toLowerCase(), u);
+            }
           }
           for (const u of activeMongoUsers) {
             userMap.set(u.email.toLowerCase(), u);
           }
-          store.users = Array.from(userMap.values()).filter((u: any) => !deletedUserSet.has(String(u.id || '').toLowerCase().trim()));
+          store.users = Array.from(userMap.values()).filter((u: any) => !store.isUserDeleted(u.id) && !store.isUserDeleted(u.email));
         }
 
         // Hydrate orders
