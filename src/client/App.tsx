@@ -59,7 +59,7 @@ export default function App() {
       }
       return <ProductDetailPage slug={candidateSlug} onNavigate={navigate} />;
     }
-    if (pathOnly === '/checkout') return <CheckoutPage onNavigate={navigate} />;
+    if (pathOnly === '/checkout' || pathOnly === '/cart' || pathOnly === '/bag') return <CheckoutPage onNavigate={navigate} />;
     if (pathOnly === '/order-success') return <OrderSuccessPage orderId={queryParams.get('orderId') || undefined} onNavigate={navigate} />;
     if (pathOnly === '/track-order' || pathOnly === '/order-tracking' || pathOnly === '/track' || pathOnly.startsWith('/track/')) { const orderId = queryParams.get('orderId') || queryParams.get('id') || queryParams.get('query') || (pathOnly.startsWith('/track/') ? pathOnly.replace('/track/', '') : undefined); return <OrderTrackingPage initialOrderId={orderId} onNavigate={navigate} />; }
     if (pathOnly === '/dashboard') return <DashboardPage onNavigate={navigate} />;

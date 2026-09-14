@@ -220,6 +220,157 @@
       "sourceUrl": "https://worldhookahmarket.com/product/wto-passionfruit-20gr",
       "createdAt": "2026-09-09T12:26:49.648Z",
       "updatedAt": "2026-09-12T01:56:38.045Z"
+    },
+    "prod-geekbar-pulse-watermelon-ice": {
+      "_id": "6aa1588e8d145f5a07e1352d",
+      "id": "prod-geekbar-pulse-watermelon-ice",
+      "name": "Geek Bar Pulse 15000 Puffs Disposable Vape – Watermelon Ice",
+      "slug": "geek-bar-pulse-15000-puffs-disposable-vape-watermelon-ice",
+      "sku": "GBP-15K-01",
+      "description": "The best-selling disposable vape on the market! Geek Bar Pulse features dual core technology with two firing modes: Regular Mode (15,000 puffs) and Pulse Mode (7,500 puffs for enhanced flavor and 20W vapor production). Features a full-screen smart capsule display with battery percentage and e-liquid level animations.",
+      "shortDescription": "15,000 puff smart screen disposable vape with dual mesh coil & Pulse mode.",
+      "price": 18.99,
+      "currency": "USD",
+      "brand": "Geek Bar",
+      "brandSlug": "geek-bar",
+      "category": "Vapes",
+      "categorySlug": "vapes",
+      "subcategory": "Disposable Vapes",
+      "images": [
+        {
+          "id": "img-gb-1",
+          "url": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1000&auto=format&fit=crop",
+          "thumbnailUrl": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=400&auto=format&fit=crop",
+          "alt": "Geek Bar Pulse 15000 Watermelon Ice",
+          "isPrimary": true,
+          "sortOrder": 1
+        }
+      ],
+      "stock": 57,
+      "lowStockThreshold": 15,
+      "material": "Polycarbonate Transparent Shell",
+      "tags": [
+        "Geek Bar",
+        "Vapes",
+        "Pulse 15K",
+        "Watermelon Ice",
+        "Smart Screen",
+        "Best Seller"
+      ],
+      "specifications": [
+        {
+          "label": "Puff Capacity",
+          "value": "15,000 Puffs (Regular) / 7,500 Puffs (Pulse Mode)"
+        },
+        {
+          "label": "Screen Display",
+          "value": "Full Display with E-Liquid & Battery Meters"
+        },
+        {
+          "label": "Coil System",
+          "value": "Dual Mesh Heating Element"
+        },
+        {
+          "label": "Battery",
+          "value": "650mAh Type-C Fast Rechargeable"
+        }
+      ],
+      "rating": 4.9,
+      "reviewCount": 230,
+      "isFeatured": true,
+      "isNewArrival": false,
+      "isBestSeller": true,
+      "isOnSale": false,
+      "isActive": true,
+      "ageRestricted": true,
+      "createdAt": "2026-09-03T02:58:25.621Z",
+      "updatedAt": "2026-09-03T02:58:25.621Z"
+    },
+    "prod-nash-raspberry-100gr": {
+      "_id": "6aa1588e8d145f5a07e11f4d",
+      "id": "prod-nash-raspberry-100gr",
+      "name": "Nash Raspberry 100gr",
+      "slug": "nash-raspberry-100gr",
+      "sku": "N-1001",
+      "description": "Nash Raspberry – rich sugar raspberry, with a pleasant sourness. Moderately sweet and overly tasty. It feels like you are popping a real raspberry! Great for solo smokes as well as mixes.",
+      "shortDescription": "Nash Raspberry – rich sugar raspberry, with a pleasant sourness. Moderately sweet and overly tasty. It feels like you are poppi...",
+      "price": 20,
+      "currency": "USD",
+      "brand": "Nash",
+      "brandSlug": "nash",
+      "category": "Tobacco",
+      "categorySlug": "tobacco",
+      "subcategory": "Dark Leaf Tobacco",
+      "images": [
+        {
+          "id": "img-1-0",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+          "alt": "Nash Raspberry 100gr",
+          "isPrimary": true,
+          "sortOrder": 1
+        },
+        {
+          "id": "img-1-1",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v.jpg.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v.jpg.webp",
+          "alt": "Nash Raspberry 100gr",
+          "isPrimary": false,
+          "sortOrder": 2
+        },
+        {
+          "id": "img-1-2",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/cyrqjQ_nLvXd-vsoDvLv88U6JlsSg8llvLIK-VmJn49TY0sOvxGqPXshziAQNQRnQXqksT5FnZrbnaCbFEherik2-2-324x324.jpg.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/cyrqjQ_nLvXd-vsoDvLv88U6JlsSg8llvLIK-VmJn49TY0sOvxGqPXshziAQNQRnQXqksT5FnZrbnaCbFEherik2-2-324x324.jpg.webp",
+          "alt": "Nash Raspberry 100gr",
+          "isPrimary": false,
+          "sortOrder": 3
+        },
+        {
+          "id": "img-1-3",
+          "url": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/WHM_Catalog-5_perede-324x324.jpg.webp",
+          "thumbnailUrl": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2021/06/WHM_Catalog-5_perede-324x324.jpg.webp",
+          "alt": "Nash Raspberry 100gr",
+          "isPrimary": false,
+          "sortOrder": 4
+        }
+      ],
+      "stock": 7,
+      "lowStockThreshold": 5,
+      "material": "Burley, Virginia & Cigar Leaf",
+      "tags": [
+        "Nash",
+        "Tobacco",
+        "Dark Leaf Tobacco"
+      ],
+      "specifications": [
+        {
+          "label": "Brand",
+          "value": "Nash"
+        },
+        {
+          "label": "Category",
+          "value": "Tobacco"
+        },
+        {
+          "label": "Material / Craft",
+          "value": "Burley, Virginia & Cigar Leaf"
+        },
+        {
+          "label": "Authenticity",
+          "value": "100% Genuine Certified"
+        }
+      ],
+      "rating": 4.7,
+      "reviewCount": 17,
+      "isFeatured": false,
+      "isNewArrival": true,
+      "isBestSeller": false,
+      "isOnSale": false,
+      "isActive": true,
+      "ageRestricted": true,
+      "createdAt": "2026-09-03T00:24:50.728Z",
+      "updatedAt": "2026-09-03T01:24:50.728Z"
     }
   },
   "deletedCategoryIds": [
@@ -442,6 +593,351 @@
       ],
       "createdAt": "2026-02-26T10:15:00Z",
       "updatedAt": "2026-09-12T01:52:53.922Z"
+    },
+    "ord-1004": {
+      "_id": "6aa1588d8d145f5a07e10899",
+      "id": "ord-1004",
+      "orderNumber": "SLT-2026-1004",
+      "userId": "usr-customer-1",
+      "customerName": "Julian Vance",
+      "customerEmail": "customer@example.com",
+      "customerPhone": "+1 (555) 219-4402",
+      "items": [
+        {
+          "productId": "prod-wookah-classic-walnut",
+          "productName": "Wookah Classic Walnut Hookah Body & Crystal Vase",
+          "productSku": "WKH-WLN-02",
+          "productImage": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=400&auto=format&fit=crop",
+          "price": 395,
+          "quantity": 1,
+          "subtotal": 395
+        }
+      ],
+      "shippingAddress": {
+        "id": "addr-1",
+        "userId": "usr-customer-1",
+        "fullName": "Julian Vance",
+        "addressLine1": "742 Evergreen Terrace",
+        "addressLine2": "Apt 4B",
+        "city": "Beverly Hills",
+        "state": "CA",
+        "postalCode": "90210",
+        "country": "United States",
+        "phone": "+1 (555) 219-4402",
+        "isDefault": true
+      },
+      "billingAddress": {
+        "id": "addr-1",
+        "userId": "usr-customer-1",
+        "fullName": "Julian Vance",
+        "addressLine1": "742 Evergreen Terrace",
+        "addressLine2": "Apt 4B",
+        "city": "Beverly Hills",
+        "state": "CA",
+        "postalCode": "90210",
+        "country": "United States",
+        "phone": "+1 (555) 219-4402",
+        "isDefault": true
+      },
+      "subtotal": 395,
+      "discount": 25,
+      "shippingFee": 0,
+      "tax": 31.45,
+      "total": 401.45,
+      "paymentMethod": "STRIPE",
+      "paymentStatus": "PAID",
+      "paymentIntentId": "pi_test_102938475612",
+      "orderStatus": "PROCESSING",
+      "trackingNumber": "DHL9823410948",
+      "carrier": "DHL Express Worldwide Air",
+      "timeline": [
+        {
+          "status": "PLACED",
+          "timestamp": "2026-03-02T08:00:00Z",
+          "note": "Order placed by client",
+          "actor": "Julian Vance"
+        },
+        {
+          "status": "PAYMENT_CONFIRMED",
+          "timestamp": "2026-03-02T08:01:00Z",
+          "note": "Payment processed",
+          "actor": "System"
+        },
+        {
+          "status": "PROCESSING",
+          "timestamp": "2026-03-02T09:30:00Z",
+          "note": "Quality check completed",
+          "actor": "Dmitri Volkov"
+        },
+        {
+          "status": "SHIPPED",
+          "timestamp": "2026-03-03T11:00:00Z",
+          "note": "Departed sorting facility in Cincinnati",
+          "actor": "DHL Air Logistics"
+        },
+        {
+          "status": "OUT_FOR_DELIVERY",
+          "timestamp": "2026-03-04T07:45:00Z",
+          "note": "With courier for final delivery today before 5:00 PM. Signature required.",
+          "actor": "DHL Courier"
+        },
+        {
+          "status": "PROCESSING",
+          "timestamp": "2026-09-12T02:06:00.605Z",
+          "note": "Status modified from OUT_FOR_DELIVERY to PROCESSING",
+          "actor": "Ehtesham Admin"
+        }
+      ],
+      "createdAt": "2026-03-02T08:00:00Z",
+      "updatedAt": "2026-09-12T02:06:00.605Z",
+      "status": "PROCESSING"
+    },
+    "ord-1789241279805-iro8": {
+      "id": "ord-1789241279805-iro8",
+      "orderNumber": "FMH-2026-6711",
+      "userId": "guest_test_123",
+      "customerName": "Test Customer",
+      "customerEmail": "test@example.com",
+      "customerPhone": "+1234567890",
+      "items": [
+        {
+          "productId": "prod-geekbar-pulse-watermelon-ice",
+          "productName": "Geek Bar Pulse 15000 Puffs Disposable Vape – Watermelon Ice",
+          "productSku": "GBP-15K-01",
+          "productImage": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1000&auto=format&fit=crop",
+          "price": 18.99,
+          "quantity": 1,
+          "subtotal": 18.99
+        }
+      ],
+      "shippingAddress": {
+        "id": "addr-1789241279805",
+        "fullName": "Test Customer",
+        "addressLine1": "123 Test St",
+        "city": "Mumbai",
+        "state": "MH",
+        "postalCode": "400001",
+        "country": "India",
+        "phone": "+1234567890"
+      },
+      "billingAddress": {
+        "id": "addr-b-1789241279805",
+        "fullName": "Test Customer",
+        "addressLine1": "123 Test St",
+        "city": "Mumbai",
+        "state": "MH",
+        "postalCode": "400001",
+        "country": "India",
+        "phone": "+1234567890"
+      },
+      "subtotal": 18.99,
+      "discount": 0,
+      "shippingFee": 9.99,
+      "tax": 1.61,
+      "total": 30.59,
+      "paymentMethod": "STRIPE_PAYMENT_INTENT",
+      "paymentStatus": "PENDING",
+      "orderStatus": "PLACED",
+      "status": "PLACED",
+      "timeline": [
+        {
+          "status": "PLACED",
+          "timestamp": "2026-09-12T19:27:59.805Z",
+          "note": "Order initialized exclusively via Stripe Payment Gateway (PaymentIntent with Cards, Apple Pay, Google Pay, Link & Adaptive Pricing)",
+          "actor": "Test Customer"
+        }
+      ],
+      "createdAt": "2026-09-12T19:27:59.805Z",
+      "updatedAt": "2026-09-12T19:27:59.805Z",
+      "paymentIntentId": "pi_3UEwaiLags4vMS5U3zXnwYsB"
+    },
+    "ord-1789241284588-6brc": {
+      "id": "ord-1789241284588-6brc",
+      "orderNumber": "FMH-2026-2331",
+      "userId": "guest_fallback_test_999",
+      "customerName": "Fallback Customer",
+      "customerEmail": "fallback@example.com",
+      "customerPhone": "+1234567890",
+      "items": [
+        {
+          "productId": "prod-geekbar-pulse-watermelon-ice",
+          "productName": "Geek Bar Pulse 15000 Puffs Disposable Vape – Watermelon Ice",
+          "productSku": "GBP-15K-01",
+          "productImage": "https://images.unsplash.com/photo-1528701800487-ba012498db85?q=80&w=1000&auto=format&fit=crop",
+          "price": 18.99,
+          "quantity": 2,
+          "subtotal": 37.98
+        }
+      ],
+      "shippingAddress": {
+        "id": "addr-1789241284588",
+        "fullName": "Fallback Customer",
+        "addressLine1": "456 Fallback Way",
+        "city": "Mumbai",
+        "state": "MH",
+        "postalCode": "400001",
+        "country": "India",
+        "phone": "+1234567890"
+      },
+      "billingAddress": {
+        "id": "addr-b-1789241284589",
+        "fullName": "Fallback Customer",
+        "addressLine1": "456 Fallback Way",
+        "city": "Mumbai",
+        "state": "MH",
+        "postalCode": "400001",
+        "country": "India",
+        "phone": "+1234567890"
+      },
+      "subtotal": 37.98,
+      "discount": 0,
+      "shippingFee": 9.99,
+      "tax": 3.23,
+      "total": 51.2,
+      "paymentMethod": "STRIPE_PAYMENT_INTENT",
+      "paymentStatus": "PENDING",
+      "orderStatus": "PLACED",
+      "status": "PLACED",
+      "timeline": [
+        {
+          "status": "PLACED",
+          "timestamp": "2026-09-12T19:28:04.589Z",
+          "note": "Order initialized exclusively via Stripe Payment Gateway (PaymentIntent with Cards, Apple Pay, Google Pay, Link & Adaptive Pricing)",
+          "actor": "Fallback Customer"
+        }
+      ],
+      "createdAt": "2026-09-12T19:28:04.589Z",
+      "updatedAt": "2026-09-12T19:28:04.589Z"
+    },
+    "ord-1789355601589-ly6a": {
+      "id": "ord-1789355601589-ly6a",
+      "orderNumber": "FMH-2026-1863",
+      "userId": "guest_1788301453533_ezjvv",
+      "customerName": "Guest Customer",
+      "customerEmail": "guest@example.com",
+      "customerPhone": "+1-555-0100",
+      "items": [
+        {
+          "productId": "prod-nash-raspberry-100gr",
+          "productName": "Nash Raspberry 100gr",
+          "productSku": "N-1001",
+          "productImage": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+          "price": 20,
+          "quantity": 1,
+          "subtotal": 20
+        }
+      ],
+      "shippingAddress": {
+        "id": "addr-1789355601589",
+        "fullName": "Guest Customer",
+        "addressLine1": "Suite 100, Commercial Ave",
+        "city": "Chicago",
+        "state": "IL",
+        "postalCode": "60062",
+        "country": "United States",
+        "phone": "+1-555-0100"
+      },
+      "billingAddress": {
+        "id": "addr-b-1789355601589",
+        "fullName": "Guest Customer",
+        "addressLine1": "Suite 100, Commercial Ave",
+        "city": "Chicago",
+        "state": "IL",
+        "postalCode": "60062",
+        "country": "United States",
+        "phone": "+1-555-0100"
+      },
+      "subtotal": 20,
+      "discount": 0,
+      "shippingFee": 9.99,
+      "tax": 1.7,
+      "total": 31.69,
+      "paymentMethod": "STRIPE_PAYMENT_INTENT",
+      "paymentStatus": "PENDING",
+      "orderStatus": "PLACED",
+      "status": "PLACED",
+      "timeline": [
+        {
+          "status": "PLACED",
+          "timestamp": "2026-09-14T03:13:21.589Z",
+          "note": "Order initialized exclusively via Stripe Payment Gateway",
+          "actor": "Guest Customer"
+        },
+        {
+          "status": "PAYMENT_CONFIRMED",
+          "timestamp": "2026-09-14T03:13:22.108Z",
+          "note": "Payment authorization succeeded and captured via Stripe",
+          "actor": "Instant Sandbox Card"
+        }
+      ],
+      "createdAt": "2026-09-14T03:13:21.589Z",
+      "updatedAt": "2026-09-14T03:13:21.589Z",
+      "paymentIntentId": "pi_3UFQKbLags4vMS5U1ORAJ7mk"
+    },
+    "ord-1789355634321-34ix": {
+      "id": "ord-1789355634321-34ix",
+      "orderNumber": "FMH-2026-9620",
+      "userId": "guest_1788301453533_ezjvv",
+      "customerName": "Guest Customer",
+      "customerEmail": "guest@example.com",
+      "customerPhone": "+1-555-0100",
+      "items": [
+        {
+          "productId": "prod-nash-raspberry-100gr",
+          "productName": "Nash Raspberry 100gr",
+          "productSku": "N-1001",
+          "productImage": "https://worldhookahmarket.com/wp-content/webp-express/webp-images/uploads/2022/05/fjPv1hjZ8xGSgMwIkZ18vYpeHQoCzO_ZZa1J2uwK0ht-9Ca6frdmKh0fEsxKKIj-XmhU_rESUmMo91J_DAl5Es6v-916x909.jpg.webp",
+          "price": 20,
+          "quantity": 1,
+          "subtotal": 20
+        }
+      ],
+      "shippingAddress": {
+        "id": "addr-1789355634321",
+        "fullName": "Guest Customer",
+        "addressLine1": "Suite 100, Commercial Ave",
+        "city": "Chicago",
+        "state": "IL",
+        "postalCode": "60062",
+        "country": "United States",
+        "phone": "+1-555-0100"
+      },
+      "billingAddress": {
+        "id": "addr-b-1789355634321",
+        "fullName": "Guest Customer",
+        "addressLine1": "Suite 100, Commercial Ave",
+        "city": "Chicago",
+        "state": "IL",
+        "postalCode": "60062",
+        "country": "United States",
+        "phone": "+1-555-0100"
+      },
+      "subtotal": 20,
+      "discount": 0,
+      "shippingFee": 9.99,
+      "tax": 1.7,
+      "total": 31.69,
+      "paymentMethod": "STRIPE_PAYMENT_INTENT",
+      "paymentStatus": "PENDING",
+      "orderStatus": "PLACED",
+      "status": "PLACED",
+      "timeline": [
+        {
+          "status": "PLACED",
+          "timestamp": "2026-09-14T03:13:54.321Z",
+          "note": "Order initialized exclusively via Stripe Payment Gateway (PaymentIntent with Cards, Apple Pay, Google Pay, Link & Adaptive Pricing)",
+          "actor": "Mohd"
+        },
+        {
+          "status": "PAYMENT_CONFIRMED",
+          "timestamp": "2026-09-14T03:13:54.873Z",
+          "note": "Payment authorization succeeded and captured via Stripe",
+          "actor": "Instant Sandbox Card"
+        }
+      ],
+      "createdAt": "2026-09-14T03:13:54.322Z",
+      "updatedAt": "2026-09-14T03:13:54.322Z",
+      "paymentIntentId": "pi_3UFQL8Lags4vMS5U1dTp7yIk"
     }
   },
   "settingsOverride": null,
@@ -453,7 +949,9 @@
     "usr-product-manager-1",
     "usr-manager-2",
     "usr-support-1",
-    "usr-inzy-admin"
+    "usr-inzy-admin",
+    "usr-admin-1789114820480",
+    "admin@sultanhookah.com"
   ],
   "userOverrides": {
     "usr-ehtesham-root": {

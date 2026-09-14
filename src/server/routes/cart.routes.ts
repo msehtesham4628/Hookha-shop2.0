@@ -6,8 +6,29 @@ import { Cart, CartItem } from '../../types/index.js';
 const router = Router();
 
 const getOrCreateUserId = (req: AuthenticatedRequest): string => {
-  if (req.user) return req.user.id;
-  const guestId = (req.headers['x-guest-id'] as string) || (req.query.guestId as string) || 'guest_default';
+  const guestId = (req.headers['x-guest-id'] as string) || (req.query.guestId as string) || (req.body?.guestId as string) || 'guest_default';
+  if (req.user) {
+    if (guestId && guestId !== req.user.id) {
+      const guestItems = db.cartItems.filter(item => item.userId === guestId);
+      if (guestItems.length > 0) {
+        for (const gItem of guestItems) {
+          const userItem = db.cartItems.find(
+            item => item.userId === req.user!.id &&
+                    item.productId === gItem.productId &&
+                    item.selectedFlavor === gItem.selectedFlavor &&
+                    item.selectedColor === gItem.selectedColor
+          );
+          if (userItem) {
+            userItem.quantity += gItem.quantity;
+          } else {
+            gItem.userId = req.user.id;
+          }
+        }
+        db.cartItems = db.cartItems.filter(item => item.userId !== guestId);
+      }
+    }
+    return req.user.id;
+  }
   return guestId;
 };
 

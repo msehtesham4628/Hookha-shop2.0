@@ -249,6 +249,69 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
     }
   };
 
+  const handleEraseAddress = async () => {
+    try {
+      setSavingAddress(true);
+      const res = await api.deleteAddress();
+      if (res.success) {
+        setHouseNo('');
+        setAreaRoad('');
+        setCity('');
+        setState('');
+        setPincode('');
+        if (user) {
+          setUser({
+            ...user,
+            address: undefined,
+            addressDetails: undefined
+          });
+        }
+        showToast('Saved address has been erased from your profile.', 'success');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to erase address', 'error');
+    } finally {
+      setSavingAddress(false);
+    }
+  };
+
+  const handleEraseAllPersonalData = async () => {
+    try {
+      const res = await api.deletePersonalData();
+      if (res.success) {
+        setHouseNo('');
+        setAreaRoad('');
+        setCity('');
+        setState('');
+        setPincode('');
+        setPhone('');
+        if (user) {
+          setUser({
+            ...user,
+            address: undefined,
+            addressDetails: undefined,
+            phone: undefined
+          });
+        }
+        try {
+          localStorage.removeItem('sultan_guest_id');
+        } catch {}
+        showToast('All saved personal data, addresses, and phone numbers have been erased.', 'success');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to erase personal data', 'error');
+    }
+  };
+
+  const handleClearLocalStorage = () => {
+    try {
+      localStorage.removeItem('sultan_guest_id');
+      showToast('Browser guest identifiers and cached session data cleared.', 'success');
+    } catch {
+      showToast('Failed to clear browser storage', 'error');
+    }
+  };
+
   const handleSavePreferences = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -942,7 +1005,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                     />
                   </div>
 
-                  <div className="pt-2">
+                  <div className="pt-2 flex flex-wrap items-center gap-3">
                     <button
                       id="account-address-save-btn"
                       type="submit"
@@ -951,6 +1014,17 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                     >
                       {savingAddress ? 'Saving Address...' : 'Save Address'}
                     </button>
+                    {(houseNo || areaRoad || city || pincode) && (
+                      <button
+                        type="button"
+                        onClick={handleEraseAddress}
+                        disabled={savingAddress}
+                        className="border border-stone-300 hover:bg-rose-50 hover:border-rose-300 text-rose-700 text-xs font-semibold px-4 py-2.5 rounded-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Erase Saved Address</span>
+                      </button>
+                    )}
                   </div>
                 </form>
               </div>
@@ -1274,6 +1348,63 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                       >
                         <span>Review Privacy Policy</span>
                         <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Data Privacy & Erasure (Don't Save My Data) */}
+                <div className="bg-emerald-50/50 border border-emerald-200 rounded-xs p-6 shadow-xs space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 text-emerald-700 mt-0.5">
+                      <Shield className="w-5 h-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-bold text-emerald-950">
+                          Data Privacy & Erasure Controls
+                        </h3>
+                        <span className="text-[10px] uppercase font-bold tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-xs">
+                          Don't Save My Data
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-600 leading-relaxed">
+                        Under our privacy-first principles, you maintain complete ownership of your data. You can instantly erase saved shipping addresses, remove contact numbers, or clear anonymous device identifiers without deleting your entire account.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <div className="p-4 bg-white border border-emerald-200/80 rounded-xs flex flex-col justify-between space-y-3">
+                      <div>
+                        <span className="text-xs font-bold text-stone-900 block">Erase Saved Personal Data</span>
+                        <p className="text-[11px] text-stone-500 mt-1 leading-relaxed">
+                          Permanently wipes your saved house/flat address, street details, pincode, and phone number from our servers.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleEraseAllPersonalData}
+                        className="bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white text-xs font-bold px-3.5 py-2 rounded-xs transition-colors flex items-center justify-center gap-1.5 w-fit cursor-pointer shadow-xs"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Erase Personal Data</span>
+                      </button>
+                    </div>
+
+                    <div className="p-4 bg-white border border-emerald-200/80 rounded-xs flex flex-col justify-between space-y-3">
+                      <div>
+                        <span className="text-xs font-bold text-stone-900 block">Clear Browser Session & Guest IDs</span>
+                        <p className="text-[11px] text-stone-500 mt-1 leading-relaxed">
+                          Clears guest tracking identifiers, local cart storage tokens, and temporary session state in your web browser.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleClearLocalStorage}
+                        className="border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-bold px-3.5 py-2 rounded-xs transition-colors flex items-center justify-center gap-1.5 w-fit cursor-pointer"
+                      >
+                        <span>Clear Browser Storage</span>
                       </button>
                     </div>
                   </div>

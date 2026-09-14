@@ -883,6 +883,59 @@ router.put('/address', authenticateToken, async (req: AuthenticatedRequest, res)
   }
 });
 
+// DELETE /api/auth/address (Erase saved address from profile)
+router.delete('/address', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  try {
+    const user = req.user!;
+    user.address = undefined;
+    user.addressDetails = undefined;
+    user.updatedAt = new Date().toISOString();
+
+    db.persist('users', user);
+    db.addresses = db.addresses.filter(a => a.userId !== user.id);
+
+    const { passwordHash: _, ...safeUser } = user as any;
+    return res.json({
+      success: true,
+      message: 'Saved address has been erased.',
+      data: { user: safeUser }
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: err.message || 'Failed to erase address' }
+    });
+  }
+});
+
+// DELETE /api/auth/data (Erase all stored personal data: addresses, phone, cart, wishlist)
+router.delete('/data', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  try {
+    const user = req.user!;
+    user.address = undefined;
+    user.addressDetails = undefined;
+    user.phone = undefined;
+    user.updatedAt = new Date().toISOString();
+
+    db.persist('users', user);
+    db.addresses = db.addresses.filter(a => a.userId !== user.id);
+    db.cartItems = db.cartItems.filter(c => c.userId !== user.id);
+    db.wishlists = db.wishlists.filter(w => w.userId !== user.id);
+
+    const { passwordHash: _, ...safeUser } = user as any;
+    return res.json({
+      success: true,
+      message: 'All your personal data and addresses have been erased.',
+      data: { user: safeUser }
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: err.message || 'Failed to erase personal data' }
+    });
+  }
+});
+
 // PUT /api/auth/profile
 router.put('/profile', authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {

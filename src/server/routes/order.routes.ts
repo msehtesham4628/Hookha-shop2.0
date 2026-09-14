@@ -28,6 +28,7 @@ const checkoutSchema = z.object({
   customerName: z.string().min(1),
   customerEmail: z.string().email(),
   customerPhone: z.string().optional(),
+  currency: z.string().default('usd'),
   shippingAddress: addressInputSchema,
   billingAddress: addressInputSchema.optional(),
   couponCode: z.string().optional(),
@@ -35,19 +36,28 @@ const checkoutSchema = z.object({
   paymentMethod: z.enum([
     'STRIPE',
     'STRIPE_CREDIT_CARD',
-    'CREDIT_CARD'
-  ]).default('STRIPE_CREDIT_CARD'),
+    'STRIPE_PAYMENT_INTENT'
+  ]).default('STRIPE_PAYMENT_INTENT'),
   cardDetails: z.object({
     cardNumber: z.string().optional(),
     cardExp: z.string().optional(),
     cardCvc: z.string().optional()
-  }).optional()
+  }).optional(),
+  guestId: z.string().optional(),
+  items: z.array(z.object({
+    productId: z.string(),
+    quantity: z.number().default(1),
+    selectedFlavor: z.string().optional(),
+    selectedColor: z.string().optional(),
+    unitPrice: z.number().optional()
+  })).optional()
 });
 
 // POST /api/checkout/validate
 router.post('/validate', optionalAuthenticateToken, (req: AuthenticatedRequest, res) => {
-  const userId = req.user ? req.user.id : (req.headers['x-guest-id'] as string) || 'guest_default';
-  const { couponCode, ageConfirmed } = req.body;
+  const guestId = (req.headers['x-guest-id'] as string) || (req.body?.guestId as string) || (req.query.guestId as string);
+  const userId = req.user ? req.user.id : (guestId || 'guest_default');
+  const { couponCode, ageConfirmed, items } = req.body;
 
   if (db.settings.ageVerificationRequired && !ageConfirmed) {
     return res.status(400).json({
@@ -56,7 +66,25 @@ router.post('/validate', optionalAuthenticateToken, (req: AuthenticatedRequest, 
     });
   }
 
-  const cart = calculateCartTotals(userId, couponCode);
+  let cart = calculateCartTotals(userId, couponCode);
+
+  // Fallback: restore items if in-memory store was reset but client has items
+  if (cart.items.length === 0 && Array.isArray(items) && items.length > 0) {
+    for (const reqItem of items) {
+      const prod = db.products.find(p => p.id === reqItem.productId && p.isActive);
+      if (prod) {
+        db.cartItems.push({
+          id: `cart-item-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+          userId,
+          productId: prod.id,
+          quantity: Math.max(1, reqItem.quantity || 1),
+          selectedFlavor: reqItem.selectedFlavor,
+          selectedColor: reqItem.selectedColor
+        });
+      }
+    }
+    cart = calculateCartTotals(userId, couponCode);
+  }
 
   if (cart.items.length === 0) {
     return res.status(400).json({
@@ -87,6 +115,12 @@ router.post('/validate', optionalAuthenticateToken, (req: AuthenticatedRequest, 
         currency: db.settings.currency,
         currencySymbol: db.settings.currencySymbol,
         freeShippingThreshold: db.settings.freeShippingThreshold
+      },
+      paymentGateway: {
+        provider: 'STRIPE',
+        isSoleGateway: true,
+        adaptivePricing: true,
+        supportedMethods: ['cards', 'apple_pay', 'google_pay', 'link', 'adaptive_local']
       }
     }
   });
@@ -95,6 +129,18 @@ router.post('/validate', optionalAuthenticateToken, (req: AuthenticatedRequest, 
 // POST /api/payments/create (Atomic stock reservation & payment intent creation)
 router.post('/create-payment', optionalAuthenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
+    // Explicit security check: strictly forbid any non-Stripe payment method attempts
+    const rawMethod = (req.body?.paymentMethod || '').toString().toUpperCase();
+    if (rawMethod && !['STRIPE', 'STRIPE_CREDIT_CARD', 'STRIPE_PAYMENT_INTENT'].includes(rawMethod)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED_PAYMENT_GATEWAY',
+          message: 'Stripe is the exclusive authorized payment processor. Cash on delivery and alternative gateways are strictly prohibited.'
+        }
+      });
+    }
+
     const parse = checkoutSchema.safeParse(req.body);
     if (!parse.success) {
       return res.status(400).json({
@@ -107,11 +153,14 @@ router.post('/create-payment', optionalAuthenticateToken, async (req: Authentica
       customerName,
       customerEmail,
       customerPhone,
+      currency = 'usd',
       shippingAddress,
       billingAddress,
       couponCode,
       ageConfirmed,
-      paymentMethod
+      paymentMethod,
+      guestId: bodyGuestId,
+      items: bodyItems
     } = parse.data;
 
     if (db.settings.ageVerificationRequired && !ageConfirmed) {
@@ -121,8 +170,49 @@ router.post('/create-payment', optionalAuthenticateToken, async (req: Authentica
       });
     }
 
-    const userId = req.user ? req.user.id : `guest_${Date.now()}`;
-    const cart = calculateCartTotals(userId, couponCode);
+    const guestId = (req.headers['x-guest-id'] as string) || bodyGuestId || (req.query.guestId as string);
+    const userId = req.user ? req.user.id : (guestId || 'guest_default');
+
+    // If user is authenticated and had guest cart items, merge them
+    if (req.user && guestId && guestId !== req.user.id) {
+      const guestItems = db.cartItems.filter(item => item.userId === guestId);
+      if (guestItems.length > 0) {
+        for (const gItem of guestItems) {
+          const userItem = db.cartItems.find(
+            item => item.userId === req.user!.id &&
+                    item.productId === gItem.productId &&
+                    item.selectedFlavor === gItem.selectedFlavor &&
+                    item.selectedColor === gItem.selectedColor
+          );
+          if (userItem) {
+            userItem.quantity += gItem.quantity;
+          } else {
+            gItem.userId = req.user.id;
+          }
+        }
+        db.cartItems = db.cartItems.filter(item => item.userId !== guestId);
+      }
+    }
+
+    let cart = calculateCartTotals(userId, couponCode);
+
+    // Fallback: restore items if in-memory store was reset but client has items
+    if (cart.items.length === 0 && Array.isArray(bodyItems) && bodyItems.length > 0) {
+      for (const bItem of bodyItems) {
+        const prod = db.products.find(p => p.id === bItem.productId && p.isActive);
+        if (prod) {
+          db.cartItems.push({
+            id: `cart-item-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+            userId,
+            productId: prod.id,
+            quantity: Math.max(1, bItem.quantity || 1),
+            selectedFlavor: bItem.selectedFlavor,
+            selectedColor: bItem.selectedColor
+          });
+        }
+      }
+      cart = calculateCartTotals(userId, couponCode);
+    }
 
     if (cart.items.length === 0) {
       return res.status(400).json({
@@ -211,7 +301,7 @@ router.post('/create-payment', optionalAuthenticateToken, async (req: Authentica
 
     const initialPaymentStatus = 'PENDING';
     const initialOrderStatus = 'PLACED';
-    const initialTimelineNote = 'Customer initiated checkout with Stripe payment gateway';
+    const initialTimelineNote = 'Order initialized exclusively via Stripe Payment Gateway (PaymentIntent with Cards, Apple Pay, Google Pay, Link & Adaptive Pricing)';
 
     const newOrder: Order = {
       id: orderId,
@@ -229,7 +319,7 @@ router.post('/create-payment', optionalAuthenticateToken, async (req: Authentica
       tax: cart.estimatedTax,
       total: cart.grandTotal,
       couponCode: cart.couponCode,
-      paymentMethod: 'STRIPE_CREDIT_CARD',
+      paymentMethod: 'STRIPE_PAYMENT_INTENT',
       paymentStatus: initialPaymentStatus,
       orderStatus: initialOrderStatus,
       status: initialOrderStatus,
@@ -252,7 +342,7 @@ router.post('/create-payment', optionalAuthenticateToken, async (req: Authentica
     db.createNotification(
       'ORDER',
       `New Order Placed: #${newOrder.orderNumber}`,
-      `${customerName} placed order #${newOrder.orderNumber} (${paymentMethod}) for $${newOrder.total.toFixed(2)} with ${orderItems.length} item(s).`,
+      `${customerName} placed order #${newOrder.orderNumber} via Stripe ($${newOrder.total.toFixed(2)}) with ${orderItems.length} item(s).`,
       `/dashboard`
     );
 
@@ -263,21 +353,41 @@ router.post('/create-payment', optionalAuthenticateToken, async (req: Authentica
     }
 
     // Clear cart
-    db.cartItems = db.cartItems.filter(i => i.userId !== userId);
+    db.cartItems = db.cartItems.filter(i => i.userId !== userId && (!guestId || i.userId !== guestId));
 
-    // Generate Stripe payment intent
+    // Generate Stripe payment intent with automatic payment methods (Cards, Apple Pay, Google Pay, Link & Adaptive Pricing)
     const amountInCents = Math.round(cart.grandTotal * 100);
-    const { clientSecret, paymentIntentId } = await paymentService.createPaymentIntent(orderId, amountInCents);
+    const resolvedCurrency = (currency || db.settings.currency || 'USD').toLowerCase();
+    const intentResult = await paymentService.createPaymentIntent(
+      orderId,
+      amountInCents,
+      resolvedCurrency,
+      {
+        orderNumber,
+        customerEmail,
+        customerName,
+        country: fullShipping.country
+      }
+    );
 
-    newOrder.paymentIntentId = paymentIntentId;
+    newOrder.paymentIntentId = intentResult.paymentIntentId;
 
     return res.status(201).json({
       success: true,
       data: {
         order: newOrder,
-        clientSecret,
-        paymentIntentId,
-        publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_fumare_hookah_mock'
+        clientSecret: intentResult.clientSecret,
+        paymentIntentId: intentResult.paymentIntentId,
+        currency: intentResult.currency,
+        adaptivePricing: intentResult.adaptivePricing,
+        supportedMethods: intentResult.supportedMethods,
+        publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_fumare_hookah_mock',
+        paymentGateway: {
+          provider: 'STRIPE',
+          isSoleGateway: true,
+          adaptivePricing: true,
+          supportedMethods: ['cards', 'apple_pay', 'google_pay', 'link', 'adaptive_local']
+        }
       }
     });
   } catch (err: any) {

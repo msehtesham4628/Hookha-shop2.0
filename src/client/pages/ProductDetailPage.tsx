@@ -3,6 +3,7 @@ import { api } from '../services/api.js';
 import { onSync } from '../services/sync.js';
 import { useStore } from '../store/useStore.js';
 import { ProductCard } from '../components/ProductCard.js';
+import { ProductDetailSkeleton } from '../components/ProductDetailSkeleton.js';
 import { Product, Review } from '../../types/index.js';
 import { sanitizeImageUrl, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/imageFallback.js';
 import { useProductHeadMetadata } from '../hooks/useDocumentMetadata.js';
@@ -137,12 +138,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, cate
   }, [slug]);
 
   if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-        <div className="w-12 h-12 border-4 border-amber-800 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-xs uppercase tracking-widest text-stone-500 font-bold">Loading Fumare Hookah Artifact...</p>
-      </div>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   if (!product) {

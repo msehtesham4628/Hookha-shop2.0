@@ -233,7 +233,7 @@ export interface Order {
   total: number;
   grandTotal?: number;
   couponCode?: string;
-  paymentMethod: 'STRIPE' | 'CREDIT_CARD' | 'BANK_TRANSFER' | string;
+  paymentMethod: 'STRIPE' | 'STRIPE_CREDIT_CARD' | 'STRIPE_PAYMENT_INTENT' | string;
   paymentStatus: PaymentStatus;
   paymentIntentId?: string;
   orderStatus: OrderStatus | string;

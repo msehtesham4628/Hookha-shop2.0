@@ -182,6 +182,18 @@ class ApiClient {
     });
   }
 
+  public async deleteAddress() {
+    return this.request<{ success: boolean; data: { user: User }; message: string }>('/auth/address', {
+      method: 'DELETE'
+    });
+  }
+
+  public async deletePersonalData() {
+    return this.request<{ success: boolean; data: { user: User }; message: string }>('/auth/data', {
+      method: 'DELETE'
+    });
+  }
+
   public async updateProfile(payload: {
     firstName?: string;
     lastName?: string;

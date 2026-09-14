@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../services/api.js';
 import { onSync } from '../services/sync.js';
 import { ProductCard } from '../components/ProductCard.js';
+import { ProductCardSkeleton } from '../components/ProductCardSkeleton.js';
 import { CategoryBrandBadges } from '../components/CategoryBrandBadges.js';
 import { CategoryHeroBanner } from '../components/CategoryHeroBanner.js';
 import { Product, Category, Brand } from '../../types/index.js';
@@ -677,14 +678,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           <main className="lg:col-span-9">
             {loading ? (
               <div className={`grid grid-cols-2 sm:grid-cols-3 ${gridColumns === 4 ? 'lg:grid-cols-4 xl:grid-cols-4' : 'lg:grid-cols-3 xl:grid-cols-3'} gap-3 sm:gap-4 md:gap-5`}>
-                {[...Array(gridColumns === 4 ? 8 : 6)].map((_, i) => (
-                  <div key={i} className="bg-white border border-stone-200 rounded-sm p-3.5 animate-pulse aspect-3/4 flex flex-col justify-between shadow-2xs">
-                    <div className="bg-stone-200 aspect-square rounded-xs mb-3" />
-                    <div className="space-y-2">
-                      <div className="h-3.5 bg-stone-200 rounded-xs w-3/4" />
-                      <div className="h-3 bg-stone-200 rounded-xs w-1/2" />
-                    </div>
-                  </div>
+                {[...Array(gridColumns === 4 ? 12 : 9)].map((_, i) => (
+                  <ProductCardSkeleton key={i} />
                 ))}
               </div>
             ) : loadError ? (

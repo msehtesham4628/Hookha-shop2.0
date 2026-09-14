@@ -2,23 +2,50 @@ import { db } from '../db/store.js';
 import { Order, OrderStatus } from '../../types/index.js';
 import { emailService } from './email.service.js';
 
+export interface PaymentIntentResult {
+  clientSecret: string;
+  paymentIntentId: string;
+  currency: string;
+  adaptivePricing: boolean;
+  supportedMethods: string[];
+}
+
 export class PaymentService {
   private stripeSecret = process.env.STRIPE_SECRET_KEY;
 
-  public async createPaymentIntent(orderId: string, amountInCents: number, currency = 'usd'): Promise<{ clientSecret: string; paymentIntentId: string }> {
+  public async createPaymentIntent(
+    orderId: string,
+    amountInCents: number,
+    currency = 'usd',
+    metadata: Record<string, string> = {}
+  ): Promise<PaymentIntentResult> {
+    const supportedMethods = ['card', 'apple_pay', 'google_pay', 'link', 'adaptive_local'];
+    const cur = (currency || 'usd').toLowerCase();
+
     if (this.stripeSecret) {
       try {
+        const bodyParams: Record<string, string> = {
+          amount: amountInCents.toString(),
+          currency: cur,
+          'automatic_payment_methods[enabled]': 'true',
+          'automatic_payment_methods[allow_redirects]': 'always',
+          'metadata[orderId]': orderId,
+          'metadata[gateway]': 'STRIPE_EXCLUSIVE',
+          'metadata[adaptivePricing]': 'enabled'
+        };
+
+        if (metadata.orderNumber) bodyParams['description'] = `Sultan Hookah Order #${metadata.orderNumber}`;
+        if (metadata.customerEmail) bodyParams['receipt_email'] = metadata.customerEmail;
+        if (metadata.customerName) bodyParams['metadata[customerName]'] = metadata.customerName;
+        if (metadata.country) bodyParams['metadata[country]'] = metadata.country;
+
         const res = await fetch('https://api.stripe.com/v1/payment_intents', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${this.stripeSecret}`,
             'Content-Type': 'application/x-www-form-urlencoded'
           },
-          body: new URLSearchParams({
-            amount: amountInCents.toString(),
-            currency: currency.toLowerCase(),
-            'metadata[orderId]': orderId
-          }).toString()
+          body: new URLSearchParams(bodyParams).toString()
         });
 
         const data = await res.json();
@@ -28,20 +55,26 @@ export class PaymentService {
 
         return {
           clientSecret: data.client_secret,
-          paymentIntentId: data.id
+          paymentIntentId: data.id,
+          currency: cur,
+          adaptivePricing: true,
+          supportedMethods
         };
       } catch (err) {
         console.error('[PaymentService] Stripe API error:', err);
       }
     }
 
-    // High-fidelity sandbox simulated Stripe Intent
+    // High-fidelity sandbox simulated Stripe Intent with automatic payment methods & Adaptive Pricing
     const mockIntentId = `pi_test_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const mockSecret = `${mockIntentId}_secret_${Math.random().toString(36).substring(2, 12)}`;
 
     return {
       clientSecret: mockSecret,
-      paymentIntentId: mockIntentId
+      paymentIntentId: mockIntentId,
+      currency: cur,
+      adaptivePricing: true,
+      supportedMethods
     };
   }
 
