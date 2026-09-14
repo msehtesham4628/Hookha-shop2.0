@@ -444,7 +444,7 @@ const CategorySliderSection: React.FC<CategorySliderProps> = ({ config, products
 };
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
-  const { cart, setCartOpen, showToast, settings } = useStore();
+  const { user, isAuthenticated, cart, setCartOpen, showToast, settings } = useStore();
 
   const [categoryData, setCategoryData] = useState<Record<CategoryKey, Product[]>>({
     tobacco: [],
@@ -778,8 +778,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* Floating Points Banner */}
-      {showPointsBanner && (
+      {/* Floating Points Banner - Display only for unregistered/guest visitors; once registered/rewarded, remove it */}
+      {showPointsBanner && !isAuthenticated && (
         <div
           id="sticky-points-banner"
           className="fixed bottom-3 left-3 right-3 sm:left-auto sm:right-6 sm:bottom-6 z-40 bg-stone-950/95 backdrop-blur-md text-white border border-stone-800 rounded-full py-2.5 px-4 sm:px-5 flex items-center justify-between gap-3 shadow-2xl animate-fade-in max-w-md"

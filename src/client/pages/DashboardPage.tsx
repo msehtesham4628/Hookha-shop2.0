@@ -370,8 +370,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
                 <Award className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-stone-900 font-serif">
-              {Math.max(120, orders.length * 85)} pts
+            <div className="text-2xl font-bold text-stone-900 font-serif flex items-baseline gap-1.5">
+              <span>{user?.points !== undefined ? user.points.toLocaleString() : '1,000'}</span>
+              <span className="text-sm font-sans font-normal text-stone-500">pts</span>
+              <span className="text-xs font-sans font-semibold text-emerald-750 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-xs ml-auto">
+                ${((user?.points !== undefined ? user.points : 1000) / 100).toFixed(0)} value
+              </span>
             </div>
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-stone-100 text-[11px] text-stone-500">
               <span className="text-emerald-700 font-medium">Free Air Shipping @ $150</span>

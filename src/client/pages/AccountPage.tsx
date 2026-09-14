@@ -511,6 +511,10 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                 <span className="bg-emerald-50 text-emerald-800 text-[10px] font-semibold px-2 py-0.5 rounded-xs">
                   21+ Verified
                 </span>
+                <span className="bg-amber-50 border border-amber-200 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-xs flex items-center gap-1">
+                  <Award className="w-3 h-3 text-amber-700" />
+                  <span>{user?.points !== undefined ? user.points.toLocaleString() : '1,000'} Lounge Points ($10)</span>
+                </span>
               </div>
               <p className="text-xs text-stone-500 mt-0.5">{user?.email} • Member ID: #{user?.id?.slice(0, 8).toUpperCase() || 'FUM-8921'}</p>
             </div>

@@ -26,13 +26,23 @@ const getOrCreateUserId = (req: AuthenticatedRequest): string => {
         }
         db.cartItems = db.cartItems.filter(item => item.userId !== guestId);
       }
+      if (db.cartCoupons.has(guestId)) {
+        db.cartCoupons.set(req.user.id, db.cartCoupons.get(guestId)!);
+        db.cartCoupons.delete(guestId);
+      }
     }
     return req.user.id;
   }
   return guestId;
 };
 
-export const calculateCartTotals = (userId: string, couponCode?: string): Cart => {
+export const calculateCartTotals = (userId: string, couponCodeParam?: string): Cart => {
+  let effectiveCouponCode = couponCodeParam !== undefined ? couponCodeParam : db.cartCoupons.get(userId);
+  if (effectiveCouponCode === '') {
+    db.cartCoupons.delete(userId);
+    effectiveCouponCode = undefined;
+  }
+
   const userItems = db.cartItems.filter(item => item.userId === userId);
   const cartItems: CartItem[] = [];
 
@@ -64,8 +74,27 @@ export const calculateCartTotals = (userId: string, couponCode?: string): Cart =
 
   // Coupon discount calculation
   let couponDiscount = 0;
-  if (couponCode) {
-    const coupon = db.coupons.find(c => c.code.toUpperCase() === couponCode.toUpperCase() && c.isActive);
+  let appliedCouponCode: string | undefined = undefined;
+  if (effectiveCouponCode) {
+    let coupon = db.coupons.find(c => c.code.toUpperCase() === effectiveCouponCode!.toUpperCase() && c.isActive);
+    if (!coupon && effectiveCouponCode.toUpperCase() === 'APP15') {
+      coupon = {
+        id: 'cpn-app15',
+        code: 'APP15',
+        description: '15% instant discount on your Fumare Hookah order',
+        discountType: 'PERCENTAGE',
+        discountValue: 15,
+        minOrderAmount: 0,
+        usageLimit: 100000,
+        usageCount: 0,
+        isActive: true,
+        createdAt: '2026-01-01T00:00:00Z'
+      };
+      if (!db.coupons.some(c => c.code.toUpperCase() === 'APP15')) {
+        db.coupons.unshift(coupon);
+      }
+    }
+
     if (coupon) {
       const isMinSpendMet = !coupon.minOrderAmount || subtotal >= coupon.minOrderAmount;
       if (isMinSpendMet) {
@@ -77,7 +106,13 @@ export const calculateCartTotals = (userId: string, couponCode?: string): Cart =
         } else {
           couponDiscount = Math.min(subtotal, coupon.discountValue);
         }
+        appliedCouponCode = coupon.code;
+        db.cartCoupons.set(userId, coupon.code);
+      } else {
+        db.cartCoupons.delete(userId);
       }
+    } else {
+      db.cartCoupons.delete(userId);
     }
   }
 
@@ -94,7 +129,7 @@ export const calculateCartTotals = (userId: string, couponCode?: string): Cart =
     items: cartItems,
     subtotal: Math.round(subtotal * 100) / 100,
     discountTotal: Math.round(couponDiscount * 100) / 100,
-    couponCode: couponDiscount > 0 ? couponCode : undefined,
+    couponCode: couponDiscount > 0 ? appliedCouponCode : undefined,
     couponDiscount: Math.round(couponDiscount * 100) / 100,
     shippingFee: Math.round(shippingFee * 100) / 100,
     estimatedTax: Math.round(estimatedTax * 100) / 100,
@@ -208,22 +243,51 @@ router.post('/apply-coupon', optionalAuthenticateToken, (req: AuthenticatedReque
   const userId = getOrCreateUserId(req);
   const { code } = req.body;
 
-  if (!code) {
-    return res.status(400).json({ success: false, error: { code: 'INVALID_COUPON', message: 'Coupon code required' } });
+  if (code === undefined || code === null || String(code).trim() === '') {
+    db.cartCoupons.delete(userId);
+    const cart = calculateCartTotals(userId, '');
+    return res.json({
+      success: true,
+      message: 'Coupon removed successfully.',
+      data: cart
+    });
   }
 
-  const coupon = db.coupons.find(c => c.code.toUpperCase() === code.toUpperCase() && c.isActive);
+  const cleanCode = String(code).trim().toUpperCase();
+  let coupon = db.coupons.find(c => c.code.toUpperCase() === cleanCode && c.isActive);
+
+  // Guarantee APP15 is supported
+  if (!coupon && cleanCode === 'APP15') {
+    coupon = {
+      id: 'cpn-app15',
+      code: 'APP15',
+      description: '15% instant discount on your Fumare Hookah order',
+      discountType: 'PERCENTAGE',
+      discountValue: 15,
+      minOrderAmount: 0,
+      usageLimit: 100000,
+      usageCount: 0,
+      isActive: true,
+      createdAt: '2026-01-01T00:00:00Z'
+    };
+    if (!db.coupons.some(c => c.code.toUpperCase() === 'APP15')) {
+      db.coupons.unshift(coupon);
+    }
+  }
+
   if (!coupon) {
     return res.status(400).json({ success: false, error: { code: 'COUPON_NOT_FOUND', message: 'Coupon code is invalid or expired.' } });
   }
 
-  const cart = calculateCartTotals(userId, code);
+  const cart = calculateCartTotals(userId, cleanCode);
   if (coupon.minOrderAmount && cart.subtotal < coupon.minOrderAmount) {
     return res.status(400).json({
       success: false,
       error: { code: 'MIN_SPEND_NOT_MET', message: `This coupon requires a minimum subtotal of $${coupon.minOrderAmount.toFixed(2)}.` }
     });
   }
+
+  db.cartCoupons.set(userId, coupon.code);
 
   return res.json({
     success: true,

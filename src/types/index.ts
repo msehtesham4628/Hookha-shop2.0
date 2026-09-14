@@ -51,6 +51,7 @@ export interface User {
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
   avatarUrl?: string;
+  points?: number;
   totalSpent: number;
   orderCount: number;
   isWholesaleCustomer?: boolean;

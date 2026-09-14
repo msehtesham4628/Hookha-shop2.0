@@ -2601,6 +2601,18 @@ export const INITIAL_PRODUCTS: Product[] = [
 
 export const INITIAL_COUPONS: Coupon[] = [
   {
+    id: 'cpn-app15',
+    code: 'APP15',
+    description: '15% instant discount on your Fumare Hookah order',
+    discountType: 'PERCENTAGE',
+    discountValue: 15,
+    minOrderAmount: 0,
+    usageLimit: 100000,
+    usageCount: 0,
+    isActive: true,
+    createdAt: '2026-01-01T00:00:00Z'
+  },
+  {
     id: 'cpn-welcome15',
     code: 'WELCOME15',
     description: '15% discount on your initial Fumare Hookah order',

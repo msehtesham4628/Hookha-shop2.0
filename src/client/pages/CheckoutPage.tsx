@@ -124,6 +124,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
   // Login Pop-up before Shipment
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [authTriggerAction, setAuthTriggerAction] = useState<'PROCEED_TO_BUY' | 'COUPON_LOGIN' | 'GENERAL' | null>(null);
 
   // Navigate to Shipment Screen
   const proceedToShipment = () => {
@@ -136,7 +137,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
   // Pre-shipment Gate: Prompt customer to log in before showing shipment page
   const handleProceedToBuy = () => {
-    if (!user) {
+    const currentUser = user || useStore.getState().user;
+    if (!currentUser) {
+      setAuthTriggerAction('PROCEED_TO_BUY');
       setShowLoginModal(true);
       return;
     }
@@ -144,7 +147,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   };
 
   // Called when login popup completes successfully
-  const handleLoginSuccess = (loggedInUser: User) => {
+  const handleLoginSuccess = async (loggedInUser: User) => {
     setShowLoginModal(false);
     // Autofill user delivery details if available
     if (loggedInUser.addressDetails) {
@@ -159,26 +162,46 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
     }
     if (loggedInUser.phone) setContactPhone(loggedInUser.phone);
     if (loggedInUser.email) setContactEmail(loggedInUser.email);
-    showToast(`Welcome, ${loggedInUser.firstName || 'Customer'}! Proceeding to delivery address.`, 'success');
 
-    if (loggedInUser.addressDetails?.houseNo && loggedInUser.addressDetails?.city && loggedInUser.addressDetails?.pincode) {
-      setStep('SELECT_ADDRESS_AND_PAY');
+    // Refresh cart to ensure synced items & applied coupons from session
+    await loadCart();
+
+    const trigger = authTriggerAction;
+    setAuthTriggerAction(null);
+
+    // If customer logged in via coupon prompt, automatically apply the coupon for them
+    if (trigger === 'COUPON_LOGIN') {
+      const codeToApply = promoCodeInput.trim() || 'APP15';
+      setIsPromoInputOpen(true);
+      await applyCoupon(codeToApply);
+      showToast(`Welcome, ${loggedInUser.firstName || 'Customer'}! Promo code ${codeToApply} applied.`, 'success');
+    } else if (trigger === 'PROCEED_TO_BUY') {
+      showToast(`Welcome, ${loggedInUser.firstName || 'Customer'}! Proceeding to delivery details.`, 'success');
+      if (loggedInUser.addressDetails?.houseNo && loggedInUser.addressDetails?.city && loggedInUser.addressDetails?.pincode) {
+        setStep('SELECT_ADDRESS_AND_PAY');
+      } else {
+        setStep('ADD_ADDRESS');
+      }
     } else {
-      setStep('ADD_ADDRESS');
+      // Stay on BAG or current view so the customer can review their coupon and cart
+      showToast(`Welcome, ${loggedInUser.firstName || 'Customer'}! Your account is now connected.`, 'success');
     }
   };
 
   const handleCloseLoginModal = () => {
     setShowLoginModal(false);
+    setAuthTriggerAction(null);
+    const currentUser = user || useStore.getState().user;
     // If not authenticated, customer cannot remain on shipment screens
-    if (!user && step !== 'BAG') {
+    if (!currentUser && step !== 'BAG') {
       setStep('BAG');
     }
   };
 
   // Intercept if customer enters shipment directly without being logged in
   useEffect(() => {
-    if (!user && step !== 'BAG') {
+    const currentUser = user || useStore.getState().user;
+    if (!currentUser && step !== 'BAG') {
       setShowLoginModal(true);
     }
   }, [user, step]);
@@ -516,50 +539,82 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
               className="flex items-center justify-between p-4 border border-stone-200 rounded-xl hover:border-stone-400 cursor-pointer transition bg-white shadow-xs"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-stone-100 flex items-center justify-center text-stone-700">
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${cart.couponCode ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-700'}`}>
                   <Tag className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-stone-900">
-                    {cart.couponCode ? `Applied: ${cart.couponCode}` : 'Log in to apply promo code'}
+                  <div className="text-xs font-bold text-stone-900 flex items-center gap-2">
+                    <span>{cart.couponCode ? `Applied: ${cart.couponCode}` : 'Apply Promo Code / Coupon'}</span>
+                    {cart.couponCode && (
+                      <span className="bg-emerald-100 text-emerald-800 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                        Saved {formatPrice(cart.discountTotal)}
+                      </span>
+                    )}
                   </div>
                   <div className="text-[11px] text-stone-500">
                     {cart.couponCode
-                      ? `Instant savings of ${formatPrice(cart.discountTotal)} applied`
-                      : 'Get instant savings on your order'}
+                      ? `Instant discount of ${formatPrice(cart.discountTotal)} active on this order`
+                      : 'Enter promo code (e.g. APP15) for instant savings'}
                   </div>
                 </div>
               </div>
-              <ChevronRight className={`w-4 h-4 text-stone-400 transition-transform ${isPromoInputOpen ? 'rotate-90' : ''}`} />
+              <div className="flex items-center gap-2">
+                {cart.couponCode && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      applyCoupon('');
+                    }}
+                    className="text-[11px] text-rose-600 font-semibold hover:underline mr-1"
+                  >
+                    Remove
+                  </button>
+                )}
+                <ChevronRight className={`w-4 h-4 text-stone-400 transition-transform ${isPromoInputOpen ? 'rotate-90' : ''}`} />
+              </div>
             </div>
 
             {/* Expandable Promo Input Form */}
             {isPromoInputOpen && (
-              <div className="mt-2 p-3 bg-stone-50 border border-stone-200 rounded-xl space-y-2">
+              <div className="mt-2 p-3 bg-stone-50 border border-stone-200 rounded-xl space-y-2.5">
                 <div className="flex gap-2">
                   <input
                     type="text"
                     placeholder="Enter Promo Code (e.g. APP15)"
                     value={promoCodeInput}
                     onChange={(e) => setPromoCodeInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleApplyPromo();
+                      }
+                    }}
                     className="flex-1 text-xs border border-stone-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-black uppercase font-mono"
                   />
                   <button
                     type="button"
                     disabled={isApplyingPromo || !promoCodeInput.trim()}
                     onClick={() => handleApplyPromo()}
-                    className="bg-black text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-stone-800 disabled:opacity-50 transition"
+                    className="bg-black text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-stone-800 disabled:opacity-50 transition cursor-pointer"
                   >
                     {isApplyingPromo ? 'Applying...' : 'Apply'}
                   </button>
                 </div>
-                <div className="flex items-center justify-between text-[11px] text-stone-500 pt-1">
-                  <span>Try code <strong className="text-black">APP15</strong> for 15% discount</span>
+                <div className="flex items-center justify-between text-[11px] text-stone-500 pt-1 flex-wrap gap-2">
+                  <span>
+                    Tap to apply: <button type="button" onClick={() => handleApplyPromo('APP15')} className="font-bold text-amber-900 underline hover:text-amber-700 cursor-pointer">APP15</button> (15% off)
+                  </span>
+                  {!user && (
+                    <span className="text-stone-400">
+                      Have an account? <button type="button" onClick={() => { setAuthTriggerAction('COUPON_LOGIN'); setShowLoginModal(true); }} className="text-amber-900 font-medium underline hover:text-amber-800 cursor-pointer">Sign in</button>
+                    </span>
+                  )}
                   {cart.couponCode && (
                     <button
                       type="button"
                       onClick={() => applyCoupon('')}
-                      className="text-red-600 font-semibold hover:underline"
+                      className="text-red-600 font-semibold hover:underline cursor-pointer"
                     >
                       Remove Code
                     </button>

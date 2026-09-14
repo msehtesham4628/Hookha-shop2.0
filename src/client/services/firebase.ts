@@ -139,6 +139,7 @@ export async function signInWithGoogle(): Promise<User> {
         isEmailVerified: fbUser.emailVerified,
         isPhoneVerified: false,
         avatarUrl: fbUser.photoURL || undefined,
+        points: 1000,
         totalSpent: 0,
         orderCount: 0,
         isWholesaleCustomer: false,

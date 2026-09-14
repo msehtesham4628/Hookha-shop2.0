@@ -188,6 +188,7 @@ export class DatabaseStore {
   public addresses: Address[] = [];
 
   public cartItems: StoredCartItem[] = [];
+  public cartCoupons: Map<string, string> = new Map();
   public wishlists: StoredWishlist[] = [];
   public otps: StoredOTP[] = [];
   public passwordResetTokens: StoredPasswordResetToken[] = [];
@@ -418,6 +419,7 @@ export class DatabaseStore {
         status: 'ACTIVE',
         isEmailVerified: true,
         isPhoneVerified: true,
+        points: 2500,
         totalSpent: 0,
         orderCount: 0,
         passwordHash: superAdminPasswordHash,
@@ -562,6 +564,7 @@ export class DatabaseStore {
         status: 'ACTIVE',
         isEmailVerified: true,
         isPhoneVerified: true,
+        points: 1000,
         totalSpent: 733.95,
         orderCount: 2,
         passwordHash: customerPasswordHash,
@@ -578,6 +581,7 @@ export class DatabaseStore {
         status: 'ACTIVE',
         isEmailVerified: true,
         isPhoneVerified: true,
+        points: 1850,
         totalSpent: 1250.00,
         orderCount: 4,
         passwordHash: sultanVipHash,
@@ -783,6 +787,20 @@ export class DatabaseStore {
     for (const [id, override] of Object.entries(this.persistenceData.couponOverrides)) {
       if (deletedCouponSet.has(id)) continue;
       couponMap.set(id, override);
+    }
+    if (!couponMap.has('cpn-app15') && !deletedCouponSet.has('cpn-app15')) {
+      couponMap.set('cpn-app15', {
+        id: 'cpn-app15',
+        code: 'APP15',
+        description: '15% instant discount on your Fumare Hookah order',
+        discountType: 'PERCENTAGE',
+        discountValue: 15,
+        minOrderAmount: 0,
+        usageLimit: 100000,
+        usageCount: 0,
+        isActive: true,
+        createdAt: '2026-01-01T00:00:00Z'
+      });
     }
     this.coupons = Array.from(couponMap.values());
 
